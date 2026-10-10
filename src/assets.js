@@ -26,7 +26,7 @@
 import {SPRITES,SPRITE_BASELINE} from './data/sprites.js';
 import {ICONS} from './data/icons.js';
 // game status key -> Artist icon key (art/v2/ui/icons.json 'status'); 'rooted' is the Kelp Matriarch's passive
-const ST_ICON={str:'might',dex:'poise',weak:'soaked',vuln:'exposed',brittle:'brittle',bleed:'bleed',drench:'soaked',reson:'might',shell:'shell',barbs:'barbs',ward:'rebuff',mending:'mending',rooted:'rooted'};
+const ST_ICON={block:'guard',str:'might',dex:'poise',weak:'soaked',vuln:'exposed',brittle:'brittle',bleed:'bleed',drench:'drenched',reson:'resonating',mightTmp:'temporary-might',shell:'shell',barbs:'barbs',ward:'rebuff',mending:'mending',rooted:'rooted'};
 const stIcons=()=>{const o={block:null};for(const [k,v] of Object.entries(ST_ICON))o[k]=ICONS.status[v]||null;return o};
 const slotIcons=m=>Object.fromEntries(Object.entries(m).map(([k,f])=>[k,{src:f,fit:'contain'}]));
 const V='art/v2/';
@@ -99,5 +99,11 @@ export function applyTextures(){const r=document.documentElement.style,abs=u=>`u
 // Per-card paintings: art/v2/cards/cards.json ({id:{art,thumb,size}}), read at runtime so new deliveries need no code change.
 // Thumbs (<id>-256.webp) in the hand / shop / grids; the full painting when a card is lifted or inspected. Missing ids -> class placeholder.
 export const CARD_ART={};
-export async function loadCardArt(){try{const r=await fetch('art/v2/cards/cards.json',{cache:'no-cache'});if(!r.ok)return 0;const j=await r.json();
+export async function loadCardArt(){await loadCombatIconArt();try{const r=await fetch('art/v2/cards/cards.json',{cache:'no-cache'});if(!r.ok)return 0;const j=await r.json();
  for(const k in CARD_ART)delete CARD_ART[k];for(const [id,v] of Object.entries(j))if(v&&v.art)CARD_ART[id]={art:v.art,thumb:v.thumb||v.art};return Object.keys(CARD_ART).length}catch(e){return 0}}
+
+// Runtime manifest allows painted replacements without rebuilding the generated icon module.
+async function loadCombatIconArt(){try{const r=await fetch('art/v2/ui/icons.json',{cache:'no-cache'});if(!r.ok)return;const j=await r.json();
+ for(const [k,id] of Object.entries(ST_ICON))if(j.status?.[id])ASSETS.status[k]=j.status[id];
+ for(const [id,path] of Object.entries(j.intent||{}))if(path)ASSETS.ui[id]=path;
+ }catch(e){/* Keep the existing art and bronze vector placeholders offline. */}}

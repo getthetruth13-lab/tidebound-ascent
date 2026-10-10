@@ -11,7 +11,11 @@
   "rebuff": "art/v2/ui/status-rebuff.webp",
   "rooted": "art/v2/ui/status-rooted.webp",
   "shell": "art/v2/ui/status-shell.webp",
-  "soaked": "art/v2/ui/status-soaked.webp"
+  "soaked": "art/v2/ui/status-soaked.webp",
+  "drenched": null,
+  "resonating": null,
+  "temporary-might": null,
+  "guard": null
  },
  "relic": {
   "abyssalpearl": "art/v2/ui/relic-abyssalpearl.webp",
@@ -103,5 +107,20 @@
   "map": "art/v2/ui/icon-map.webp",
   "settings": "art/v2/ui/icon-settings.webp",
   "sunk": "art/v2/ui/icon-sunk.webp"
- }
+ },
+ "intent": {
+  "intent-attack": "art/v2/ui/intent-attack.webp",
+  "intent-defend": "art/v2/ui/intent-defend.webp",
+  "intent-buff": "art/v2/ui/intent-buff.webp",
+  "intent-debuff": "art/v2/ui/intent-debuff.webp",
+  "intent-unknown": "art/v2/ui/intent-unknown.webp",
+  "intent-heal": null,
+  "intent-summon": null,
+  "intent-status": null,
+  "intent-steal": null,
+  "intent-ring": null,
+  "intent-potion": null,
+  "intent-drain": null
+ },
+ "combatant_art_note": "Null slots use distinct inline bronze SVG placeholders. Set a slot to its painted file path; loaded at runtime, no code changes required. Expected missing files: status-drenched.webp, status-resonating.webp, status-temporary-might.webp and intent-<slot>.webp (192x192 transparent)."
 }

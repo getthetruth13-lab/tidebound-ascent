@@ -24,9 +24,9 @@ const T=(n,kind,kw,dur)=>({n,kind,kw,dur});
 const STATUS={
  str:T('Might','buff','Might','Stays until the end of combat.'),
  dex:T('Poise','buff','Poise','Stays until the end of combat.'),
- weak:T('Soaked','debuff','Soaked','Falls by 1 at the end of its owner\'s turn.'),
- vuln:T('Exposed','debuff','Exposed','Falls by 1 at the end of its owner\'s turn.'),
- brittle:T('Brittle','debuff','Brittle','Falls by 1 at the end of its owner\'s turn.'),
+ weak:T('Soaked','debuff','Soaked','Falls by 1 after its turn (player: at the start of the enemy phase).'),
+ vuln:T('Exposed','debuff','Exposed','Falls by 1 after its turn (player: at the start of the enemy phase).'),
+ brittle:T('Brittle','debuff','Brittle','Falls by 1 after its turn (player: at the start of the enemy phase).'),
  bleed:T('Bleed','debuff','Bleed X','Falls by 1 each time the target is hit by an Attack.'),
  drench:T('Drenched','debuff','Drenched X','Falls by 1 at the end of its owner\'s turn.'),
  reson:T('Resonating','debuff','Resonating X','Falls by 1 at the end of its owner\'s turn.'),
@@ -34,24 +34,25 @@ const STATUS={
  barbs:T('Barbs','buff','Barbs X','Stays until the end of combat.'),
  ward:T('Rebuff','buff','Rebuff X','Each debuff it blocks uses up 1 stack.'),
  mending:T('Mending','buff','Mending X','Stays until the end of combat.'),
- mightTmp:T('Sapped','debuff',null,'Lasts until the end of its owner\'s next turn.')
+ mightTmp:T('Temporary Might','buff',null,'Removed at the end of its next turn.'),
+ rooted:T('Rooted','buff',null,'Passive: stays throughout combat.')
 };
 const ORDER=Object.keys(STATUS);
 export const GUARD_SVG='<svg class="sti" viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1.5L2.5 5v8c0 6.5 4 11 9.5 13.5C17.500 24 21.500 19.500 21.500 13V5z" fill="currentColor" stroke="#05070b" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 4.5v19M5 9h14" fill="none" stroke="#05070b66" stroke-width="1"/></svg>';
 export const STATUS_KEYS=ORDER;
 export const statusInfo=k=>STATUS[k];
-const PAINTED=new Set(['str','dex','weak','vuln','brittle','bleed','shell','barbs','ward','mending']); // statuses with real art in icons.json
-function iconOf(k){const a=PAINTED.has(k)&&assetSrc('status',k);return a?`<img class="uic" src="${a}" alt="" draggable="false">`:ICON[k]}
+// Optional art slots use distinct ids: no reuse of another status's painting.
+function iconOf(k){const a=assetSrc('status',k);return `<span class="status-art">${ICON[k]}${a?`<img class="uic" src="${a}" alt="" draggable="false" onerror="this.remove()">`:''}</span>`}
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 const sentence=t=>{const s=(t||'').split(/(?<=[.!?])\s+/);return s.slice(0,2).join(' ')};
 export function statusText(k,v){const d=STATUS[k];if(!d)return '';
- const rule=(d.kw&&(KW[d.kw]||KW[d.kw.replace(/ X$/,'')]))||(k==='mightTmp'?'Its Attacks deal less damage this turn.':'');
+ const rule=(d.kw&&(KW[d.kw]||KW[d.kw.replace(/ X$/,'')]))||(k==='mightTmp'?'Changes Attack damage by the shown amount.':k==='rooted'?'Gains 4 Guard per living Tendril at the end of her turn.':'');
  return `${v>0?'×'+v+' ':'−'+Math.abs(v)+' '}${esc(sentence(rule))} Duration: ${esc(d.dur)}`}
 export function statusRowHTML(st){const p=[];
  for(const k of ORDER){let v=st&&st[k];if(!v||!STATUS[k])continue;const d=STATUS[k];
-  const bad=d.kind==='debuff'||(k==='str'&&v<0);
-  p.push(`<span class="bd ${bad?'debuff':'buff'}" data-kw="${d.n}" data-sinfo="${esc(statusText(k,v))}" data-sname="${d.n}${v<0&&k==='str'?' (negative)':''}">${iconOf(k)}<b>${Math.abs(v)}</b></span>`)}
+  const bad=d.kind==='debuff'||((k==='str'||k==='dex'||k==='mightTmp')&&v<0);
+  p.push(`<span class="bd ${bad?'debuff':'buff'}" tabindex="0" role="button" aria-label="${d.n} ${v}" data-kw="${d.n}" data-sinfo="${esc(statusText(k,v))}" data-sname="${d.n}${v<0?' (negative)':''}">${iconOf(k)}<b>${Math.abs(v)}</b></span>`)}
  return `<div class="badges">${p.join('')}</div>`}
 // HP bar: bronze frame, blood fill, a ghost chunk for damage, a pale steel overlay while Guard is up, and the Guard shield on its left end.
 export function barHTML(h,m,blk,sh,who){const pc=Math.max(0,Math.min(1,h/m)),low=pc<=.3;
- return `<div class="hpbar${blk?' blk':''}${low?' low':''}"${who!=null?` data-who="${who}" data-hp="${Math.max(0,h)}" data-max="${m}" data-blk="${blk||0}"`:''}><span class="hpin"><i class="gh" style="transform:scaleX(${pc})"></i><i style="transform:scaleX(${pc})"></i><em class="steel"></em></span><span class="hpnum">${Math.max(0,h)}<small>/${m}</small></span>${blk?`<span class="hpblk${sh?' shim':''}" ${sh?`style="${sh}"`:''} data-kw="Guard" data-sinfo="${esc('Absorbs '+blk+' damage. Duration: removed at the start of its owner\'s next turn.')}">${GUARD_SVG}<b>${blk}</b></span>`:''}</div>`}
+ return `<div class="hpbar${blk?' blk':''}${low?' low':''}"${who!=null?` data-who="${who}" data-hp="${Math.max(0,h)}" data-max="${m}" data-blk="${blk||0}"`:''}><span class="hpin"><i class="gh" style="transform:scaleX(${pc})"></i><i style="transform:scaleX(${pc})"></i><em class="steel"></em></span><span class="hpnum">${Math.max(0,h)}<small>/${m}</small></span>${blk?`<span class="hpblk${sh?' shim':''}" ${sh?`style="${sh}"`:''} tabindex="0" role="button" aria-label="Guard ${blk}" data-kw="Guard" data-sinfo="${esc('Absorbs '+blk+' damage. Duration: normally cleared at the start of its next turn; retaining effects can preserve it.')}"><span class="guard-art">${GUARD_SVG}${assetSrc('status','block')?`<img class="uic" src="${assetSrc('status','block')}" alt="" draggable="false" onerror="this.remove()">`:''}</span><b>${blk}</b></span>`:''}</div>`}

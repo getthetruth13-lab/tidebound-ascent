@@ -1,3 +1,4 @@
+import {intentIcon} from './intent-icons.js';
 // ui/render.js — all screens as HTML strings. Inline handlers call the globals main.js exposes.
 // Player-facing terminology follows design-v2 §0.3 (Guard, Might, Soaked, Exposed, Sink).
 import {barHTML,statusRowHTML} from './combatant.js';
@@ -85,25 +86,28 @@ export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x
   const txt=String(x.txt).replace('🛡',iconHTML('status','block','🛡️')).replace('❤','').replace('⚡','⚡');
   return `<div class="fl ${x.cls}${big?' big':''}" style="--fs:${fs}px;--ox:${ox}px;--oy:${oy}px;animation-delay:${x.d||0?(x.d-(now-x.t)):-(now-x.t)}ms">${txt}</div>`}).join('')}
 // ---------------- intents ----------------
-export function intentHTML(e){const m=intentOf(e);const p=[];const deb=m.w||m.v||m.brittle;
- if(m.a)p.push(`${uiIcon(deb?'intent-attack-debuff':'intent-attack','⚔️')}<span class="atk">${eAtk(e,m.a)}${m.h>1?'×'+m.h:''}</span>`);
- if(m.b)p.push(`${uiIcon('intent-defend','🛡️')}<span class="def">${m.b}</span>`);
- if(m.s||m.grow)p.push(`${uiIcon('intent-buff','⬆')}<span class="buf">+${m.s||m.grow}</span>`);
- // Debuff-only (and debuff-plus-guard) intents name the status and the stacks. A bare down-arrow is not an intent.
- for(const [k,st,ic,nm] of [['w','weak','💧','Soaked'],['v','vuln','💔','Exposed'],['brittle','brittle','🧊','Brittle']])if(m[k])p.push(`<span class="debn" data-kw="${nm}" title="${nm} ${m[k]}">${iconHTML('status',st,ic,'dic')}<span class="deb">${nm} ${m[k]}</span></span>`);
- if(m.heal)p.push(`<span class="oth">💚${m.heal}</span>`);
- if(m.status)p.push(`<span class="oth">🌿${m.status.n}</span>`);
- if(m.summon)p.push(`<span class="oth">📯</span>`);if(m.steal)p.push(`<span class="oth">💰🏃</span>`);if(m.ring)p.push(`<span class="oth">🔔${m.ring}</span>`);
- if(m.stealPotion)p.push(`<span class="oth">🧪</span>`);if(m.drainE)p.push(`<span class="oth">⚡−${m.drainE}</span>`);
- if(m.none&&!p.length)p.push(`${uiIcon('intent-unknown','❔')}<span class="oth">…</span>`);
- return `<div class="intent${m.mirror?' mirror':''}" title="${esc(intentText(e))}">${p.join('')}</div>`}
+export function intentHTML(e){const m=intentOf(e),p=[];
+ const add=(k,n,cl='oth')=>p.push(`<span class="intent-part ${cl}">${intentIcon(k)}<b>${n}</b></span>`);
+ if(m.a)add('attack',`${eAtk(e,m.a)}${m.h>1?'×'+m.h:''}`,'atk');
+ if(m.b)add('guard',m.b,'def');
+ if(m.s||m.grow)add('buff','+'+(m.s||m.grow),'buf');
+ for(const [k,nm] of [['w','Soaked'],['v','Exposed'],['brittle','Brittle']])if(m[k])add('debuff',m[k],'deb');
+ if(m.heal)add('heal',m.heal,'buf');
+ if(m.status)add('status',m.status.n,'deb');
+ if(m.summon)add('summon',m.n>1?'×'+m.n:'');
+ if(m.steal)add('steal',m.steal);
+ if(m.ring)add('ring',m.ring);
+ if(m.stealPotion)add('potion','');
+ if(m.drainE)add('drain','−'+m.drainE);
+ if(!p.length)add('unknown','…');
+ return `<div class="intent${m.mirror?' mirror':''}" tabindex="0" role="button" aria-label="${esc(intentText(e))}" data-kw="Intent" data-sname="${esc(m.lbl||'Enemy intent')}" data-sinfo="${esc(intentText(e))}">${p.join('')}</div>`}
 export function intentText(e){const m=intentOf(e);const p=[];if(m.lbl)p.push(m.lbl+':');
  if(m.mirror)p.push('(copies the type of the last card you play this turn: Attack → attack 15, Skill → 12 Guard, Power → +2 Might; play nothing and it attacks for 15)');
  if(m.none)p.push('Does nothing');
  if(m.a)p.push(`Attack for ${eAtk(e,m.a)}${m.h>1?' × '+m.h:''}`+(m.boom?' then dies':''));if(m.b)p.push(`Gain ${m.b} Guard`);if(m.s)p.push(`Gain ${m.s} Might`);
  if(m.grow)p.push(`All Tendrils gain ${m.grow} Might; summons a Tendril if fewer than 2`);if(m.w)p.push(`Apply ${m.w} Soaked`);if(m.v)p.push(`Apply ${m.v} Exposed`);if(m.brittle)p.push(`Apply ${m.brittle} Brittle`);
  if(m.heal)p.push(`Heal ${m.heal}`);if(m.status)p.push(`Add ${m.status.n} ${CARDS[m.status.id].n} to your ${m.status.pile==='disc'?'discard pile':m.status.pile==='hand'?'hand':'draw pile'}`);
- if(m.summon)p.push(`Summon a ${EN[m.summon].n}`);if(m.steal)p.push(`Steal ${m.steal} gold and flee`);if(m.ring)p.push(`Add ${m.ring} Ringing to your discard pile`);
+ if(m.summon)p.push(`Summon ${m.n||1} ${EN[m.summon].n}${m.max?' (up to '+m.max+' alive)':''}`);if(m.steal)p.push(`Steal ${m.steal} gold and flee`);if(m.ring)p.push(`Add ${m.ring} Ringing to your discard pile`);
  if(m.stealPotion)p.push('Steal a potion');if(m.drainE)p.push(`You lose ${m.drainE} Energy next turn`);
  if(e.passive)p.push(`· Passive ${e.passive.n}: ${e.passive.text}`);return p.join(' ')}
 // ---------------- class bars (v2.1 rules, all actions non-blocking) ----------------
@@ -138,13 +142,13 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
 // ---------------- combat ----------------
 // ---------------- battle figures (Art Director spec) ----------------
 // Heights on the 1560x720 basis: hero 300, normals 220-300, elites 320-360 (about 340), boss 420, scaled to the viewport.
-// Within a role, the sprite's own screenHeightPct (sprites.json) sets where it falls in that range. Feet on the 69% floor line.
+// Within a role, the sprite's screenHeightPct sets its preferred height; cap it to reserve panel and hand space.
 const ROLE_H={hero:[280,340,47,57],normal:[220,300,24,49],elite:[320,360,44,52],boss:[420,420,75,75]};
-export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*(SPRITE_BASELINE||.69)),top:52}}
+export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*.50),top:52,heroTop:W.run.cls==='carto'?120:94}}
 function figH(role,sp){const r=ROLE_H[role]||ROLE_H.normal;const p=sp?sp.pct:(r[2]+r[3])/2;const t=r[3]>r[2]?Math.max(0,Math.min(1,(p-r[2])/(r[3]-r[2]))):0;return r[0]+(r[1]-r[0])*t}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
-// name plate + HP bar (Guard at its left end) just under the feet, status badges just above the feet.
-function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const H=Math.round(figH(role,sp)*g.s);
+// name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
+function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const H=Math.round(Math.min(figH(role,sp)*g.s,g.feet-(role==='hero'?Math.max(g.top+42,g.heroTop):g.top+42)));
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
  const top=g.feet-H-hov,L=x-Math.round(W*ax),fx0=Math.round(W*ax);const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.max(96,Math.min(150,H*.62)));
  const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px" onerror="assetFail(this)">`:''}</div>`;
@@ -152,13 +156,13 @@ function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){
  <i class="shadow" style="left:${fx0}px;top:${H+hov}px;width:${Math.round(Math.min(W,H*.9)*.8)}px"></i>
  <div class="fig ${shake?'shake':''}" style="width:${W}px;height:${H}px;left:0;top:0;${shake||''}">${img}</div>
  ${intent?`<div class="intentw" style="top:${it}px">${intent}</div>`:''}
- <div class="stw" style="bottom:${hov+3}px">${badgesH}</div><div class="plate" style="top:${H+hov+2}px">${`<div class="nm">${name}</div>`}${hp}</div>${fx}</div>`}
+ <div class="plate" style="top:${H+hov+2}px">${`<div class="nm">${name}</div>`}${hp}<div class="stw">${badgesH}</div></div>${fx}</div>`}
 function enemyX(i,n,g){const a=.58,b=.88;return Math.round(g.vw*(n===1?.74:a+(b-a)*i/(n-1)))}
 export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
  const role=e.boss?'boss':e.elite?'elite':'normal';const vi=W.cb.ens.slice(0,i).filter(x=>x.key===e.key).length;
  const name=`${e.n}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}${e.passive?` <span class="pas" title="${esc(e.passive.n+': '+e.passive.text)}">${e.passive.n==='Rooted'?iconHTML('status','rooted','🌿'):'🌿'}${e.passive.n}</span>`:''}`;
  return figureHTML({sp:spriteFor('enemies',e.key,vi),role,ph:e.e,g,x:enemyX(k==null?i:k,n||1,g),shake:sh,intent:intentHTML(e),name,hp:hpbar(e.hp,e.max,e.block,e.blkT,'e'+e.uid),
-  badgesH:badges(0,0,e.st),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
+  badgesH:badges(0,0,{...e.st,...(e.passive?.n==='Rooted'?{rooted:1}:{})}),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
 export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const sh=motionEnabled()?null:anim(W.cb.pshake,400);
  return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.18),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
   badgesH:badges(0,0,W.cb.p.st),fx:fxHTML('p'),cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}

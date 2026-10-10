@@ -777,3 +777,27 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 .bd.debuff::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--status-debuff)}
 .bd.buff::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--status-buff)}
 #kwtip b{display:block}
+/* Task 18: free-floating intent glyphs, and panels entirely below the figures. */
+.combat .intentw .intent{background:none;border:0;border-radius:0;box-shadow:none;padding:0;gap:7px;height:auto;min-height:36px;filter:drop-shadow(0 2px 2px #000) drop-shadow(0 0 3px #000)}
+.intent-part{display:inline-flex;align-items:center;gap:2px;white-space:nowrap}
+.combat .intentw .intent .intent-part{font-size:16px;margin:0}
+.intent-art{position:relative;display:block;width:32px;height:34px;flex:none;filter:drop-shadow(0 0 3px #a47a3944)}
+.intent-art .intent-svg,.combat .intentw .intent .intent-art .uic{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.intent-art:has(img) .intent-svg{visibility:hidden}
+.combat .plate .stw{position:relative;left:auto;transform:none;width:100%;max-width:100%;margin-top:5px}
+.combat .plate .stw .bd{position:relative;border-radius:4px;padding:1px 2px;min-height:20px;cursor:help}
+.status-art{position:relative;width:17px;height:17px;display:inline-block;flex:none}
+.status-art .sti,.status-art .uic{position:absolute;inset:0;width:100%!important;height:100%!important}
+.status-art:has(img) .sti{visibility:hidden}
+.bd:focus-visible,.hpblk:focus-visible,.intent:focus-visible{outline:2px solid #e3b54a;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.hpbar.low .hpin>i:not(.gh){animation:none}.hpin>i,.steel{transition:none}}
+.combat .plate .stw .badges{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;max-width:100%;padding:1px 0 3px;scrollbar-width:thin;scrollbar-color:#9c7a3c transparent}
+.combat .plate .stw .bd{flex:none}
+.combat .plate .stw .badges:empty{display:none}
+@media(min-height:600px){.combat .plate .stw .badges{flex-wrap:wrap;justify-content:center;overflow:visible}}
+@media(max-height:599px){.combat .plate .stw .badges{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,22px);grid-auto-columns:max-content;gap:2px;justify-content:start;max-height:48px}.combat .plate .stw .bd .uic,.combat .plate .stw .status-art{width:15px;height:15px}.combat .plate .stw .bd{font-size:11px;min-height:20px}}
+@media(max-height:599px){.combat .plate .stw .badges{max-height:54px;row-gap:4px;padding-bottom:4px}}
+.bd.debuff .sti{filter:brightness(1.15) drop-shadow(0 1px 1px #000)}
+.guard-art{position:absolute;inset:0}
+.guard-art .uic{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.guard-art:has(img) .sti{visibility:hidden}

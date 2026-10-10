@@ -135,8 +135,8 @@ function syncBars(){for(const bar of $$('.hpbar[data-who]')){const who=bar.datas
   if(hp<prev){const from=Math.min(1,prev/mx),to=Math.max(0,hp/mx);
    entry(750,el=>{const b=$(`.hpbar[data-who="${who}"]`);if(!b)return;
     const gh=b.querySelector('.gh');if(gh)play(gh,[{transform:`scaleX(${from})`},{transform:`scaleX(${from})`,offset:.45},{transform:`scaleX(${to})`}],750,el,0,'ease-out');
-    const f=b.querySelector('i:not(.gh)');if(f)play(f,[{filter:'brightness(2.6)'},{filter:'none'}],260,el,0,'ease-out')})}
-  else{const f=bar.closest('.en,.hero'),c=f&&f.querySelector('.fig')&&rectOf(f.querySelector('.fig'));if(c)emit('heal',c.x,c.y+c.h*.1,c.w*.5)}}
+    const f=b.querySelector('i:not(.gh)');if(f)play(f,[{transform:`scaleX(${from})`,filter:'brightness(2.6)'},{transform:`scaleX(${to})`,filter:'none'}],350,el,0,'ease-out')})}
+  else{const from=Math.max(0,prev/mx),to=Math.min(1,hp/mx);entry(450,el=>{const fill=$(`.hpbar[data-who="${who}"] i:not(.gh)`);if(fill)play(fill,[{transform:`scaleX(${from})`,filter:'brightness(1.7)'},{transform:`scaleX(${to})`,filter:'none'}],450,el,0,'ease-out')});const f=bar.closest('.en,.hero'),c=f&&f.querySelector('.fig')&&rectOf(f.querySelector('.fig'));if(c)emit('heal',c.x,c.y+c.h*.1,c.w*.5)}}
 }
 // ---------- resources: energy orb, tide gauge ----------
 function syncResources(){const cb=W.cb;if(!cb)return;

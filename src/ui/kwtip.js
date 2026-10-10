@@ -69,3 +69,6 @@ document.addEventListener('contextmenu',e=>{const el=find(e);if(el&&el.matches('
 document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))showTip(el)});
 document.addEventListener('pointerout',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))hideTip()});
 addEventListener('scroll',hideTip,true);
+
+document.addEventListener('focusin',e=>{const el=find(e);if(el&&el.matches('.bd,.hpblk,.intent'))showTip(el)});
+document.addEventListener('focusout',e=>{if(e.target.matches('.bd,.hpblk,.intent'))hideTip()});
