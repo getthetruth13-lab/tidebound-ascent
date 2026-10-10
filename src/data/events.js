@@ -4,7 +4,7 @@
 import {registerEvents,registerCharm,RELICS,CARDS,POTIONS,CHARMS} from '../core/registry.js';
 import {W,pick,rng,R,shuffle} from '../core/state.js';
 import {cname,mk} from '../engine/cards.js';
-import {goMap,heal,hurt,msg,openPick,randomCard,gainCard,gainCurse,gainGold,gainRelic,loseRelic,randomRelic,randomPotion,addPotion,addPotionSlot,
+import {isLocked,goMap,heal,hurt,msg,openPick,randomCard,gainCard,gainCurse,gainGold,gainRelic,loseRelic,randomRelic,randomPotion,addPotion,addPotionSlot,
  loseMaxHp,gainMaxHp,eventFight,toast,pickable} from '../engine/run.js';
 import {mod} from '../core/bus.js';
 import {render} from '../ui/render.js';
@@ -77,7 +77,7 @@ registerEvents([
   {l:'🚶 Leave',f:goMap}]},
  {id:'inkgrotto',pool:'act',act:1,n:'Ink Grotto',e:'🦑',t:'Black ink pools in a cave. It moves when you look away.',o:[
   {l:'🦑 Bathe in the ink: gain Kraken Ink and a Dread curse',f:()=>{gainRelic('krakenink');gainCurse('dread');done('🦑 Ink Grotto','You come out stained and uneasy. (Kraken Ink, Curse: Dread)')}},
-  {l:'🧪 Bottle some: gain a random Uncommon potion',ok:freeSlot,f:()=>{const pool=Object.values(POTIONS).filter(p=>p.rarity==='u'&&(!p.cls||p.cls===run().cls));const p=pick(pool,'events').id;addPotion(p);done('🦑 Ink Grotto',`You bottle <b>${POTIONS[p].e} ${POTIONS[p].n}</b>.`)}},
+  {l:'🧪 Bottle some: gain a random Uncommon potion',ok:freeSlot,f:()=>{const pool=Object.values(POTIONS).filter(p=>p.rarity==='u'&&(!p.cls||p.cls===run().cls)&&!isLocked('potions',p.id));const p=pick(pool,'events').id;addPotion(p);done('🦑 Ink Grotto',`You bottle <b>${POTIONS[p].e} ${POTIONS[p].n}</b>.`)}},
   {l:'🚶 Leave',f:goMap}]},
  {id:'sailor',pool:'act',act:1,n:'Shipwrecked Sailor',e:'🧔',t:'A sailor clings to a broken mast, a fine whetstone and a fat purse beside him.',o:[
   {l:'💰 Pay 25 gold: he upgrades 2 random cards',ok:()=>run().gold>=25,f:()=>{run().gold-=25;const c=shuffle(pickable('upgrade'),'events').slice(0,2);c.forEach(x=>x.up=true);done('🧔 Shipwrecked Sailor',c.length?`He sharpens <b>${c.map(cname).join('</b> and <b>')}</b>.`:'Nothing to sharpen.')}},

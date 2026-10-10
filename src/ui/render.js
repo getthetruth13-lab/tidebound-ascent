@@ -203,7 +203,7 @@ export function settingsHTML(){return `<div class="settings"><label><input type=
  <label>SFX <input id="setsfx" aria-label="SFX volume" type="range" min="0" max="1" step="0.01" value="${settings.sfxVolume}" oninput="setAudioSetting('sfxVolume',this.value)"></label>
  <label><input id="setmute" type="checkbox" ${settings.audioMuted?'checked':''} onchange="setAudioSetting('audioMuted',this.checked)"> Mute audio</label>
  <label><input id="setreduce" type="checkbox" ${settings.reduceMotion?'checked':''} onchange="setReduceMotion(this.checked)"> Reduced motion</label>
- <label><input id="setskipintro" type="checkbox" ${settings.skipIntro?'checked':''} onchange="setSkipIntro(this.checked)"> Always skip intro</label></div>`}
+ </div>`}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
 export function setEnvFx(v){settings.envFx=v;saveSettings();render()}
 // Act I title card (design-v2 §W.5, art/v2/bg/_src/tc-a1-spec.json): the painted plate (frame + emblem, 60% of the screen width, centred) fades in

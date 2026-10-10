@@ -8,7 +8,7 @@ export const CLASS_ORDER=['tide','echo','carto','duel'];
 export const LOCK_CARDS={
  tide:['seesaw','pivot','turningpoint','crosscur','abyssdraw','lowmark','brineward','foamburst','moonrhythm','highmark','trench','neap'],
  echo:['feedback','delay','overtone','amplify','cavity','choir','coda','longdecay','standing','magnumopus','infinitehum','crescendo'],
- carto:['relocate','rubble','scorched','avalanche','beacon','huntmark','party','longshot','grandexp','leylines','atlas','cataclysm'],
+ carto:['relocate','rubble','scorched','huntmark','party','longshot','grandexp','atlas','cataclysm','forcedmarch'],
  duel:['openveins','lacerate','arterial','exsang','ironwrist','returnblow','saltedblade','tempothrust','rend','oath','mastersrip','hemorrhage']};
 // Class relics: the Shop relic is offered at Lamp 5, the Rare at Lamp 9. (Blood Rapier is not in the Act 1 pools yet, so Surgeon's Lancet is the Duelist's locked Rare.)
 export const LOCK_CLASS_RELICS={tide:{shop:'tidetable',rare:'moonstone'},echo:{shop:'musicstand',rare:'organpipe'},carto:{shop:'surveychain',rare:'staratlas'},duel:{shop:'manual',rare:'lancet'}};

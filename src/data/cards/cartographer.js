@@ -30,7 +30,7 @@ K('waystation',{e:'🚉',d:'Waypoint: at the start of your turn, Advance another
  thisTurn({id:'waystation',on:{afterDraw(inst){if(inst.dead)return;inst.dead=true;const ok2=cb.slots.filter(x=>x!==w&&(x.rank||0)<CORE.carto.rank_max);if(!ok2.length)return;
   choose('Waystation: Advance which Waypoint?',ok2.map(x=>({l:(CARDS[x.id].e||'')+' '+cname(x)+' (Rank '+(x.rank||0)+' → '+((x.rank||0)+1)+')',f:()=>rankUp(x,'Waystation')})))}}})}});
 K('triang',{e:'📐',xu:0,d:'Trigger all your Waypoints.{ Sink.|}',p:f=>{const cb=W.cb;cb.wpDraw=0;[...cb.slots].forEach(trigWp);const d=cb.wpDraw;cb.wpDraw=0;if(d)drawCards(d)}});
-K('camp',{e:'🏰',wpGuard:1,d:'Waypoint: at the start of your turn, gain {6|8} Guard.',wp:f=>f.blk(f.v(6,8))});
+K('camp',{e:'🏰',wpGuard:1,d:'Waypoint: at the start of your turn, gain {5|6} Guard.',wp:f=>f.blk(f.v(5,6))});
 K('foreknow',{e:'🔮',d:'If the top card of your draw pile is an Attack, deal {6|9}. If it\'s a Skill, gain {6|9} Guard. Then draw it.',p:f=>{refill(1);const t=W.cb.draw[0];if(!t)return;const ty=CARDS[t.id].t;if(ty==='A')f.dmg(f.v(6,9));else if(ty==='S')f.blk(f.v(6,9));drawCards(1)}});
 K('grand',{e:'🌐',d:'You have 4 Waypoint slots.{| Also Chart 3.}',p:f=>{W.cb.nslots=Math.max(W.cb.nslots,4);if(f.u)f.chart(3)},power:{}});
 K('known',{e:'🗾',d:'Draw 1 extra card each turn (5 instead of 4).',power:{mod:{drawCount(inst,ctx,v){return v+1}}}});

@@ -15,7 +15,7 @@ Object.assign(kw,{
  'Crest':`The Tide reaches 10: deal ${T.crest_dmg} to ALL enemies, then the Tide resets to 5 with its arrow pointing down.`,
  'Undertow':`The Tide reaches 0: gain ${T.undertow_blk} Guard and draw ${T.undertow_draw}, then the Tide resets to 5 with its arrow pointing up.`,
  'Mark':`Once per turn, tap the bell before playing a card to Mark it. It Echoes at the end of your turn, +${E.bonus_per_card_after} per card played after it (max +${E.bonus_cap}).`,
- 'Rank':`Each Waypoint has a Rank from 0 to ${K.rank_max}. Each Rank adds +${K.per_rank} to its damage. Lost when it leaves its slot.`,
+ 'Rank':`Each Waypoint has a Rank from 0 to ${K.rank_max}. Damage bonuses at Ranks 1–${K.rank_max}: +${(K.rank_dmg||[0,K.per_rank,K.per_rank*2,K.per_rank*3]).slice(1).join(" / +")}. Lost when it leaves its slot.`,
  'Fast Waypoint':'Triggers once as soon as it is placed, including when replacing a Waypoint, then again at the start of each turn.',
  'Spend':'Spend N Tide: lower the Tide by N as part of the card. The card cannot be played if the Tide is too low. Spending can cause a Tideturn or an Undertow.',
  'Drenched X':'Enemy status. Whenever the Tide turns, Crests or Undertows, the enemy loses X HP (Guard cannot stop it). Falls by 1 at the end of its turn. Max 12.',

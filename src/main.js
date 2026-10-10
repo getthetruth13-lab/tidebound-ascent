@@ -22,6 +22,7 @@ import * as intro from './ui/screens/intro.js';
 import * as lamp from './ui/screens/lamp.js';
 import * as lampEngine from './engine/lamplight.js';
 import * as progress from './progress.js';
+import * as lampData from './data/lamplight.js';
 
 // Inline onclick="..." handlers in rendered HTML (and the test scripts) call these by name.
 for(const m of [assets,cards,combat,runMod,render,fx,save,bus,env,title,select,learn,intro,lamp])for(const [k,v] of Object.entries(m))if(typeof v==='function')window[k]=v;
@@ -34,7 +35,7 @@ window.G={get S(){return W.S},get run(){return W.run},get cb(){return W.cb},CARD
  // Phase 1 test / debug surface
  giveRelic:runMod.giveRelic,loseRelic:runMod.loseRelic,addPotion:runMod.addPotion,usePotion:combat.usePotion,drinkPotion:combat.drinkPotion,
  playCard:combat.playCard,tapCard:combat.tapCard,endTurn:combat.endTurn,advance:combat.advance,tideAct:combat.tideAct,modeAct:combat.modeAct,
- TASKS:lampEngine.TASKS,progress,lampEngine,
+ TASKS:lampEngine.TASKS,progress,lampEngine,lampData,
  run$:runMod,combat$:combat,cards$:cards,debugEnv:env.debugEnv,envState:env.envState,quality:env.quality};
 if(save.settings.fastAnim&&window.FAST==null)window.FAST=1;
 assets.applyTextures();title.applyMotion();env.initEnv();

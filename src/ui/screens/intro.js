@@ -1,4 +1,4 @@
-// ui/screens/intro.js: the opening cinematic (design/intro-cinematic.md). Plays on New Game the first time, replayable from Learn to Play.
+// ui/screens/intro.js: the opening cinematic (design/intro-cinematic.md). Plays on every New Game, replayable from Learn to Play.
 // Scene state lives in W.S ({view:'intro',scene,prev}); each render restarts that scene's CSS Ken Burns, crossfade and letter reveal.
 // Scenes 1-4 use art/v2/intro/intro-N.webp; scene 5 is built from intro-3 (push in to the stair base, mist, hero silhouettes).
 import {W} from '../../core/state.js';
@@ -39,6 +39,6 @@ export function introNext(){if(W.S.screen!=='title'||W.S.view!=='intro')return;c
 function introDone(){clearTimeout(timer);const replay=W.S.replay;settings.introSeen=true;saveSettings();
  W.S=replay?{screen:'title',view:'learn',page:0}:{screen:'title',view:'select',page:0,hero:null};render()}
 export function introSkip(){introDone()}
-// New Game: cinematic the first time (and every time until seen) unless "Always skip intro" is on.
-export function newGame(){if(settings.skipIntro||settings.introSeen){W.S={screen:'title',view:'select',page:0,hero:null};render()}else introStart(false)}
+// Every New Game opens the cinematic; Continue and Load use their own paths.
+export function newGame(){introStart(false)}
 export function setSkipIntro(on){settings.skipIntro=!!on;saveSettings()}
