@@ -1,0 +1,1210 @@
+{
+ "splash": {
+  "art": "art/v2/cards/splash.webp",
+  "thumb": "art/v2/cards/splash-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "arc": {
+  "art": "art/v2/cards/arc.webp",
+  "thumb": "art/v2/cards/arc-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cstrike": {
+  "art": "art/v2/cards/cstrike.webp",
+  "thumb": "art/v2/cards/cstrike-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "thrust": {
+  "art": "art/v2/cards/thrust.webp",
+  "thumb": "art/v2/cards/thrust-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brace": {
+  "art": "art/v2/cards/brace.webp",
+  "thumb": "art/v2/cards/brace-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "shimmer": {
+  "art": "art/v2/cards/shimmer.webp",
+  "thumb": "art/v2/cards/shimmer-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tent": {
+  "art": "art/v2/cards/tent.webp",
+  "thumb": "art/v2/cards/tent-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "parry": {
+  "art": "art/v2/cards/parry.webp",
+  "thumb": "art/v2/cards/parry-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "riptide": {
+  "art": "art/v2/cards/riptide.webp",
+  "thumb": "art/v2/cards/riptide-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "reverb": {
+  "art": "art/v2/cards/reverb.webp",
+  "thumb": "art/v2/cards/reverb-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "survey": {
+  "art": "art/v2/cards/survey.webp",
+  "thumb": "art/v2/cards/survey-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lunge": {
+  "art": "art/v2/cards/lunge.webp",
+  "thumb": "art/v2/cards/lunge-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "still": {
+  "art": "art/v2/cards/still.webp",
+  "thumb": "art/v2/cards/still-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hum": {
+  "art": "art/v2/cards/hum.webp",
+  "thumb": "art/v2/cards/hum-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "signal": {
+  "art": "art/v2/cards/signal.webp",
+  "thumb": "art/v2/cards/signal-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "footwork": {
+  "art": "art/v2/cards/footwork.webp",
+  "thumb": "art/v2/cards/footwork-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "breaker": {
+  "art": "art/v2/cards/breaker.webp",
+  "thumb": "art/v2/cards/breaker-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "gracenote": {
+  "art": "art/v2/cards/gracenote.webp",
+  "thumb": "art/v2/cards/gracenote-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cache": {
+  "art": "art/v2/cards/cache.webp",
+  "thumb": "art/v2/cards/cache-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "salute": {
+  "art": "art/v2/cards/salute.webp",
+  "thumb": "art/v2/cards/salute-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "shoal": {
+  "art": "art/v2/cards/shoal.webp",
+  "thumb": "art/v2/cards/shoal-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "belltone": {
+  "art": "art/v2/cards/belltone.webp",
+  "thumb": "art/v2/cards/belltone-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cairn": {
+  "art": "art/v2/cards/cairn.webp",
+  "thumb": "art/v2/cards/cairn-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "measure": {
+  "art": "art/v2/cards/measure.webp",
+  "thumb": "art/v2/cards/measure-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "undercur": {
+  "art": "art/v2/cards/undercur.webp",
+  "thumb": "art/v2/cards/undercur-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "drone": {
+  "art": "art/v2/cards/drone.webp",
+  "thumb": "art/v2/cards/drone-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "smoke": {
+  "art": "art/v2/cards/smoke.webp",
+  "thumb": "art/v2/cards/smoke-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "readystance": {
+  "art": "art/v2/cards/readystance.webp",
+  "thumb": "art/v2/cards/readystance-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sandbar": {
+  "art": "art/v2/cards/sandbar.webp",
+  "thumb": "art/v2/cards/sandbar-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "counterpt": {
+  "art": "art/v2/cards/counterpt.webp",
+  "thumb": "art/v2/cards/counterpt-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "watchfire": {
+  "art": "art/v2/cards/watchfire.webp",
+  "thumb": "art/v2/cards/watchfire-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "feint": {
+  "art": "art/v2/cards/feint.webp",
+  "thumb": "art/v2/cards/feint-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "groundswell": {
+  "art": "art/v2/cards/groundswell.webp",
+  "thumb": "art/v2/cards/groundswell-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tremolo": {
+  "art": "art/v2/cards/tremolo.webp",
+  "thumb": "art/v2/cards/tremolo-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "blaze": {
+  "art": "art/v2/cards/blaze.webp",
+  "thumb": "art/v2/cards/blaze-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "counter": {
+  "art": "art/v2/cards/counter.webp",
+  "thumb": "art/v2/cards/counter-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "swell": {
+  "art": "art/v2/cards/swell.webp",
+  "thumb": "art/v2/cards/swell-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "triad": {
+  "art": "art/v2/cards/triad.webp",
+  "thumb": "art/v2/cards/triad-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "waymarker": {
+  "art": "art/v2/cards/waymarker.webp",
+  "thumb": "art/v2/cards/waymarker-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "nick": {
+  "art": "art/v2/cards/nick.webp",
+  "thumb": "art/v2/cards/nick-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ebb": {
+  "art": "art/v2/cards/ebb.webp",
+  "thumb": "art/v2/cards/ebb-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "plot": {
+  "art": "art/v2/cards/plot.webp",
+  "thumb": "art/v2/cards/plot-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "serrate": {
+  "art": "art/v2/cards/serrate.webp",
+  "thumb": "art/v2/cards/serrate-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "spray": {
+  "art": "art/v2/cards/spray.webp",
+  "thumb": "art/v2/cards/spray-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "afterimg": {
+  "art": "art/v2/cards/afterimg.webp",
+  "thumb": "art/v2/cards/afterimg-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "trail": {
+  "art": "art/v2/cards/trail.webp",
+  "thumb": "art/v2/cards/trail-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "quickstep": {
+  "art": "art/v2/cards/quickstep.webp",
+  "thumb": "art/v2/cards/quickstep-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "foamwall": {
+  "art": "art/v2/cards/foamwall.webp",
+  "thumb": "art/v2/cards/foamwall-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bivouac": {
+  "art": "art/v2/cards/bivouac.webp",
+  "thumb": "art/v2/cards/bivouac-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hiltguard": {
+  "art": "art/v2/cards/hiltguard.webp",
+  "thumb": "art/v2/cards/hiltguard-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "mirror": {
+  "art": "art/v2/cards/mirror.webp",
+  "thumb": "art/v2/cards/mirror-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lookout": {
+  "art": "art/v2/cards/lookout.webp",
+  "thumb": "art/v2/cards/lookout-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hamstring": {
+  "art": "art/v2/cards/hamstring.webp",
+  "thumb": "art/v2/cards/hamstring-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brinelash": {
+  "art": "art/v2/cards/brinelash.webp",
+  "thumb": "art/v2/cards/brinelash-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "crackle": {
+  "art": "art/v2/cards/crackle.webp",
+  "thumb": "art/v2/cards/crackle-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "pinpoint": {
+  "art": "art/v2/cards/pinpoint.webp",
+  "thumb": "art/v2/cards/pinpoint-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "fleche": {
+  "art": "art/v2/cards/fleche.webp",
+  "thumb": "art/v2/cards/fleche-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "chime": {
+  "art": "art/v2/cards/chime.webp",
+  "thumb": "art/v2/cards/chime-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sidestep": {
+  "art": "art/v2/cards/sidestep.webp",
+  "thumb": "art/v2/cards/sidestep-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hollowecho": {
+  "art": "art/v2/cards/hollowecho.webp",
+  "thumb": "art/v2/cards/hollowecho-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "dismantle": {
+  "art": "art/v2/cards/dismantle.webp",
+  "thumb": "art/v2/cards/dismantle-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "compassrose": {
+  "art": "art/v2/cards/compassrose.webp",
+  "thumb": "art/v2/cards/compassrose-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rend": {
+  "art": "art/v2/cards/rend.webp",
+  "thumb": "art/v2/cards/rend-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "scout": {
+  "art": "art/v2/cards/scout.webp",
+  "thumb": "art/v2/cards/scout-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "swellnote": {
+  "art": "art/v2/cards/swellnote.webp",
+  "thumb": "art/v2/cards/swellnote-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ridgeshot": {
+  "art": "art/v2/cards/ridgeshot.webp",
+  "thumb": "art/v2/cards/ridgeshot-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bounding": {
+  "art": "art/v2/cards/bounding.webp",
+  "thumb": "art/v2/cards/bounding-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ping": {
+  "art": "art/v2/cards/ping.webp",
+  "thumb": "art/v2/cards/ping-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "swash": {
+  "art": "art/v2/cards/swash.webp",
+  "thumb": "art/v2/cards/swash-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rockfall": {
+  "art": "art/v2/cards/rockfall.webp",
+  "thumb": "art/v2/cards/rockfall-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "slash": {
+  "art": "art/v2/cards/slash.webp",
+  "thumb": "art/v2/cards/slash-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "staccato": {
+  "art": "art/v2/cards/staccato.webp",
+  "thumb": "art/v2/cards/staccato-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "breakcamp": {
+  "art": "art/v2/cards/breakcamp.webp",
+  "thumb": "art/v2/cards/breakcamp-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sweep": {
+  "art": "art/v2/cards/sweep.webp",
+  "thumb": "art/v2/cards/sweep-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "moonward": {
+  "art": "art/v2/cards/moonward.webp",
+  "thumb": "art/v2/cards/moonward-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bind": {
+  "art": "art/v2/cards/bind.webp",
+  "thumb": "art/v2/cards/bind-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "flare": {
+  "art": "art/v2/cards/flare.webp",
+  "thumb": "art/v2/cards/flare-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "whitecap": {
+  "art": "art/v2/cards/whitecap.webp",
+  "thumb": "art/v2/cards/whitecap-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "echoshard": {
+  "art": "art/v2/cards/echoshard.webp",
+  "thumb": "art/v2/cards/echoshard-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "stake": {
+  "art": "art/v2/cards/stake.webp",
+  "thumb": "art/v2/cards/stake-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "prism": {
+  "art": "art/v2/cards/prism.webp",
+  "thumb": "art/v2/cards/prism-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "twincuts": {
+  "art": "art/v2/cards/twincuts.webp",
+  "thumb": "art/v2/cards/twincuts-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "stakeclaim": {
+  "art": "art/v2/cards/stakeclaim.webp",
+  "thumb": "art/v2/cards/stakeclaim-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "countercur": {
+  "art": "art/v2/cards/countercur.webp",
+  "thumb": "art/v2/cards/countercur-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "glissando": {
+  "art": "art/v2/cards/glissando.webp",
+  "thumb": "art/v2/cards/glissando-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "jab": {
+  "art": "art/v2/cards/jab.webp",
+  "thumb": "art/v2/cards/jab-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "retort": {
+  "art": "art/v2/cards/retort.webp",
+  "thumb": "art/v2/cards/retort-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cadence": {
+  "art": "art/v2/cards/cadence.webp",
+  "thumb": "art/v2/cards/cadence-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "slack": {
+  "art": "art/v2/cards/slack.webp",
+  "thumb": "art/v2/cards/slack-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "riposte": {
+  "art": "art/v2/cards/riposte.webp",
+  "thumb": "art/v2/cards/riposte-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "waystation": {
+  "art": "art/v2/cards/waystation.webp",
+  "thumb": "art/v2/cards/waystation-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "overtone": {
+  "art": "art/v2/cards/overtone.webp",
+  "thumb": "art/v2/cards/overtone-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lacerate": {
+  "art": "art/v2/cards/lacerate.webp",
+  "thumb": "art/v2/cards/lacerate-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "risingwater": {
+  "art": "art/v2/cards/risingwater.webp",
+  "thumb": "art/v2/cards/risingwater-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "amplify": {
+  "art": "art/v2/cards/amplify.webp",
+  "thumb": "art/v2/cards/amplify-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "openveins": {
+  "art": "art/v2/cards/openveins.webp",
+  "thumb": "art/v2/cards/openveins-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lowmark": {
+  "art": "art/v2/cards/lowmark.webp",
+  "thumb": "art/v2/cards/lowmark-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sostenuto": {
+  "art": "art/v2/cards/sostenuto.webp",
+  "thumb": "art/v2/cards/sostenuto-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "turningpoint": {
+  "art": "art/v2/cards/turningpoint.webp",
+  "thumb": "art/v2/cards/turningpoint-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "choir": {
+  "art": "art/v2/cards/choir.webp",
+  "thumb": "art/v2/cards/choir-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "party": {
+  "art": "art/v2/cards/party.webp",
+  "thumb": "art/v2/cards/party-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "crosscur": {
+  "art": "art/v2/cards/crosscur.webp",
+  "thumb": "art/v2/cards/crosscur-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cavity": {
+  "art": "art/v2/cards/cavity.webp",
+  "thumb": "art/v2/cards/cavity-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "harmonics": {
+  "art": "art/v2/cards/harmonics.webp",
+  "thumb": "art/v2/cards/harmonics-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "seesaw": {
+  "art": "art/v2/cards/seesaw.webp",
+  "thumb": "art/v2/cards/seesaw-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "flurry": {
+  "art": "art/v2/cards/flurry.webp",
+  "thumb": "art/v2/cards/flurry-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sinking": {
+  "art": "art/v2/cards/sinking.webp",
+  "thumb": "art/v2/cards/sinking-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "relocate": {
+  "art": "art/v2/cards/relocate.webp",
+  "thumb": "art/v2/cards/relocate-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ironwrist": {
+  "art": "art/v2/cards/ironwrist.webp",
+  "thumb": "art/v2/cards/ironwrist-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "feedback": {
+  "art": "art/v2/cards/feedback.webp",
+  "thumb": "art/v2/cards/feedback-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "huntmark": {
+  "art": "art/v2/cards/huntmark.webp",
+  "thumb": "art/v2/cards/huntmark-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "crestrider": {
+  "art": "art/v2/cards/crestrider.webp",
+  "thumb": "art/v2/cards/crestrider-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "delay": {
+  "art": "art/v2/cards/delay.webp",
+  "thumb": "art/v2/cards/delay-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "landslide": {
+  "art": "art/v2/cards/landslide.webp",
+  "thumb": "art/v2/cards/landslide-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "abyssdraw": {
+  "art": "art/v2/cards/abyssdraw.webp",
+  "thumb": "art/v2/cards/abyssdraw-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "camp": {
+  "art": "art/v2/cards/camp.webp",
+  "thumb": "art/v2/cards/camp-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "pivot": {
+  "art": "art/v2/cards/pivot.webp",
+  "thumb": "art/v2/cards/pivot-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "avalanche": {
+  "art": "art/v2/cards/avalanche.webp",
+  "thumb": "art/v2/cards/avalanche-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "arterial": {
+  "art": "art/v2/cards/arterial.webp",
+  "thumb": "art/v2/cards/arterial-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lash": {
+  "art": "art/v2/cards/lash.webp",
+  "thumb": "art/v2/cards/lash-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "press": {
+  "art": "art/v2/cards/press.webp",
+  "thumb": "art/v2/cards/press-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "longdecay": {
+  "art": "art/v2/cards/longdecay.webp",
+  "thumb": "art/v2/cards/longdecay-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "beacon": {
+  "art": "art/v2/cards/beacon.webp",
+  "thumb": "art/v2/cards/beacon-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "secondwind": {
+  "art": "art/v2/cards/secondwind.webp",
+  "thumb": "art/v2/cards/secondwind-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cascade": {
+  "art": "art/v2/cards/cascade.webp",
+  "thumb": "art/v2/cards/cascade-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "metronome": {
+  "art": "art/v2/cards/metronome.webp",
+  "thumb": "art/v2/cards/metronome-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "returnblow": {
+  "art": "art/v2/cards/returnblow.webp",
+  "thumb": "art/v2/cards/returnblow-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "scorched": {
+  "art": "art/v2/cards/scorched.webp",
+  "thumb": "art/v2/cards/scorched-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brineward": {
+  "art": "art/v2/cards/brineward.webp",
+  "thumb": "art/v2/cards/brineward-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "foamburst": {
+  "art": "art/v2/cards/foamburst.webp",
+  "thumb": "art/v2/cards/foamburst-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rubble": {
+  "art": "art/v2/cards/rubble.webp",
+  "thumb": "art/v2/cards/rubble-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tempothrust": {
+  "art": "art/v2/cards/tempothrust.webp",
+  "thumb": "art/v2/cards/tempothrust-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "longshot": {
+  "art": "art/v2/cards/longshot.webp",
+  "thumb": "art/v2/cards/longshot-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "coda": {
+  "art": "art/v2/cards/coda.webp",
+  "thumb": "art/v2/cards/coda-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "coup": {
+  "art": "art/v2/cards/coup.webp",
+  "thumb": "art/v2/cards/coup-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "moonrhythm": {
+  "art": "art/v2/cards/moonrhythm.webp",
+  "thumb": "art/v2/cards/moonrhythm-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "infinitehum": {
+  "art": "art/v2/cards/infinitehum.webp",
+  "thumb": "art/v2/cards/infinitehum-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "leylines": {
+  "art": "art/v2/cards/leylines.webp",
+  "thumb": "art/v2/cards/leylines-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hemorrhage": {
+  "art": "art/v2/cards/hemorrhage.webp",
+  "thumb": "art/v2/cards/hemorrhage-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "spring": {
+  "art": "art/v2/cards/spring.webp",
+  "thumb": "art/v2/cards/spring-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "standing": {
+  "art": "art/v2/cards/standing.webp",
+  "thumb": "art/v2/cards/standing-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "grandexp": {
+  "art": "art/v2/cards/grandexp.webp",
+  "thumb": "art/v2/cards/grandexp-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "neap": {
+  "art": "art/v2/cards/neap.webp",
+  "thumb": "art/v2/cards/neap-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "known": {
+  "art": "art/v2/cards/known.webp",
+  "thumb": "art/v2/cards/known-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "trench": {
+  "art": "art/v2/cards/trench.webp",
+  "thumb": "art/v2/cards/trench-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "crescendo": {
+  "art": "art/v2/cards/crescendo.webp",
+  "thumb": "art/v2/cards/crescendo-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "highmark": {
+  "art": "art/v2/cards/highmark.webp",
+  "thumb": "art/v2/cards/highmark-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "oath": {
+  "art": "art/v2/cards/oath.webp",
+  "thumb": "art/v2/cards/oath-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "mastersrip": {
+  "art": "art/v2/cards/mastersrip.webp",
+  "thumb": "art/v2/cards/mastersrip-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "magnumopus": {
+  "art": "art/v2/cards/magnumopus.webp",
+  "thumb": "art/v2/cards/magnumopus-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cataclysm": {
+  "art": "art/v2/cards/cataclysm.webp",
+  "thumb": "art/v2/cards/cataclysm-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ }
+}

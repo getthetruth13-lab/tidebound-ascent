@@ -1,0 +1,60 @@
+/* Deckbound palette — generated from palette.json by tools/build_palette.py. */
+:root {
+  /* Shared dark UI neutrals */
+  --ui-bg-0: #0b0e14;
+  --ui-bg-1: #131822;
+  --ui-bg-2: #1c2230;
+  --ui-bg-3: #262e3f;
+  --ui-line: #36405a;
+  --ui-outline: #05070b;
+  --ui-rim: #8fa3c7;
+  --ui-text: #eef1f6;
+  --ui-text-muted: #aab3c5;
+  --ui-text-dim: #8590a6;
+  --ui-parchment: #efe3c6;
+  --ui-ink: #1a2230;
+  /* tidecaller */
+  --tidecaller-primary: #2fb8c4;
+  --tidecaller-secondary: #155a80;
+  --tidecaller-accent: #a6f2e8;
+  --tidecaller-deep: #0a2a3d;
+  /* echo-mage */
+  --echo-mage-primary: #a07bff;
+  --echo-mage-secondary: #4b2c91;
+  --echo-mage-accent: #f0b8ff;
+  --echo-mage-deep: #1d1238;
+  /* cartographer */
+  --cartographer-primary: #d8a446;
+  --cartographer-secondary: #6e4a28;
+  --cartographer-accent: #f3e3bf;
+  --cartographer-deep: #2a1d10;
+  /* duelist */
+  --duelist-primary: #ec5f4a;
+  --duelist-secondary: #7c1f2c;
+  --duelist-accent: #d3dbe6;
+  --duelist-deep: #2c0c12;
+  /* Status (always pair with an icon/shape, never color alone) */
+  --status-damage: #ff6161;
+  --status-block: #5aaeff;
+  --status-buff: #4fd48c;
+  --status-debuff: #f2903f;
+  --status-energy: #ffd84a;
+  /* Rarity (paired with marker shape: circle / diamond / star) */
+  --rarity-common: #a7b0c0;
+  --rarity-uncommon: #58d6c0;
+  --rarity-rare: #f2c14e;
+  /* Stroke system (in SVG user units at 256px art) */
+  --stroke-outline: 4px;
+  --stroke-detail: 2px;
+  --stroke-fine: 1px;
+  /* Type */
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, 'Times New Roman', serif;
+  --font-body: 'Source Sans 3', 'Source Sans Pro', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-number: 'Cinzel', Georgia, serif;
+}
+
+/* Class theming helper: <div class="theme-tidecaller"> ... uses var(--class-primary) */
+.theme-tidecaller { --class-primary: var(--tidecaller-primary); --class-secondary: var(--tidecaller-secondary); --class-accent: var(--tidecaller-accent); --class-deep: var(--tidecaller-deep); }
+.theme-echo-mage { --class-primary: var(--echo-mage-primary); --class-secondary: var(--echo-mage-secondary); --class-accent: var(--echo-mage-accent); --class-deep: var(--echo-mage-deep); }
+.theme-cartographer { --class-primary: var(--cartographer-primary); --class-secondary: var(--cartographer-secondary); --class-accent: var(--cartographer-accent); --class-deep: var(--cartographer-deep); }
+.theme-duelist { --class-primary: var(--duelist-primary); --class-secondary: var(--duelist-secondary); --class-accent: var(--duelist-accent); --class-deep: var(--duelist-deep); }

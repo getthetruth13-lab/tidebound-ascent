@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="t">
+  <title id="t">Duelist portrait: long rapier in the right hand, broad parrying dagger in the left hand</title>
+  <!-- Palette: duelist primary #ec5f4a, secondary #7c1f2c, accent #d3dbe6, deep #2c0c12; rare gold #f2c14e; ui-ink #1a2230; outline #05070b -->
+  <defs>
+    <radialGradient id="du-bg" cx="0.5" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#7c1f2c"/>
+      <stop offset="1" stop-color="#2c0c12"/>
+    </radialGradient>
+    <linearGradient id="du-steel" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#8590a6"/>
+      <stop offset="0.5" stop-color="#eef1f6"/>
+      <stop offset="1" stop-color="#d3dbe6"/>
+    </linearGradient>
+    <linearGradient id="du-dark-steel" x1="1" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#36405a"/>
+      <stop offset="0.4" stop-color="#8590a6"/>
+      <stop offset="1" stop-color="#aab3c5"/>
+    </linearGradient>
+    <filter id="du-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+    <clipPath id="du-clip"><rect x="4" y="4" width="248" height="248" rx="22"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#du-clip)">
+    <rect width="256" height="256" fill="url(#du-bg)"/>
+    <!-- diagonal slash streaks -->
+    <path d="M20 60 L 90 20 M180 250 L 250 200 M10 140 L 40 122" stroke="#ec5f4a" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+
+    <!-- doublet -->
+    <path d="M36 260 L 52 198 C 60 178 84 168 106 166 L 150 166 C 172 168 196 178 204 198 L 220 260 Z"
+          fill="#1a2230" stroke="#05070b" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M128 170 V260" stroke="#ec5f4a" stroke-width="2"/>
+    <circle cx="120" cy="192" r="3" fill="#d3dbe6"/><circle cx="120" cy="210" r="3" fill="#d3dbe6"/>
+    <path d="M62 196 C 70 182 86 174 104 170" fill="none" stroke="#36405a" stroke-width="3" stroke-linecap="round"/>
+    <!-- half cape over the left shoulder (viewer's right) -->
+    <path d="M148 164 C 192 166 216 196 224 260 L 162 260 C 170 222 166 190 148 164 Z" fill="#7c1f2c" stroke="#05070b" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M154 170 C 190 174 208 204 214 256" fill="none" stroke="#ec5f4a" stroke-width="3" stroke-linecap="round"/>
+    <!-- collar -->
+    <path d="M104 166 L 112 148 L 144 148 L 152 166 L 128 178 Z" fill="#7c1f2c" stroke="#05070b" stroke-width="3" stroke-linejoin="round"/>
+
+    <!-- head in shadow -->
+    <ellipse cx="128" cy="104" rx="30" ry="37" fill="#2c0c12" stroke="#05070b" stroke-width="4"/>
+    <!-- swept hair -->
+    <path d="M96 106 C 90 70 110 54 132 54 C 156 56 172 70 192 60 C 184 78 176 88 162 92 C 150 80 128 76 110 86 C 102 92 100 98 98 110 Z"
+          fill="#1a2230" stroke="#05070b" stroke-width="3" stroke-linejoin="round"/>
+    <!-- domino mask -->
+    <path d="M94 98 L 162 98 L 164 114 L 138 116 L 128 110 L 118 116 L 92 114 Z" fill="#ec5f4a" stroke="#05070b" stroke-width="3" stroke-linejoin="round"/>
+    <g fill="#d3dbe6">
+      <path d="M104 106 L 122 104 L 118 110 Z" filter="url(#du-glow)"/>
+      <path d="M152 106 L 134 104 L 138 110 Z" filter="url(#du-glow)"/>
+      <path d="M104 106 L 122 104 L 118 110 Z"/>
+      <path d="M152 106 L 134 104 L 138 110 Z"/>
+    </g>
+    <path d="M118 128 q10 4 20 0" fill="none" stroke="#7c1f2c" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- LEFT-HAND blade: short broad parrying dagger (main-gauche): dark blued steel, long straight quillons + side ring, crimson grip, diamond pommel -->
+    <g stroke="#05070b" stroke-linejoin="round">
+      <path d="M200 214 L 118 130 L 180 230 Z" fill="url(#du-dark-steel)" stroke-width="3"/>
+      <path d="M190 222 L 126 138" stroke="#d3dbe6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M190 222 L 204 240" stroke="#05070b" stroke-width="12" stroke-linecap="round"/>
+      <path d="M190 222 L 204 240" stroke="#ec5f4a" stroke-width="7" stroke-linecap="round"/>
+      <path d="M211 206 L 169 238" stroke="#05070b" stroke-width="10" stroke-linecap="round"/>
+      <path d="M211 206 L 169 238" stroke="#aab3c5" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="184" cy="214" r="7" fill="none" stroke="#aab3c5" stroke-width="3"/>
+      <path d="M207 236 L 216 244 L 210 254 L 201 246 Z" fill="#aab3c5" stroke-width="2.5"/>
+    </g>
+
+    <!-- RIGHT-HAND blade: long slender rapier: bright steel, gold crossguard + knuckle-bow, round gold pommel -->
+    <g stroke="#05070b" stroke-linejoin="round">
+      <path d="M84 217 L 228 28 L 76 211 Z" fill="url(#du-steel)" stroke-width="2.5"/>
+      <path d="M80 214 L 66 232" stroke="#05070b" stroke-width="11" stroke-linecap="round"/>
+      <path d="M80 214 L 66 232" stroke="#1a2230" stroke-width="6" stroke-linecap="round"/>
+      <path d="M64 201 L 96 227" stroke="#05070b" stroke-width="9" stroke-linecap="round"/>
+      <path d="M64 201 L 96 227" stroke="#f2c14e" stroke-width="5" stroke-linecap="round"/>
+      <path d="M96 227 C 94 246 74 250 63 238" fill="none" stroke="#05070b" stroke-width="7" stroke-linecap="round"/>
+      <path d="M96 227 C 94 246 74 250 63 238" fill="none" stroke="#f2c14e" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="62" cy="237" r="7" fill="#f2c14e" stroke-width="3"/>
+    </g>
+  </g>
+  <rect x="4" y="4" width="248" height="248" rx="22" fill="none" stroke="#ec5f4a" stroke-width="4"/>
+  <rect x="10" y="10" width="236" height="236" rx="17" fill="none" stroke="#05070b" stroke-width="2" opacity="0.6"/>
+</svg>

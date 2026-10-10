@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="t">
+  <title id="t">Inkmaw</title>
+  <!-- Palette: ui-ink #1a2230 + ui-outline #05070b (ink body), echo-mage-primary #a07bff (sheen), ui-parchment #efe3c6 (eyes/teeth), status-damage #ff6161 (iris), ui-rim #8fa3c7 -->
+  <defs>
+    <filter id="rim" x="-15%" y="-15%" width="130%" height="130%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="3" result="grown"/>
+      <feFlood flood-color="#8fa3c7" flood-opacity="0.6"/>
+      <feComposite in2="grown" operator="in" result="halo"/>
+      <feMerge><feMergeNode in="halo"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+    <radialGradient id="ink" cx="0.38" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#262e3f"/>
+      <stop offset="0.5" stop-color="#1a2230"/>
+      <stop offset="1" stop-color="#05070b"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="128" cy="242" rx="84" ry="8" fill="#05070b" opacity="0.6"/>
+  <!-- splatter -->
+  <g fill="#1a2230" stroke="#8fa3c7" stroke-width="1.5">
+    <circle cx="30" cy="218" r="6"/><circle cx="44" cy="232" r="3.5"/><circle cx="222" cy="214" r="7"/><circle cx="210" cy="236" r="3.5"/><circle cx="226" cy="58" r="4"/>
+  </g>
+  <g filter="url(#rim)" stroke="#05070b" stroke-linejoin="round" stroke-linecap="round">
+    <!-- blot body with drips -->
+    <path d="M128 36 C 170 32 206 64 206 106 C 224 116 232 140 214 156 C 222 180 206 204 182 206 C 178 222 162 232 148 222 L 142 248 L 132 224 C 118 232 104 230 96 214 L 88 244 L 80 208 C 58 208 38 190 46 166 C 26 154 28 126 50 118 C 50 78 88 40 128 36 Z" fill="url(#ink)" stroke-width="4"/>
+    <circle cx="142" cy="248" r="5" fill="#1a2230" stroke-width="3"/>
+    <circle cx="88" cy="244" r="4" fill="#1a2230" stroke-width="3"/>
+    <!-- violet sheen (key light from top-left) -->
+    <path d="M70 92 C 80 66 104 50 128 46" fill="none" stroke="#a07bff" stroke-width="4"/>
+    <path d="M56 126 C 50 132 48 142 54 150" fill="none" stroke="#a07bff" stroke-width="3"/>
+    <!-- central eye -->
+    <ellipse cx="128" cy="104" rx="28" ry="22" fill="#efe3c6" stroke-width="4"/>
+    <circle cx="130" cy="104" r="13" fill="#ff6161" stroke-width="3"/>
+    <path d="M130 93 V115" stroke-width="5"/>
+    <circle cx="122" cy="98" r="3" fill="#eef1f6" stroke="none"/>
+    <!-- lesser eyes -->
+    <g fill="#efe3c6" stroke-width="3">
+      <circle cx="80" cy="96" r="10"/><circle cx="176" cy="88" r="11"/><circle cx="72" cy="142" r="7"/><circle cx="186" cy="134" r="8"/><circle cx="150" cy="60" r="6"/>
+    </g>
+    <g fill="#05070b" stroke="none">
+      <circle cx="82" cy="97" r="4.5"/><circle cx="174" cy="90" r="5"/><circle cx="73" cy="143" r="3"/><circle cx="184" cy="135" r="3.5"/><circle cx="151" cy="61" r="2.5"/>
+    </g>
+    <!-- maw -->
+    <path d="M84 156 Q 128 200 172 156 Q 128 174 84 156 Z" fill="#05070b" stroke-width="3"/>
+    <g fill="#efe3c6" stroke-width="1.5">
+      <path d="M96 162 l5 10 l5 -8 Z"/><path d="M112 166 l5 12 l5 -11 Z"/><path d="M130 167 l5 12 l5 -12 Z"/><path d="M148 165 l5 10 l5 -10 Z"/>
+      <path d="M104 178 l5 -7 l5 9 Z"/><path d="M124 184 l5 -9 l5 9 Z"/><path d="M144 180 l5 -9 l4 6 Z"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,280 @@
+{
+ "version": 2,
+ "screen": {
+  "w": 3120,
+  "h": 1440,
+  "orientation": "landscape"
+ },
+ "baselinePct": 69,
+ "notes": "anchor = (x of the feet, 1.0 = bottom edge); x is measured from the opaque pixels in the bottom 8% so wide weapons/cloaks do not shift the figure. Place the anchor on the shared floor line at baselinePct of screen height; scale each sprite so its height = screenHeightPct of screen height. hoverPx lifts floating figures (px at 1440 high). Hero x \u2248 18% of width; enemies spread over 55\u201392%. Files carry 24px transparent padding left/right/top, none at the bottom.",
+ "sprites": {
+  "tidecaller": {
+   "file": "sprites/tidecaller.webp",
+   "w": 921,
+   "h": 884,
+   "bytes": 195300,
+   "role": "hero",
+   "facing": "right",
+   "anchor": {
+    "x": 0.375,
+    "y": 1.0
+   },
+   "screenHeightPct": 49,
+   "hoverPx": 0
+  },
+  "echo-mage": {
+   "file": "sprites/echo-mage.webp",
+   "w": 756,
+   "h": 884,
+   "bytes": 198852,
+   "role": "hero",
+   "facing": "right",
+   "anchor": {
+    "x": 0.381,
+    "y": 1.0
+   },
+   "screenHeightPct": 49,
+   "hoverPx": 0
+  },
+  "cartographer": {
+   "file": "sprites/cartographer.webp",
+   "w": 592,
+   "h": 884,
+   "bytes": 151782,
+   "role": "hero",
+   "facing": "right",
+   "anchor": {
+    "x": 0.469,
+    "y": 1.0
+   },
+   "screenHeightPct": 49,
+   "hoverPx": 0
+  },
+  "duelist": {
+   "file": "sprites/duelist.webp",
+   "w": 1171,
+   "h": 894,
+   "bytes": 162486,
+   "role": "hero",
+   "facing": "right",
+   "anchor": {
+    "x": 0.427,
+    "y": 1.0
+   },
+   "screenHeightPct": 49,
+   "hoverPx": 0
+  },
+  "brine-slug": {
+   "file": "sprites/brine-slug.webp",
+   "w": 1154,
+   "h": 544,
+   "bytes": 172262,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.51,
+    "y": 1.0
+   },
+   "screenHeightPct": 24,
+   "hoverPx": 0
+  },
+  "gull-thief": {
+   "file": "sprites/gull-thief.webp",
+   "w": 1127,
+   "h": 704,
+   "bytes": 176424,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.543,
+    "y": 1.0
+   },
+   "screenHeightPct": 38,
+   "hoverPx": 0
+  },
+  "rust-knight": {
+   "file": "sprites/rust-knight.webp",
+   "w": 874,
+   "h": 924,
+   "bytes": 196040,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.556,
+    "y": 1.0
+   },
+   "screenHeightPct": 49,
+   "hoverPx": 0
+  },
+  "spore-pod": {
+   "file": "sprites/spore-pod.webp",
+   "w": 521,
+   "h": 664,
+   "bytes": 140784,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.536,
+    "y": 1.0
+   },
+   "screenHeightPct": 30,
+   "hoverPx": 0
+  },
+  "glimmer-wisp": {
+   "file": "sprites/glimmer-wisp.webp",
+   "w": 686,
+   "h": 844,
+   "bytes": 196238,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.66,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 40
+  },
+  "coral-crab": {
+   "file": "sprites/coral-crab.webp",
+   "w": 906,
+   "h": 624,
+   "bytes": 185268,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.552,
+    "y": 1.0
+   },
+   "screenHeightPct": 30,
+   "hoverPx": 0
+  },
+  "drowned-captain": {
+   "file": "sprites/drowned-captain.webp",
+   "w": 678,
+   "h": 924,
+   "bytes": 161078,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.581,
+    "y": 1.0
+   },
+   "screenHeightPct": 50,
+   "hoverPx": 0
+  },
+  "mirror-warden": {
+   "file": "sprites/mirror-warden.webp",
+   "w": 773,
+   "h": 944,
+   "bytes": 183882,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.575,
+    "y": 1.0
+   },
+   "screenHeightPct": 52,
+   "hoverPx": 0
+  },
+  "twin-eels-a": {
+   "file": "sprites/twin-eels-a.webp",
+   "w": 782,
+   "h": 844,
+   "bytes": 196512,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.468,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
+   "hoverPx": 0,
+   "pairNote": "Twin Eels = two separate enemies, use -a and -b"
+  },
+  "twin-eels-b": {
+   "file": "sprites/twin-eels-b.webp",
+   "w": 731,
+   "h": 844,
+   "bytes": 173756,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.479,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
+   "hoverPx": 0,
+   "pairNote": "Twin Eels = two separate enemies, use -a and -b"
+  },
+  "leviathan-bell": {
+   "file": "sprites/leviathan-bell.webp",
+   "w": 1308,
+   "h": 1248,
+   "bytes": 306484,
+   "role": "boss",
+   "facing": "left",
+   "anchor": {
+    "x": 0.512,
+    "y": 1.0
+   },
+   "screenHeightPct": 75,
+   "hoverPx": 0
+  },
+  "tide-leech": {
+   "file": "sprites/tide-leech.webp",
+   "w": 800,
+   "h": 544,
+   "bytes": 141580,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.646,
+    "y": 1.0
+   },
+   "screenHeightPct": 24,
+   "hoverPx": 0
+  },
+  "kelp-lurker": {
+   "file": "sprites/kelp-lurker.webp",
+   "w": 1093,
+   "h": 724,
+   "bytes": 227176,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.606,
+    "y": 1.0
+   },
+   "screenHeightPct": 34,
+   "hoverPx": 0
+  },
+  "kelp-matriarch": {
+   "file": "sprites/kelp-matriarch.webp",
+   "w": 872,
+   "h": 1284,
+   "bytes": 198710,
+   "role": "boss",
+   "facing": "left",
+   "anchor": {
+    "x": 0.497,
+    "y": 1.0
+   },
+   "screenHeightPct": 78,
+   "hoverPx": 0
+  },
+  "kelp-tendril": {
+   "file": "sprites/kelp-tendril.webp",
+   "w": 480,
+   "h": 724,
+   "bytes": 122618,
+   "role": "summon",
+   "facing": "left",
+   "anchor": {
+    "x": 0.442,
+    "y": 1.0
+   },
+   "screenHeightPct": 34,
+   "hoverPx": 0
+  }
+ }
+}

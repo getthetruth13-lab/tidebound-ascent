@@ -1,0 +1,30 @@
+// data/cards/duelist.js — Duelist Phase 1 cards. v2.1: start each combat with 1 Momentum (max 5); Attacks gain 1;
+// Momentum fades by 1 at end of turn; taking unblocked damage loses 1. Flourish (armed toggle, 2+ Momentum):
+// spend all Momentum, the Attack deals ×(1 + ½ per Momentum). Parry X: reduce the first enemy Attack this turn by X, reflect half.
+import {W} from '../../core/state.js';
+import {card} from './loader.js';
+import {log,addSt,gainMom} from '../../engine/combat.js';
+import {forCombat} from '../../core/bus.js';
+import {ask} from './kit.js';
+const D=(id,o)=>card('duel',id,o);
+D('thrust',{e:'🗡️',d:'Deal {5|8}.',fx:[['dmg',5,8]]});
+D('parry',{e:'🛡️',d:'Parry {5|8}.',fx:[['parry',5,8]]});
+D('lunge',{e:'🤺',d:'Deal {10|14}.',fx:[['dmg',10,14]]});
+D('footwork',{e:'👣',d:'Gain 1 Momentum. Draw {1|2}.',p:f=>{f.mom(1);f.draw(f.v(1,2))}});
+D('jab',{e:'👊',d:'Deal {3|4}.',fx:[['dmg',3,4]]});
+D('feint',{e:'🎭',tg:1,d:'Gain 1 Momentum. Apply 1 Soaked.{| Draw 1.}',p:f=>{f.mom(1);f.weak(1);if(f.u)f.draw(1)}});
+D('slash',{e:'⚔️',d:'Deal {8|11}.',fx:[['dmg',8,11]]});
+D('sweep',{e:'🌙',tg:1,d:'Choose: deal {5|7} to ALL; or deal {9|12} to one enemy (one Attack).',p:f=>ask(f,'Arc Cut',[{l:'Deal '+f.v(5,7)+' to ALL',f:()=>f.all(f.v(5,7))},{l:'Deal '+f.v(9,12)+' to target',f:()=>f.dmg(f.v(9,12))}])});
+D('counter',{e:'🧱',d:'Parry {8|11}.',fx:[['parry',8,11]]});
+D('bind',{e:'🪢',d:'Deal 4. Apply {2|3} Exposed.',fx:[['dmg',4],['vuln',2,3]]});
+D('flurry',{e:'💨',d:'Deal {3|4} three times (one Attack).',fx:[['dmg',3,4,3]]});
+D('riposte',{e:'↪️',d:'Parry {6|8}. With 2+ Momentum: Parry {12|14} instead.',p:f=>f.parry(W.cb.mom>=2?f.v(12,14):f.v(6,8))});
+D('press',{e:'🏃',d:'Deal {7|10}. Your Momentum doesn\'t fade at the end of this turn.',p:f=>{f.dmg(f.v(7,10));W.cb.keepMom=true}});
+D('secondwind',{e:'🌬️',d:'Gain {3|4} Guard per Momentum (min {3|4}). Doesn\'t spend it.',p:f=>f.blk(f.v(3,4)*Math.max(1,W.cb.mom))});
+D('disarm',{e:'🫳',tg:1,d:'Target loses {2|3} Might for this combat. Sink.',p:f=>{const t=f.tg;if(t){addSt(t,'str',-f.v(2,3));log('🫳 '+t.n+' loses '+f.v(2,3)+' Might')}}});
+D('coup',{e:'💀',d:'Deal {12|15}. If this is a Flourish and kills, gain 1 Energy and draw 2.',p:f=>{const t=f.tg;f.dmg(f.v(12,15));if(f.flourish&&t&&t.hp<=0){f.gainEnergy(1);f.draw(2);log('💀 Coup! +1 Energy, draw 2')}}});
+D('engarde',{e:'🎌',d:'Start each turn with 1 Momentum.',power:{on:{turnStart(inst){if(W.cb.mom<1)gainMom(1-W.cb.mom)}}}});
+D('perfect',{e:'✨',d:'Parry {10|14}. If it triggers, gain 2 Momentum next turn.',p:f=>{f.parry(f.v(10,14));
+ const turn=W.cb.turn;
+ forCombat({id:'perfect',on:{parry(inst){if(W.cb.turn!==turn||inst.dead)return;inst.dead=true;W.cb.nextTurnQ.push(()=>{gainMom(2);log('✨ Perfect Parry: +2 Momentum')})},turnStart(inst){if(W.cb.turn>turn)inst.dead=true}}})}});
+D('cuts',{e:'🩸',d:'Deal {2|3} for each Attack played this combat (max 30). Sink.',p:f=>{const n=Math.min(30,W.cb.stat.attacksCombat);if(n)f.dmg(f.v(2,3),n);else log('No Attacks yet!')}});

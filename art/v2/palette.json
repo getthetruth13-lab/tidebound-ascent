@@ -1,0 +1,571 @@
+{
+  "name": "Tidebound Ascent v2 Coastal-Gothic Palette",
+  "version": "2.0.0",
+  "ui": {
+    "ui-bg-0": "#07080a",
+    "ui-bg-1": "#0e0f12",
+    "ui-bg-2": "#16171b",
+    "ui-bg-3": "#202127",
+    "ui-line": "#3a342b",
+    "ui-outline": "#000000",
+    "ui-rim": "#7d8794",
+    "ui-iron": "#4a4d55",
+    "ui-brass": "#9c7a3c",
+    "ui-text": "#ece4d4",
+    "ui-text-muted": "#b8ad99",
+    "ui-text-dim": "#948b7b",
+    "ui-parchment": "#d6c39b",
+    "ui-parchment-dark": "#a8916a",
+    "ui-ink": "#1c140c",
+    "ui-ink-muted": "#36281a",
+    "ui-ink-red": "#58110b"
+  },
+  "classes": {
+    "tidecaller": {
+      "primary": "#3fb4b0",
+      "secondary": "#1d4f55",
+      "accent": "#9fe3d6",
+      "deep": "#0a1d20"
+    },
+    "echo-mage": {
+      "primary": "#a98af2",
+      "secondary": "#3f2a6e",
+      "accent": "#d9c2ff",
+      "deep": "#150d26"
+    },
+    "cartographer": {
+      "primary": "#d29a3e",
+      "secondary": "#5e4220",
+      "accent": "#efd9a8",
+      "deep": "#1f160b"
+    },
+    "duelist": {
+      "primary": "#ea6252",
+      "secondary": "#6a1a22",
+      "accent": "#c9ced6",
+      "deep": "#1c080b"
+    }
+  },
+  "status": {
+    "damage": "#ef5a50",
+    "block": "#5fa3ea",
+    "buff": "#5cc98a",
+    "debuff": "#e48a3c",
+    "energy": "#f0c84a"
+  },
+  "rarity": {
+    "common": "#9aa1ab",
+    "uncommon": "#4fc2ad",
+    "rare": "#e3b54a",
+    "boss": "#e8604c"
+  },
+  "environments": {
+    "_note": "Painting & lighting notes for backgrounds/scenes (design \u00a7W.7.9 #3). Not for UI text. rim = optional env rim tint on figures (subtle, <=35%, switchable via --env-rim / --env-rim-strength).",
+    "a1-shore": {
+      "palette": [
+        "#f2c99a",
+        "#6fb7b4",
+        "#2c5a63",
+        "#1a2b33",
+        "#e9efe8"
+      ],
+      "rim": "#f2c99a",
+      "tint": "#ffcf9e",
+      "vignette": "#0b1a20"
+    },
+    "a1-cloister": {
+      "palette": [
+        "#0f2e2a",
+        "#2f6b4f",
+        "#7fbf7a",
+        "#c9e6a3",
+        "#0a1716"
+      ],
+      "rim": "#7fbf7a",
+      "tint": "#2f6b4f",
+      "vignette": "#06110f"
+    },
+    "a1-bellcourt": {
+      "palette": [
+        "#3a4650",
+        "#6b7f86",
+        "#a9b8b5",
+        "#c78a4a",
+        "#141b21"
+      ],
+      "rim": "#c78a4a",
+      "tint": "#6b7f86",
+      "vignette": "#0a0f13"
+    },
+    "a1-lair-bell": {
+      "palette": [
+        "#10171d",
+        "#2b3a45",
+        "#6aa8b0",
+        "#d9b46a",
+        "#e7eef0"
+      ],
+      "rim": "#d9b46a",
+      "tint": "#d9b46a",
+      "vignette": "#05080b"
+    },
+    "a1-lair-kelp": {
+      "palette": [
+        "#08221c",
+        "#1d5a3f",
+        "#3f8f5b",
+        "#9fd38a",
+        "#e6d27a"
+      ],
+      "rim": "#e6d27a",
+      "tint": "#1d5a3f",
+      "vignette": "#03100c"
+    },
+    "a2-harbour": {
+      "palette": [
+        "#2b3540",
+        "#4e5d68",
+        "#8a5a3c",
+        "#c8b89a",
+        "#11161b"
+      ],
+      "rim": "#c8b89a",
+      "tint": "#4e5d68",
+      "vignette": "#080b0e"
+    },
+    "a2-halls": {
+      "palette": [
+        "#1a1714",
+        "#3d3027",
+        "#7a5132",
+        "#e0a85a",
+        "#5a6b6a"
+      ],
+      "rim": "#e0a85a",
+      "tint": "#e0a85a",
+      "vignette": "#060504"
+    },
+    "a2-ramparts": {
+      "palette": [
+        "#1d2630",
+        "#3c4b59",
+        "#9aa8b3",
+        "#d9e1e4",
+        "#7a2e2a"
+      ],
+      "rim": "#9aa8b3",
+      "tint": "#3c4b59",
+      "vignette": "#06090c"
+    },
+    "a2-lair-colossus": {
+      "palette": [
+        "#20272b",
+        "#4a5a5f",
+        "#b07a3e",
+        "#e8d9b8",
+        "#2f8f8a"
+      ],
+      "rim": "#b07a3e",
+      "tint": "#2f8f8a",
+      "vignette": "#060809"
+    },
+    "a2-lair-queen": {
+      "palette": [
+        "#0b1412",
+        "#1f3a33",
+        "#4fd1a5",
+        "#a0e8c8",
+        "#3b2a22"
+      ],
+      "rim": "#4fd1a5",
+      "tint": "#4fd1a5",
+      "vignette": "#030806"
+    },
+    "a3-cliffs": {
+      "palette": [
+        "#2a2440",
+        "#5b4f86",
+        "#a99fd0",
+        "#e8e4f5",
+        "#1a1626"
+      ],
+      "rim": "#e8e4f5",
+      "tint": "#a99fd0",
+      "vignette": "#0c0a14"
+    },
+    "a3-spires": {
+      "palette": [
+        "#141128",
+        "#3a2f6b",
+        "#7b6cd9",
+        "#c6f0ff",
+        "#f2e9a0"
+      ],
+      "rim": "#c6f0ff",
+      "tint": "#7b6cd9",
+      "vignette": "#06050f"
+    },
+    "a3-terraces": {
+      "palette": [
+        "#1b1e2c",
+        "#4b5675",
+        "#b9c4dc",
+        "#ffffff",
+        "#8a7bd1"
+      ],
+      "rim": "#b9c4dc",
+      "tint": "#b9c4dc",
+      "vignette": "#080a10"
+    },
+    "a3-lair-engine": {
+      "palette": [
+        "#0f1020",
+        "#2d2c55",
+        "#c08b3e",
+        "#6fd3e8",
+        "#e8e2ff"
+      ],
+      "rim": "#c08b3e",
+      "tint": "#6fd3e8",
+      "vignette": "#05050c"
+    },
+    "a3-lair-thalassa": {
+      "palette": [
+        "#071824",
+        "#135a6e",
+        "#49b6c4",
+        "#c0f2ee",
+        "#7b6cd9"
+      ],
+      "rim": "#c0f2ee",
+      "tint": "#49b6c4",
+      "vignette": "#030c12"
+    },
+    "f-stair": {
+      "palette": [
+        "#08090d",
+        "#1c2030",
+        "#e8e6dc",
+        "#f2d17a",
+        "#3a4a66"
+      ],
+      "rim": "#e8e6dc",
+      "tint": "#f2d17a",
+      "vignette": "#020203"
+    },
+    "f-lair-sun": {
+      "palette": [
+        "#030305",
+        "#1a1405",
+        "#b8862b",
+        "#ffe9a8",
+        "#0d2230"
+      ],
+      "rim": "#ffe9a8",
+      "tint": "#b8862b",
+      "vignette": "#000000"
+    },
+    "map-a1": {
+      "palette": [
+        "#e8d6ae",
+        "#c9a46a",
+        "#3f7f80",
+        "#5a3a1e",
+        "#7c1f2c"
+      ],
+      "rim": "#7c1f2c",
+      "tint": "#3f7f80",
+      "vignette": "#5a3a1e"
+    },
+    "map-a2": {
+      "palette": [
+        "#26313b",
+        "#e3ddcf",
+        "#9c7a3c",
+        "#8a5a3c",
+        "#121a20"
+      ],
+      "rim": "#121a20",
+      "tint": "#26313b",
+      "vignette": "#121a20"
+    },
+    "map-a3": {
+      "palette": [
+        "#3b3552",
+        "#c9c2e0",
+        "#9aa3b5",
+        "#ffffff",
+        "#7b6cd9"
+      ],
+      "rim": "#7b6cd9",
+      "tint": "#7b6cd9",
+      "vignette": "#1a1626"
+    },
+    "map-f": {
+      "palette": [
+        "#050608",
+        "#1b2233",
+        "#f2d17a",
+        "#e8e6dc"
+      ],
+      "rim": "#e8e6dc",
+      "tint": "#f2d17a",
+      "vignette": "#000000"
+    },
+    "ev-a1": {
+      "palette": [
+        "#1c3a40",
+        "#5fa7a3",
+        "#e8d7b0",
+        "#0d1a1e"
+      ],
+      "rim": "#0d1a1e",
+      "tint": "#1c3a40",
+      "vignette": "#05070b"
+    },
+    "shop-a1": {
+      "palette": [
+        "#3a2614",
+        "#a8743c",
+        "#f0c27a",
+        "#2c5a63",
+        "#120c07"
+      ],
+      "rim": "#120c07",
+      "tint": "#3a2614",
+      "vignette": "#05070b"
+    },
+    "camp-a1": {
+      "palette": [
+        "#2a1a10",
+        "#d9733a",
+        "#ffc46b",
+        "#2c5a63",
+        "#0b0705"
+      ],
+      "rim": "#0b0705",
+      "tint": "#2a1a10",
+      "vignette": "#05070b"
+    },
+    "chest-a1": {
+      "palette": [
+        "#e6cf9a",
+        "#6fb7b4",
+        "#5a3a1e",
+        "#f7e3a1"
+      ],
+      "rim": "#f7e3a1",
+      "tint": "#e6cf9a",
+      "vignette": "#05070b"
+    },
+    "ev-a2": {
+      "palette": [
+        "#1c1a17",
+        "#5a4a36",
+        "#e0c48a",
+        "#3e5560"
+      ],
+      "rim": "#3e5560",
+      "tint": "#1c1a17",
+      "vignette": "#05070b"
+    },
+    "shop-a2": {
+      "palette": [
+        "#24201c",
+        "#8a5a3c",
+        "#e0a85a",
+        "#4e5d68"
+      ],
+      "rim": "#4e5d68",
+      "tint": "#24201c",
+      "vignette": "#05070b"
+    },
+    "camp-a2": {
+      "palette": [
+        "#1d1a18",
+        "#c4612e",
+        "#ffb35c",
+        "#3c4b59"
+      ],
+      "rim": "#3c4b59",
+      "tint": "#1d1a18",
+      "vignette": "#05070b"
+    },
+    "chest-a2": {
+      "palette": [
+        "#20262b",
+        "#5a6b6a",
+        "#b07a3e",
+        "#e8d9b8"
+      ],
+      "rim": "#e8d9b8",
+      "tint": "#20262b",
+      "vignette": "#05070b"
+    },
+    "ev-a3": {
+      "palette": [
+        "#231f36",
+        "#5b4f86",
+        "#e8e4f5",
+        "#c6a75a"
+      ],
+      "rim": "#c6a75a",
+      "tint": "#231f36",
+      "vignette": "#05070b"
+    },
+    "shop-a3": {
+      "palette": [
+        "#2a2238",
+        "#8a6a3c",
+        "#f0c27a",
+        "#a99fd0"
+      ],
+      "rim": "#a99fd0",
+      "tint": "#2a2238",
+      "vignette": "#05070b"
+    },
+    "camp-a3": {
+      "palette": [
+        "#141428",
+        "#3f8f9a",
+        "#ff9f50",
+        "#d0d8ff"
+      ],
+      "rim": "#d0d8ff",
+      "tint": "#141428",
+      "vignette": "#05070b"
+    },
+    "chest-a3": {
+      "palette": [
+        "#1b1e2c",
+        "#8a7bd1",
+        "#d0d8ff",
+        "#c6a75a"
+      ],
+      "rim": "#c6a75a",
+      "tint": "#1b1e2c",
+      "vignette": "#05070b"
+    },
+    "camp-f": {
+      "palette": [
+        "#0b0b10",
+        "#c48a3a",
+        "#ffd98a",
+        "#3a4a66"
+      ],
+      "rim": "#3a4a66",
+      "tint": "#0b0b10",
+      "vignette": "#05070b"
+    },
+    "shop-f": {
+      "palette": [
+        "#0e0e12",
+        "#6e5a3a",
+        "#f2d17a",
+        "#3a4a66"
+      ],
+      "rim": "#3a4a66",
+      "tint": "#0e0e12",
+      "vignette": "#05070b"
+    },
+    "tc-a1": {
+      "palette": [
+        "#e9efe8",
+        "#6fb7b4",
+        "#2c5a63",
+        "#0b1a20"
+      ],
+      "rim": "#0b1a20",
+      "tint": "#000000",
+      "vignette": "#000000"
+    },
+    "tc-a2": {
+      "palette": [
+        "#c8b89a",
+        "#8a5a3c",
+        "#2b3540",
+        "#11161b"
+      ],
+      "rim": "#11161b",
+      "tint": "#000000",
+      "vignette": "#000000"
+    },
+    "tc-a3": {
+      "palette": [
+        "#e8e4f5",
+        "#7b6cd9",
+        "#2a2440",
+        "#0c0a14"
+      ],
+      "rim": "#0c0a14",
+      "tint": "#000000",
+      "vignette": "#000000"
+    },
+    "tc-f": {
+      "palette": [
+        "#ffe9a8",
+        "#e8e6dc",
+        "#1c2030",
+        "#030305"
+      ],
+      "rim": "#030305",
+      "tint": "#000000",
+      "vignette": "#000000"
+    },
+    "tr-start": {
+      "palette": [
+        "#f2c99a",
+        "#2c5a63",
+        "#0b1a20",
+        "#e9efe8"
+      ],
+      "rim": "#e9efe8",
+      "tint": "#ffcf9e",
+      "vignette": "#000000"
+    },
+    "tr-a1a2": {
+      "palette": [
+        "#c78a4a",
+        "#4e5d68",
+        "#2b3540",
+        "#c8b89a"
+      ],
+      "rim": "#c8b89a",
+      "tint": "#4e5d68",
+      "vignette": "#000000"
+    },
+    "tr-a2a3": {
+      "palette": [
+        "#3c4b59",
+        "#a99fd0",
+        "#e8e4f5",
+        "#2a2440"
+      ],
+      "rim": "#2a2440",
+      "tint": "#a99fd0",
+      "vignette": "#000000"
+    },
+    "tr-a3f": {
+      "palette": [
+        "#7b6cd9",
+        "#e8e6dc",
+        "#f2d17a",
+        "#08090d"
+      ],
+      "rim": "#08090d",
+      "tint": "#f2d17a",
+      "vignette": "#000000"
+    },
+    "ending-lit": {
+      "palette": [
+        "#ffe9a8",
+        "#f2c99a",
+        "#6fb7b4",
+        "#1c2030"
+      ],
+      "rim": "#1c2030",
+      "tint": "#ffe9a8",
+      "vignette": "#000000"
+    }
+  }
+}

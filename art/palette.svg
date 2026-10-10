@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 1028" width="1120" height="1028">
+  <style>
+    .t { font: 700 24px Cinzel, Georgia, serif; fill: #eef1f6; }
+    .h { font: 600 15px 'Source Sans 3', Arial, sans-serif; fill: #aab3c5; letter-spacing: 1px; text-transform: uppercase; }
+    .n { font: 11px 'Source Sans 3', Arial, sans-serif; fill: #aab3c5; }
+    .hex { font: 600 12px 'Source Code Pro', monospace; }
+  </style>
+  <rect width="1120" height="1028" fill="#0b0e14"/>
+  <text x="32" y="40" class="t">Deckbound Palette</text>
+    <text x="32" y="70" class="h">Shared UI neutrals</text>
+  <rect x="32" y="86" width="120" height="72" rx="8" fill="#0b0e14" stroke="#36405a" stroke-width="1"/>
+  <text x="40" y="150" class="hex" fill="#eef1f6">#0b0e14</text>
+  <text x="32" y="176" class="n">ui-bg-0</text>
+  <rect x="164" y="86" width="120" height="72" rx="8" fill="#131822" stroke="#36405a" stroke-width="1"/>
+  <text x="172" y="150" class="hex" fill="#eef1f6">#131822</text>
+  <text x="164" y="176" class="n">ui-bg-1</text>
+  <rect x="296" y="86" width="120" height="72" rx="8" fill="#1c2230" stroke="#36405a" stroke-width="1"/>
+  <text x="304" y="150" class="hex" fill="#eef1f6">#1c2230</text>
+  <text x="296" y="176" class="n">ui-bg-2</text>
+  <rect x="428" y="86" width="120" height="72" rx="8" fill="#262e3f" stroke="#36405a" stroke-width="1"/>
+  <text x="436" y="150" class="hex" fill="#eef1f6">#262e3f</text>
+  <text x="428" y="176" class="n">ui-bg-3</text>
+  <rect x="560" y="86" width="120" height="72" rx="8" fill="#36405a" stroke="#36405a" stroke-width="1"/>
+  <text x="568" y="150" class="hex" fill="#eef1f6">#36405a</text>
+  <text x="560" y="176" class="n">ui-line</text>
+  <rect x="692" y="86" width="120" height="72" rx="8" fill="#05070b" stroke="#36405a" stroke-width="1"/>
+  <text x="700" y="150" class="hex" fill="#eef1f6">#05070b</text>
+  <text x="692" y="176" class="n">ui-outline</text>
+  <rect x="824" y="86" width="120" height="72" rx="8" fill="#8fa3c7" stroke="#36405a" stroke-width="1"/>
+  <text x="832" y="150" class="hex" fill="#05070b">#8fa3c7</text>
+  <text x="824" y="176" class="n">ui-rim</text>
+  <rect x="956" y="86" width="120" height="72" rx="8" fill="#eef1f6" stroke="#36405a" stroke-width="1"/>
+  <text x="964" y="150" class="hex" fill="#05070b">#eef1f6</text>
+  <text x="956" y="176" class="n">ui-text</text>
+  <rect x="32" y="204" width="120" height="72" rx="8" fill="#aab3c5" stroke="#36405a" stroke-width="1"/>
+  <text x="40" y="268" class="hex" fill="#05070b">#aab3c5</text>
+  <text x="32" y="294" class="n">ui-text-muted</text>
+  <rect x="164" y="204" width="120" height="72" rx="8" fill="#8590a6" stroke="#36405a" stroke-width="1"/>
+  <text x="172" y="268" class="hex" fill="#05070b">#8590a6</text>
+  <text x="164" y="294" class="n">ui-text-dim</text>
+  <rect x="296" y="204" width="120" height="72" rx="8" fill="#efe3c6" stroke="#36405a" stroke-width="1"/>
+  <text x="304" y="268" class="hex" fill="#05070b">#efe3c6</text>
+  <text x="296" y="294" class="n">ui-parchment</text>
+  <rect x="428" y="204" width="120" height="72" rx="8" fill="#1a2230" stroke="#36405a" stroke-width="1"/>
+  <text x="436" y="268" class="hex" fill="#eef1f6">#1a2230</text>
+  <text x="428" y="294" class="n">ui-ink</text>
+  <text x="32" y="328" class="h">Tidecaller</text>
+  <rect x="32" y="344" width="120" height="72" rx="8" fill="#2fb8c4" stroke="#36405a" stroke-width="1"/>
+  <text x="40" y="408" class="hex" fill="#05070b">#2fb8c4</text>
+  <text x="32" y="434" class="n">tidecaller-primary</text>
+  <rect x="164" y="344" width="120" height="72" rx="8" fill="#155a80" stroke="#36405a" stroke-width="1"/>
+  <text x="172" y="408" class="hex" fill="#eef1f6">#155a80</text>
+  <text x="164" y="434" class="n">tidecaller-secondary</text>
+  <rect x="296" y="344" width="120" height="72" rx="8" fill="#a6f2e8" stroke="#36405a" stroke-width="1"/>
+  <text x="304" y="408" class="hex" fill="#05070b">#a6f2e8</text>
+  <text x="296" y="434" class="n">tidecaller-accent</text>
+  <rect x="428" y="344" width="120" height="72" rx="8" fill="#0a2a3d" stroke="#36405a" stroke-width="1"/>
+  <text x="436" y="408" class="hex" fill="#eef1f6">#0a2a3d</text>
+  <text x="428" y="434" class="n">tidecaller-deep</text>
+  <text x="32" y="468" class="h">Echo Mage</text>
+  <rect x="32" y="484" width="120" height="72" rx="8" fill="#a07bff" stroke="#36405a" stroke-width="1"/>
+  <text x="40" y="548" class="hex" fill="#05070b">#a07bff</text>
+  <text x="32" y="574" class="n">echo-mage-primary</text>
+  <rect x="164" y="484" width="120" height="72" rx="8" fill="#4b2c91" stroke="#36405a" stroke-width="1"/>
+  <text x="172" y="548" class="hex" fill="#eef1f6">#4b2c91</text>
+  <text x="164" y="574" class="n">echo-mage-secondary</text>
+  <rect x="296" y="484" width="120" height="72" rx="8" fill="#f0b8ff" stroke="#36405a" stroke-width="1"/>
+  <text x="304" y="548" class="hex" fill="#05070b">#f0b8ff</text>
+  <text x="296" y="574" class="n">echo-mage-accent</text>
+  <rect x="428" y="484" width="120" height="72" rx="8" fill="#1d1238" stroke="#36405a" stroke-width="1"/>
+  <text x="436" y="548" class="hex" fill="#eef1f6">#1d1238</text>
+  <text x="428" y="574" class="n">echo-mage-deep</text>
+  <text x="32" y="608" class="h">Cartographer</text>
+  <rect x="32" y="624" width="120" height="72" rx="8" fill="#d8a446" stroke="#36405a" stroke-width="1"/>
+  <text x="40" y="688" class="hex" fill="#05070b">#d8a446</text>
+  <text x="32" y="714" class="n">cartographer-primary</text>
+  <rect x="164" y="624" width="120" height="72" rx="8" fill="#6e4a28" stroke="#36405a" stroke-width="1"/>
+  <text x="172" y="688" class="hex" fill="#eef1f6">#6e4a28</text>
+  <text x="164" y="714" class="n">cartographer-secondary</text>
+  <rect x="296" y="624" width="120" height="72" rx="8" fill="#f3e3bf" stroke="#36405a" stroke-width="1"/>
+  <text x="304" y="688" class="hex" fill="#05070b">#f3e3bf</text>
+  <text x="296" y="714" class="n">cartographer-accent</text>
+  <rect x="428" y="624" width="120" height="72" rx="8" fill="#2a1d10" stroke="#36405a" stroke-width="1"/>
+  <text x="436" y="688" class="hex" fill="#eef1f6">#2a1d10</text>
+  <text x="428" y="714" class="n">cartographer-deep</text>
+  <text x="32" y="748" class="h">Duelist</text>
+  <rect x="32" y="764" width="120" height="72" rx="8" fill="#ec5f4a" stroke="#36405a" stroke-width="1"/>
+  <text x="40" y="828" class="hex" fill="#05070b">#ec5f4a</text>
+  <text x="32" y="854" class="n">duelist-primary</text>
+  <rect x="164" y="764" width="120" height="72" rx="8" fill="#7c1f2c" stroke="#36405a" stroke-width="1"/>
+  <text x="172" y="828" class="hex" fill="#eef1f6">#7c1f2c</text>
+  <text x="164" y="854" class="n">duelist-secondary</text>
+  <rect x="296" y="764" width="120" height="72" rx="8" fill="#d3dbe6" stroke="#36405a" stroke-width="1"/>
+  <text x="304" y="828" class="hex" fill="#05070b">#d3dbe6</text>
+  <text x="296" y="854" class="n">duelist-accent</text>
+  <rect x="428" y="764" width="120" height="72" rx="8" fill="#2c0c12" stroke="#36405a" stroke-width="1"/>
+  <text x="436" y="828" class="hex" fill="#eef1f6">#2c0c12</text>
+  <text x="428" y="854" class="n">duelist-deep</text>
+  <text x="32" y="888" class="h">Status</text>
+  <rect x="32" y="904" width="120" height="72" rx="8" fill="#ff6161" stroke="#36405a" stroke-width="1"/>
+  <text x="40" y="968" class="hex" fill="#05070b">#ff6161</text>
+  <text x="32" y="994" class="n">status-damage</text>
+  <rect x="164" y="904" width="120" height="72" rx="8" fill="#5aaeff" stroke="#36405a" stroke-width="1"/>
+  <text x="172" y="968" class="hex" fill="#05070b">#5aaeff</text>
+  <text x="164" y="994" class="n">status-block</text>
+  <rect x="296" y="904" width="120" height="72" rx="8" fill="#4fd48c" stroke="#36405a" stroke-width="1"/>
+  <text x="304" y="968" class="hex" fill="#05070b">#4fd48c</text>
+  <text x="296" y="994" class="n">status-buff</text>
+  <rect x="428" y="904" width="120" height="72" rx="8" fill="#f2903f" stroke="#36405a" stroke-width="1"/>
+  <text x="436" y="968" class="hex" fill="#05070b">#f2903f</text>
+  <text x="428" y="994" class="n">status-debuff</text>
+  <rect x="560" y="904" width="120" height="72" rx="8" fill="#ffd84a" stroke="#36405a" stroke-width="1"/>
+  <text x="568" y="968" class="hex" fill="#05070b">#ffd84a</text>
+  <text x="560" y="994" class="n">status-energy</text>
+  <rect x="692" y="904" width="120" height="72" rx="8" fill="#a7b0c0" stroke="#36405a" stroke-width="1"/>
+  <text x="700" y="968" class="hex" fill="#05070b">#a7b0c0</text>
+  <text x="692" y="994" class="n">rarity-common</text>
+  <rect x="824" y="904" width="120" height="72" rx="8" fill="#58d6c0" stroke="#36405a" stroke-width="1"/>
+  <text x="832" y="968" class="hex" fill="#05070b">#58d6c0</text>
+  <text x="824" y="994" class="n">rarity-uncommon</text>
+  <rect x="956" y="904" width="120" height="72" rx="8" fill="#f2c14e" stroke="#36405a" stroke-width="1"/>
+  <text x="964" y="968" class="hex" fill="#05070b">#f2c14e</text>
+  <text x="956" y="994" class="n">rarity-rare</text>
+</svg>

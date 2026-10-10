@@ -1,0 +1,31 @@
+/* Combat life affects only artwork: intents, HP and touch targets stay anchored. */
+.combat-motion .hero .spr,.combat-motion .en .spr{transform-origin:50% 100%;animation:combat-breathe var(--idle-period,4400ms) ease-in-out var(--idle-phase,0ms) infinite}
+@keyframes combat-breathe{0%,100%{transform:translateY(0) rotate(-.35deg) scale(1)}50%{transform:translateY(-1px) rotate(.35deg) scale(1.006,1.012)}}
+.combat-motion .en[data-key="wisp"] .spr,.combat-motion .en[data-key="gull"] .spr{animation-name:combat-hover}
+@keyframes combat-hover{50%{transform:translateY(-3px) rotate(1deg) scale(1.01)}}
+.combat-motion .spr-slot::after{content:'';position:absolute;left:42%;top:38%;width:15%;height:18%;pointer-events:none;background:radial-gradient(ellipse,var(--class-accent,var(--env-rim,#8fa3c7)),transparent 70%);opacity:.07;animation:accent-breathe var(--idle-period,4400ms) ease-in-out var(--idle-phase,0ms) infinite}
+@keyframes accent-breathe{50%{opacity:.17}}
+.combat-action{position:fixed;z-index:35;pointer-events:none;width:100px;height:70px;margin:-35px -50px;--action-color:#a6f2e8;border:2px solid var(--action-color);border-radius:50%;opacity:0;animation:action-ring 480ms ease-out forwards}
+@keyframes action-ring{10%{opacity:.65;transform:scale(.3)}65%{opacity:.4}100%{opacity:0;transform:scale(1.7)}}
+.combat-action.rings{--action-color:#a07bff;box-shadow:0 0 0 10px #a07bff22,0 0 0 22px #a07bff15}
+.combat-action.wave,.combat-action.crest{width:210px;height:85px;border-width:5px 0 0;border-radius:55% 80% 0 0;background:linear-gradient(transparent,#2fb8c433);animation-name:action-wave}
+.combat-action.crest{width:420px;height:140px;border-top-width:9px}
+@keyframes action-wave{10%{opacity:.65;transform:translateX(-40px) rotate(-12deg) scale(.5)}100%{opacity:0;transform:translateX(170px) rotate(8deg) scale(1.2)}}
+.combat-action.undertow{width:220px;border-color:#2fb8c4;animation:action-pull 520ms ease-out forwards}
+@keyframes action-pull{10%{opacity:.6;transform:translateX(140px) scale(1.8,.4)}100%{opacity:0;transform:translateX(-30px) scale(.2,.15)}}
+.combat-action.slash,.combat-action.flourish{--action-color:#ec5f4a;border-width:3px 0 0;transform:rotate(-35deg);animation-name:action-slash}
+.combat-action.flourish{box-shadow:10px 12px 0 -8px #d3dbe6,-10px -15px 0 -8px #ec5f4a}
+@keyframes action-slash{15%{opacity:.85;transform:rotate(-55deg) scale(.4)}100%{opacity:0;transform:rotate(45deg) scale(1.7)}}
+.combat-action.spark{--action-color:#d3dbe6;width:55px;height:55px;border-radius:0;clip-path:polygon(50% 0,60% 35%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 35%);background:var(--action-color)}
+.combat-action.quill{--action-color:#d8a446;border-width:0 0 2px;border-radius:0;width:90px;height:30px;transform:rotate(-25deg)}
+.combat-action.waypoint,.combat-action.landmark{--action-color:#d8a446;width:48px;height:48px;border-radius:0;box-shadow:12px 12px 0 -8px #f3e3bf;animation-name:action-raise}
+.combat-action.landmark{width:90px;height:100px;background:linear-gradient(transparent,#d8a44633)}
+@keyframes action-raise{15%{opacity:.7;transform:translateY(25px) scale(.5)}100%{opacity:0;transform:translateY(-25px) scale(1.1)}}
+.combat-action.guard{background:linear-gradient(110deg,transparent,#5fa3ea33,transparent)}
+.action-ghost{position:fixed;pointer-events:none;z-index:34;animation:ghost-echo 520ms ease-out forwards}
+.action-ghost .fig,.action-ghost .spr-slot{animation:none!important;transform:none!important}
+@keyframes ghost-echo{0%{opacity:.4;transform:translateX(-8px)}100%{opacity:0;transform:translateX(36px)}}
+.action-ghost.death-sink{animation-name:ghost-death}
+@keyframes ghost-death{0%{opacity:.85}100%{opacity:0;transform:translateY(22px) scale(.94,.85)}}
+.echo-card{position:fixed!important;left:27%!important;top:30%!important;width:65px!important;pointer-events:none!important;z-index:34!important;animation:ghost-echo 520ms ease-out forwards!important}
+@media(prefers-reduced-motion:reduce){.hero .spr,.en .spr,.spr-slot::after{animation:none!important}.combat-action,.action-ghost,.echo-card{display:none!important}.fig.shake,.fig.lunge,.flycard{animation:none!important}}

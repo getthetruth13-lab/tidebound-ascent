@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+ <title>Tidebound Ascent icon</title>
+ <!-- palette: ui-bg-0 #0b0e14, tidecaller #2fb8c4 #155a80 #a6f2e8 #0a2a3d, rarity-rare #f2c14e, ui-outline #05070b -->
+ <defs>
+  <radialGradient id="bg" cx=".4" cy=".3" r=".9"><stop offset="0" stop-color="#155a80"/><stop offset=".6" stop-color="#0a2a3d"/><stop offset="1" stop-color="#0b0e14"/></radialGradient>
+  <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+ </defs>
+ <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+ <circle cx="340" cy="150" r="58" fill="#f2c14e" opacity=".9"/><circle cx="364" cy="136" r="52" fill="#0a2a3d"/>
+ <path d="M256 92 L322 300 H190 Z" fill="#05070b" stroke="#a6f2e8" stroke-width="6" stroke-linejoin="round"/>
+ <circle cx="256" cy="168" r="16" fill="#f2c14e" filter="url(#glow)"/><circle cx="256" cy="168" r="10" fill="#fff3b0"/>
+ <path d="M40 330 C100 280 150 300 180 330 C150 320 140 350 170 360 C220 375 250 300 330 310 C390 318 420 360 472 330 V420 H40 Z" fill="#2fb8c4" stroke="#05070b" stroke-width="6" stroke-linejoin="round"/>
+ <path d="M40 380 C120 350 190 400 256 375 C330 350 400 400 472 372 V472 H40 Z" fill="#155a80" stroke="#05070b" stroke-width="6" stroke-linejoin="round"/>
+ <path d="M70 340 C110 315 140 320 160 335" fill="none" stroke="#a6f2e8" stroke-width="6" stroke-linecap="round"/>
+</svg>

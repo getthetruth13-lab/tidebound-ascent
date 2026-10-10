@@ -1,0 +1,98 @@
+{
+  "files": {
+    "@2x (default, 1000x1400)": "frames/frame-<class>.webp",
+    "@1x (500x700)": "frames/frame-<class>@1x.webp"
+  },
+  "size": {
+    "w": 1000,
+    "h": 1400
+  },
+  "aspectRatio": "5:7",
+  "units": "rects are exact px in the 1000x1400 frame-<class>.webp; 'percent' gives the same rects as % of card width (x,w,cx,r) / height (y,h,cy) for CSS; @1x = halve the px",
+  "card": {
+    "x": 0,
+    "y": 0,
+    "w": 1000,
+    "h": 1400,
+    "radius": 44
+  },
+  "costGem": {
+    "cx": 120,
+    "cy": 116,
+    "r": 60
+  },
+  "title": {
+    "x": 192,
+    "y": 64,
+    "w": 748,
+    "h": 100
+  },
+  "art": {
+    "x": 68,
+    "y": 196,
+    "w": 864,
+    "h": 648,
+    "radius": 8
+  },
+  "typeLine": {
+    "x": 80,
+    "y": 864,
+    "w": 840,
+    "h": 76
+  },
+  "textBox": {
+    "x": 88,
+    "y": 960,
+    "w": 824,
+    "h": 368
+  },
+  "rarity": {
+    "cx": 500,
+    "cy": 1358,
+    "r": 18
+  },
+  "percent": {
+    "costGem": {
+      "cx": 12.0,
+      "cy": 8.286,
+      "r_w": 6.0
+    },
+    "title": {
+      "x": 19.2,
+      "y": 4.571,
+      "w": 74.8,
+      "h": 7.143
+    },
+    "art": {
+      "x": 6.8,
+      "y": 14.0,
+      "w": 86.4,
+      "h": 46.286
+    },
+    "typeLine": {
+      "x": 8.0,
+      "y": 61.714,
+      "w": 84.0,
+      "h": 5.429
+    },
+    "textBox": {
+      "x": 8.8,
+      "y": 68.571,
+      "w": 82.4,
+      "h": 26.286
+    },
+    "rarity": {
+      "cx": 50.0,
+      "cy": 97.0,
+      "r_w": 1.8
+    }
+  },
+  "notes": {
+    "art": "fully transparent (alpha 0); place art underneath, object-fit: cover, art masters are 4:3 (768x576)",
+    "title": "dark plate: light text (--v2-text)",
+    "typeLine": "dark plate: light small-caps text",
+    "textBox": "parchment: dark ink text (--v2-ink)",
+    "costGem": "cabochon gem: overlay number in HTML, light text + dark shadow",
+    "rarity": "dark socket: overlay rarity shape+colour in HTML"
+  }
+}

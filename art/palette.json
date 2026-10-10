@@ -1,0 +1,36 @@
+{
+  "name": "Deckbound Dark Palette",
+  "version": "1.0.0",
+  "ui": {
+    "ui-bg-0": "#0b0e14",
+    "ui-bg-1": "#131822",
+    "ui-bg-2": "#1c2230",
+    "ui-bg-3": "#262e3f",
+    "ui-line": "#36405a",
+    "ui-outline": "#05070b",
+    "ui-rim": "#8fa3c7",
+    "ui-text": "#eef1f6",
+    "ui-text-muted": "#aab3c5",
+    "ui-text-dim": "#8590a6",
+    "ui-parchment": "#efe3c6",
+    "ui-ink": "#1a2230"
+  },
+  "classes": {
+    "tidecaller":   { "primary": "#2fb8c4", "secondary": "#155a80", "accent": "#a6f2e8", "deep": "#0a2a3d" },
+    "echo-mage":    { "primary": "#a07bff", "secondary": "#4b2c91", "accent": "#f0b8ff", "deep": "#1d1238" },
+    "cartographer": { "primary": "#d8a446", "secondary": "#6e4a28", "accent": "#f3e3bf", "deep": "#2a1d10" },
+    "duelist":      { "primary": "#ec5f4a", "secondary": "#7c1f2c", "accent": "#d3dbe6", "deep": "#2c0c12" }
+  },
+  "status": {
+    "damage": "#ff6161",
+    "block":  "#5aaeff",
+    "buff":   "#4fd48c",
+    "debuff": "#f2903f",
+    "energy": "#ffd84a"
+  },
+  "rarity": {
+    "common":   "#a7b0c0",
+    "uncommon": "#58d6c0",
+    "rare":     "#f2c14e"
+  }
+}

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="t">
+  <title id="t">Brinecrawler</title>
+  <!-- Palette: duelist-secondary #7c1f2c (shell), duelist-primary #ec5f4a (highlight), ui-bg-3 #262e3f (underside), cartographer-accent #f3e3bf (barnacles), status-energy #ffd84a (eyes), tidecaller-accent #a6f2e8 (brine), ui-rim #8fa3c7, outline #05070b -->
+  <defs>
+    <filter id="rim" x="-15%" y="-15%" width="130%" height="130%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="3" result="grown"/>
+      <feFlood flood-color="#8fa3c7" flood-opacity="0.6"/>
+      <feComposite in2="grown" operator="in" result="halo"/>
+      <feMerge><feMergeNode in="halo"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+    <linearGradient id="shell" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#ec5f4a"/>
+      <stop offset="0.35" stop-color="#7c1f2c"/>
+      <stop offset="1" stop-color="#2c0c12"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="128" cy="236" rx="96" ry="10" fill="#05070b" opacity="0.6"/>
+  <g filter="url(#rim)" stroke="#05070b" stroke-linejoin="round" stroke-linecap="round">
+    <!-- legs -->
+    <g fill="none">
+      <path d="M92 178 L 58 162 L 34 226 M98 188 L 66 196 L 54 234 M108 196 L 90 214 L 84 236 M164 178 L 198 162 L 222 226 M158 188 L 190 196 L 202 234 M148 196 L 166 214 L 172 236" stroke-width="12"/>
+      <path d="M92 178 L 58 162 L 34 226 M98 188 L 66 196 L 54 234 M108 196 L 90 214 L 84 236 M164 178 L 198 162 L 222 226 M158 188 L 190 196 L 202 234 M148 196 L 166 214 L 172 236" stroke="#7c1f2c" stroke-width="6"/>
+    </g>
+    <!-- giant claw arm (left) -->
+    <path d="M70 160 L 46 126" fill="none" stroke-width="16"/>
+    <path d="M70 160 L 46 126" fill="none" stroke="#7c1f2c" stroke-width="10"/>
+    <path d="M44 136 C 10 120 4 66 36 40 C 50 60 56 80 50 98 C 72 82 82 60 76 34 C 104 58 98 116 62 136 Z" fill="url(#shell)" stroke-width="4"/>
+    <path d="M36 52 C 26 72 26 96 36 112" fill="none" stroke="#ec5f4a" stroke-width="3"/>
+    <path d="M52 100 l6 -6 M58 92 l7 -5 M64 82 l7 -4" stroke="#f3e3bf" stroke-width="2.5"/>
+    <!-- small claw arm (right) -->
+    <path d="M186 160 L 206 138" fill="none" stroke-width="12"/>
+    <path d="M186 160 L 206 138" fill="none" stroke="#7c1f2c" stroke-width="6"/>
+    <path d="M204 146 C 190 130 196 108 214 102 C 214 112 218 118 224 120 C 232 112 236 104 236 96 C 248 112 238 140 204 146 Z" fill="url(#shell)" stroke-width="4"/>
+    <!-- eye stalks -->
+    <path d="M114 112 L 104 74 M142 112 L 154 70" fill="none" stroke-width="9"/>
+    <path d="M114 112 L 104 74 M142 112 L 154 70" fill="none" stroke="#7c1f2c" stroke-width="4"/>
+    <!-- shell -->
+    <path d="M48 180 C 46 122 88 98 128 98 C 168 98 210 122 208 180 C 180 198 76 198 48 180 Z" fill="url(#shell)" stroke-width="4"/>
+    <path d="M60 150 C 70 124 96 108 124 106" fill="none" stroke="#ec5f4a" stroke-width="3"/>
+    <path d="M70 176 C 96 186 160 186 186 176" fill="none" stroke="#2c0c12" stroke-width="2"/>
+    <!-- barnacles -->
+    <g fill="#f3e3bf" stroke-width="2.5">
+      <path d="M150 116 l6 -12 l6 12 Z"/><path d="M168 126 l5 -10 l5 10 Z"/><path d="M178 144 l7 -13 l7 13 Z"/><path d="M98 122 l4 -8 l4 8 Z"/>
+    </g>
+    <g fill="#05070b" stroke="none"><circle cx="156" cy="111" r="1.6"/><circle cx="173" cy="122" r="1.4"/><circle cx="185" cy="139" r="1.8"/></g>
+    <!-- mandibles + underside -->
+    <path d="M100 190 C 108 204 148 204 156 190 Z" fill="#262e3f" stroke-width="3"/>
+    <path d="M116 196 l4 10 l4 -8 M132 198 l4 8 l4 -10" fill="none" stroke="#f3e3bf" stroke-width="2"/>
+    <!-- eyes -->
+    <circle cx="104" cy="70" r="10" fill="#ffd84a" stroke-width="3"/>
+    <circle cx="154" cy="66" r="10" fill="#ffd84a" stroke-width="3"/>
+    <path d="M104 63 V77 M154 59 V73" stroke-width="3.5"/>
+  </g>
+  <!-- brine drips (outside rim filter) -->
+  <g fill="#a6f2e8" opacity="0.85">
+    <path d="M78 190 q4 8 0 12 q-4 -4 0 -12 Z"/><path d="M182 188 q4 9 0 13 q-4 -4 0 -13 Z"/><path d="M40 138 q3 7 0 10 q-3 -3 0 -10 Z"/>
+  </g>
+  <circle cx="104" cy="70" r="12" fill="#ffd84a" filter="url(#glow)" opacity="0.35"/>
+  <circle cx="154" cy="66" r="12" fill="#ffd84a" filter="url(#glow)" opacity="0.35"/>
+</svg>

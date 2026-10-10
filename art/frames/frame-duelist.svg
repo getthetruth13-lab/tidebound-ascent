@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350" width="250" height="350" role="img" aria-labelledby="t">
+  <title id="t">Duelist card frame</title>
+  <!-- Regions: gem c(32,32) r22 | banner x52-234 y16-48 | art window x20-230 y58-194 (transparent) | type x60-190 y194-214 | text x18-232 y220-326 | rarity c(125,336) r8 -->
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#7c1f2c"/>
+      <stop offset="0.55" stop-color="#2c0c12"/>
+      <stop offset="1" stop-color="#0b0e14"/>
+    </linearGradient>
+    <radialGradient id="gem" cx="0.38" cy="0.32" r="0.75">
+      <stop offset="0" stop-color="#7c1f2c"/>
+      <stop offset="1" stop-color="#2c0c12"/>
+    </radialGradient>
+  </defs>
+
+  <!-- frame body with transparent art window -->
+  <path d="M18 4 H232 L246 18 V332 L232 346 H18 L4 332 V18 Z M26 58 H224 A6 6 0 0 1 230 64 V188 A6 6 0 0 1 224 194 H26 A6 6 0 0 1 20 188 V64 A6 6 0 0 1 26 58 Z" fill="url(#body)" fill-rule="evenodd" stroke="#05070b" stroke-width="2"/>
+  <path d="M18 4 H232 L246 18 V332 L232 346 H18 L4 332 V18 Z" fill="none" stroke="#ec5f4a" stroke-width="3" transform="translate(125 175) scale(0.985) translate(-125 -175)"/>
+  <path d="M20 9 H230 L241 20 V330 L230 341 H20 L9 330 V20 Z" fill="none" stroke="#d3dbe6" stroke-width="1" opacity="0.35"/>
+  <!-- art window rim -->
+  <path d="M26 58 H224 A6 6 0 0 1 230 64 V188 A6 6 0 0 1 224 194 H26 A6 6 0 0 1 20 188 V64 A6 6 0 0 1 26 58 Z" fill="none" stroke="#05070b" stroke-width="4"/>
+  <path d="M26 58 H224 A6 6 0 0 1 230 64 V188 A6 6 0 0 1 224 194 H26 A6 6 0 0 1 20 188 V64 A6 6 0 0 1 26 58 Z" fill="none" stroke="#ec5f4a" stroke-width="2"/>
+
+  <!-- text box (dark panel, keep clear of decoration) -->
+  <rect x="18" y="220" width="214" height="106" rx="8" fill="#0b0e14" fill-opacity="0.92" stroke="#36405a" stroke-width="1.5"/>
+  
+  <!-- motif: crossed blades behind the gem, rapier (right hand) along the left band, parrying dagger (left hand) along the right band, blade points at the base -->
+  <g stroke-linecap="round">
+    <line x1="6" y1="6" x2="58" y2="58" stroke="#05070b" stroke-width="5"/>
+    <line x1="6" y1="6" x2="58" y2="58" stroke="#d3dbe6" stroke-width="2.5"/>
+    <line x1="58" y1="6" x2="6" y2="58" stroke="#05070b" stroke-width="5"/>
+    <line x1="58" y1="6" x2="6" y2="58" stroke="#d3dbe6" stroke-width="2.5"/>
+  </g>
+  <!-- rapier: long, thin, gold cross + round pommel -->
+  <path d="M12 70 L 14 190 L 10 190 Z" fill="#d3dbe6" stroke="#05070b" stroke-width="1"/>
+  <line x1="6" y1="192" x2="18" y2="192" stroke="#f2c14e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="12" y1="194" x2="12" y2="206" stroke="#05070b" stroke-width="3"/>
+  <circle cx="12" cy="210" r="3.5" fill="#f2c14e" stroke="#05070b" stroke-width="1"/>
+  <!-- main-gauche: short, broad, steel quillons + diamond pommel -->
+  <path d="M238 120 L 244 186 L 232 186 Z" fill="#8590a6" stroke="#05070b" stroke-width="1"/>
+  <line x1="230" y1="188" x2="246" y2="188" stroke="#aab3c5" stroke-width="3" stroke-linecap="round"/>
+  <line x1="238" y1="190" x2="238" y2="200" stroke="#ec5f4a" stroke-width="3"/>
+  <path d="M238 201 l3.5 4 l-3.5 4 l-3.5 -4 Z" fill="#aab3c5" stroke="#05070b" stroke-width="1"/>
+  <g fill="#ec5f4a" stroke="#05070b" stroke-width="1">
+    <path d="M96 336 L 112 332 L 112 340 Z"/><path d="M154 336 L 138 332 L 138 340 Z"/>
+    <path d="M60 340 L 90 334 L 90 342 Z" opacity="0.7"/><path d="M190 340 L 160 334 L 160 342 Z" opacity="0.7"/>
+  </g>
+
+  <!-- name banner -->
+  <path d="M52 16 H224 L234 32 L224 48 H52 Z" fill="#131822" stroke="#05070b" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M52 16 H224 L234 32 L224 48 H52 Z" fill="none" stroke="#ec5f4a" stroke-width="2" stroke-linejoin="round"/>
+  <!-- type line plaque -->
+  <path d="M70 194 H180 L190 204 L180 214 H70 L60 204 Z" fill="#131822" stroke="#05070b" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M70 194 H180 L190 204 L180 214 H70 L60 204 Z" fill="none" stroke="#ec5f4a" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- cost gem slot -->
+  <circle cx="32" cy="32" r="23" fill="#05070b"/>
+  <circle cx="32" cy="32" r="21" fill="url(#gem)" stroke="#ec5f4a" stroke-width="3"/>
+  <circle cx="32" cy="32" r="16" fill="none" stroke="#d3dbe6" stroke-width="1" opacity="0.5"/>
+  <path d="M20 22 A16 16 0 0 1 34 16" fill="none" stroke="#d3dbe6" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- rarity socket (fill with rarity glyph in HTML) -->
+  <circle cx="125" cy="336" r="9" fill="#0b0e14" stroke="#ec5f4a" stroke-width="2"/>
+</svg>

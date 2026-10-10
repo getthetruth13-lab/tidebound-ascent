@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="t">
+  <title id="t">Rustwarden</title>
+  <!-- Palette: ui-line #36405a / ui-bg-3 #262e3f / ui-text-dim #8590a6 (steel), status-debuff #f2903f + cartographer-secondary #6e4a28 (rust), status-damage #ff6161 (visor), ui-rim #8fa3c7, outline #05070b -->
+  <defs>
+    <filter id="rim" x="-15%" y="-15%" width="130%" height="130%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="3" result="grown"/>
+      <feFlood flood-color="#8fa3c7" flood-opacity="0.6"/>
+      <feComposite in2="grown" operator="in" result="halo"/>
+      <feMerge><feMergeNode in="halo"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8590a6"/>
+      <stop offset="0.45" stop-color="#36405a"/>
+      <stop offset="1" stop-color="#1c2230"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="128" cy="240" rx="88" ry="9" fill="#05070b" opacity="0.6"/>
+  <g filter="url(#rim)" stroke="#05070b" stroke-linejoin="round" stroke-linecap="round">
+    <!-- halberd -->
+    <path d="M198 22 V238" stroke-width="9"/>
+    <path d="M198 22 V238" stroke="#6e4a28" stroke-width="4"/>
+    <path d="M198 8 L 192 30 H204 Z" fill="url(#steel)" stroke-width="3"/>
+    <path d="M200 40 C 228 40 240 60 238 88 C 224 78 212 78 200 84 Z" fill="url(#steel)" stroke-width="4"/>
+    <path d="M196 46 L 176 56 L 196 62 Z" fill="url(#steel)" stroke-width="3"/>
+    <path d="M226 54 L 232 70" stroke="#f2903f" stroke-width="3"/>
+    <!-- legs -->
+    <path d="M102 176 H124 L 120 228 H 98 Z M134 176 H156 L 160 228 H138 Z" fill="url(#steel)" stroke-width="4"/>
+    <path d="M90 226 H124 V238 H86 Z M134 226 H168 L 172 238 H134 Z" fill="#262e3f" stroke-width="4"/>
+    <!-- right arm to halberd -->
+    <path d="M168 114 L 192 156" fill="none" stroke-width="16"/>
+    <path d="M168 114 L 192 156" fill="none" stroke="#36405a" stroke-width="10"/>
+    <circle cx="196" cy="160" r="9" fill="#262e3f" stroke-width="4"/>
+    <!-- torso -->
+    <path d="M90 102 H166 L 158 180 H98 Z" fill="url(#steel)" stroke-width="4"/>
+    <path d="M128 106 V166 M100 126 H156" fill="none" stroke="#1c2230" stroke-width="2"/>
+    <rect x="96" y="166" width="64" height="14" fill="#6e4a28" stroke-width="3"/>
+    <!-- pauldrons -->
+    <path d="M70 116 C 70 94 88 88 108 94 L 104 122 Z" fill="url(#steel)" stroke-width="4"/>
+    <path d="M186 116 C 186 94 168 88 148 94 L 152 122 Z" fill="url(#steel)" stroke-width="4"/>
+    <!-- helm -->
+    <path d="M104 46 C 106 32 150 32 152 46 L 158 98 H98 Z" fill="url(#steel)" stroke-width="4"/>
+    <path d="M128 34 L 122 14 L 136 20 L 134 34 Z" fill="#f2903f" stroke-width="3"/>
+    <path d="M108 64 H148 L 146 74 H110 Z" fill="#05070b" stroke-width="2"/>
+    <path d="M112 50 C 112 44 118 40 126 40" fill="none" stroke="#8590a6" stroke-width="3"/>
+    <!-- tower shield -->
+    <path d="M44 104 H118 V178 C 118 206 81 226 81 226 C 81 226 44 206 44 178 Z" fill="url(#steel)" stroke-width="4"/>
+    <path d="M52 112 H110 V176 C 110 198 81 214 81 214 C 81 214 52 198 52 176 Z" fill="none" stroke="#8590a6" stroke-width="2"/>
+    <circle cx="81" cy="158" r="16" fill="#262e3f" stroke-width="3"/>
+    <path d="M69 158 Q 81 146 93 158 Q 81 168 69 158 Z" fill="#05070b" stroke-width="2"/>
+    <g fill="#8590a6" stroke-width="1.5"><circle cx="54" cy="114" r="3"/><circle cx="108" cy="114" r="3"/><circle cx="54" cy="176" r="3"/><circle cx="108" cy="176" r="3"/></g>
+  </g>
+  <!-- rust patches (on top, no rim) -->
+  <g fill="#f2903f" opacity="0.85">
+    <path d="M58 128 c8 -4 14 2 12 8 c-2 6 -10 4 -14 8 c-4 -6 -4 -12 2 -16 Z"/>
+    <path d="M96 192 c6 -2 10 4 6 8 c-4 4 -10 0 -8 -4 Z"/>
+    <path d="M140 122 c10 -2 14 6 8 12 c-6 6 -14 0 -12 -6 Z"/>
+    <path d="M140 200 c6 0 8 6 4 10 c-6 2 -8 -6 -4 -10 Z"/>
+    <path d="M150 48 c4 2 4 10 0 14 c-4 -4 -4 -10 0 -14 Z"/>
+  </g>
+  <g fill="#6e4a28" opacity="0.9"><circle cx="66" cy="134" r="2.5"/><circle cx="146" cy="128" r="2.5"/><path d="M92 196 v10" stroke="#6e4a28" stroke-width="2"/></g>
+  <!-- visor glow -->
+  <g fill="#ff6161">
+    <path d="M110 66 H146 L 145 72 H111 Z" filter="url(#glow)"/>
+    <path d="M112 67 H144 L 143 71 H113 Z"/>
+    <path d="M73 158 Q 81 151 89 158 Q 81 164 73 158 Z"/>
+  </g>
+</svg>

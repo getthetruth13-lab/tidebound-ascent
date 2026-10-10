@@ -1,0 +1,17 @@
+{
+ "map": [
+  "map-act1-1.mp3"
+ ],
+ "fight": [
+  "fight-act1-1.mp3"
+ ],
+ "elite": [
+  "elite-act1-1.mp3"
+ ],
+ "boss": [
+  "boss-act1-1.mp3"
+ ],
+ "intro": [
+  "intro-1.mp3"
+ ]
+}

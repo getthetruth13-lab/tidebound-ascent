@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="t">
+  <title id="t">Echo Mage portrait</title>
+  <!-- Palette: echo-mage primary #a07bff, secondary #4b2c91, accent #f0b8ff, deep #1d1238; ui-text #eef1f6; outline #05070b -->
+  <defs>
+    <radialGradient id="em-bg" cx="0.5" cy="0.42" r="0.7">
+      <stop offset="0" stop-color="#4b2c91"/>
+      <stop offset="1" stop-color="#1d1238"/>
+    </radialGradient>
+    <linearGradient id="em-robe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a07bff"/>
+      <stop offset="0.3" stop-color="#4b2c91"/>
+      <stop offset="1" stop-color="#1d1238"/>
+    </linearGradient>
+    <linearGradient id="em-mask" x1="0" y1="0" x2="1" y2="0.6">
+      <stop offset="0" stop-color="#eef1f6"/>
+      <stop offset="0.65" stop-color="#eef1f6"/>
+      <stop offset="1" stop-color="#f0b8ff"/>
+    </linearGradient>
+    <filter id="em-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <clipPath id="em-clip"><rect x="4" y="4" width="248" height="248" rx="22"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#em-clip)">
+    <rect width="256" height="256" fill="url(#em-bg)"/>
+    <!-- concentric echo rings radiating from the head -->
+    <g fill="none" stroke-linecap="round">
+      <circle cx="128" cy="108" r="50" stroke="#f0b8ff" stroke-width="3" opacity="0.9"/>
+      <circle cx="128" cy="108" r="68" stroke="#a07bff" stroke-width="3" opacity="0.75" stroke-dasharray="60 14"/>
+      <circle cx="128" cy="108" r="86" stroke="#a07bff" stroke-width="2" opacity="0.5" stroke-dasharray="40 18"/>
+      <circle cx="128" cy="108" r="104" stroke="#a07bff" stroke-width="2" opacity="0.3" stroke-dasharray="24 22"/>
+    </g>
+
+    <!-- robe / shoulders -->
+    <path d="M36 260 L 52 198 C 60 178 84 168 106 166 L 150 166 C 172 168 196 178 204 198 L 220 260 Z"
+          fill="url(#em-robe)" stroke="#05070b" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M128 168 V260" stroke="#1d1238" stroke-width="2"/>
+    <!-- neck -->
+    <rect x="116" y="136" width="24" height="34" fill="#1d1238" stroke="#05070b" stroke-width="2"/>
+    <!-- flared collar blades -->
+    <path d="M110 174 C 84 162 68 138 62 100 C 80 122 98 136 120 150 Z" fill="#a07bff" stroke="#05070b" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M146 174 C 172 162 188 138 194 100 C 176 122 158 136 136 150 Z" fill="#a07bff" stroke="#05070b" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M70 112 C 78 134 92 150 108 160" fill="none" stroke="#f0b8ff" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- serene mask face -->
+    <ellipse cx="128" cy="106" rx="29" ry="37" fill="url(#em-mask)" stroke="#05070b" stroke-width="4"/>
+    <!-- closed eyes -->
+    <path d="M110 106 q7 6 14 0 M132 106 q7 6 14 0" fill="none" stroke="#1d1238" stroke-width="3" stroke-linecap="round"/>
+    <!-- sound-wave mouth -->
+    <path d="M114 126 q3.5 -5 7 0 t7 0 t7 0 t7 0" fill="none" stroke="#4b2c91" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- forehead echo rune -->
+    <circle cx="128" cy="86" r="5" fill="#a07bff" stroke="#05070b" stroke-width="2"/>
+    <path d="M118 80 a12 12 0 0 0 0 12 M138 80 a12 12 0 0 1 0 12" fill="none" stroke="#a07bff" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- resonating orb -->
+    <circle cx="128" cy="214" r="18" fill="#f0b8ff" filter="url(#em-glow)" opacity="0.8"/>
+    <circle cx="128" cy="214" r="12" fill="#f0b8ff" stroke="#05070b" stroke-width="3"/>
+    <circle cx="124" cy="210" r="4" fill="#eef1f6"/>
+    <path d="M100 200 a30 30 0 0 0 0 28 M156 200 a30 30 0 0 1 0 28 M90 194 a42 42 0 0 0 0 40 M166 194 a42 42 0 0 1 0 40"
+          fill="none" stroke="#f0b8ff" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <rect x="4" y="4" width="248" height="248" rx="22" fill="none" stroke="#a07bff" stroke-width="4"/>
+  <rect x="10" y="10" width="236" height="236" rx="17" fill="none" stroke="#05070b" stroke-width="2" opacity="0.6"/>
+</svg>
