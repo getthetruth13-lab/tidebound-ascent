@@ -29,6 +29,6 @@ observeEvents((event,c)=>{if(W.S.screen!=='combat')return;
  if((event==='damageDealt'&&c.hpLoss>=c.target?.max*.25)||(event==='playerHit'&&c.amount>=W.run.max*.15))shakeLayers();
 });
 
-function shakeLayers(){if(!motionOn()||quality()!=='full')return;
+export function shakeLayers(){if(!motionOn()||quality()!=='full')return;
  document.querySelectorAll('#env .envL,#env-front .envL').forEach(el=>{const f={sky:.2,far:.35,mid:.6,ground:.8,fg:1}[el.dataset.l]||.5;el.animate([{translate:'0px'},{translate:`${2*f}px -1px`,offset:.2},{translate:`${-f}px 0px`,offset:.5},{translate:'0px'}],{duration:260,easing:'ease-out'});});}
 reduced.addEventListener('change',()=>{camera.forEach(a=>a.cancel());camera=[];syncStage()});

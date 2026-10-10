@@ -49,6 +49,8 @@ function applyVolumes(){if(master)master.gain.setTargetAtTime(level('sfxVolume')
 const tones={tap:[220,150,.07],lift:[270,410,.12],play:[340,170,.19],draw:[200,320,.09],shuffle:[130,250,.23],light:[150,65,.16],heavy:[95,38,.3],guard:[180,360,.26],debuff:[240,90,.24],death:[120,35,.45],hurt:[100,48,.23],reward:[330,495,.28],victory:[220,440,.7],defeat:[165,55,.75],endTurn:[220,110,.22]};
 // UI voices: [pitch start, pitch end, seconds, peak, noise mix, cutoff].
 Object.assign(tones,{
+ endTurn:[110,82,.65,.15,.08,1800],crest:[90,38,.38,.14,.45,950],echo:[440,660,.3,.09,.04,1600],rank:[260,390,.24,.08,.08,1200],landmark:[196,392,.42,.12,.06,1600],flourish:[180,55,.32,.13,.35,1700],critical:[125,42,.28,.13,.3,1500],
+ draw:[650,950,.085,.055,.7,3600],shuffle:[190,310,.3,.07,.8,2400],
  uiTap:[190,130,.065,.045,.12,750],select:[285,210,.09,.05,.1,950],
  menuOpen:[170,280,.14,.045,.35,800],menuClose:[240,150,.1,.04,.3,750],
  tab:[260,320,.075,.04,.22,850],confirm:[280,420,.16,.05,.08,1000],cancel:[210,135,.1,.04,.12,750],
@@ -58,9 +60,10 @@ Object.assign(tones,{
  enlarge:[210,350,.15,.045,.3,900],pickup:[200,310,.1,.04,.4,850],drop:[250,160,.1,.045,.3,750],
  sparkle:[1500,3000,.5,.06,.015,6000],flip:[320,180,.12,.05,.1,900],levelUp:[220,440,.42,.065,.035,1000],taskComplete:[330,495,.32,.055,.035,1000]
 });
-export function playSound(name){if(!ctx||ctx.state!=='running'||!level('sfxVolume'))return;const now=ctx.currentTime;
+export function playSound(name,pitch=1){if(!ctx||ctx.state!=='running'||!level('sfxVolume'))return;const now=ctx.currentTime;
  if(now-(recent[name]??-10)<.055)return;recent[name]=now;
- const [from,to,duration,peak=.12,noiseMix=.22,cutoff=1100]=tones[name]||tones.tap;
+ const [f,t,duration,peak=.12,noiseMix=.22,cutoff=1100]=tones[name]||tones.tap;
+ const from=f*pitch,to=t*pitch;
  const gain=ctx.createGain(),filter=ctx.createBiquadFilter(),osc=ctx.createOscillator();
  filter.type='lowpass';filter.frequency.value=cutoff;gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(peak,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
  osc.type='sine';osc.frequency.setValueAtTime(from,now);osc.frequency.exponentialRampToValueAtTime(to,now+duration);
@@ -68,6 +71,7 @@ export function playSound(name){if(!ctx||ctx.state!=='running'||!level('sfxVolum
  for(let i=0;i<samples.length;i++)samples[i]=(Math.random()*2-1)*noiseMix;
  const noise=ctx.createBufferSource();noise.buffer=buffer;osc.connect(filter);noise.connect(filter);filter.connect(gain);gain.connect(master);
  osc.start(now);noise.start(now);osc.stop(now+duration);noise.stop(now+duration);osc.onended=()=>{osc.disconnect();noise.disconnect();filter.disconnect();gain.disconnect()};
+ if(name==='endTurn'){for(const ratio of [2.76,4.07]){const bell=ctx.createOscillator();bell.frequency.value=from*ratio;bell.connect(gain);bell.start(now);bell.stop(now+duration);bell.onended=()=>bell.disconnect()}}
  if(name==='victory'||name==='reward'||name==='room'||name==='levelUp'||name==='taskComplete'||name==='sparkle'){const bell=ctx.createOscillator();bell.frequency.value=from*1.5;bell.connect(gain);bell.start(now+.08);bell.stop(now+duration);bell.onended=()=>bell.disconnect()}
 }
 // Observe real state changes, so rerenders and rejected actions stay silent.
@@ -138,7 +142,7 @@ export function initAudio(){
  document.addEventListener('keydown',unlock,{once:true});
  document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const node=e.target.closest?.('.node');if(node&&!node.contains(e.relatedTarget))playSound('mapHover')});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){retire();for(const voice of voices){if(voice.frame)cancelAnimationFrame(voice.frame);voice.el.pause();voice.el.removeAttribute('src');voice.el.load()}voices.clear();if(ctx)ctx.suspend().catch(()=>{})}else if(unlocked){if(ctx)ctx.resume().catch(()=>{});startTrack()}});
- observeEvents((event,c)=>{queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={cardPlayed:'play',draw:'draw',shuffle:'shuffle',guardGained:'guard',enemyKilled:'death',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward'};
+ observeEvents((event,c)=>{queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={cardPlayed:'play',shuffle:'shuffle',guardGained:'guard',enemyKilled:'death',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward'};
  if(event==='damageDealt'&&c.amount>0)playSound(c.amount>=15?'heavy':'light');
  else if(event==='statusApplied'&&((c.n>0&&['weak','vuln','brittle','soaked','bleed','sink'].includes(c.key))||(c.n<0&&['str','dex'].includes(c.key))))playSound('debuff');
  else if(event==='combatEnd'&&!c.escaped)playSound(c.won?'victory':'defeat');else if(sounds[event])playSound(sounds[event]);

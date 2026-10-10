@@ -184,7 +184,7 @@ export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W
  const g=sceneGeom();const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
  h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
- if(cb.banner){const a=anim(cb.banner.t,560);if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
+ if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,560);if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
  h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&d.t!=='P'&&(!d.faint||hasRelic('hollowreed'))&&!d.unplay})}).join('')}</div>
  <div class="ctl"><div><div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy"><span>${cb.energy}/${cb.maxE}</span></div><button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile">${iconHTML('hud','draw','📚')} ${cb.draw.length}</button></div>

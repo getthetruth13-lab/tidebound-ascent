@@ -982,3 +982,12 @@ body.scene-choice .wrap{background:transparent}
 .tip#detail #playbtn{position:sticky;bottom:0;width:100%;margin-top:3px}
 /* Lantern Tasks retain the current map or battle beneath the illustrated choices. */
 .ov:has(.lp-taskbox){backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);background:#060a1066}
+
+/* Task 16: short, tappable phase sweep and payoff numbers. */
+.turn-sweep.banner{position:fixed;translate:0 0;z-index:70;pointer-events:none;left:50%;top:23%;transform:translateX(-50%);padding:9px 42px;color:#efe0b5;font-family:Cinzel,serif;font-size:clamp(18px,3vw,28px);text-align:center;white-space:nowrap;border:1px solid #9d8050;outline:1px solid #564b36;outline-offset:4px;background:linear-gradient(90deg,#10171de6,#192228f5,#10171de6);box-shadow:0 3px 16px #0008;animation:turn-sweep 750ms ease-out both}
+.turn-sweep::before,.turn-sweep::after{content:'◆';position:absolute;top:50%;transform:translateY(-50%);font-size:12px;color:#b89a62}.turn-sweep::before{left:12px}.turn-sweep::after{right:12px}
+@keyframes turn-sweep{0%{opacity:0;translate:-25px 0}18%,65%{opacity:1;translate:0 0}100%{opacity:0;translate:25px 0}}
+.turn-sweep.still{animation:turn-still 750ms linear both}@keyframes turn-still{0%,100%{opacity:0}15%,70%{opacity:1}}
+body.combat-motion #endbtn:active{transform:translateY(3px) scale(.94);filter:brightness(1.35)}
+.combo-pop{font-size:clamp(30px,calc(var(--fs) * 1.2),48px)!important;color:#ffe5ac!important;text-shadow:0 2px 3px #000,0 0 8px #713d20;font-weight:900}
+@media(prefers-reduced-motion:reduce){#endbtn:active{transform:none}.turn-sweep{animation:turn-still 750ms linear both}}

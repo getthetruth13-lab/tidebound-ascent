@@ -2,6 +2,7 @@
 //  (a) a body-level persistent element (ghosts, card clones, FX layer, see vfx.js), or
 //  (b) a timed ENTRY: {t0,total,apply(elapsed)} that syncCombatAnimations() re-applies to the new DOM with the elapsed time,
 //      so an animation resumes instead of restarting or vanishing when something re-renders mid-flight.
+import {shakeLayers} from './stage.js';
 import {W} from '../core/state.js';
 import {CARDS} from '../core/registry.js';
 import {observeEvents} from '../core/bus.js';
@@ -68,10 +69,35 @@ function death(e,lead){const sel=enemy(e);const el=sel&&$(sel);if(!el)return;
  if(last)fxQueue.push(lead+hold,()=>slowmo(400,.5));
 }
 export const deathHold=()=>performance.now()-finalKillAt<250?(finalKillBig?950:560):0;
+// Combo beats are presentation only: never delay input or combat resolution.
+let lastBeat=0,phase=null,phaseTimer=null,drawTimer=0;
+function comboBeat(kind,size=1,delay=impactBase()){
+ const cb=W.cb;
+ later(delay,()=>{if(W.cb!==cb||W.S.screen!=='combat')return;
+  if(performance.now()-lastBeat<55){if(kind!=='critical')playSound(kind);return}lastBeat=performance.now();
+  playSound(kind);vignette(kind==='crest'?'blue':'gold',.16,240);
+  if(!enabled())return;
+  const stop=Math.min(120,60+size*15);
+  document.querySelectorAll('.scene .fig').forEach(el=>freezeIdle(el,stop));
+  shakeLayers();
+ });
+}
+function phaseSweep(text){
+ phase?.remove();clearTimeout(phaseTimer);if(!fxOn())return;
+ phase=document.createElement('div');phase.className='banner turn-sweep'+(reducedMotion()?' still':'');
+ phase.setAttribute('role','status');phase.textContent=text;document.body.appendChild(phase);
+ const node=phase;phaseTimer=setTimeout(()=>{node.remove();if(phase===node)phase=null},750);
+ vignette('gold',.12,340);
+ if(enabled())entry(320,e=>play($('#hand'),[{translate:'0 0',opacity:1},{translate:'0 55px',opacity:.25},{translate:'0 0',opacity:1}],320,e));
+}
+document.addEventListener('pointerdown',()=>{if(phase){phase.remove();phase=null;clearTimeout(phaseTimer)}},true);
 // ---------- observer ----------
 function queue(rec){pending.push(rec)}
 observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
+ if(event==='draw'&&!enabled()){const now=performance.now(),delay=Math.max(0,drawTimer-now);drawTimer=now+delay+62;const cb=W.cb;setTimeout(()=>{if(W.cb===cb&&!document.hidden)playSound('draw',.96+Math.random()*.08)},delay)}
  if(!fxOn())return;
+ if(event==='turnEnd')phaseSweep('Enemy Turn');
+ if(event==='turnStart')phaseSweep('Your Turn');
  const cls=W.run.cls,target=enemy(c.target||c.enemy),hero='#hero',move=enabled();
  if(event==='beforeCardPlay'){
   const d=CARDS[c.card.id];setImpact(d.t==='A'?IMPACT_MS:0);
@@ -79,20 +105,21 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
   effect(d.t==='A'?enemy(c.f.tgt)||hero:hero,{tide:'wave',echo:'rings',carto:'quill',duel:d.t==='A'?'slash':'spark'}[cls]);
  }
  if(event==='cardPlayed')setImpact(0);
- if(event==='crest'||event==='undertow'){effect(hero,event);playSound(event==='crest'?'heavy':'guard');
+ if(event==='crest')for(const v of W.cb.vfx)if(Date.now()-v.t<60&&v.txt==='-'+c.dmg)v.cls+=' combo-pop';
+ if(event==='crest'||event==='undertow'){effect(hero,event);if(event==='crest')comboBeat('crest',c.dmg/10);else playSound('guard');
   if(event==='crest'){shakeNow(5);vignette('blue',.35,420)}}
  if(event==='echo'){
-  effect(hero,'rings');ghost(hero,'echo-replay');playSound('play');
+  effect(hero,'rings');ghost(hero,'echo-replay');comboBeat('echo',1+c.k);
   // Recreate the actual echoed card, including its art, without interactive attributes.
   const holder=document.createElement('div');holder.innerHTML=cardHTML(c.card);const card=holder.firstElementChild;
   if(card){const g=card.cloneNode(true);g.querySelectorAll('*').forEach(n=>{for(const a of [...n.attributes])if(a.name.startsWith('on'))n.removeAttribute(a.name)});for(const a of [...g.attributes])if(a.name.startsWith('on')||a.name.startsWith('data-'))g.removeAttribute(a.name);
    g.className+=' echo-card';g.setAttribute('aria-hidden','true');document.body.appendChild(g);setTimeout(()=>g.remove(),550)}
  }
- if(event==='flourish'){effect(enemy(c.f.tgt)||hero,'flourish');playSound('heavy')}
+ if(event==='flourish'){effect(enemy(c.f.tgt)||hero,'flourish');comboBeat('flourish',c.mom/2)}
  if(event==='parry'){effect(hero,'spark');playSound('guard');burstAt(hero,'guard',0)}
  if(event==='waypointPlaced'||event==='waypointTrigger'||event==='advance'){
   effect(hero,event==='advance'&&(c.wp.rank||0)>=3?'landmark':'waypoint');
-  if(event==='advance')playSound('guard');
+  if(event==='advance')comboBeat((c.wp.rank||0)>=3?'landmark':'rank',c.wp.rank,0);
  }
  if(event==='guardGained'){effect(hero,'guard','var(--status-block,#5fa3ea)');if(move)queue({k:'guard'})}
  if(event==='statusApplied'){const bad=['weak','vuln','brittle','soaked','bleed','sink','drench','reson'].includes(c.key)?c.n>0:c.n<0;
@@ -100,6 +127,8 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
   effect(sel,'pulse',bad?'var(--status-debuff,#e48a3c)':'var(--status-buff,#5cc98a)');queue({k:'status',sel,key:c.key,bad,n:c.n})}
  if(event==='damageDealt'&&c.amount>0){
   const t=c.target,dealt=c.hpLoss||0,big=t&&(t.hp<=0||dealt>=t.max*.25);
+  if(big||c.f?.flourish||c.f?.echo||c.f?.doubled){comboBeat(c.f?.flourish?'flourish':c.f?.echo?'echo':'critical',dealt/12);
+   const number=W.cb.vfx.findLast(v=>v.who===t.uid&&v.txt==='-'+dealt);if(number)number.cls+=' combo-pop';}
   queue({k:'hit',sel:target,amount:dealt,big:!!big,boss:!!(t&&t.boss),kill:!!(t&&t.hp<=0),delay:IMPACT_MS,e:t});
   if(!c.hpLoss&&c.amount)queue({k:'blocked',sel:target})}
  if(event==='playerHit'){queue({k:'herohit',amount:c.amount,blocked:c.blocked,enemy:c.enemy})}
@@ -159,8 +188,8 @@ function syncResources(){const cb=W.cb;if(!cb)return;
 export function syncCombatAnimations(){
  const active=W.S.screen==='combat'&&W.cb;
  document.body.classList.toggle('combat-motion',!!active&&enabled());
- if(!active){pending=[];syncScreens();if(combat){combat=null;hpMem={};blkMem={};lastEnergy=lastTide=null}return}
- if(combat!==W.cb){combat=W.cb;pending=[];entries=entries.filter(e=>e.keep);hpMem={};blkMem={};lastEnergy=lastTide=null;lastTurn=0;firstDrawn=false;enterCombat()}
+ if(!active){phase?.remove();phase=null;clearTimeout(phaseTimer);drawTimer=0;pending=[];syncScreens();if(combat){combat=null;hpMem={};blkMem={};lastEnergy=lastTide=null}return}
+ if(combat!==W.cb){combat=W.cb;pending=pending.filter(r=>r.k==='draw');entries=entries.filter(e=>e.keep);hpMem={};blkMem={};lastEnergy=lastTide=null;lastTurn=0;firstDrawn=false;enterCombat()}
  if(!enabled()){const recs=pending;pending=[];for(const e of entries)for(const {animation} of e.animations.values())animation.cancel();entries=[];document.querySelectorAll('.combat-action,.action-ghost,.echo-card').forEach(n=>n.remove());
   // reduced motion: no movement, just a short edge flash when the hero is hit
   if(fxOn())for(const r of recs)if(r.k==='herohit'){vignette(r.amount>0?'red':'blue',r.amount>0?.4:.26,300);break}
@@ -183,7 +212,7 @@ function enterCombat(){if(!enabled())return;const hold=holdLeft();
 // ---------- turn pending records into timed entries ----------
 function flush(){let recs=pending;pending=[];if(!recs.length)return;
  {const by=new Map();recs=recs.filter(r=>{if(r.k!=='hit')return true;const m=by.get(r.sel);if(m){m.big=m.big||r.big;m.kill=m.kill||r.kill;m.amount+=r.amount;return false}by.set(r.sel,r);return true})}
- const hits=recs.filter(r=>r.k==='hit'),stopOf=h=>h.big?125:60;
+ const hits=recs.filter(r=>r.k==='hit'),stopOf=h=>h.big?120:35;
  const stop=hits.length?Math.max(...hits.map(stopOf)):60;
  let drawI=0,heroHits=0,vig=null;
  const draws=recs.filter(r=>r.k==='draw'),baseDraw=W.cb&&W.cb.turn===1&&!firstDrawn?holdLeft()+520:holdLeft();
@@ -223,7 +252,7 @@ function flush(){let recs=pending;pending=[];if(!recs.length)return;
   else if(r.k==='estrike'){const sel=r.sel,total=60+50+60+200,dir=-1;
    entry(total,el=>play(figOf(sel),[{translate:'0 0',scale:'1 1',offset:0},{translate:`${-dir*7}px 0`,scale:'1.02 .97',offset:at(60,total),easing:'cubic-bezier(.2,.9,.3,1)'},{translate:`${dir*30}px 0`,scale:'1.06 .96',offset:at(110,total)},{translate:`${dir*30}px 0`,scale:'1.06 .96',offset:at(170,total),easing:'ease-out'},{translate:'0 0',scale:'1 1',offset:1}],total,el,0,'linear'))}
   else if(r.k==='status'){statusFx(r)}
-  else if(r.k==='draw'){const i=drawI++;
+  else if(r.k==='draw'){const i=drawI++;const cb=W.cb;later(baseDraw+i*62,()=>{if(W.cb===cb&&!document.hidden)playSound('draw',.96+Math.random()*.08)});
    entry(baseDraw+draws.length*60+360,el=>{const card=$(`.hand .card[data-uid="${r.uid}"]`),pile=$('#drawpile');if(!card||!pile)return;
     const a=rectOf(pile),b=rectOf(card),dx=a.x-b.x,dy=a.y-b.y;
     play(card,[{translate:`${dx}px ${dy}px`,scale:'.35',rotate:'-14deg',opacity:0},{translate:`${dx*.35}px ${dy*.35-22}px`,scale:'.8',rotate:'-5deg',opacity:1,offset:.55},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],300,el,baseDraw+i*62,'cubic-bezier(.3,.7,.4,1)')})}
