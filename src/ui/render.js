@@ -5,6 +5,7 @@ import {barHTML,statusRowHTML} from './combatant.js';
 import {CARD_ART,assetEntry,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE} from '../assets.js';
 import {syncAudio} from '../audio.js';
 import {syncEnv,envFxSettingLabel} from './env.js';
+import {groundY,stageAtmosphereHTML,syncStage} from './stage.js';
 import {deathLine} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
 import {loadRunData,settings,saveSettings} from '../save.js';
@@ -141,14 +142,15 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
   return `<span>Momentum</span><span class="pips mom">${p}</span>${fb}${cb.parry?`<span class="chip parry">🤺 Parry ${cb.parry}</span>`:''}${cb.keepMom?'<span class="chip">🏃 keeps</span>':''}`}}
 // ---------------- combat ----------------
 // ---------------- battle figures (Art Director spec) ----------------
-// Heights on the 1560x720 basis: hero 300, normals 220-300, elites 320-360 (about 340), boss 420, scaled to the viewport.
+// Larger figures on the 1560x720 basis, capped below the mechanic strip and intents.
 // Within a role, the sprite's screenHeightPct sets its preferred height; cap it to reserve panel and hand space.
-const ROLE_H={hero:[280,340,47,57],normal:[220,300,24,49],elite:[320,360,44,52],boss:[420,420,75,75]};
-export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*.50),top:52,heroTop:W.run.cls==='carto'?120:94}}
+const ROLE_H={hero:[380,440,47,57],normal:[300,390,24,49],elite:[400,440,44,52],boss:[470,470,75,75]};
+export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*groundY()),top:52,heroTop:W.run.cls==='carto'?114:94}}
 function figH(role,sp){const r=ROLE_H[role]||ROLE_H.normal;const p=sp?sp.pct:(r[2]+r[3])/2;const t=r[3]>r[2]?Math.max(0,Math.min(1,(p-r[2])/(r[3]-r[2]))):0;return r[0]+(r[1]-r[0])*t}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
-function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const H=Math.round(Math.min(figH(role,sp)*g.s,g.feet-(role==='hero'?Math.max(g.top+42,g.heroTop):g.top+42)));
+function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min(figH(role,sp)*g.s,g.feet-(role==='hero'?Math.max(g.top+42,g.heroTop):g.top+42)));
+ if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*sp.h/sp.w));
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
  const top=g.feet-H-hov,L=x-Math.round(W*ax),fx0=Math.round(W*ax);const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.max(96,Math.min(150,H*.62)));
  const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px" onerror="assetFail(this)">`:''}</div>`;
@@ -157,14 +159,14 @@ function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){
  <div class="fig ${shake?'shake':''}" style="width:${W}px;height:${H}px;left:0;top:0;${shake||''}">${img}</div>
  ${intent?`<div class="intentw" style="top:${it}px">${intent}</div>`:''}
  <div class="plate" style="top:${H+hov+2}px">${`<div class="nm">${name}</div>`}${hp}<div class="stw">${badgesH}</div></div>${fx}</div>`}
-function enemyX(i,n,g){const a=.58,b=.88;return Math.round(g.vw*(n===1?.74:a+(b-a)*i/(n-1)))}
-export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
+function enemyX(i,n,g){const a=n>=3?.54:.57,b=n>=3?.89:.84;return Math.round(g.vw*(n===1?.70:a+(b-a)*i/(n-1)))}
+export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,enemyMaxWidth:(n||1)>=3?g.vw*.165:0};const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
  const role=e.boss?'boss':e.elite?'elite':'normal';const vi=W.cb.ens.slice(0,i).filter(x=>x.key===e.key).length;
  const name=`${e.n}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}${e.passive?` <span class="pas" title="${esc(e.passive.n+': '+e.passive.text)}">${e.passive.n==='Rooted'?iconHTML('status','rooted','🌿'):'🌿'}${e.passive.n}</span>`:''}`;
  return figureHTML({sp:spriteFor('enemies',e.key,vi),role,ph:e.e,g,x:enemyX(k==null?i:k,n||1,g),shake:sh,intent:intentHTML(e),name,hp:hpbar(e.hp,e.max,e.block,e.blkT,'e'+e.uid),
   badgesH:badges(0,0,{...e.st,...(e.passive?.n==='Rooted'?{rooted:1}:{})}),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
 export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const sh=motionEnabled()?null:anim(W.cb.pshake,400);
- return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.18),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
+ return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.25),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
   badgesH:badges(0,0,W.cb.p.st),fx:fxHTML('p'),cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
 export function tipHTML(){const cb=W.cb;
  if(cb.sel!=null&&cb.hand[cb.sel]){const ci=cb.hand[cb.sel],d=CARDS[ci.id];const can=canPlay(ci),nt=needsTarget(ci);const t=nt?curTgt():null;
@@ -178,7 +180,7 @@ const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.sl
 export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}">`+topBar();
  h+=`<div class="subbar"><div class="classbar">${classBar()}</div></div>`;
  const g=sceneGeom();const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
- h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${tipHTML()}${calloutsHTML()}`;
+ h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner){const a=anim(cb.banner.t,560);if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
@@ -299,7 +301,7 @@ export function render(){if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))re
  a.innerHTML=h;
  decorateCardRefs(a);decorateKeywords(a);fitCards(a);
  if(s==='combat')layoutHand();
- syncEnv();syncAudio();syncCombatAnimations();
+ syncEnv();syncStage();syncAudio();syncCombatAnimations();
  if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
 // Fit text within the printed frame areas; never grow a panel into the illustration.
 export function fitCards(root=document){for(const c of root.querySelectorAll('.card')){
