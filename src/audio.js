@@ -10,6 +10,7 @@ const indexURL=new URL('../audio/music/index.json',import.meta.url);
 fetch(indexURL).then(r=>{if(!r.ok)throw Error('Music index unavailable');return r.json()}).then(data=>{
  for(const k of ['map','fight','elite','boss'])manifest[k]=(data[k]||[]).filter(f=>new RegExp(`^${k}-act1-\\d+\\.mp3$`).test(f));
  manifest.intro=(data.intro||[]).filter(f=>/^intro-\d+\.mp3$/.test(f));
+ manifest.menu=(data.menu||[]).filter(f=>/^menu-\d+\.mp3$/.test(f));
  if(unlocked)startTrack();
 }).catch(e=>console.warn('Music unavailable:',e.message));
 function ramp(voice,to,seconds,dispose=false){
