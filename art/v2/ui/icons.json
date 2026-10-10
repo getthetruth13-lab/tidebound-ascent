@@ -122,5 +122,12 @@
   "intent-potion": null,
   "intent-drain": null
  },
- "combatant_art_note": "Null slots use distinct inline bronze SVG placeholders. Set a slot to its painted file path; loaded at runtime, no code changes required. Expected missing files: status-drenched.webp, status-resonating.webp, status-temporary-might.webp and intent-<slot>.webp (192x192 transparent)."
+ "combatant_art_note": "Null slots use distinct inline bronze SVG placeholders. Set a slot to its painted file path; loaded at runtime, no code changes required. Expected missing files: status-drenched.webp, status-resonating.webp, status-temporary-might.webp and intent-<slot>.webp (192x192 transparent).",
+ "dais": {
+  "dais-tide": null,
+  "dais-echo": null,
+  "dais-carto": null,
+  "dais-duel": null
+ },
+ "dais_note": "Class mechanic display backplates (painted slot, ~256x560 transparent webp, drawn behind the live widgets). Set a path to use it; no code change."
 }

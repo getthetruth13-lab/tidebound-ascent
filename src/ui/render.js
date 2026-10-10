@@ -1,4 +1,6 @@
 import {intentIcon} from './intent-icons.js';
+import {daisHTML} from './classdais.js';
+import {placeDetail} from './place.js';
 // ui/render.js — all screens as HTML strings. Inline handlers call the globals main.js exposes.
 // Player-facing terminology follows design-v2 §0.3 (Guard, Might, Soaked, Exposed, Sink).
 import {barHTML,statusRowHTML} from './combatant.js';
@@ -178,7 +180,7 @@ export function tipHTML(){const cb=W.cb;
 function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<1300);return c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:''}
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
 export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}">`+topBar();
- h+=`<div class="subbar"><div class="classbar">${classBar()}</div></div>`;
+ h+=daisHTML();
  const g=sceneGeom();const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
  h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
@@ -188,10 +190,10 @@ export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W
  <div class="ctl"><div><div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy"><span>${cb.energy}/${cb.maxE}</span></div><button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile">${iconHTML('hud','draw','📚')} ${cb.draw.length}</button></div>
  <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk (removed for this combat)">${iconHTML('hud','sunk','⚓')} ${cb.exh.length}</button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile">${iconHTML('hud','discard','🗑️')} ${cb.disc.length}</button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>${cb.busy?'Enemy…':'End Turn'}</button></div></div></div>`;
  const m=cb.mode;
- if(m&&m.k==='choice')h+=`<div class="ov"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
- if(m&&m.k==='slot')h+=`<div class="ov"><div class="box tilebox" id="slotbox">${titleHTML(m.title)}<div class="tiles chtiles slottiles" style="--n:${cb.slots.length}">${cb.slots.map((w,i)=>`<div class="tcard opt slotpick">${cardHTML(w,{click:`modeAct('slot',${i})`})}<span class="tcap">${w.rank?'Rank '+w.rank:'Rank 0'}${w.temp?' · starting':''}</span></div>`).join('')}</div></div></div>`;
+ if(m&&m.k==='choice')h+=`<div class="ov battle"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
+ if(m&&m.k==='slot')h+=`<div class="ov battle"><div class="box tilebox" id="slotbox">${titleHTML(m.title)}<div class="tiles chtiles slottiles" style="--n:${cb.slots.length}">${cb.slots.map((w,i)=>`<div class="tcard opt slotpick">${cardHTML(w,{click:`modeAct('slot',${i})`})}<span class="tcap">${w.rank?'Rank '+w.rank:'Rank 0'}${w.temp?' · starting':''}</span></div>`).join('')}</div></div></div>`;
  if(m&&m.k==='chart'){const n=m.n;const cards=Array.from({length:n},(_,i)=>{const ci=cb.draw[i];return `<div class="cslot${i===0?' first':''}" data-i="${i}"><span class="cnum">${i===0?'<b>1</b> drawn first':'<b>'+(i+1)+'</b>'}</span>${cardHTML({...ci,uid:ci.uid},{})}<span class="cmv"><button class="cmvb" aria-label="Earlier" onclick="modeAct('up',${i})" ${i===0?'disabled':''}>◀</button><button class="cmvb" aria-label="Later" onclick="modeAct('dn',${i})" ${i===n-1?'disabled':''}>▶</button></span></div>`}).join('');
-  h+=`<div class="ov"><div class="box chartbox" id="chartbox"><h2>🗺️ Chart: set the order of your next draws</h2><div class="muted csub">Drag cards left or right. The leftmost card is drawn first. Drop one in the Bottom slot to send it under the pile.</div>
+  h+=`<div class="ov battle"><div class="box chartbox" id="chartbox"><h2>🗺️ Chart: set the order of your next draws</h2><div class="muted csub">Drag cards left or right. The leftmost card is drawn first. Drop one in the Bottom slot to send it under the pile.</div>
   <div class="chartrow" style="--n:${n}"><div class="cards" id="chartcards">${cards}</div><div class="cright"><div class="cbottom${m.moved?' used':''}" id="chartbottom"><span class="cbi">⤓</span><b>Bottom</b><i>${m.moved?'Card sent down':'Drop 1 card here'}</i></div><button class="btn pri" id="chartdone" onclick="modeAct('done')">Done</button></div></div></div></div>`}
  return h+'</div>'}
 export function tgt(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return;const e=cb.ens[i];if(!e||e.hp<=0)return;cb.tgt=i;
@@ -207,9 +209,11 @@ export function layoutHand(){const hand=document.getElementById('hand');if(!hand
  const Wd=hand.clientWidth,cw=cards[0].offsetWidth,ch=cards[0].offsetHeight;const hr=hand.getBoundingClientRect();const cx=hr.left+Wd/2;
  const step=n>1?Math.min(cw*.92,(Wd-cw)/(n-1)):0;const ang=land?1.6:n>6?2.5:4;
  const eL=Math.min(innerWidth,...[...document.querySelectorAll('.combat .en .fig')].map(f=>f.getBoundingClientRect().left));
+ const textSizes=cards.map(el=>{const tx=el.querySelector('.text');return tx?parseFloat(getComputedStyle(tx).fontSize)||9:9});
+ const zoom=land?0:(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--zoom'))||1.4);
  cards.forEach((el,i)=>{const off=i-(n-1)/2;const x=off*step,y=Math.abs(off)*Math.abs(off)*cw*(land?.012:.018);
-  const txEl=el.querySelector('.text');const textPx=txEl?parseFloat(getComputedStyle(txEl).fontSize)||9:9;
-  const zl=land?Math.min(Math.max(1.62,15.2/textPx),(vh-10)/ch):(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--zoom'))||1.4);
+  const textPx=textSizes[i];
+  const zl=land?Math.min(Math.max(1.62,15.2/textPx),(vh-10)/ch):zoom;
   const hidden=land?Math.max(0,ch-(vh*(1-HAND_REST_TOP))):0;const ly=land?-(hidden+4):-8;
   // a lifted card slides left of the enemy row when there is room, so it doesn't hide the target it's aimed at
   const zw=cw*zl;const lo=zw/2+4-cx;let hi=innerWidth-zw/2-4-cx;if(land&&eL<innerWidth&&eL-zw-10>0)hi=Math.min(hi,eL-zw/2-6-cx);const xs=Math.max(lo,Math.min(hi,x));
@@ -217,8 +221,12 @@ export function layoutHand(){const hand=document.getElementById('hand');if(!hand
   el.style.setProperty('--zl',zl.toFixed(3));el.style.setProperty('--ly',ly+'px');el.dataset.x=x;el.dataset.y=y;el.dataset.zl=zl.toFixed(3);el.dataset.ly=ly});void hand.offsetWidth;hand.classList.remove('instant');if(land)clampPlates(hand)}
 // Name plates + HP bars (incl. extra lines such as the Matriarch's 'Rooted') always sit above the resting hand's top edge.
 function clampPlates(hand){const rest=[...hand.querySelectorAll('.card:not(.sel)')].map(c=>c.getBoundingClientRect().top);const lim=(rest.length?Math.min(...rest):innerHeight*HAND_REST_TOP)-3;
- for(const p of document.querySelectorAll('.combat .en .plate,.combat .hero .plate')){const r=p.parentNode.getBoundingClientRect();const box=p.parentNode;
-  if(r.right<hand.getBoundingClientRect().left)continue;p.style.top=p.dataset.top||(p.dataset.top=p.style.top);const over=p.getBoundingClientRect().bottom-lim;if(over>0)p.style.top=(parseFloat(p.style.top)-over)+'px'}}
+ const left=hand.getBoundingClientRect().left;
+ const plates=[...document.querySelectorAll('.combat .en .plate,.combat .hero .plate')].filter(p=>p.parentNode.getBoundingClientRect().right>=left);
+ for(const p of plates)p.style.top=p.dataset.top||(p.dataset.top=p.style.top);
+ const offsets=plates.map(p=>p.getBoundingClientRect().bottom-lim);
+ plates.forEach((p,i)=>{if(offsets[i]>0)p.style.top=(parseFloat(p.style.top)-offsets[i])+'px'})}
+
 // ---------------- title / travel ----------------
 export function settingsHTML(){return `<div class="settings"><label><input type="checkbox" id="setfast" ${settings.fastAnim?'checked':''} onchange="setFast(this.checked)"> Fast animations</label>
  <label>Effects <select id="setenvfx" onchange="setEnvFx(this.value)">${['full','reduced','off'].map(v=>`<option value="${v}" ${settings.envFx===v?'selected':''}>${envFxSettingLabel(v)}</option>`).join('')}</select></label>
@@ -277,6 +285,46 @@ function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
  return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${run.won?'🏆':'🪦'}</div><h1>${run.won?'Act 1 cleared!':'Defeated'}</h1><p class="sub">${run.won?`${K.e} ${K.n} silenced ${EN[run.boss].n}.`:`${K.e} ${K.n} fell on floor ${run.floor} of 15. ${deathLine(run.floor,run.boss)}`}</p>
  <div class="panel">Seed ${run.seed} · ${mins} min · Enemies ${run.kills} · Elites ${st.elites.reduce((a,b)=>a+b,0)} · Relics ${run.relics.length} · Deck ${run.deck.length} · Gold ${run.gold} · Biggest hit ${st.maxHit}</div><button class="btn pri full" id="restart" onclick="W.S={screen:'title'};render()">🔄 Play again</button></div>${lampSummaryHTML(sum)}</div>`}
+// Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing
+// sources preserves fitted text, sprite animations and stage styles on unchanged nodes.
+let renderTree=null,renderedCombat=null;
+const liveNodes=new WeakMap();
+const nodeKey=n=>n.nodeType===1?`${n.tagName}:${n.id|| (n.hasAttribute('data-uid')?'card:'+n.dataset.uid+':'+n.dataset.id:n.hasAttribute('data-en')?'enemy:'+n.dataset.en+':'+n.dataset.key:n.classList[0]||'')}`:'#text';
+function bindTree(source,live){liveNodes.set(source,live);source.childNodes.forEach((n,i)=>bindTree(n,live.childNodes[i]))}
+function transferTree(old,next){liveNodes.set(next,liveNodes.get(old));next.childNodes.forEach((n,i)=>transferTree(old.childNodes[i],n))}
+function patchNode(old,next){const live=liveNodes.get(old);
+ if(!live||!live.isConnected)return null;
+ if(old.isEqualNode(next)){transferTree(old,next);return live}
+ liveNodes.set(next,live);
+ if(next.nodeType!==1){live.nodeValue=next.nodeValue;return live}
+ const attrs=new Set([...old.attributes,...next.attributes].map(a=>a.name));
+ for(const name of attrs){const before=old.getAttribute(name),after=next.getAttribute(name);if(before===after)continue;
+  if(name==='style'){const props=new Set([...old.style,...next.style]);for(const prop of props){if(old.style.getPropertyValue(prop)===next.style.getPropertyValue(prop)&&old.style.getPropertyPriority(prop)===next.style.getPropertyPriority(prop))continue;
+    if(next.style.getPropertyValue(prop))live.style.setProperty(prop,next.style.getPropertyValue(prop),next.style.getPropertyPriority(prop));else live.style.removeProperty(prop);if(prop==='top'&&live.classList.contains('plate'))delete live.dataset.top}}
+  else if(name==='class'){for(const c of old.classList)if(!next.classList.contains(c))live.classList.remove(c);for(const c of next.classList)if(!old.classList.contains(c))live.classList.add(c)}
+  else if(after===null)live.removeAttribute(name);else live.setAttribute(name,after);
+ }
+ patchChildren(old,next,live);return live;
+}
+function patchChildren(old,next,live){
+ // A decorator may have replaced a text node with keyword/card-reference spans.
+ // Rebuild only that changed text container, leaving all other branches intact.
+ if([...old.childNodes].some(n=>liveNodes.get(n)?.parentNode!==live)){
+  live.replaceChildren(...[...next.childNodes].map(n=>n.cloneNode(true)));next.childNodes.forEach((n,i)=>bindTree(n,live.childNodes[i]));return;
+ }
+ const pools=new Map();for(const n of old.childNodes){const k=nodeKey(n);if(!pools.has(k))pools.set(k,[]);pools.get(k).push(n)}
+ let cursor=live.firstChild;
+ for(const n of next.childNodes){const prev=pools.get(nodeKey(n))?.shift();let el=prev?patchNode(prev,n):null;
+  if(!el){el=n.cloneNode(true);bindTree(n,el)}
+  if(el!==cursor)live.insertBefore(el,cursor);cursor=el.nextSibling;
+ }
+ for(const pool of pools.values())for(const n of pool)liveNodes.get(n)?.remove();
+}
+function updateHTML(app,html,reset){const next=document.createElement('div');next.innerHTML=html;
+ if(reset||!renderTree){app.replaceChildren(...[...next.childNodes].map(n=>n.cloneNode(true)));bindTree(next,app)}
+ else{liveNodes.set(next,app);patchChildren(renderTree,next,app)}renderTree=next;
+}
+
 // ---------------- render ----------------
 export function render(){if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;
  if(s==='title')h=titleScr();
@@ -297,15 +345,51 @@ export function render(){if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))re
   const t={deck:'Your deck',draw:W.run.cls==='carto'?'Draw pile (in order: face up)':'Draw pile (order hidden)',disc:'Discard pile',exh:'Sunk this combat'}[W.S.ov];
   h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box"><h2>${t} (${list.length})</h2><div class="grid small">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div><button class="btn full">Close</button></div></div>`}
  if(inspecting)h+=inspectHTML();
- {const prev=a.dataset.screen;if(prev!==s){a.dataset.screen=s;screenChange(a,prev,s)}}
- a.innerHTML=h;
+ const prev=a.dataset.screen;const changed=prev!==s;
+ if(changed){a.dataset.screen=s;screenChange(a,prev,s)}
+ updateHTML(a,h,changed||(s==='combat'&&renderedCombat!==W.cb));renderedCombat=s==='combat'?W.cb:null;
+ // Input used a full rebuild to clear temporary drag poses after drop/cancel.
+ // Reused nodes need the same cleanup once the drag render gate is released.
+ for(const el of a.querySelectorAll('.hand .card.drag,.cslot')){el.style.transform='';el.classList.remove('drag','armed','lift','over-zone')}
+ for(const el of a.querySelectorAll('.en.hot,.foes.armed,.chartbox.dragging,.cbottom.hot'))el.classList.remove('hot','armed','dragging');
  decorateCardRefs(a);decorateKeywords(a);fitCards(a);
- if(s==='combat')layoutHand();
+ if(s==='combat'){layoutHand();placeDetail()}
  syncEnv();syncStage();syncAudio();syncCombatAnimations();
  if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
 // Fit text within the printed frame areas; never grow a panel into the illustration.
+const fittedCards=new WeakMap(),fitCache=new Map();let fitEpoch=0;
+function fitSignature(c){return [fitEpoch,innerWidth,innerHeight,devicePixelRatio,c.dataset.id,c.dataset.up,
+ ...['.name','.cost','.type','.text'].map(q=>{const el=c.querySelector(q);return el?.innerHTML+'@'+el?.getAttribute('style')}),
+ c.querySelector('.rline')?.dataset.full].join('|')}
+function measureCardBox(box){const style=getComputedStyle(box);
+    const width=box.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+    const height=box.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
+ return ()=>{const range=document.createRange();range.selectNodeContents(box);
+      const rects=[...range.getClientRects()],r=box.getBoundingClientRect();
+      const sx=r.width/box.offsetWidth,sy=r.height/box.offsetHeight;
+      return box.scrollWidth<=box.clientWidth+1&&box.scrollHeight<=box.clientHeight+1&&
+        rects.every(q=>q.width<=width*sx+.5&&q.height<=height*sy+.5&&q.top>=r.top+parseFloat(style.paddingTop)*sy-.5&&q.bottom<=r.bottom-parseFloat(style.paddingBottom)*sy+.5);
+ };
+}
 export function fitCards(root=document){for(const c of root.querySelectorAll('.card')){
+  // A retained card needs no measurements if its content and viewport are unchanged.
+  const content=[c.dataset.id,c.dataset.up,...['.name','.cost','.type','.text'].map(q=>c.querySelector(q)?.innerHTML),c.querySelector('.rline')?.dataset.full].join('|');
+  const context=[];for(let p=c.parentElement;p&&p!==root;p=p.parentElement)context.push(p.className+'@'+(p.getAttribute('style')||''));
+  const stamp=`${fitEpoch}|${innerWidth}|${innerHeight}|${devicePixelRatio}|${c.style.width}|${c.style.height}|${context.join('/')}|${content}`;
+  if(fittedCards.get(c)===stamp)continue;
+  if(!c.offsetWidth||!c.offsetHeight)continue;
   const transform=c.style.transform,transition=c.style.transition;c.style.transition='none';c.style.transform='none';
+  const rect=c.getBoundingClientRect();
+  // Fractional placement affects browser glyph rounding at the fitter's boundary.
+  const key=[fitSignature(c),rect.width,rect.height,rect.left%1,rect.top%1,context.join('/')].join('|');
+  const cached=fitCache.get(key);
+  if(cached){for(const [q,style] of cached.panels){const box=c.querySelector(q);if(box){if(style===null)box.removeAttribute('style');else box.setAttribute('style',style)}}
+   const rl=c.querySelector('.rline');if(rl&&cached.line){rl.textContent=cached.line.text;rl.classList.toggle('nofit',cached.line.nofit)}
+   // Verify the cached answer once: inherited typography and browser rounding
+   // can differ even when a card has the same dimensions and source text.
+   const valid=['.name','.cost','.type','.text'].every(q=>{const box=c.querySelector(q);return !box||!box.clientHeight||measureCardBox(box)()});
+   if(valid){c.style.transform=transform;c.style.transition=transition;fittedCards.set(c,stamp);continue}
+  }
   c.classList.remove('grown');c.style.removeProperty('--tt');
   for(const selector of ['.name','.cost','.type','.text']){
     const box=c.querySelector(selector);if(!box||!box.clientHeight)continue;
@@ -315,23 +399,22 @@ export function fitCards(root=document){for(const c of root.querySelectorAll('.c
     const child=box.firstElementChild;
     if(selector==='.name'&&child)child.style.transform='';
     const style=getComputedStyle(box),px=parseFloat(style.fontSize);
-    const width=box.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
-    const height=box.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
-    const fits=()=>{const range=document.createRange();range.selectNodeContents(box);
-      const rects=[...range.getClientRects()],r=box.getBoundingClientRect();
-      const sx=r.width/box.offsetWidth,sy=r.height/box.offsetHeight;
-      return box.scrollWidth<=box.clientWidth+1&&box.scrollHeight<=box.clientHeight+1&&
-        rects.every(q=>q.width<=width*sx+.5&&q.height<=height*sy+.5&&q.top>=r.top+parseFloat(style.paddingTop)*sy-.5&&q.bottom<=r.bottom-parseFloat(style.paddingBottom)*sy+.5);
-    };
+    const fits=measureCardBox(box);
     let lo=.5,hi=px;
     if(!fits()){for(let i=0;i<14;i++){const mid=(lo+hi)/2;box.style.setProperty('font-size',mid+'px','important');if(fits())lo=mid;else hi=mid}
       box.style.setProperty('font-size',lo+'px','important');}
   }
   c.style.transform=transform;c.style.transition=transition;
   const rl=c.querySelector('.rline');if(rl&&rl.offsetWidth){rl.classList.remove('nofit','covered');rl.textContent=rl.dataset.full||'';
-    if(rl.scrollWidth>rl.clientWidth+1){rl.textContent=rl.dataset.first||'';if(rl.scrollWidth>rl.clientWidth+1){rl.textContent='Tap to read';rl.classList.add('nofit')}}}
+    if(rl.scrollWidth>rl.clientWidth+1){rl.textContent=rl.dataset.first||'';if(rl.scrollWidth>rl.clientWidth+1){rl.classList.add('nofit')}}}
+  fitCache.set(key,{panels:['.name','.cost','.type','.text'].map(q=>[q,c.querySelector(q)?.getAttribute('style')??null]),line:rl?{text:rl.textContent,nofit:rl.classList.contains('nofit')}:null});
+  if(fitCache.size>2048)fitCache.delete(fitCache.keys().next().value);
+  fittedCards.set(c,stamp);
 }}
-if(typeof document!=='undefined'&&document.fonts)document.fonts.ready.then(()=>{const a=document.getElementById('app');if(a){fitCards(a);if(document.getElementById('hand'))layoutHand()}});
+if(typeof document!=='undefined'&&document.fonts){
+ const fontsChanged=()=>{fitEpoch++;fitCache.clear();fitCards(document);if(document.getElementById('hand'))layoutHand()};
+ document.fonts.ready.then(fontsChanged);document.fonts.addEventListener('loadingdone',fontsChanged);
+}
 if(typeof window!=='undefined'){let resizeFrame;window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{fitCards(document);layoutHand()})})}
 // ===== long-press (or right-click) to enlarge any card =====
 export let inspecting=null;

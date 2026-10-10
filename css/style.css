@@ -689,7 +689,7 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 @media (orientation:landscape){
  .combat .hand .card:not(.sel):not(.drag) .rline:not(.covered){display:block;position:absolute;left:7%;right:7%;top:47.5%;height:12px;padding:0 3px;overflow:hidden;white-space:nowrap;text-overflow:clip;
   font:600 10px/12px var(--font-body);color:#f1ece0;text-align:center;background:#0b0e14d6;border-radius:3px;text-shadow:0 1px 1px #000;pointer-events:none;z-index:3}
- .combat .hand .card:not(.sel):not(.drag) .rline.nofit{background:#1a1408e6;color:#ffe7a3;outline:1px solid #e7c56a}
+ .combat .hand .card:not(.sel):not(.drag) .rline.nofit{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
  .combat .hand .card.sel{transition:none}
 }
 /* (d) type labels >= 10px everywhere */
@@ -820,3 +820,93 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 @keyframes stage-mist{to{transform:translate3d(16px,-3px,0);opacity:.25}}
 @keyframes stage-spray{0%,75%,100%{opacity:0;transform:translate3d(0,0,0)}15%{opacity:.2}65%{opacity:0;transform:translate3d(10px,-18px,0)}}
 @media (prefers-reduced-motion:reduce){.stage-air *{animation:none!important}}
+
+/* =====================================================================================================================
+   Task 19: class mechanic "dais" beside the hero + battle popup placement
+   ===================================================================================================================== */
+.dais{--bz:#a8803c;--bz2:#5a4220;position:absolute;left:max(8px,env(safe-area-inset-left));top:52px;width:124px;max-height:calc(77vh - 52px);z-index:6;box-sizing:border-box;padding:5px 6px 6px;
+ display:flex;flex-direction:column;gap:4px;color:var(--ui-text);overflow:hidden;
+ background:radial-gradient(120% 70% at 50% 0,color-mix(in srgb,var(--class-primary) 22%,transparent),transparent 70%),linear-gradient(#10151ee6,#080b11ee);
+ border:2px solid var(--bz);border-radius:10px 10px 14px 14px;
+ box-shadow:inset 0 0 0 1px #000,inset 0 0 0 3px var(--bz2),inset 0 0 14px #000c,0 4px 12px #000c,0 0 14px color-mix(in srgb,var(--class-primary) 30%,transparent)}
+.dais::before,.dais::after{content:'';position:absolute;top:4px;width:5px;height:5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f1d79a,var(--bz) 55%,#2a1c0a);box-shadow:0 1px 1px #000}
+.dais::before{left:4px}.dais::after{right:4px}
+.dais-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9;pointer-events:none;z-index:0}
+.dais>*{position:relative;z-index:1}
+.dais-hd{text-align:center;line-height:1.05;padding:0 9px}
+.dais-hd b{display:block;font:700 12px var(--font-display);letter-spacing:.14em;text-transform:uppercase;color:var(--class-accent);text-shadow:0 1px 2px #000,0 0 6px color-mix(in srgb,var(--class-primary) 60%,transparent)}
+.dais-hd span{display:block;font:italic 600 9px var(--font-body);color:var(--ui-text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dais-body{display:flex;gap:5px;align-items:stretch;min-height:0;flex:1}
+.dais [data-info]{cursor:help}
+.dais .tbtn{min-height:30px;border-radius:7px;border:1px solid var(--bz);background:linear-gradient(#2a2216,#120e08);color:var(--class-accent);font:700 11px var(--font-display);padding:2px 5px;cursor:pointer;text-shadow:0 1px 1px #000;box-shadow:inset 0 1px 0 #fff2}
+.dais .tbtn.on{background:linear-gradient(var(--class-primary),var(--class-secondary));color:#fff;box-shadow:0 0 10px var(--class-primary)}
+.dais .tbtn:disabled{opacity:.45;cursor:default}
+.dais .chip{font-size:10px;padding:1px 4px;margin:0;border-color:var(--bz2);background:#0b0e14cc;white-space:nowrap}
+/* Tidecaller: tall glass tide gauge, Crest on top, Undertow below */
+.dais-tide .dais-body{flex-direction:row;gap:6px}
+.tg-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0}
+.tg-lbl{text-align:center;line-height:1;font:600 8.5px var(--font-body);color:var(--tidecaller-accent);white-space:nowrap}.tg-lbl b{display:block;font:700 9px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#bff6f0}
+.tg-lbl i{font-style:normal;color:var(--ui-text-muted)}
+.dais .tg-tube{display:flex;flex-direction:column;gap:1px;flex:1;width:34px;min-width:0;max-width:none;padding:3px;border-radius:12px;background:linear-gradient(90deg,#03080cf0,#0a1a24f0 40%,#03080cf0);border:2px solid #7fd9e277;box-shadow:inset 0 0 8px #000,0 0 8px #2fb8c433}
+.dais .tg-tube i{flex:1;height:auto;min-height:7px;border-radius:3px;background:#12212b;border:0;opacity:.8}
+.dais .tg-tube i.on{background:linear-gradient(90deg,#1b6f93,#3fc3d8 50%,#1b6f93);opacity:1}
+.dais .tg-tube i.on.hi{background:linear-gradient(90deg,#2fb8c4,#bff6f0 50%,#2fb8c4)}
+.dais .tg-tube i.on.lo{background:linear-gradient(90deg,#27408f,#4f6fd8 50%,#27408f)}
+.dais .tg-tube i.cur{outline:2px solid #fff;outline-offset:-1px;box-shadow:0 0 10px #a6f2e8;position:relative;z-index:2}
+.tg-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:42px}
+.tg-read{display:flex;flex-direction:column;align-items:center;line-height:1}.tg-read b{font:700 24px var(--font-number);text-shadow:0 0 8px #2fb8c4}.tg-read i{font:700 9px var(--font-display);font-style:normal;letter-spacing:.1em;color:var(--tidecaller-accent)}
+.tg-read.hi b{color:#bff6f0}.tg-read.lo b{color:#8fa8ff;text-shadow:0 0 8px #4f6fd8}.tg-read .drift{text-decoration:none;font-size:13px;color:#a6f2e8}
+/* Echo Mage: hanging bell rack */
+.dais-echo{--bellc:#7a6a9a}.dais-echo .dais-body{flex-direction:column}
+.rack{display:flex;flex-direction:column;gap:5px;border-top:3px solid var(--bz);padding-top:3px;background:linear-gradient(#0000,#0000)}
+.dbell{display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:5px;align-items:center;padding:2px 3px;border-radius:8px;background:#0b0e14aa;border:1px solid #4b2c9188}
+.dbell-svg{grid-row:1/3;width:30px;height:34px;color:#e8d9ff;filter:drop-shadow(0 2px 2px #000)}
+.dbell.ring{border-color:var(--echo-mage-primary);box-shadow:0 0 10px #a07bff66;--bellc:#c9a8ff}.dbell.ring .dbell-svg{animation:bellsway 2.6s ease-in-out infinite;transform-origin:50% 0}
+.dbell.empty{opacity:.6;border-style:dashed}
+.dcard{font:600 10.5px/1.1 var(--font-body);color:var(--echo-mage-accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dpv{font:700 11px var(--font-number);color:#fff}.dpv b{color:var(--echo-mage-accent)}
+.dghost{font:italic 600 10px var(--font-body);color:#cdbbf5;opacity:.85;border:1px dashed #a07bff88;border-radius:8px;padding:2px 4px;display:flex;justify-content:space-between;gap:4px}.dghost i{font-style:normal}
+@keyframes bellsway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+/* Cartographer: parchment sea chart with pinned Waypoints along a dotted route */
+.dais-carto{background:radial-gradient(120% 80% at 50% 0,#f3e3bf2e,transparent 70%),repeating-linear-gradient(0deg,#ffffff06 0 1px,transparent 1px 9px),linear-gradient(#3a2814f2,#1d130af2);border-color:#c79a4a}
+.dais-carto .dais-body{flex-direction:column}
+.wps.route{display:flex;flex-direction:column;gap:5px;position:relative;padding-left:3px}
+.wps.route::before{content:'';position:absolute;left:17px;top:10px;bottom:10px;border-left:2px dotted #d8a44699}
+.dais .wp{display:grid;grid-template-columns:28px 1fr;grid-template-rows:auto auto;column-gap:5px;align-items:center;min-width:0;min-height:30px;padding:2px 4px;margin:0;text-align:left;border-radius:8px;border:1px dashed #d8a44666;background:#0b0e1466;color:var(--cartographer-accent);font:inherit}
+.dais .wp.full{border:1px solid #d8a446;background:linear-gradient(#4a3418e0,#241808e0);box-shadow:inset 0 0 0 1px #000a;cursor:default}
+.dais .wp.adv{cursor:pointer;box-shadow:0 0 9px #d8a446aa;animation:wpglow 1.6s ease-in-out infinite}
+.dais .wp.land{border-color:#ffe29a;box-shadow:0 0 10px #ffe29a99}
+.dais .wp.pick{border-color:var(--status-energy);cursor:pointer}
+.dais .wp .pin{grid-row:1/3;width:26px;height:26px;border-radius:50% 50% 50% 8%;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;font-style:normal;background:radial-gradient(circle at 35% 30%,#ffd98a,#b5472f 60%,#4a1a10);border:1px solid #1a0c06;box-shadow:0 2px 3px #000}
+.dais .wp .pin>*,.dais .wp .pin{font-size:13px}.dais .wp .pin{line-height:1}
+.dais .wp.empty .pin{background:#241a0e;border:1px dashed #d8a44688;box-shadow:none}
+.dais .wp .wpn{font:700 10.5px/1.1 var(--font-body);max-width:none;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dais .wp.empty .wpn{color:#d8a44699;font-weight:600;font-style:italic}
+.dais .wp .pips{grid-column:2;gap:3px}.dais .wp .pips i{width:7px;height:7px;transform:rotate(45deg)}
+.dais .nexts{font-size:11px;white-space:nowrap;overflow:hidden;color:var(--cartographer-accent);max-width:100%}
+.dais .advhint{font:italic 600 9.5px var(--font-body);color:#f3e3bf;text-align:center}
+@keyframes wpglow{50%{box-shadow:0 0 3px #d8a44666}}
+/* Duelist: rhythm blade, Momentum notches climb the steel */
+.dais-duel .dais-body{flex-direction:row;gap:6px}
+.blade{position:relative;width:30px;display:flex;flex-direction:column;align-items:center;flex:none}
+.blade .tip-b{order:-1;width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-bottom:12px solid #cfd8e4;filter:drop-shadow(0 0 4px #d3dbe699)}
+.blade .notches{order:0;flex:1;width:22px;display:flex;flex-direction:column;gap:3px;padding:3px 3px;background:linear-gradient(90deg,#7e8b9c,#e8eef6 45%,#6c7888);box-shadow:inset 0 0 0 1px #0008}
+.blade .notches i{flex:1;min-height:12px;background:#22140f;box-shadow:inset 0 0 3px #000;transform:skewY(0)}
+.blade .notches i.on{background:linear-gradient(90deg,#9c2a1c,#ff7a5a 50%,#9c2a1c);box-shadow:0 0 8px #ec5f4a}
+.blade .notches i.mark{outline:1px solid #ffe29a;outline-offset:1px}
+.blade .hilt{order:1;width:30px;height:7px;border-radius:3px;background:linear-gradient(#e0b565,#6a4a1c);box-shadow:0 2px 2px #000}
+.blade-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:1;min-width:0}
+.mom-read{line-height:1;font:700 24px var(--font-number);text-shadow:0 0 8px #ec5f4a}.mom-read i{font:600 12px var(--font-number);font-style:normal;color:var(--ui-text-muted)}
+.dais-duel .tbtn.flo{width:100%;white-space:normal;line-height:1.05}
+.dais-duel .tbtn.flo:not(:disabled){animation:wpglow 1.4s ease-in-out infinite;border-color:#ec5f4a}
+/* tooltips and detail panel never sit on combatants: JS places them (ui/place.js); this is the baseline look */
+.tip#detail{max-width:188px}
+/* modal choices: centred over the empty middle of the battlefield, lighter backdrop so combatants stay visible */
+.combat .ov.battle{position:absolute;inset:50px 0 21% 0;background:radial-gradient(60% 80% at 50% 50%,#000a,#0004 80%,transparent);align-items:center;padding:4px}
+.combat .ov.battle .box{max-height:100%}
+.combat .ov.battle .box.tilebox{max-width:min(50vw,420px)}
+@media (orientation:portrait){.dais{position:relative;left:auto;top:auto;width:auto;max-height:none;margin:4px 8px}}
+.dais .nexts{display:flex;flex-direction:column;gap:0;font-size:10px;line-height:1.2;border-top:1px solid #d8a44655;padding-top:3px;white-space:normal}
+.dais .nexts b{font:700 9px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#d8a446;margin-left:2px}
+.dais .nexts .nx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8;padding-left:14px}.dais .nexts .nx.next{opacity:1;color:#fff3cf}
+.tip#detail.narrow{font-size:11px;padding:5px 6px}.tip#detail.narrow .desc{font-size:11px;line-height:1.2}.tip#detail.narrow .btn{min-height:34px;font-size:12px}
+@media(min-height:600px){.dais{zoom:1.25}}

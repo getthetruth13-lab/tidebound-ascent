@@ -18,10 +18,17 @@ const enemy=e=>e&&W.cb?`.en[data-en="${W.cb.ens.indexOf(e)}"]`:null;
 const figOf=sel=>sel&&$(sel+' .fig');
 const centre=sel=>{const el=sel&&($(sel+' .fig')||$(sel));return el?rectOf(el):null};
 // ---------- entries ----------
-function entry(total,apply){const e={t0:performance.now(),total,apply};entries.push(e);return e}
+let activeEntry=null;
+function entry(total,apply){const e={t0:performance.now(),total,animations:new Map(),slot:0};
+ e.apply=elapsed=>{const previous=activeEntry;activeEntry=e;e.slot=0;try{apply(elapsed)}finally{activeEntry=previous}};
+ entries.push(e);return e}
 // element.animate with a delay and an elapsed offset (resume); frames use individual transform properties (translate/scale/rotate) so they stack
-function play(el,frames,dur,elapsed,delay=0,easing='linear'){if(!el||!el.animate||elapsed>=delay+dur)return;
- return el.animate(frames,{duration:dur,delay:delay-elapsed,easing,fill:'backwards'})}
+function play(el,frames,dur,elapsed,delay=0,easing='linear'){const slot=activeEntry?activeEntry.slot++:0;
+ if(!el||!el.animate||elapsed>=delay+dur)return;
+ // A retained element already runs this entry at its original timeline position.
+ const previous=activeEntry?.animations.get(slot);if(previous?.el===el)return previous.animation;
+ previous?.animation.cancel();const animation=el.animate(frames,{duration:dur,delay:delay-elapsed,easing,fill:'backwards'});
+ if(activeEntry)activeEntry.animations.set(slot,{el,animation});return animation}
 const at=(ms,total)=>+(ms/total).toFixed(4);
 // ---------- one-shot visuals at a fixed time ----------
 const later=(ms,fn)=>ms>0?fxQueue.push(ms,fn):fn();
@@ -113,9 +120,9 @@ function reshuffle(){if(!enabled())return;const a=$('#discpile'),b=$('#drawpile'
   el.animate([{transform:'translate(-50%,-50%) scale(.9) rotate(0deg)',opacity:0},{transform:`translate(calc(-50% + ${dx*.5}px),calc(-50% + ${dy*.5+lift}px)) scale(1) rotate(${i%2?14:-14}deg)`,opacity:1,offset:.5},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.9) rotate(0deg)`,opacity:0}],{duration:360,delay:i*45,easing:'ease-in-out',fill:'backwards'}).finished.then(()=>el.remove(),()=>el.remove())}
  b.animate([{transform:'scale(1)'},{transform:'scale(1.14)',offset:.7},{transform:'scale(1)'}],{duration:260,delay:330})}
 function discardHand(){if(!enabled()||!W.cb)return;const pile=$('#discpile');if(!pile)return;const dest=rectOf(pile);
- const cards=$$('.hand .card').filter(el=>W.cb.hand.some(ci=>ci.uid==el.dataset.uid));let n=0;
+ const cards=$$('.hand .card').filter(el=>W.cb.hand.some(ci=>ci.uid==el.dataset.uid));const rects=new Map(cards.map(el=>[el,el.getBoundingClientRect()]));let n=0;
  for(const el of cards){const ci=W.cb.hand.find(c=>c.uid==el.dataset.uid),d=CARDS[ci.id];if(d.moor||ci.moor)continue;
-  const {g,r}=cloneCard(el);const i=n++,delay=i*40;
+  const {g,r}=cloneCard(el,rects.get(el));const i=n++,delay=i*40;
   if(d.fleet){emit('death',r.left+r.width/2,r.top+r.height/2,r.width*.7,r.height*.6,8);
    g.animate([{opacity:1,filter:'none',transform:'none'},{opacity:.9,filter:'brightness(1.8) grayscale(.5)',transform:'scale(1.04)',offset:.35},{opacity:0,filter:'brightness(.7) grayscale(1)',transform:'translateY(-14px) scale(.9)'}],{duration:320,delay,easing:'ease-out',fill:'backwards'}).finished.then(()=>g.remove(),()=>g.remove());continue}
   const tx=dest.x-(r.left+r.width/2),ty=dest.y-(r.top+r.height/2);
@@ -154,13 +161,13 @@ export function syncCombatAnimations(){
  document.body.classList.toggle('combat-motion',!!active&&enabled());
  if(!active){pending=[];syncScreens();if(combat){combat=null;hpMem={};blkMem={};lastEnergy=lastTide=null}return}
  if(combat!==W.cb){combat=W.cb;pending=[];entries=entries.filter(e=>e.keep);hpMem={};blkMem={};lastEnergy=lastTide=null;lastTurn=0;firstDrawn=false;enterCombat()}
- if(!enabled()){const recs=pending;pending=[];entries=[];document.querySelectorAll('.combat-action,.action-ghost,.echo-card').forEach(n=>n.remove());
+ if(!enabled()){const recs=pending;pending=[];for(const e of entries)for(const {animation} of e.animations.values())animation.cancel();entries=[];document.querySelectorAll('.combat-action,.action-ghost,.echo-card').forEach(n=>n.remove());
   // reduced motion: no movement, just a short edge flash when the hero is hit
   if(fxOn())for(const r of recs)if(r.k==='herohit'){vignette(r.amount>0?'red':'blue',r.amount>0?.4:.26,300);break}
   return}
  $$('.hero .spr-slot,.en .spr-slot').forEach((el,i)=>{
   const key=el.closest('.en')?.dataset.key||W.run.cls;let hash=0;for(const c of key)hash+=c.charCodeAt(0);
-  el.style.setProperty('--idle-phase',`-${(Date.now()+hash*17+i*719)%(3800+hash%1700)}ms`);
+  if(!el.style.getPropertyValue('--idle-period'))el.style.setProperty('--idle-phase',`-${(Date.now()+hash*17+i*719)%(3800+hash%1700)}ms`);
   el.style.setProperty('--idle-period',`${3800+hash%1700}ms`);
  });
  syncBars();syncResources();
@@ -264,9 +271,9 @@ function syncScreens(){if(!motionOn())return;const S=W.S,s=S.screen;
 // capture-phase click hooks: flights start before the click's own handler re-renders the screen
 addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.closest)return;
  const card=t.closest('.rewgrid .card');
- if(card){const deck=$('#deckbtn');if(deck){const all=$$('.rewgrid .card').filter(c=>c!==card);const {g,r}=cloneCard(card);
-   all.forEach(c=>{const o=cloneCard(c);o.g.animate([{opacity:1},{opacity:0,transform:'translateY(18px) scale(.9)'}],{duration:260,easing:'ease-in'}).finished.then(()=>o.g.remove(),()=>o.g.remove())});
-   const b=rectOf(deck),dx=b.x-(r.left+r.width/2),dy=b.y-(r.top+r.height/2);let raf=0;
+ if(card){const deck=$('#deckbtn');if(deck){const all=$$('.rewgrid .card').filter(c=>c!==card);const b=rectOf(deck),rects=new Map([card,...all].map(c=>[c,c.getBoundingClientRect()]));const {g,r}=cloneCard(card,rects.get(card));
+   all.forEach(c=>{const o=cloneCard(c,rects.get(c));o.g.animate([{opacity:1},{opacity:0,transform:'translateY(18px) scale(.9)'}],{duration:260,easing:'ease-in'}).finished.then(()=>o.g.remove(),()=>o.g.remove())});
+   const dx=b.x-(r.left+r.width/2),dy=b.y-(r.top+r.height/2);let raf=0;
    const trail=()=>{if(!g.isConnected)return;const q=g.getBoundingClientRect();emit('trail',q.left+q.width/2,q.top+q.height/2,COL.gold);raf=requestAnimationFrame(trail)};raf=requestAnimationFrame(trail);
    const end=()=>{cancelAnimationFrame(raf);g.remove();ring(b.x,b.y,COL.gold,54,360);emit('burst',b.x,b.y,COL.gold,10);deck.animate([{transform:'scale(1)'},{transform:'scale(1.3)',offset:.4},{transform:'scale(1)'}],{duration:320})};
    g.animate([{transform:'none',opacity:1},{transform:`translate(${dx*.3}px,${dy*.3-30}px) scale(.8) rotate(-6deg)`,opacity:1,offset:.4},{transform:`translate(${dx}px,${dy}px) scale(.18)`,opacity:.6}],{duration:520,easing:'cubic-bezier(.4,0,.5,1)'}).finished.then(end,end)}return}

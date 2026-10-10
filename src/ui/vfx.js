@@ -94,9 +94,10 @@ export function flyIcon(fromEl,toEl,{html,ms=520,col=COL.gold,done}={}){
 // ---------- screen crossfade: the old #app contents fade out over the new screen ----------
 let xf=null;
 export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!app||!app.firstChild)return;
+ const scrollOffset=scrollY,height=app.scrollHeight;
  if(xf){xf.remove();xf=null}
  const o=app.cloneNode(true);o.removeAttribute('id');o.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));o.classList.add('xfade');o.setAttribute('aria-hidden','true');
- o.style.cssText=`position:fixed;left:0;right:0;top:${-scrollY}px;height:${app.scrollHeight}px;z-index:55;pointer-events:none;overflow:hidden;visibility:visible`;
+ o.style.cssText=`position:fixed;left:0;right:0;top:${-scrollOffset}px;height:${height}px;z-index:55;pointer-events:none;overflow:hidden;visibility:visible`;
  o.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
  document.body.appendChild(o);xf=o;
  const fin=()=>{o.remove();if(xf===o)xf=null};

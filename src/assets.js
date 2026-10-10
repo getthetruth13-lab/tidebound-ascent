@@ -102,8 +102,11 @@ export const CARD_ART={};
 export async function loadCardArt(){await loadCombatIconArt();try{const r=await fetch('art/v2/cards/cards.json',{cache:'no-cache'});if(!r.ok)return 0;const j=await r.json();
  for(const k in CARD_ART)delete CARD_ART[k];for(const [id,v] of Object.entries(j))if(v&&v.art)CARD_ART[id]={art:v.art,thumb:v.thumb||v.art};return Object.keys(CARD_ART).length}catch(e){return 0}}
 
+// Class mechanic display (the 'dais' beside the hero): painted backplate per class, art/v2/ui/icons.json 'dais'. Null -> CSS placeholder.
+export const DAIS_ART={};
 // Runtime manifest allows painted replacements without rebuilding the generated icon module.
 async function loadCombatIconArt(){try{const r=await fetch('art/v2/ui/icons.json',{cache:'no-cache'});if(!r.ok)return;const j=await r.json();
  for(const [k,id] of Object.entries(ST_ICON))if(j.status?.[id])ASSETS.status[k]=j.status[id];
  for(const [id,path] of Object.entries(j.intent||{}))if(path)ASSETS.ui[id]=path;
+ for(const [id,path] of Object.entries(j.dais||{}))if(path)DAIS_ART[id]=path;
  }catch(e){/* Keep the existing art and bronze vector placeholders offline. */}}

@@ -1,7 +1,7 @@
 // ui/screens/heroes.js: presentation text for the four Lampbearers (character select, Learn to Play).
 // Voice and facts follow design-v2 "WORLD LORE & VOICE" (L.1 premise, L.2 why you climb). Mechanic numbers come from CLASSES[k].rule.
 export const SPRITE_OF={tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist'};
-export const ORDER=['tide','echo','carto','duel'];
+export const ORDER=['duel','echo','carto','tide'];
 export const HEROES={
  tide:{epithet:'Moon-Sworn Keeper of the Tides',
   blurb:'A patient caster who bends the sea itself: raise it, lower it, and let it break over every foe.',

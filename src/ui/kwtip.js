@@ -3,6 +3,7 @@
 // The list is built from the KW glossary (data/keywords.js), so new keywords appear automatically.
 import {KW,CARDS,RELICS} from '../core/registry.js';
 import {cardHTML,fitCards} from './render.js';
+import {pickSpot} from './place.js';
 const EXTRA={ // statuses and terms the glossary spreads across other entries
  Landmark:'A Waypoint at Rank 3. Landmarks count twice for Expedition cards.',
  Rooted:'At the end of each of her turns, she gains 4 Guard per living Tendril.'};
@@ -37,16 +38,12 @@ function showCard(el){const id=el.dataset.card;if(!CARDS[id])return false;
  if(!ctip){ctip=document.createElement('div');ctip.id='cardtip';ctip.setAttribute('role','tooltip');document.body.appendChild(ctip)}
  if(tip)tip.classList.remove('on');
  ctip.innerHTML=cardHTML({id,uid:-900,up:el.dataset.up==='1'},{full:true});ctip.classList.add('on');fitCards(ctip);anchor=el;shownAt=Date.now();
- const r=el.getBoundingClientRect(),W=innerWidth,H=innerHeight,tr=ctip.getBoundingClientRect();
- let x=r.right+10;if(x+tr.width>W-6)x=r.left-tr.width-10;if(x<6)x=Math.max(6,Math.min(W-tr.width-6,r.left+r.width/2-tr.width/2));
- let y=r.top+r.height/2-tr.height/2;y=Math.max(6,Math.min(H-tr.height-6,y));
+ const r=el.getBoundingClientRect(),tr=ctip.getBoundingClientRect();const sp=pickSpot(tr.width,tr.height,r,el);const x=sp.x,y=sp.y;
  ctip.style.left=x+'px';ctip.style.top=y+'px';clearTimeout(timer);timer=setTimeout(hideTip,6500);return true}
 export function showTip(el){if(el.dataset.card)return showCard(el);if(ctip)ctip.classList.remove('on');const c=contentOf(el);if(!c||!c.text){return false}
  const t=ensure();const sl=el.matches('.relic,.potion,.shopicon')&&el.querySelector('.slot');const rl=el.dataset.relic&&RELICS[el.dataset.relic];
  t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${rl.flavour}</em>`:''}</div></div>`:`${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>`;t.classList.toggle('item',!!sl);t.classList.add('on');anchor=el;shownAt=Date.now();
- const r=el.getBoundingClientRect(),W=innerWidth,H=innerHeight,tr=t.getBoundingClientRect();
- let x=r.left+r.width/2-tr.width/2;x=Math.max(6,Math.min(W-tr.width-6,x));
- let y=r.top-tr.height-8;if(y<6)y=Math.min(H-tr.height-6,r.bottom+8);
+ t.style.maxWidth=el.closest('.dais')?'150px':'';const r=el.getBoundingClientRect(),tr=t.getBoundingClientRect();let x,y;if(document.querySelector('.combat')){const sp=pickSpot(tr.width,tr.height,r,el);x=sp.x;y=sp.y}else{x=Math.max(6,Math.min(innerWidth-tr.width-6,r.left+r.width/2-tr.width/2));y=r.top-tr.height-8;if(y<6)y=Math.min(innerHeight-tr.height-6,r.bottom+8)}
  t.style.left=x+'px';t.style.top=y+'px';clearTimeout(timer);timer=setTimeout(hideTip,6500);return true}
 // ---------------- input ----------------
 const LP=450;let lp=null,eat=false;
@@ -55,13 +52,13 @@ const inHand=el=>!!el.closest('.hand .card'); // hand cards: a tap must lift/pla
 const inButton=el=>!!el.closest('button');
 document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.preventDefault();return}
  const el=find(e);const ref=el&&(el.dataset.kw||el.dataset.card);
- if(el&&el.matches('.tipi,.lp-node')){if(anchor===el&&tip.classList.contains('on'))hideTip();else showTip(el);e.stopPropagation();e.preventDefault();return}
+ if(el&&el.matches('.tipi,.lp-node,.dais [data-info]:not(button)')){if(anchor===el&&tip.classList.contains('on'))hideTip();else showTip(el);e.stopPropagation();e.preventDefault();return}
  if(!ref){const on=(tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on'));if(on&&!(e.target.closest&&e.target.closest('#kwtip,#cardtip')))hideTip();return}
  if(inHand(el)||inButton(el))return hideTip();
  const open=anchor===el&&((tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on')));if(open&&Date.now()-shownAt>400){hideTip()}else if(open){/* hover just opened it */}else showTip(el);
  e.stopPropagation();e.preventDefault()},true);
 document.addEventListener('pointerdown',e=>{if(lp){clearTimeout(lp.t);lp=null}if(e.pointerType==='mouse'&&e.button>0)return;
- const el=find(e);if(!el||inHand(el))return;const ok=(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.lp-node');if(!ok)return;
+ const el=find(e);if(!el||inHand(el))return;const ok=(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.lp-node,.dais [data-info]');if(!ok)return;
  lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el))eat=true},LP)}},true);
 document.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){clearTimeout(lp.t);lp=null}},true);
 document.addEventListener('pointerup',()=>{if(lp){clearTimeout(lp.t);lp=null}setTimeout(()=>{eat=false},350)},true);

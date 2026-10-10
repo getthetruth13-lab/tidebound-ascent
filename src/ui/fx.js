@@ -9,7 +9,7 @@ export {syncCombatAnimations} from './anim.js';
 // Animation that should play ONCE: returns a negative delay so a re-render resumes it instead of replaying it.
 export function anim(ts,dur){const age=Date.now()-(ts||0);return age<dur?`animation-delay:-${age}ms`:null}
 // A positioned, inert copy of a rendered hand card (body-level, so it survives render()).
-export function cloneCard(el){const r=el.getBoundingClientRect();const g=el.cloneNode(true);g.classList.remove('sel','drag','unp');g.classList.add('flycard');
+export function cloneCard(el,rect){const r=rect||el.getBoundingClientRect();const g=el.cloneNode(true);g.classList.remove('sel','drag','unp');g.classList.add('flycard');
  for(const a of ['data-i','data-uid','id'])g.removeAttribute(a);g.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));g.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));g.removeAttribute('onclick');g.setAttribute('aria-hidden','true');
  Object.assign(g.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',transform:'none',transition:'none'});document.body.appendChild(g);return {g,r}}
 // Card play (R7): 60 ms anticipation (lift 8 px, scale 1.1), then a type-specific flight with a class-coloured trail and a landing flash.
@@ -17,11 +17,12 @@ export function cloneCard(el){const r=el.getBoundingClientRect();const g=el.clon
 export const IMPACT_MS=160;
 export function flyCard(ci,target){if(!motionOn())return;const el=document.querySelector(`.hand .card[data-uid="${ci.uid}"]`);if(!el||!el.animate)return;
  const d=CARDS[ci.id],type=d.t==='A'?'A':d.t==='P'?'P':'S',col=CLASS_COL[W.run.cls]||COL.teal;
- const {g,r}=cloneCard(el);const cx=r.left+r.width/2,cy=r.top+r.height/2;let dest=null;
+ let dest=null;
  const te=target&&document.querySelector(`.en[data-en="${W.cb.ens.indexOf(target)}"] .fig`);
  if(type==='A'){if(te)dest=rectOf(te);else{const fs=[...document.querySelectorAll('.en .fig')].map(rectOf);if(fs.length)dest={x:fs.reduce((a,b)=>a+b.x,0)/fs.length,y:fs[0].y}}}
  else{const h=document.querySelector('#hero .fig');if(h)dest=rectOf(h)}
  if(!dest)dest={x:innerWidth/2,y:innerHeight*.3};
+ const {g,r}=cloneCard(el);const cx=r.left+r.width/2,cy=r.top+r.height/2;
  const tx=dest.x-cx,ty=dest.y-cy,rot=tx>0?8:-8;
  const fly=type==='A'?100:type==='S'?260:520,total=60+fly,k=60/total;
  const frames=type==='A'

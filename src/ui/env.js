@@ -167,7 +167,8 @@ export function bandToast(name){const el=document.createElement('div');el.classN
 // The painted floor line (69% of the 1440-tall layer space) sits on 69% of the screen height, layers cover the viewport
 // (the S24's 19.5:9 frame is exactly the centred 3120×1440, i.e. 240 px overscan each side), aspect never distorted.
 // On screens wider than 2.5:1 the stack grows 4% so the fg parallax still has overscan.
-function anchor(force){if(!root)return;const vw=innerWidth,vh=innerHeight;const gy=vh*GROUND;
+let anchorWidth=0,anchorHeight=0;
+function anchor(force){if(!root)return;if(force||!anchorWidth){anchorWidth=innerWidth;anchorHeight=innerHeight}const vw=anchorWidth,vh=anchorHeight;const gy=vh*GROUND;
  const ASPECT=aspect();const h=Math.max(vh,vw*1.04/ASPECT);const top=gy-h*GROUND;
  const sig=`${vw}x${vh}@${Math.round(gy)}`;if(!force&&root.dataset.anchor===sig)return;root.dataset.anchor=sig;
  document.querySelectorAll('#env .envstack,#env-front .envstack').forEach(el=>{const st=el.style;st.height=h+'px';st.width=h*ASPECT+'px';st.top=top+'px'})}
