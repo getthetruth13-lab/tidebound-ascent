@@ -15,9 +15,8 @@ const E=(id,o)=>card('echo',id,o);
 const susUp=(f,extra)=>{if(f.echo&&f.u&&extra)f.ci.sus=(f.ci.sus||0)+extra};
 const notes=n=>{for(let i=0;i<n;i++)addCard('note','hand');floatText('p','🎵 +'+n+' Note'+(n>1?'s':''),'')};
 // How many times this card instance has Echoed this combat (Swell Note).
-const echoN=new WeakMap();
-const echoCount=ci=>{const m=echoN.get(W.cb);return m&&m.get(ci.uid)||0};
-const bumpEcho=ci=>{let m=echoN.get(W.cb);if(!m)echoN.set(W.cb,m=new Map());m.set(ci.uid,(m.get(ci.uid)||0)+1);return m.get(ci.uid)};
+const echoCount=ci=>W.cb.echoCounts?.[ci.uid]||0;
+const bumpEcho=ci=>{const m=W.cb.echoCounts||(W.cb.echoCounts={});return m[ci.uid]=(m[ci.uid]||0)+1};
 // ---------------- Common ----------------
 E('gracenote',{e:'🎵',d:'Add {2|3} Notes to your hand. Faint.',p:f=>notes(f.v(2,3))});
 E('chime',{e:'🔔',d:'Choose: deal {9|12}; or deal {4|6} and draw 1.',p:f=>ask(f,'Chime',[{l:'Deal '+f.v(9,12),f:()=>f.dmg(f.v(9,12))},{l:'Deal '+f.v(4,6)+'; draw 1',f:()=>{f.dmg(f.v(4,6));f.draw(1)}}])});
@@ -56,8 +55,8 @@ E('metronome',{e:'⏱️',d:'Every 4th card you play each turn, draw 1.',power:{
 // here: if the Mark comes later we catch it on the Mark; if it already happened we read the discard pile order.
 E('fermata',{e:'𝄐',d:'This turn, your Echo also repeats the card you played just before your Marked card. Faint.',p:f=>{const c=W.cb;let prev=null,prevTgt=null;
  if(c.mark){const pile=c.disc.includes(c.mark)?c.disc:c.exh;const i=pile.indexOf(c.mark);if(i>0&&!CARDS[pile[i-1].id].faint&&CARDS[pile[i-1].id].t!=='P')prev=pile[i-1]}
- const L=thisTurn({id:'fermata',on:{mark(inst){prev=c.last&&!CARDS[c.last.id].faint?c.last:null;prevTgt=c.lastTgt},
-  echo(inst,ctx){if(inst.done||ctx.k!==0||!prev||!c.mark)return;inst.done=true;if(c.stat.echoesTurn>=EC.cap){log('🔇 Fermata: Echo cap reached');return}
+ const L=thisTurn({id:'fermata',prev,prevTgt,on:{mark(inst){inst.prev=c.last&&!CARDS[c.last.id].faint?c.last:null;inst.prevTgt=c.lastTgt},
+  echo(inst,ctx){const prev=inst.prev,prevTgt=inst.prevTgt;if(inst.done||ctx.k!==0||!prev||!c.mark)return;inst.done=true;if(c.stat.echoesTurn>=EC.cap){log('🔇 Fermata: Echo cap reached');return}
    const d=CARDS[prev.id];const g=F(prev,{echo:true,tgt:prevTgt});runCard(d,g);c.stat.echoesTurn++;c.stat.echoesCombat++;if(d.sus)prev.sus=(prev.sus||0)+mod('sustain',{card:prev},d.sus);
    log('𝄐 Fermata: '+cname(prev)+' echoes too');callout('FERMATA: '+cname(prev),'echo')}}});
  log(prev?'𝄐 Fermata will repeat '+cname(prev):'𝄐 Fermata: Mark a card after another card')}});
@@ -76,7 +75,7 @@ E('chorusline',{e:'🎤',d:'Draw 1 for every 2 cards played this turn (max {3|4}
 E('dissonance',{e:'🔀',d:'Deal {9|12}. If the target has Exposed, apply 2 Soaked. <b>Resound:</b> it hits ALL.',p:f=>{const ts=f.echo?alive():[f.tg].filter(Boolean);
  const exp=new Set(ts.filter(t=>t.st.vuln));if(f.echo)f.all(f.v(9,12));else f.dmg(f.v(9,12));exp.forEach(t=>{if(t.hp>0)f.weak(2,t)})}});
 E('grandpause',{e:'⏸️',d:'Gain {10|14} Guard. End your turn (Echo still happens).',p:f=>{f.blk(f.v(10,14));if(f.echo)return;const c=W.cb,turn=c.turn;
- callout('GRAND PAUSE','echo');queueMicrotask(()=>{if(W.cb===c&&c.turn===turn&&!c.busy&&!c.mode)endTurn()})}});
+ callout('GRAND PAUSE','echo');if(W.previewing){c.previewEndTurn=true;return}queueMicrotask(()=>{if(W.cb===c&&c.turn===turn&&!c.busy&&!c.mode)endTurn()})}});
 E('coda',{e:'🎯',d:'Can only be played if you played 3+ cards this turn. Deal {14|18}.',req:f=>W.cb.stat.playedTurn>=3,fx:[['dmg',14,18]]});
 E('tuningblade',{e:'🗡️',sus:2,moor:1,d:'Deal {7|9}. Sustain {2|3}. Moor.',p:f=>{f.dmg(f.v(7,9));susUp(f,1)}});
 E('swellchord',{e:'🎶',d:'Gain {3|4} Guard for each card played this turn (counting this). Faint.',p:f=>f.blk(f.v(3,4)*(playedBefore()+1))});
@@ -92,6 +91,6 @@ E('magnumopus',{e:'🏆',d:'Deal {24|30}. <b>Resound:</b> deal {24|30} to ALL in
 E('infinitehum',{e:'🎵',d:'Your Marked card gains +2 per card played after it, not +1 (max +6).',power:{mod:{markPer(inst,ctx,v){return v*2},markCap(inst,ctx,v){return v*3}}}});
 E('livingsong',{e:'🌱',sus:4,moor:1,d:'Deal {6|9}. Sustain {4|5}. When this Echoes, draw 1. Moor.',p:f=>{f.dmg(f.v(6,9));if(f.echo)f.draw(1);susUp(f,1)}});
 E('feedstorm',{e:'🌪️',d:'Deal {4|5} to ALL for each Echo this combat (max 15). Sink.',p:f=>{const n=Math.min(15,W.cb.stat.echoesCombat);if(!n){log('🌪️ Feedback Storm: no Echoes yet');return}f.all(f.v(4,5)*n);callout('FEEDBACK STORM ×'+n,'echo')}});
-E('solo',{e:'🎸',d:'This turn, your Echo happens one extra time, and you can play at most 3 more cards. Faint.',p:f=>{const ci=f.ci;let k=0;callout('SOLO: 3 more cards','echo');
- thisTurn({id:'solo',mod:{echoPlan(inst,ctx,p){return {...p,repeats:p.repeats+1}},canPlay(inst,ctx,v){return k>=3?false:v}},on:{cardPlayed(inst,ctx){if(ctx.card!==ci)k++}}})}});
+E('solo',{e:'🎸',d:'This turn, your Echo happens one extra time, and you can play at most 3 more cards. Faint.',p:f=>{const ci=f.ci;callout('SOLO: 3 more cards','echo');
+ thisTurn({id:'solo',played:0,mod:{echoPlan(inst,ctx,p){return {...p,repeats:p.repeats+1}},canPlay(inst,ctx,v){return inst.played>=3?false:v}},on:{cardPlayed(inst,ctx){if(ctx.card!==ci)inst.played++}}})}});
 E('finalchord',{e:'🎆',d:'Deal 3 for each card played this combat (max 40 counted). Sink.',p:f=>{const n=Math.min(40,W.cb.stat.playedCombat);f.dmg(3*n);if(n>=10)callout('FINAL CHORD ×'+n,'echo')}});

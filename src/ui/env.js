@@ -52,7 +52,7 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
  if(s==='combat'&&W.cb){if(!W.cb.envKey){const boss=W.cb.ens.find(e=>e.boss);
    W.cb.envKey=W.cb.kind==='boss'&&boss?{id:ENV.bossLair[boss.key]||bandEnv(act,15),grade:'boss'}:{id:bandEnv(act,floor),grade:W.cb.kind==='elite'?'elite':'normal'}}
   return last=W.cb.envKey}
- if(s==='reward'||s==='pick'||s==='msg'||s==='potpick')return {...(last||{id:bandEnv(act,floor),grade:'normal'}),dim:.55};
+ if(s==='event'||s==='reward'||s==='pick'||s==='msg'||s==='potpick')return {...(last||{id:bandEnv(act,floor),grade:'normal'}),dim:.55};
  if(s==='end')return {...(last||{id:bandEnv(act,floor)}),grade:'boss',dim:.5};
  const room={event:'event',shop:'shop',rest:'rest',chest:'treasure'}[s];
  if(room)return {id:(ENV.screenScene[room]||{})[act]||(ENV.screenScene[room]||{})[1],grade:'room',dim:{event:.5,shop:.3,rest:.25,treasure:.8}[room]};
@@ -60,6 +60,7 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
 // Called after every render(): touches the DOM only when the key changes.
 export function syncEnv(){if(!root)return;const k=envKeyFor();const sig=`${k.id}|${k.band||''}|${k.grade}|${k.dim||0}|${quality()}`;anchor();
  overlayOpen=!!document.querySelector('#app .ov');document.body.classList.toggle('env-combat',!!(W.S&&W.S.screen==='combat'));
+ document.body.classList.toggle('scene-choice',['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks');
  if(sig===cur)return;const prev=cur;cur=sig;
  const e0=ENV.envs[k.id]||ENV.envs.a1_shore||{};const e=k.id==='map_a1'?mapEnv(e0,k.band):e0;const g=ENV.grades[k.grade]||{tint_add:0,vig_add:0};
  const changedEnv=root.dataset.env!==k.id;
@@ -164,11 +165,12 @@ function playTransition(kind,col){if(!wipe||!wipe.animate)return;const fast=wind
  if(kind==='iris'){wipe.className='iris';wipe.animate([{clipPath:'circle(0% at 50% 45%)',opacity:1,offset:0},{clipPath:'circle(150% at 50% 45%)',opacity:1,offset:.85},{clipPath:'circle(150% at 50% 45%)',opacity:0}],{duration:1050*fast,easing:'ease-out'});return}}
 export function bandToast(name){const el=document.createElement('div');el.className='bandtoast';el.textContent='Entering '+name;document.body.appendChild(el);setTimeout(()=>el.remove(),window.FAST?600:1700)}
 // ---------- ground anchor ----------
-// The painted floor line (69% of the 1440-tall layer space) sits on 69% of the screen height, layers cover the viewport
+// The painted floor line is 69% of the layer space; align it to the battle foot
+// anchor (56% of the viewport), or 69% outside combat. Layers cover the viewport
 // (the S24's 19.5:9 frame is exactly the centred 3120×1440, i.e. 240 px overscan each side), aspect never distorted.
 // On screens wider than 2.5:1 the stack grows 4% so the fg parallax still has overscan.
 let anchorWidth=0,anchorHeight=0;
-function anchor(force){if(!root)return;if(force||!anchorWidth){anchorWidth=innerWidth;anchorHeight=innerHeight}const vw=anchorWidth,vh=anchorHeight;const gy=vh*GROUND;
+function anchor(force){if(!root)return;if(force||!anchorWidth){anchorWidth=innerWidth;anchorHeight=innerHeight}const vw=anchorWidth,vh=anchorHeight;const gy=vh*(W.S.screen==='combat'?.56:GROUND);
  const ASPECT=aspect();const h=Math.max(vh,vw*1.04/ASPECT);const top=gy-h*GROUND;
  const sig=`${vw}x${vh}@${Math.round(gy)}`;if(!force&&root.dataset.anchor===sig)return;root.dataset.anchor=sig;
  document.querySelectorAll('#env .envstack,#env-front .envstack').forEach(el=>{const st=el.style;st.height=h+'px';st.width=h*ASPECT+'px';st.top=top+'px'})}

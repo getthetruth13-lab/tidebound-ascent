@@ -13,7 +13,7 @@ const PROFILES={
  a1_lair_kelp:{groundY:.55,grade:'saturate(.83) brightness(.88)',light:-1,haze:.11}
 };
 export function stageProfile(){const id=envKeyFor().id,e=ENV.envs[id]||{};return {groundY:.55,grade:'saturate(.88) brightness(.93)',light:-1,haze:.08,...PROFILES[id],rim:e.rim||'#8fa3c7',air:e.tint?.col||e.pal?.[1]||'#587c83'}}
-export function groundY(){return Math.min(stageProfile().groundY,innerHeight<=400?.54:.56)}
+export function groundY(){return .56}
 export function stageAtmosphereHTML(front){return `<div class="stage-air ${front?'front':'back'}" aria-hidden="true"><i class="stage-mist"></i>${Array.from({length:front?4:6},(_,i)=>`<i class="stage-spray" style="--i:${i};left:${15+i*13}%;top:${front?47+i%2*3:38+i%3*4}%"></i>`).join('')}</div>`}
 export function syncStage(){const scene=document.querySelector('.combat .scene');if(!scene)return;const p=stageProfile();
  scene.style.setProperty('--stage-grade',p.grade);scene.style.setProperty('--stage-rim',p.rim);scene.style.setProperty('--stage-air',p.air);scene.style.setProperty('--stage-haze',p.haze);scene.style.setProperty('--stage-light',p.light+'px');

@@ -74,7 +74,7 @@ export const GUARD_SVG='<svg class="sti" viewBox="0 0 24 28" aria-hidden="true">
 export const STATUS_KEYS=ORDER;
 export const statusInfo=k=>STATUS[k];
 // Optional art slots use distinct ids: no reuse of another status's painting.
-function iconOf(k){const a=assetSrc('status',k);return `<span class="status-art">${ICON[k]}${a?`<img class="uic" src="${a}" alt="" draggable="false" onerror="this.remove()">`:''}</span>`}
+export function iconOf(k){const a=assetSrc('status',k);return `<span class="status-art">${ICON[k]}${a?`<img class="uic" src="${a}" alt="" draggable="false" onerror="this.remove()">`:''}</span>`}
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 const sentence=t=>{const s=(t||'').split(/(?<=[.!?])\s+/);return s.slice(0,2).join(' ')};
 export function statusText(k,v){const d=STATUS[k];if(!d)return '';

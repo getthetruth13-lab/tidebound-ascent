@@ -1,3 +1,4 @@
+import {showOutcome} from './outcome.js';
 import {intentIcon} from './intent-icons.js';
 import {daisHTML} from './classdais.js';
 import {placeDetail} from './place.js';
@@ -145,14 +146,11 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
   return `<span>Momentum</span><span class="pips mom">${p}</span>${fb}${cb.parry?`<span class="chip parry">🤺 Parry ${cb.parry}</span>`:''}${cb.keepMom?'<span class="chip">🏃 keeps</span>':''}`}}
 // ---------------- combat ----------------
 // ---------------- battle figures (Art Director spec) ----------------
-// Larger figures on the 1560x720 basis, capped below the mechanic strip and intents.
-// Within a role, the sprite's screenHeightPct sets its preferred height; cap it to reserve panel and hand space.
-const ROLE_H={hero:[380,440,47,57],normal:[300,390,24,49],elite:[400,440,44,52],boss:[470,470,75,75]};
-export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*groundY()),top:52,heroTop:W.run.cls==='carto'?114:94}}
-function figH(role,sp){const r=ROLE_H[role]||ROLE_H.normal;const p=sp?sp.pct:(r[2]+r[3])/2;const t=r[3]>r[2]?Math.max(0,Math.min(1,(p-r[2])/(r[3]-r[2]))):0;return r[0]+(r[1]-r[0])*t}
+// Fill the free battle area, keeping foot anchors above the resting hand.
+export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*groundY()),top:52,heroTop:72}}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
-function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min(figH(role,sp)*g.s,g.feet-(role==='hero'?Math.max(g.top+42,g.heroTop):g.top+42)));
+function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min((role==='hero'?g.vh*.40:role==='boss'?g.vh*.43:role==='elite'?g.vh*.38:g.vh*.34),g.feet-(role==='hero'?g.heroTop:g.top+32)));
  if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*sp.h/sp.w));
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
  const top=g.feet-H-hov,L=x-Math.round(W*ax),fx0=Math.round(W*ax);const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.max(96,Math.min(150,H*.62)));
@@ -162,7 +160,7 @@ function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){
  <div class="fig ${shake?'shake':''}" style="width:${W}px;height:${H}px;left:0;top:0;${shake||''}">${img}</div>
  ${intent?`<div class="intentw" style="top:${it}px">${intent}</div>`:''}
  <div class="plate" style="top:${H+hov+2}px">${`<div class="nm">${name}</div>`}${hp}<div class="stw">${badgesH}</div></div>${fx}</div>`}
-function enemyX(i,n,g){const a=n>=3?.54:.57,b=n>=3?.89:.84;return Math.round(g.vw*(n===1?.70:a+(b-a)*i/(n-1)))}
+function enemyX(i,n,g){const a=n>=3?.53:.60,b=n>=3?.87:.80;return Math.round(g.vw*(n===1?.70:a+(b-a)*i/(n-1)))}
 export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,enemyMaxWidth:(n||1)>=3?g.vw*.165:0};const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
  const role=e.boss?'boss':e.elite?'elite':'normal';const vi=W.cb.ens.slice(0,i).filter(x=>x.key===e.key).length;
  const flav=ENEMY_FLAVOUR[e.key],nm0=flav?`<span class="nmf" data-info="${tesc(e.n+': '+flav)}">${e.n}</span>`:e.n;
@@ -170,7 +168,7 @@ export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,enemyMaxWidth:(n||
  return figureHTML({sp:spriteFor('enemies',e.key,vi),role,ph:e.e,g,x:enemyX(k==null?i:k,n||1,g),shake:sh,intent:intentHTML(e),name,hp:hpbar(e.hp,e.max,e.block,e.blkT,'e'+e.uid),
   badgesH:badges(0,0,{...e.st,...(e.passive?.n==='Rooted'?{rooted:1}:{})}),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
 export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const sh=motionEnabled()?null:anim(W.cb.pshake,400);
- return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.25),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
+ return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.30),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
   badgesH:badges(0,0,{...W.cb.p.st,...(W.cb.parry&&!W.cb.parryUsed?{parry:W.cb.parry}:{})},playerStates()),fx:fxHTML('p'),cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
 export function tipHTML(){const cb=W.cb;
  if(cb.sel!=null&&cb.hand[cb.sel]){const ci=cb.hand[cb.sel],d=CARDS[ci.id];const can=canPlay(ci),nt=needsTarget(ci);const t=nt?curTgt():null;
@@ -202,21 +200,17 @@ export function tgt(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)ret
  if(cb.sel!=null&&cb.hand[cb.sel]&&needsTarget(cb.hand[cb.sel])){const s=cb.sel;return window.playCard(s)}
  cb.insp=cb.insp===i?null:i;cb.sel=null;render()}
 export function sceneTap(ev){if(!W.cb||drag)return;if(ev.target.closest('.en,.tip,.hero'))return;if(W.cb.sel!=null||W.cb.insp!=null){W.cb.sel=null;W.cb.insp=null;render()}}
-// Hand (Art Director spec, landscape): at rest cards are 34% of the screen height (5:7), fanned and overlapping, tops at 79%
-// (no higher than 66%), the lower part off-screen, so the floor line, sprite feet, name plates and HP bars stay visible.
-// Touch (select) or drag lifts a card to full view: --zl scales it so its rules text is >= 15 CSS px, bottom on the screen edge.
-export const HAND_REST_TOP=.79;
+// Full framed cards at rest; one card rises above a scrubbing finger or cursor.
+export const HAND_REST_TOP=.67;
 export function layoutHand(){const hand=document.getElementById('hand');if(!hand)return;const cards=[...hand.querySelectorAll('.card')];const n=cards.length;if(!n)return;hand.classList.add('instant');
  const land=matchMedia('(orientation:landscape)').matches;const vh=innerHeight;
  const Wd=hand.clientWidth,cw=cards[0].offsetWidth,ch=cards[0].offsetHeight;const hr=hand.getBoundingClientRect();const cx=hr.left+Wd/2;
  const step=n>1?Math.min(cw*.92,(Wd-cw)/(n-1)):0;const ang=land?1.6:n>6?2.5:4;
  const eL=Math.min(innerWidth,...[...document.querySelectorAll('.combat .en .fig')].map(f=>f.getBoundingClientRect().left));
- const textSizes=cards.map(el=>{const tx=el.querySelector('.text');return tx?parseFloat(getComputedStyle(tx).fontSize)||9:9});
  const zoom=land?0:(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--zoom'))||1.4);
- cards.forEach((el,i)=>{const off=i-(n-1)/2;const x=off*step,y=Math.abs(off)*Math.abs(off)*cw*(land?.012:.018);
-  const textPx=textSizes[i];
-  const zl=land?Math.min(Math.max(1.62,15.2/textPx),(vh-10)/ch):zoom;
-  const hidden=land?Math.max(0,ch-(vh*(1-HAND_REST_TOP))):0;const ly=land?-(hidden+4):-8;
+ cards.forEach((el,i)=>{const off=i-(n-1)/2;const x=off*step,y=(Math.abs(off)*Math.abs(off)-Math.pow((n-1)/2,2))*cw*(land?.012:.018);
+  const zl=land?1.55:zoom;
+  const ly=land?-Math.min(68,vh*.15):-8;
   // a lifted card slides left of the enemy row when there is room, so it doesn't hide the target it's aimed at
   const zw=cw*zl;const lo=zw/2+4-cx;let hi=innerWidth-zw/2-4-cx;if(land&&eL<innerWidth&&eL-zw-10>0)hi=Math.min(hi,eL-zw/2-6-cx);const xs=Math.max(lo,Math.min(hi,x));
   el.style.setProperty('--x',x+'px');el.style.setProperty('--y',y+'px');el.style.setProperty('--r',off*ang+'deg');el.style.setProperty('--xs',xs+'px');
@@ -329,7 +323,7 @@ function updateHTML(app,html,reset){const next=document.createElement('div');nex
 }
 
 // ---------------- render ----------------
-export function render(){if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;
+export function render(){if(W.previewing)return;if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;
  if(s==='title')h=titleScr();
  else if(s==='travel')h=travelScr();
  else if(s==='map')h=`<div class="page mappage">`+topBar()+mapHTML(true)+'</div>';
@@ -356,7 +350,7 @@ export function render(){if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))re
  for(const el of a.querySelectorAll('.hand .card.drag,.cslot')){el.style.transform='';el.classList.remove('drag','armed','lift','over-zone')}
  for(const el of a.querySelectorAll('.en.hot,.foes.armed,.chartbox.dragging,.cbottom.hot'))el.classList.remove('hot','armed','dragging');
  decorateCardRefs(a);decorateKeywords(a);fitCards(a);
- if(s==='combat'){layoutHand();placeDetail()}
+ if(s==='combat'){layoutHand();placeDetail();if(W.cb.sel!=null)showOutcome(W.cb.sel)}
  syncEnv();syncStage();syncAudio();syncCombatAnimations();
  if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
 // Fit text within the printed frame areas; never grow a panel into the illustration.

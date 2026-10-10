@@ -39,7 +39,7 @@
 /* ===== title flow: shared backdrop ===== */
 .tb-scr{position:fixed;inset:0;z-index:20;overflow:hidden;background:#05080b;color:var(--cream);font-family:var(--serif)}
 .tb-bg{position:absolute;inset:0;overflow:hidden}
-.tb-sea{position:absolute;inset:-2%;background:url(../art/v2/ui/title-bg.webp) center/cover no-repeat,url(../art/v2/bg/a1-shore-composite@2x.webp) 46% 60%/cover no-repeat;filter:saturate(.95) brightness(.82)}
+.tb-sea{position:absolute;inset:-2%;background:url(../art/v2/bg/a1-shore-composite@2x.webp) 46% 60%/cover no-repeat;filter:saturate(.95) brightness(.82)}
 .tb-select .tb-sea{filter:saturate(.9) brightness(.62) blur(1px)}
 .tb-fog{position:absolute;left:0;width:200%;height:46%;background:
  radial-gradient(ellipse 18% 55% at 8% 55%,rgba(190,215,220,.30),transparent 70%),radial-gradient(ellipse 22% 50% at 30% 40%,rgba(160,195,205,.24),transparent 70%),

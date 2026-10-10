@@ -11,7 +11,7 @@ fetch(indexURL).then(r=>{if(!r.ok)throw Error('Music index unavailable');return 
  for(const k of ['map','fight','elite','boss'])manifest[k]=(data[k]||[]).filter(f=>new RegExp(`^${k}-act1-\\d+\\.mp3$`).test(f));
  manifest.intro=(data.intro||[]).filter(f=>/^intro-\d+\.mp3$/.test(f));
  manifest.menu=(data.menu||[]).filter(f=>/^menu-\d+\.mp3$/.test(f));
- if(unlocked)startTrack();
+ startTrack();
 }).catch(e=>console.warn('Music unavailable:',e.message));
 function ramp(voice,to,seconds,dispose=false){
  if(voice.frame)cancelAnimationFrame(voice.frame);
@@ -25,16 +25,16 @@ function nextFile(){let bag=bags[context];if(!bag||!bag.length){bag=[...(manifes
  if(bag.length>1&&bag[bag.length-1]===lastTrack[context])[bag[0],bag[bag.length-1]]=[bag[bag.length-1],bag[0]];bags[context]=bag}
  return bag.pop();
 }
-function startTrack(){if(!unlocked||!context||current||document.hidden)return;const file=nextFile();if(!file)return;
- lastTrack[context]=file;const el=new Audio(new URL(file,indexURL).href),voice={el,frame:null};el.volume=0;el.preload='auto';voices.add(voice);current=voice;
+function startTrack(){if((!unlocked&&context!=='menu')||!context||current||document.hidden)return;const file=nextFile();if(!file)return;
+ lastTrack[context]=file;const el=new Audio(new URL(file,indexURL).href),voice={el,frame:null};el.volume=0;el.muted=!unlocked;el.loop=context==='menu';el.preload='auto';voices.add(voice);current=voice;
  el.onended=()=>{if(current===voice){retire();startTrack()}};
- el.ontimeupdate=()=>{if(current===voice&&Number.isFinite(el.duration)&&el.duration-el.currentTime<=2&&el.currentTime>0){retire();startTrack()}};
+ el.ontimeupdate=()=>{if(!el.loop&&current===voice&&Number.isFinite(el.duration)&&el.duration-el.currentTime<=2&&el.currentTime>0){retire();startTrack()}};
  // A missing track must not spin through an unavailable playlist forever.
  el.onerror=()=>{if(current===voice)retire()};
- el.play().then(()=>{if(current===voice)ramp(voice,level('musicVolume'),1.5)}).catch(()=>{if(current===voice)retire()});
+ el.play().then(()=>{if(current===voice&&unlocked)ramp(voice,level('musicVolume'),1.5)}).catch(()=>{voice.blocked=true});
 }
 export function syncAudio(){syncUIState();const s=W.S.screen;
- const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='start'||W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:'map'):null;
+ const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:'map'):null;
  if(next!==context){retire();context=next;startTrack()}
  if(s==='end'&&lastScreen!==s)playSound(W.run&&W.run.won?'victory':'defeat');lastScreen=s;
 }
@@ -117,7 +117,7 @@ function observeUI(){
 export function initAudio(){
  if(initialized)return;initialized=true;observeUI();
  const unlock=()=>{unlocked=true;try{if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(AC){ctx=new AC();master=ctx.createGain();master.gain.value=level('sfxVolume');master.connect(ctx.destination)}}if(ctx)ctx.resume().catch(()=>{})}catch(_){}
- syncAudio();startTrack();};
+ syncAudio();startTrack();if(current&&(current.el.muted||current.blocked)){const voice=current;voice.el.muted=false;voice.blocked=false;voice.el.play().then(()=>{if(current===voice)ramp(voice,level('musicVolume'),.15)}).catch(()=>{voice.blocked=true})}};
  let pendingDrag=null;
  document.addEventListener('pointerdown',e=>{unlock();if(e.button>0)return;
   const card=e.target.closest?.('.hand .card,#chartcards .card');

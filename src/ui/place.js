@@ -20,6 +20,16 @@ export function pickSpot(w,h,anchor,anchorEl){const W=innerWidth,H=innerHeight,m
  return best}
 // Put the in-scene detail panel (selected-card / enemy inspect) in the free middle, clear of every combatant.
 export function placeDetail(){const t=document.getElementById('detail');if(!t||!document.querySelector('.combat'))return;
+ // Dedicated play shelf above the right-hand controls, outside the fan and
+ // below all combatant panels. Its position never depends on the selected card.
+ if(t.querySelector('#playbtn')){
+  const w=188,x=innerWidth-w-6,y=Math.round(innerHeight*.67);
+  const controls=[...document.querySelectorAll('.combat .ctl button')].map(e=>e.getBoundingClientRect()).filter(r=>r.right>x);
+  const bottom=Math.min(innerHeight-6,...controls.map(r=>r.top))-5;
+  const parent=t.offsetParent?.getBoundingClientRect()||{left:0,top:0};
+  Object.assign(t.style,{left:(x-parent.left)+'px',top:(y-parent.top)+'px',right:'auto',width:w+'px',maxWidth:w+'px',maxHeight:Math.max(48,bottom-y)+'px',overflow:'auto'});return;
+ }
+
  t.style.left='0px';t.style.top='0px';t.style.right='auto';const r=t.getBoundingClientRect(),sc=t.offsetParent?t.offsetParent.getBoundingClientRect():{left:0,top:0};
  const hero=document.querySelector('.combat .hero .fig'),en=[...document.querySelectorAll('.combat .en .fig')];
  const hr=hero?hero.getBoundingClientRect():null,er=en.map(e=>e.getBoundingClientRect());
@@ -27,8 +37,8 @@ export function placeDetail(){const t=document.getElementById('detail');if(!t||!
  const dais=document.querySelector('.combat .dais'),dr=dais?dais.getBoundingClientRect().right+6:0;
  const pl=e=>{const p=e.parentNode.querySelector('.plate');return p?p.getBoundingClientRect():null};
  const gapL=Math.max(dr,hero?Math.max(img(hero).right,(pl(hero)||{right:0}).right)+6:0),gapR=en.length?Math.min(...en.map(e=>Math.min(img(e).left,(pl(e)||{left:1e9}).left)))-6:innerWidth;
- const gw=Math.max(0,gapR-gapL);let x,y=Math.round(innerHeight*.14);
- if(gw>=96){t.style.maxWidth=t.style.width=Math.min(188,gw)+'px';if(gw<150)t.classList.add('narrow');else t.classList.remove('narrow');const r2=t.getBoundingClientRect();x=gapL+(gw-r2.width)/2}
+ const gw=Math.max(0,gapR-gapL);let x,y=52;
+ if(gw>=96){t.style.maxWidth=t.style.width=Math.min(144,gw)+'px';if(gw<150)t.classList.add('narrow');else t.classList.remove('narrow');const r2=t.getBoundingClientRect();x=gapL+(gw-r2.width)/2}
  else{const p=pickSpot(r.width,r.height,null);x=p.x;y=p.y}
  x=Math.max(6,Math.min(innerWidth-r.width-6,x));
  // never cover the lifted hand card: slide up to the top bar and, if still needed, scroll inside the panel

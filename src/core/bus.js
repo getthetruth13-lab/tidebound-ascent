@@ -27,7 +27,7 @@ export function sources(event){const out=[],cb=W.cb,run=W.run;
  return out}
 const observers=new Set();
 export function observeEvents(listener){observers.add(listener);return ()=>observers.delete(listener)}
-export function fire(event,ctx={}){for(const s of sources(event)){const h=s.def.on&&s.def.on[event];if(h)h(s.inst,ctx,s);if(ctx.cancel)break}for(const listener of observers){try{listener(event,ctx)}catch(e){console.warn("Event observer failed",e)}}return ctx}
+export function fire(event,ctx={}){if(W.previewing)ctx.preview=true;for(const s of sources(event)){const h=s.def.on&&s.def.on[event];if(h)h(s.inst,ctx,s);if(ctx.cancel)break}if(!W.previewing)for(const listener of observers){try{listener(event,ctx)}catch(e){console.warn("Event observer failed",e)}}return ctx}
 export function mod(name,ctx,value){for(const s of sources(name)){const h=s.def.mod&&s.def.mod[name];if(h){const v=h(s.inst,ctx,value,s);if(v!==undefined)value=v}}return value}
 // Turn-scoped listener helper: thisTurn({on:{cardPlayed(){...}}}) — expires at end of the player's turn.
 export function thisTurn(listener){if(W.cb)W.cb.fx.push(listener);return listener}

@@ -923,3 +923,62 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 .card{touch-action:pan-x pan-y}
 .hand .card,.cslot .card,.cslot{touch-action:none}
 .page.fit>.grid,.ov .box{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+
+/* Task 15: full framed hand, lower grounded composition, quiet intent glyphs. */
+@media (orientation:landscape){
+ .combat .hand .card{width:calc(32vh*5/7);margin-left:calc(32vh*5/7/-2);bottom:8px;transition:transform 120ms ease-out,opacity 120ms ease-out}
+ .combat .hand .card.sel,.combat .hand .card.peek{transform:translate(var(--xs,0),var(--ly,-58px)) scale(var(--zl,1.5));z-index:30;transition:transform 120ms ease-out,opacity 120ms ease-out}
+ .combat .hand .card.peek::after{content:"";position:absolute;left:0;right:0;top:100%;height:54px;background:transparent}
+ .combat .hand .card.peek-neighbour{transition:transform 120ms ease-out,opacity 120ms ease-out}
+ .combat .hand .card .rline{pointer-events:none}
+ .combat .intentw{height:27px}
+ .combat .intentw .intent{min-height:24px;gap:4px}
+ .combat .intentw .intent .intent-part,.combat .intentw .intent span{font-size:11px}
+ .combat .intent-art{width:21px;height:23px}
+ .combat .intentw .intent .uic{width:21px;height:23px}
+ .combat .banner{left:50%;top:48px;font-size:12px;letter-spacing:.5px;padding:2px 8px;max-width:32vw;white-space:normal}
+ .tip#detail{font-size:11px;padding:5px 7px;max-width:144px}
+ .tip#detail .desc{font-size:11px;line-height:1.18}
+ .tip#detail .kws{display:none}
+ .tip#detail .btn{font-size:11px;min-height:28px;padding:3px 6px}
+}
+body.scene-choice #env .envstack,body.scene-choice #env-front .envstack{filter:blur(7px) brightness(.65)}
+body.scene-choice .wrap{background:transparent}
+.end.withlamp{align-items:start!important;max-height:calc(100dvh - 24px);overflow:auto;padding-bottom:12px!important}
+.end.withlamp .lp-sum{overflow:visible;min-height:0}
+.end.withlamp .lp-lines tr{animation:none;transform:none;opacity:1}
+.outcome{position:absolute;inset:0;pointer-events:none;z-index:8}
+.outcome-chunk{position:absolute;top:3px;bottom:3px;background:repeating-linear-gradient(120deg,#ffe0a9bb 0 3px,#b7503277 3px 6px);border-right:1px solid #ffe3ad}
+.outcome-label{position:absolute;bottom:100%;left:50%;translate:-50% -2px;white-space:nowrap;font:700 12px var(--font-number);color:#ffe0a9;text-shadow:0 1px 3px #000,0 0 4px #000}
+.outcome.lethal .outcome-label{color:#ffb3a0}
+.outcome-status{position:absolute;top:100%;left:0;display:flex;gap:3px;opacity:.8;color:#dccdf6;font-size:10px;white-space:nowrap}
+.outcome-status img{width:15px;height:15px}
+@media (orientation:landscape) and (max-height:520px){
+ .fit-shop .shelf.cards{--gw:calc(29vh * 5/7);gap:9px;padding:4px 10px;overflow-x:auto}
+ .fit-shop .shelf.cards .shopitem{flex:0 0 var(--gw);width:var(--gw)}
+ .fit-shop .shlbl{writing-mode:vertical-rl;min-width:16px}
+}
+
+@media (orientation:landscape){
+ .combat .plate .nm{font-size:11px;line-height:12px}
+ .combat .plate .hpbar{height:14px;margin-top:1px}
+ .combat .plate .stw{margin-top:2px}
+ .combat .plate .stw .badges{display:flex;flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;max-width:100%;gap:2px;padding:0;scrollbar-width:none}
+ .combat .plate .stw .bd{min-height:16px;flex:none;font-size:10px;padding:0 1px}
+ .combat .plate .status-art{width:14px;height:14px}
+ .outcome-label{bottom:auto;top:-32px;background:#080d13df;border:1px solid #d8a44666;border-radius:3px;padding:1px 3px;font-size:10px}
+ .outcome-status{top:calc(100% + 20px);font-size:9px}
+}
+
+.outcome-status{top:-51px;left:50%;translate:-50% 0}.outcome-status>span{display:flex;align-items:center;gap:1px;background:#080d13cc;border:1px dashed #d8a44677;padding:1px 2px}.outcome-status .status-art{width:14px;height:14px}
+
+/* map_a1: painted lighthouse (top, tower base on the boss node) + shore/boat (bottom, waterline on the tide line); edges alpha-faded into the repeating strip */
+.mapwrap.a1{isolation:isolate}
+.mapwrap.a1 .a1art{position:absolute;left:-4.348%;width:108.696%;aspect-ratio:16/9;z-index:-1;pointer-events:none;background:center/100% 100% no-repeat}
+.mapwrap.a1 .a1art.top{background-image:url("../art/v2/bg/map-a1-top@2x.webp");transform:translateY(-31.3%)}
+.mapwrap.a1 .a1art.bot{background-image:url("../art/v2/bg/map-a1-bot@2x.webp");transform:translateY(-74.2%)}
+
+.tip#detail:has(#playbtn) .desc,.tip#detail:has(#playbtn) .kws{display:none}
+.tip#detail #playbtn{position:sticky;bottom:0;width:100%;margin-top:3px}
+/* Lantern Tasks retain the current map or battle beneath the illustrated choices. */
+.ov:has(.lp-taskbox){backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);background:#060a1066}

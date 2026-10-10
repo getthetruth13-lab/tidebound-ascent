@@ -76,8 +76,8 @@ D('untouchable',{e:'🛡️',d:'Parry {20|26}. Sink.',p:f=>{f.parry(f.v(20,26));
 D('duelsend',{e:'⚰️',d:'Deal {20|26}. If this is a Flourish, also deal the target\'s Bleed (not multiplied).',p:f=>{const t=f.tg;f.dmg(f.v(20,26));
  if(f.flourish&&t&&t.hp>0&&t.st.bleed){const b=t.st.bleed;dmgEnemy(t,b);callout('DUEL\'S END +'+b+' 🩸','bleed')}}});
 D('matador',{e:'🐂',d:'Whenever you Flourish, Parry {6|8}.',power:{on:{flourish(inst){addParry((inst.up?8:6)*stacks(inst))}}}});
-D('bladewaltz',{e:'💃',d:'Your next 3 Attacks this turn cost 0.',p:f=>{let k=0;const src=f.ci;callout('BLADE WALTZ','flourish');
- thisTurn({id:'bladewaltz',mod:{cost(inst,ctx,v){return k<3&&ctx.def&&ctx.def.t==='A'?0:v}},on:{cardPlayed(inst,ctx){if(ctx.card!==src&&ctx.type==='A'&&++k>=3)inst.dead=true}}})}});
+D('bladewaltz',{e:'💃',d:'Your next 3 Attacks this turn cost 0.',p:f=>{const src=f.ci;callout('BLADE WALTZ','flourish');
+ thisTurn({id:'bladewaltz',played:0,mod:{cost(inst,ctx,v){return inst.played<3&&ctx.def&&ctx.def.t==='A'?0:v}},on:{cardPlayed(inst,ctx){if(ctx.card!==src&&ctx.type==='A'&&++inst.played>=3)inst.dead=true}}})}});
 D('oath',{e:'📜',d:'Momentum doesn\'t fade. Whenever you Flourish with 5 Momentum, gain 1 Energy and draw 2.',power:{mod:{keepMomentum(){return true}},
  on:{flourish(inst,ctx){if(ctx.mom<5)return;const n=stacks(inst);gainEnergy(n);drawCards(2*n);callout('OATH! +1⚡ draw 2','flourish')}}}});
 

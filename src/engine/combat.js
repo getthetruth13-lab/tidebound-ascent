@@ -240,7 +240,7 @@ export const canMark=()=>{const cb=W.cb;return !!cb&&(!cb.mark||(markLimit()>1&&
 // playCard(i, opts): opts.flourish (Duelist) and opts.mark (Echo Mage) come from the UI; default = the armed toggles.
 export function playCard(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)return;if(!canPlay(ci)){cb.sel=i;return render()}const d=CARDS[ci.id];
  if(opts.flourish==null)opts.flourish=cb.armFlourish;if(opts.mark==null)opts.mark=cb.armMark;
- flyCard(ci,needsTarget(ci)?curTgt():null);
+ if(!W.previewing)flyCard(ci,needsTarget(ci)?curTgt():null);
  const c=cost(ci);const x=isX(ci)?cb.energy:0;cb.energy-=isX(ci)?x:c;cb.hand.splice(i,1);ci.tmp0=false;cb.sel=null;
  const tg=curTgt();const f=F(ci,{tgt:tg,x});cb.curF=f;
  // Flourish (Duelist, v2.1): optional, spends all Momentum, x(1 + 0.5 per Momentum), capped at x3.5.
@@ -268,7 +268,7 @@ export function playCard(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)ret
  const st=cb.stat;st.playedTurn++;st.playedCombat++;if(d.t==='A'){st.attacksTurn++;st.attacksCombat++}if(W.run.stats){W.run.stats.cardsPlayed++;W.run.stats.maxCardsTurn=Math.max(W.run.stats.maxCardsTurn,st.playedTurn)}
  fire('cardPlayed',{card:ci,f,nThisTurn:st.playedTurn,nThisCombat:st.playedCombat,type:d.t});
  cb.curF=null;after()}
-export function after(){if(!W.cb)return;if(W.run.hp<=0&&!cheatDeath())return lose();if(!alive().length&&!W.cb.mode)return win();render()}
+export function after(){if(W.previewing)return;if(!W.cb)return;if(W.run.hp<=0&&!cheatDeath())return lose();if(!alive().length&&!W.cb.mode)return win();render()}
 // ================= Echo (Echo Mage, v2.1) =================
 // Plan: the Marked card at its original target with +min(2, cards after it) (first repeat), else the last non-Faint card at half strength.
 // 'echoPlan' modifiers add repeats / doubling (once) / allTargets; total repeats per turn are capped at 4.
@@ -300,7 +300,7 @@ export function doEcho(){const cb=W.cb;if(W.run.cls!=='echo')return;
 // endTurn: onTurnEnd -> Echo -> onTurnEndInHand -> Fleeting sink / Moor keep / discard -> Momentum fade -> expire turn fx -> enemy phase
 export function endTurn(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  fire('turnEnd',{turn:cb.turn});if(!W.cb)return;
- const held=cb.hand.slice();cb.ending=true;doEcho();cb.ending=false;if(!W.cb)return;if(!alive().length)return win();
+ const held=cb.hand.slice();cb.ending=true;doEcho();cb.ending=false;if(W.previewing)return;if(!W.cb)return;if(!alive().length)return win();
  for(const ci of held){const d=CARDS[ci.id];if(cb.hand.includes(ci)&&d.endInHand)d.endInHand(F(ci,{}),ci)}
  fire('turnEndInHand',{});
  if(W.run.hp<=0&&!cheatDeath())return lose();

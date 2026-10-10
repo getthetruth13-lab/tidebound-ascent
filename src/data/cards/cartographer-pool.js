@@ -26,8 +26,7 @@ function cardAdvance(f){const cb=W.cb;const ok=cb.slots.filter(w=>(w.rank||0)<CA
  ask(f,'Grand Expedition: Advance which Waypoint?',ok.map(w=>({l:(CARDS[w.id].e||'')+' '+cname(w)+' (Rank '+(w.rank||0)+' → '+((w.rank||0)+1)+')',f:()=>rankUp(w,'Grand Expedition')})))}
 // Rubble: returns from the discard pile whenever a Waypoint is destroyed. Its listener is armed the first time the card is
 // drawn or played in a combat (discard-pile cards aren't bus listeners).
-const rubbleArmed=new WeakMap();
-function armRubble(ci){const cb=W.cb;let s=rubbleArmed.get(cb);if(!s)rubbleArmed.set(cb,s=new Set());if(s.has(ci.uid))return;s.add(ci.uid);
+function armRubble(ci){const cb=W.cb;const s=cb.rubbleArmed||(cb.rubbleArmed={});if(s[ci.uid])return;s[ci.uid]=true;
  forCombat({id:'rubble',on:{decamp(inst,ctx){if(ctx.reason!=='destroyed')return;const i=cb.disc.indexOf(ci);if(i<0||cb.hand.length>=handLimit())return;cb.disc.splice(i,1);cb.hand.push(ci);log('🪨 Rubble returns to your hand');floatText('p','🪨 Rubble','')}}})}
 // ---------------- Common ----------------
 K('scout',{e:'🔭',d:'Choose: deal {8|11}; or deal {4|6} and Bearing (Attack): draw 2.',p:f=>{const b=bearing(f,'A');ask(f,'Scout Ahead',[{l:'Deal '+f.v(8,11),f:()=>f.dmg(f.v(8,11))},{l:'Deal '+f.v(4,6)+(b?'; draw 2':' (no Bearing)'),f:()=>{f.dmg(f.v(4,6));if(b)f.draw(2)}}])}});
