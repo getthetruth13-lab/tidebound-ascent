@@ -176,7 +176,7 @@
 .tb-lbody ul{margin:6px 0 0;padding-left:18px}.tb-lbody li{font:400 14px/1.27 var(--serif);color:var(--cream-dim);margin-bottom:2px}
 .tb-lnav{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:6px;border-top:1px solid #8a744044}
 .tb-lnav .tb-btn{min-width:96px}
-.tb-dots{display:flex;gap:2px}.tb-dots button{width:30px;height:30px;border:0;background:none;cursor:pointer;position:relative}
+.tb-dots{display:flex;gap:2px}.tb-dots button{width:44px;height:44px;border:0;background:none;cursor:pointer;position:relative}
 .tb-dots button::after{content:'';position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border-radius:50%;border:1px solid var(--gold-dim);background:#10141b}
 .tb-dots button.on::after{background:var(--gold);box-shadow:0 0 8px #d9b46a}
 

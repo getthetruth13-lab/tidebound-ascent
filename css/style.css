@@ -901,9 +901,9 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 /* tooltips and detail panel never sit on combatants: JS places them (ui/place.js); this is the baseline look */
 .tip#detail{max-width:188px}
 /* modal choices: centred over the empty middle of the battlefield, lighter backdrop so combatants stay visible */
-.combat .ov.battle{position:absolute;inset:50px 0 21% 0;background:radial-gradient(60% 80% at 50% 50%,#000a,#0004 80%,transparent);align-items:center;padding:4px}
+.combat .ov.battle{position:absolute;inset:auto 0 0;background:linear-gradient(transparent,#0008);align-items:flex-end;padding:6px;height:52%;box-sizing:border-box}
 .combat .ov.battle .box{max-height:100%}
-.combat .ov.battle .box.tilebox{max-width:min(50vw,420px)}
+.combat .ov.battle .box.tilebox,.combat .ov.battle .box.chartbox{width:min(96vw,880px);max-width:96vw;max-height:100%;overflow:visible;padding:6px 10px;--choice-art:min(100px,calc(52dvh - 106px));--choice-card:min(150px,calc((52dvh - 85px)*5/7))}
 @media (orientation:portrait){.dais{position:relative;left:auto;top:auto;width:auto;max-height:none;margin:4px 8px}}
 .dais .nexts{display:flex;flex-direction:column;gap:0;font-size:10px;line-height:1.2;border-top:1px solid #d8a44655;padding-top:3px;white-space:normal}
 .dais .nexts b{font:700 9px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#d8a446;margin-left:2px}
@@ -1006,3 +1006,24 @@ body.combat-motion #endbtn:active{transform:translateY(3px) scale(.94);filter:br
 .combat .plate .nm .nmfl{display:none}
 .combat .namelong .plate .nm{white-space:normal;width:200px!important;text-align:center}
 .combat .namelong .plate .nm .nmfl{display:block;font:italic 500 10.5px/13px var(--font-body);color:#cfc3a3;margin-top:2px}
+/* ===== Minimal StS-style battle HUD (Oct 10): no top/bottom bars or shade, small icons on the scene, low hand, StS control spots ===== */
+@media (orientation:landscape){
+ .combat>.topbar{background:none!important;box-shadow:none!important;border:0!important;min-height:40px}
+ .combat>.topbar::after,.combat>.topbar::before{display:none!important}
+ .combat>.topbar .stat,.combat>.topbar .mini,.combat>.topbar button{text-shadow:0 1px 2px #000,0 0 6px #000}
+ body.env-combat #env-front{opacity:.45}
+ body.env-combat #env .envstack{top:auto!important;bottom:0!important}
+ .combat .dais{background:none!important;border:0!important;box-shadow:none!important;width:96px;top:44px;padding:2px;transform-origin:0 0;transform:scale(.86)}
+ .combat .dais::before,.combat .dais::after,.combat .dais .dais-art{display:none}
+ .combat .dais-hd span{display:none}
+ .combat .dais *{text-shadow:0 1px 2px #000,0 0 5px #000}
+ .combat .hand{left:calc(150px + env(safe-area-inset-left));right:calc(170px + env(safe-area-inset-right))}
+ .combat .ctl{position:fixed;inset:0;padding:0;display:block;pointer-events:none}
+ .combat .ctl>div{display:contents}
+ .combat .ctl .row2{display:contents}
+ .combat #orb{position:absolute;left:calc(74px + env(safe-area-inset-left));bottom:56px;width:62px;pointer-events:auto}
+ .combat #drawpile{position:absolute;left:calc(4px + env(safe-area-inset-left));bottom:4px;pointer-events:auto}
+ .combat #discpile{position:absolute;right:calc(4px + env(safe-area-inset-right));bottom:4px;pointer-events:auto}
+ .combat #exhpile{position:absolute;right:calc(4px + env(safe-area-inset-right));bottom:54px;pointer-events:auto}
+ .combat #endbtn{position:absolute;right:calc(64px + env(safe-area-inset-right));bottom:72px;min-width:104px;min-height:48px;pointer-events:auto}
+}

@@ -147,10 +147,10 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
 // ---------------- combat ----------------
 // ---------------- battle figures (Art Director spec) ----------------
 // Fill the free battle area, keeping foot anchors above the resting hand.
-export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*groundY()),top:52,heroTop:72}}
+export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*.70),top:40,heroTop:40}}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
-function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min((role==='hero'?g.vh*.40:role==='boss'?g.vh*.43:role==='elite'?g.vh*.38:g.vh*.34),g.feet-(role==='hero'?g.heroTop:g.top+32)));
+function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min((role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:g.vh*.31),g.feet-(role==='hero'?g.heroTop:g.top+32)));
  if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*sp.h/sp.w));
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
  const top=g.feet-H-hov,L=x-Math.round(W*ax),fx0=Math.round(W*ax);const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.max(96,Math.min(150,H*.62)));
@@ -160,7 +160,7 @@ function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){
  <div class="fig ${shake?'shake':''}" style="width:${W}px;height:${H}px;left:0;top:0;${shake||''}">${img}</div>
  ${intent?`<div class="intentw" style="top:${it}px">${intent}</div>`:''}
  <div class="plate" style="top:${H+hov+2}px">${`<div class="nm">${name}</div>`}${hp}<div class="stw">${badgesH}</div></div>${fx}</div>`}
-function enemyX(i,n,g){const a=n>=3?.53:.60,b=n>=3?.87:.80;return Math.round(g.vw*(n===1?.70:a+(b-a)*i/(n-1)))}
+function enemyX(i,n,g){const a=n>=3?.56:.64,b=n>=3?.90:.86;return Math.round(g.vw*(n===1?.76:a+(b-a)*i/(n-1)))}
 export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,enemyMaxWidth:(n||1)>=3?g.vw*.165:0};const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
  const role=e.boss?'boss':e.elite?'elite':'normal';const vi=W.cb.ens.slice(0,i).filter(x=>x.key===e.key).length;
  const flav=ENEMY_FLAVOUR[e.key],nm0=flav?`${e.n}<i class="nmfl">${esc(flav)}</i>`:e.n;
@@ -168,7 +168,7 @@ export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,enemyMaxWidth:(n||
  return figureHTML({sp:spriteFor('enemies',e.key,vi),role,ph:e.e,g,x:enemyX(k==null?i:k,n||1,g),shake:sh,intent:intentHTML(e),name,hp:hpbar(e.hp,e.max,e.block,e.blkT,'e'+e.uid),
   badgesH:pasH+badges(0,0,{...e.st,...(e.passive?.n==='Rooted'?{rooted:1}:{})}),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
 export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const sh=motionEnabled()?null:anim(W.cb.pshake,400);
- return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.30),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
+ return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.25),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
   badgesH:badges(0,0,{...W.cb.p.st,...(W.cb.parry&&!W.cb.parryUsed?{parry:W.cb.parry}:{})},playerStates()),fx:fxHTML('p'),cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
 export function tipHTML(){const cb=W.cb;
  if(cb.sel!=null&&cb.hand[cb.sel]){const ci=cb.hand[cb.sel],d=CARDS[ci.id];const can=canPlay(ci),nt=needsTarget(ci);const t=nt?curTgt():null;
@@ -181,7 +181,7 @@ function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
 export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}">`+topBar();
  h+=daisHTML();
- const g=sceneGeom();const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
+ const g=sceneGeom();if(cb.mode&&['choice','slot','chart'].includes(cb.mode.k)){g.s*=.58;g.feet=Math.round(innerHeight*.39)}const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
  h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,560);if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
