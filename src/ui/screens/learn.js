@@ -6,12 +6,14 @@ import {HEROES,ORDER} from './heroes.js';
 import {bgHTML,frameOpen,frameClose} from './frame.js';
 import {spriteImg} from './select.js';
 import {introStart} from './intro.js';
+import {LEARN_HEDGE,LEARN_LAMPLIGHT} from '../../data/lore.js';
 const CORE=[
- ['The climb','Climb 15 floors of the Wrack Terraces, the foot of the Drowned Stair, along the Tidewater Chart. Choose your path through fights, elites, events, merchants and camps. A boss waits at the top.'],
+ ['The climb','Climb 15 floors of the Wrack Terraces, the foot of the Drowned Stair, along the Tidewater Chart: fights, elites, events, merchants and camps. A boss waits at the top. '+LEARN_HEDGE],
  ['Your turn','Normally, each turn refreshes 3 Energy and draws 5 cards (4 for the Cartographer). Tap a card to lift it, tap it again (or drag it upward) to play it. Hold a card to enlarge it.'],
  ['Guard and intents','Guard soaks damage and fades at the start of your turn. Above each enemy, an intent shows what it will do next, so you can plan your defence.'],
  ['Rewards','Won fights give gold and a choice of three cards. Elites also drop a relic, and a potion sometimes drops. Skipping a card is allowed: a lean deck is a strong deck.'],
- ['Underlined words','Tap or hold any underlined word on a card, relic or potion for a quick explanation.']];
+ ['Underlined words','Tap or hold any underlined word on a card, relic or potion for a quick explanation.'],
+ LEARN_LAMPLIGHT];
 export const LEARN_PAGES=1+ORDER.length;
 function pageHTML(n){
  if(n===0)return `<div class="tb-lhead"><h2>The Basics</h2><div class="tb-epi">How a climb works</div></div><div class="tb-cols">${CORE.map(([h,t])=>`<section><h3>${h}</h3><p>${t}</p></section>`).join('')}</div><button class="tb-btn sm" id="replayintro" onclick="introStart(true)">▶ Replay intro</button>`;

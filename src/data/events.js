@@ -7,6 +7,7 @@ import {cname,mk} from '../engine/cards.js';
 import {isLocked,goMap,heal,hurt,msg,openPick,randomCard,gainCard,gainCurse,gainGold,gainRelic,loseRelic,randomRelic,randomPotion,addPotion,addPotionSlot,
  loseMaxHp,gainMaxHp,eventFight,toast,pickable} from '../engine/run.js';
 import {mod} from '../core/bus.js';
+import {eventText} from './lore.js';
 import {render} from '../ui/render.js';
 const run=()=>W.run;
 const done=(title,text)=>msg(title,text);
@@ -75,11 +76,11 @@ registerEvents([
   {l:'🐤 Raid the nest: gain Golden Gull, then fight 2 Gull Thieves (no card reward)',f:()=>{gainRelic('goldengull');eventFight(['gull','gull'],{noCards:true,event:'gullnest'})}},
   {l:'🥚 Take one egg: +30 gold, lose 4 HP',ok:()=>run().hp>4,f:()=>{gainGold(30);hurt(4);done('🪺 Gull Nest','You sell the egg later. +30 gold, −4 HP.')}},
   {l:'🚶 Leave',f:goMap}]},
- {id:'inkgrotto',pool:'act',act:1,n:'Ink Grotto',e:'🦑',t:'Black ink pools in a cave. It moves when you look away.',o:[
-  {l:'🦑 Bathe in the ink: gain Kraken Ink and a Dread curse',f:()=>{gainRelic('krakenink');gainCurse('dread');done('🦑 Ink Grotto','You come out stained and uneasy. (Kraken Ink, Curse: Dread)')}},
-  {l:'🧪 Bottle some: gain a random Uncommon potion',ok:freeSlot,f:()=>{const pool=Object.values(POTIONS).filter(p=>p.rarity==='u'&&(!p.cls||p.cls===run().cls)&&!isLocked('potions',p.id));const p=pick(pool,'events').id;addPotion(p);done('🦑 Ink Grotto',`You bottle <b>${POTIONS[p].e} ${POTIONS[p].n}</b>.`)}},
+ {id:'inkgrotto',pool:'act',act:1,n:'Ink Grotto',e:'🖋️',t:'Black ink pools in a cave. It moves when you look away.',o:[
+  {l:'🖋️ Bathe in the ink: gain Lampblack and a Dread curse',f:()=>{gainRelic('krakenink');gainCurse('dread');done('🖋️ Ink Grotto','You come out stained and uneasy. (Lampblack, Curse: Dread)')}},
+  {l:'🧪 Bottle some: gain a random Uncommon potion',ok:freeSlot,f:()=>{const pool=Object.values(POTIONS).filter(p=>p.rarity==='u'&&(!p.cls||p.cls===run().cls)&&!isLocked('potions',p.id));const p=pick(pool,'events').id;addPotion(p);done('🖋️ Ink Grotto',`You bottle <b>${POTIONS[p].e} ${POTIONS[p].n}</b>.`)}},
   {l:'🚶 Leave',f:goMap}]},
- {id:'sailor',pool:'act',act:1,n:'Shipwrecked Sailor',e:'🧔',t:'A sailor clings to a broken mast, a fine whetstone and a fat purse beside him.',o:[
+ {id:'sailor',pool:'act',act:1,n:'Shipwrecked Sailor',e:'🧔',t:'A sailor clings to a broken mast, a fine whetstone and a fat purse beside him. He counts under his breath: "Nine to climb and nine to shine..."',o:[
   {l:'💰 Pay 25 gold: he upgrades 2 random cards',ok:()=>run().gold>=25,f:()=>{run().gold-=25;const c=shuffle(pickable('upgrade'),'events').slice(0,2);c.forEach(x=>x.up=true);done('🧔 Shipwrecked Sailor',c.length?`He sharpens <b>${c.map(cname).join('</b> and <b>')}</b>.`:'Nothing to sharpen.')}},
   {l:'🗡️ Rob him: +40 gold and a Brine Rot curse',f:()=>{gainGold(40);gainCurse('brinerot');done('🧔 Shipwrecked Sailor','You take his purse. It smells of rot. (+40 gold, Curse: Brine Rot)')}},
   {l:'🍞 Share rations: lose 6 HP, gain a random Rare card',ok:()=>run().hp>6,f:()=>{hurt(6);const id=randomCard('r');gainCard(id);done('🧔 Shipwrecked Sailor',`He presses a worn card into your hand: <b>${CARDS[id].n}</b>.`)}}]},
@@ -94,4 +95,4 @@ registerEvents([
   {l:'🚶 Leave',f:goMap}]},
 ]);
 import {EVENTS} from '../core/registry.js';
-function EV(id){return EVENTS.find(e=>e.id===id)}
+function EV(id){const e=EVENTS.find(e=>e.id===id);return e&&{...e,t:eventText(e.id,e.t)}}

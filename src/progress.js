@@ -2,11 +2,14 @@
 // defensively so a missing, old or damaged save never breaks the game. No DOM or engine imports: usable from tests and bots.
 import {LAMP_XP,CLIMB_XP,CLASS_ORDER,LOCK_CARDS,LOCK_CLASS_RELICS,LOCK_SHARED_RELICS,LOCK_POTIONS,LAMP_PLAN,CLIMB_PLAN} from './data/lamplight.js';
 export const PROFILE_KEY='tidebound.profile.v1',PROFILE_V=1;
+export const ENDING_IDS=['light','lens','cut'];
 let mem=null; // fallback when localStorage is unavailable (private mode, Node)
-const blank=()=>({v:PROFILE_V,xp:{},climb:0,claimed:{},climbClaimed:0,runs:{},wins:{},unlocked:{cards:[],relics:[],potions:[]},seen:{enemy:{},event:{},relic:{},card:{},potion:{}},tasks:0,best:{}});
+const blank=()=>({v:PROFILE_V,xp:{},climb:0,claimed:{},climbClaimed:0,runs:{},wins:{},unlocked:{cards:[],relics:[],potions:[]},seen:{enemy:{},event:{},relic:{},card:{},potion:{}},tasks:0,best:{},twistSeen:false,endings:{},lastEnding:''});
 function norm(p){const b=blank();if(!p||typeof p!=='object'||Array.isArray(p))return b;
  const num=x=>Number.isFinite(+x)&&+x>0?Math.floor(+x):0,map=o=>{const r={};if(o&&typeof o==='object')for(const k of Object.keys(o))r[k]=num(o[k]);return r};
  b.xp=map(p.xp);b.climb=num(p.climb);b.claimed=map(p.claimed);b.climbClaimed=num(p.climbClaimed);b.runs=map(p.runs);b.wins=map(p.wins);b.tasks=num(p.tasks);b.best=map(p.best);
+ // Lore (design/lore/LORE-BIBLE.md §14): twistSeen gates the S3 tier; endings / lastEnding drive the title-screen variants. Old saves load with safe defaults.
+ b.twistSeen=p.twistSeen===true;b.endings=map(p.endings);b.lastEnding=ENDING_IDS.includes(p.lastEnding)?p.lastEnding:'';
  for(const k of ['cards','relics','potions'])b.unlocked[k]=Array.isArray(p.unlocked&&p.unlocked[k])?[...new Set(p.unlocked[k].filter(x=>typeof x==='string'))]:[];
  for(const k of Object.keys(b.seen))if(p.seen&&p.seen[k]&&typeof p.seen[k]==='object')for(const id of Object.keys(p.seen[k]))b.seen[k][id]=1;
  return b}
@@ -19,6 +22,10 @@ export const lampLevel=(p,cls)=>levelOf(p.xp[cls]||0,LAMP_XP);
 export const climbLevel=p=>levelOf(p.climb||0,CLIMB_XP);
 export const lampPending=(p,cls)=>Math.max(0,lampLevel(p,cls)-(p.claimed[cls]||0));
 export const climbPending=p=>Math.max(0,climbLevel(p)-(p.climbClaimed||0));
+// ---------- lore flags (the twist scene and the ending screen will call these; Act 1 never does) ----------
+export const deathsOf=p=>Math.max(0,Object.values(p.runs||{}).reduce((n,x)=>n+x,0)-Object.values(p.wins||{}).reduce((n,x)=>n+x,0));
+export function markTwistSeen(p){p.twistSeen=true;return p}
+export function markEnding(p,id){if(!ENDING_IDS.includes(id))return p;p.endings[id]=(p.endings[id]||0)+1;p.lastEnding=id;return p}
 export const totalPending=p=>CLASS_ORDER.reduce((n,c)=>n+lampPending(p,c),0)+climbPending(p);
 // progress inside the current level: {lvl,max,into,span,pct}
 export function barOf(xp,table){const lvl=levelOf(xp,table),max=lvl>=table.length,lo=lvl?table[lvl-1]:0,hi=max?lo:table[lvl];return {lvl,max,into:xp-lo,span:hi-lo,pct:max?100:Math.max(0,Math.min(100,100*(xp-lo)/Math.max(1,hi-lo)))}}

@@ -7,10 +7,11 @@ import {LAMP_XP,CLIMB_XP,LAMP_PLAN,CLIMB_PLAN,CLASS_ORDER,LOCK_CARDS,LOCK_CLASS_
 import {loadProfile,saveProfile,lampLevel,climbLevel,lampPending,climbPending,totalPending,barOf,offerFor,claim,lockedFor,firstLevel} from '../../progress.js';
 import {slotHTML} from '../../assets.js';
 import {TASKS,taskProgress} from '../../engine/lamplight.js';
-import {emblemHTML,relicTile,potionTile,esc as tesc} from '../tiles.js';
+import {emblemHTML,relicTile,potionTile,TILES,esc as tesc} from '../tiles.js';
 import {render,cardHTML,TH} from '../render.js';
 import {bgHTML,frameOpen,frameClose} from './frame.js';
 import {deathLine} from '../../data/places.js';
+import {LEDGER_STAGES,stageUnlockedLine,loreStage,loreTier,lamplightMeaning,menuLore,ghostSpots,MENU_LAYERS,DEATH_LINE} from '../../data/lore.js';
 const RARN={s:'Starter',c:'Common',u:'Uncommon',r:'Rare',x:'Special'};
 const esc=s=>String(s).replace(/"/g,'&quot;');
 const TRACK_NAME=t=>t==='climb'?'Stair Climb':CLASSES[t].n+' Lamp';
@@ -57,7 +58,8 @@ export function openLedger(tab){W.S={screen:'title',view:'ledger',tab:tab||(W.S&
 export function ledgerTab(t){W.S={...W.S,tab:t};render()}
 function barHTML(xp,table,cls=''){const b=barOf(xp,table);return `<div class="lp-bar ${cls}"><i style="width:${b.pct}%"></i></div>`}
 export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=lockedFor(p);
- const tabs=[...CLASS_ORDER,'climb'].map(t=>{const pend=t==='climb'?climbPending(p):lampPending(p,t);return `<button class="tb-btn sm lp-tab${t===tab?' on':''}" data-tab="${t}" onclick="ledgerTab('${t}')">${t==='climb'?'Stair Climb':CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
+ const tabs=[...CLASS_ORDER,'climb','pages'].map(t=>{const pend=t==='pages'?0:t==='climb'?climbPending(p):lampPending(p,t);return `<button class="tb-btn sm lp-tab${t===tab?' on':''}" data-tab="${t}" onclick="ledgerTab('${t}')">${t==='climb'?'Stair Climb':t==='pages'?'Pages':CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
+ if(tab==='pages')return pagesScr(tabs,p);
  const climb=tab==='climb',xp=climb?p.climb:(p.xp[tab]||0),table=climb?CLIMB_XP:LAMP_XP,b=barOf(xp,table),pend=climb?climbPending(p):lampPending(p,tab);
  const offer=pend?offerFor(p,tab,CARDS):null,on=new Set(offer&&!offer.final?offer.items.map(i=>i.id):[]);
  const nx=b.max?null:planAt(tab,b.lvl+1);
@@ -72,11 +74,19 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
  else{tiles=[...LOCK_SHARED_RELICS.map(id=>[ 'relic',id]),...LOCK_POTIONS.map(id=>['potion',id])].map(([k,id])=>(k==='relic'?lock.relics[id]:lock.potions[id])?lockItem(k,id,on.has(id)?'On offer: choose it now':`A lantern waits. Stair ${firstLevel('climb',k,id,CARDS)}+`,on.has(id)):itemTile(k,id)).join('')}
  return `<div class="tb-scr tb-ledger${climb?'':' theme-'+TH[tab]}">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">‹ Back</button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
   <div class="lp-tabs">${tabs}</div>${info}<div class="lp-grid" id="ledgergrid">${tiles}</div></div>`}
+// ---------- the Keeper's Ledger pages: eight reveal stages, one per lit window (design/lore/LORE-BIBLE.md §14.2) ----------
+const pageHTML=(st,got)=>got
+ ?`<article class="lp-page${st.cut?' cut':''}${st.twist?' deep':''}" data-stage="${st.n}">${st.cut?'<i class="lp-stub" aria-hidden="true"></i>':''}<span class="lp-pn">${st.n}</span><h3>${st.title}</h3>${st.lines.map(l=>`<p>${l}</p>`).join('')}</article>`
+ :`<article class="lp-page sealed${st.twist?' deep':''}" data-stage="${st.n}"><span class="lp-pn">${st.n}</span><h3>${emblemHTML('lore-page-sealed','🕯️','pip')} ???</h3><p class="lp-hint">${stageUnlockedLine(st)} Stair Climb ${st.n}.</p></article>`;
+function pagesScr(tabs,p){const stage=loreStage(p),tier=loreTier(p);
+ return `<div class="tb-scr tb-ledger">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">‹ Back</button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
+  <div class="lp-tabs">${tabs}</div><div class="lp-pagehead"><i>${lamplightMeaning(tier)}</i><span>${stage} of ${LEDGER_STAGES.length} pages found</span></div>
+  <div class="lp-pages" id="ledgerpages">${LEDGER_STAGES.map(st=>pageHTML(st,st.n<=stage)).join('')}</div></div>`}
 // ---------- end-of-run summary ----------
 export function lampSummaryHTML(sum){if(!sum)return '';const K=CLASSES[sum.cls],{lampBar:lb,climbBar:cb}=sum;
  const bar=(label,from,to,emb,emo)=>{const up=to.lvl>from.lvl;return `<div class="lp-row${up?' up':''}"><span class="lp-med">${emblemHTML(emb,emo,'pip')}<b>${to.lvl}</b></span><div class="lp-rb"><span class="lp-rl">${label}${up?` <em class="lvup">level up!</em>`:''}</span><div class="lp-bar anim" style="--from:${from.pct}%;--to:${up?100:to.pct}%"><i></i></div></div></div>`};
  let n=0;
- return `<div class="lp-sum"><div class="lp-banner">${emblemHTML(sum.won?'lamp-banner-win':'lamp-banner-lose',sum.won?'🏮':'🕯️','strip')}<div class="lp-bt"><h3>🏮 Lamplight</h3><div class="lp-story">${sum.won?'The lamp room answers.':`${deathLine(sum.floor,sum.boss)} Your lantern burns on.`}</div></div></div>
+ return `<div class="lp-sum"><div class="lp-banner">${emblemHTML(sum.won?'lamp-banner-win':'lamp-banner-lose',sum.won?'🏮':'🕯️','strip')}<div class="lp-bt"><h3>🏮 Lamplight</h3><div class="lp-story">${sum.won?'The lamp room answers.':`${deathLine(sum.floor,sum.boss)} ${DEATH_LINE}`}</div></div></div>
   <table class="lp-lines">${sum.lines.map(l=>`<tr style="--i:${n++}"><td>${l.label}</td><td>+${l.pts}</td></tr>`).join('')}${sum.mults.map(m=>`<tr class="mul" style="--i:${n++}"><td>${m.label}</td><td>×${+m.x.toFixed(2)}</td></tr>`).join('')}<tr class="tot" style="--i:${n++}"><td>Total</td><td class="lp-count" style="--v:${sum.total}">+<b>${sum.total}</b></td></tr></table>
   ${bar(K.n+' Lamp',lb.from,lb.to,'lamp-class-'+sum.cls,K.e)}${bar('Stair Climb',cb.from,cb.to,'lamp-climb','🗼')}
   <div class="lp-tasks">${sum.tasks.map(t=>`<span class="lp-tsk${t.done?' ok':''}">${emblemHTML('lamp-task-'+(TASKS[t.id].cls||'any'),t.done?'🏮':'🕯️','pip')}${t.done?'✔':'○'} ${t.n}</span>`).join('')}</div>
@@ -89,14 +99,31 @@ export function tasksHTML(){const L=W.run&&W.run.lamp;if(!L)return '';
  return `<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box tilebox lp-taskbox"><h2>🏮 Lantern Tasks</h2><div class="muted csub">Optional. Each lantern lit is +15 Lamplight when the run ends. Missing them costs nothing.</div>
  <div class="tiles lp-tasktiles" style="--n:${L.tasks.length}">${L.tasks.map(card).join('')}</div><button class="btn full">Close</button></div></div>`}
 export const lampBtnLabel=()=>{const L=W.run&&W.run.lamp;return L?L.tasks.filter(t=>t.done).length+'/'+L.tasks.length:''};
-// ---------- title lighthouse + chips ----------
-export function lighthouseHTML(){const p=loadProfile(),n=climbLevel(p),full=n>=CLIMB_XP.length;
- const ys=[250,226,202,178,154,130,106,82],win=ys.map((y,i)=>`<rect class="${i<n?'lit':''}" x="${46+(i%2?2:-2)}" y="${y}" width="8" height="12" rx="4"/>`).join('');
- return `<div class="lp-tower${full?' blaze':''}" id="lighthouse" title="Stair Climb ${n}/${CLIMB_XP.length}" aria-label="The Pale Lighthouse: ${n} of ${CLIMB_XP.length} windows lit"><svg viewBox="0 0 100 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+// ---------- title lighthouse + layered menu scene (design/lore/LORE-BIBLE.md §17.4) ----------
+// Everything here is a CSS / SVG placeholder over named art slots (MENU_LAYERS in data/lore.js, listed in tools/make-tiles-manifest.cjs):
+// when a painted file for a slot exists it is drawn on top of its placeholder, with no code change.
+const slotImg=id=>{const t=TILES[id];return t&&t.ready?`<img class="ml-art" src="${t.path}" alt="" draggable="false" onerror="this.remove()">`:''};
+const layer=(id,cls='')=>`<div class="ml-layer ${cls}" data-slot="${id}">${slotImg(id)}</div>`;
+export function lighthouseHTML(over){const p=loadProfile(),M=menuLore(p,over),n=M.windows,dark=M.ending==='lens';
+ const ys=[250,226,202,178,154,130,106,82],xo=[-2,2,-2,2,-2,3.5,-4,5];
+ // windows 1-5 are warm and ordinary; 6-8 drift off the grid and pale: by the last window the tower no longer reads as a lighthouse
+ const win=ys.map((y,i)=>`<rect class="${i<n&&!dark?'lit':''}${i>=5?' odd':''}" x="${46+xo[i]}" y="${y}" width="8" height="12" rx="4"/>`).join('');
+ const full=M.lamp&&!dark;
+ return `<div class="lp-tower${full?' blaze':''}${dark?' dark':''}" id="lighthouse" title="Stair Climb ${n}/${CLIMB_XP.length}" aria-label="The Pale Lighthouse: ${n} of ${CLIMB_XP.length} windows lit" data-windows="${n}" data-ring="${M.ring?1:0}" data-line="${M.line?1:0}"><svg viewBox="0 0 100 300" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
   <defs><linearGradient id="lpbody" x1="0" x2="1"><stop offset="0" stop-color="#1b232d"/><stop offset=".55" stop-color="#2d3844"/><stop offset="1" stop-color="#141a22"/></linearGradient></defs>
+  ${M.ring?'<ellipse class="ml-ring" cx="50" cy="296" rx="58" ry="9"/><ellipse class="ml-ring in" cx="50" cy="296" rx="38" ry="5.5"/>':''}
   ${full?'<polygon class="beam" points="50,46 -60,20 -60,70"/><polygon class="beam" points="50,46 160,20 160,70"/>':''}
   <path d="M28 296 L40 70 H60 L72 296 Z" fill="url(#lpbody)" stroke="#05070b" stroke-width="1.2"/><path d="M36 70 H64 L68 62 H32 Z" fill="#3a4654" stroke="#05070b"/>
-  <rect class="lamproom${full?' lit':''}" x="39" y="42" width="22" height="20" rx="2"/><path d="M36 42 L50 26 L64 42 Z" fill="#232c37" stroke="#05070b"/><rect x="48.5" y="16" width="3" height="11" fill="#232c37"/>${win}</svg>
+  <rect class="lamproom${full?' lit':dark?'':' glint'}" x="39" y="42" width="22" height="20" rx="2"/><path d="M36 42 L50 26 L64 42 Z" fill="#232c37" stroke="#05070b"/><rect x="48.5" y="16" width="3" height="11" fill="#232c37"/>${win}
+  ${M.line?'<line class="ml-pale" x1="50" y1="50" x2="50" y2="302"/>':''}</svg>${slotImg('menu-lighthouse')}${M.ring?`<div class="ml-layer ml-ringart" data-slot="menu-ring">${slotImg('menu-ring')}</div>`:''}${M.line?`<div class="ml-layer ml-lineart" data-slot="menu-line">${slotImg('menu-line')}</div>`:''}
   <span class="lp-cap">Stair ${n}/${CLIMB_XP.length}</span></div>`}
+// The whole title backdrop above the sea: sky / ending layers, the tower, and the ghost lanterns on the foreground steps.
+export function menuSceneHTML(over){const p=loadProfile(),M=menuLore(p,over),g=TILES['menu-ghost'];
+ const ghosts=ghostSpots(M.ghosts).map(s=>`<i class="ml-gl r${s.row}" style="left:${s.x}%;--s:${s.s};--d:${s.d}s">${g&&g.ready?`<img class="ml-art" src="${g.path}" alt="" draggable="false" onerror="this.remove()">`:''}</i>`).join('');
+ return `<div class="ml-scene ml-end-${M.ending||'none'}" id="menuscene" data-stage="${M.stage}" data-tier="${M.tier}" data-ghosts="${M.ghosts}" data-windows="${M.windows}" data-ring="${M.ring?1:0}" data-line="${M.line?1:0}" data-ending="${M.ending}" aria-hidden="true">
+  ${layer('menu-sky','ml-sky')}${layer('menu-sea','ml-sea')}
+  ${M.ending==='lens'?layer('menu-stars','ml-stars'):''}${M.ending==='light'?layer('menu-dawn-light','ml-dawn')+layer('menu-shape','ml-shape'):''}${M.ending==='cut'?layer('menu-dawn-cut','ml-dawn cut'):''}
+  ${lighthouseHTML(over)}
+  <div class="ml-steps">${layer('menu-steps','ml-stepart')}${ghosts}</div></div>`}
 export const lampChip=cls=>{const p=loadProfile();const l=lampLevel(p,cls),pend=lampPending(p,cls);return `<span class="lp-chip" data-lamp="${cls}"><svg class="lp-lamp-icon" viewBox="0 0 32 28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 24H24M17 20V24M8 10Q16 6 25 10L23 17Q18 23 11 17Z M9 11Q1 5 3 13Q4 17 11 16M24 11L30 7Q30 13 23 15M12 8L17 3L21 8M17 3V1"/><path d="M12 11Q17 8 22 11L20 16H14Z" fill="currentColor" opacity=".4"/></svg>Lamp ${l}${pend?'<em>●</em>':''}</span>`};
 export {totalPending};

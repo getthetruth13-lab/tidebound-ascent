@@ -6,6 +6,7 @@ import {cname,cost,desc,isEx,isUp,isX,mk,needsTarget,plain} from './cards.js';
 import {runCard} from './effects.js';
 import {fire,mod,thisTurn} from '../core/bus.js';
 import {DATA} from '../data/generated/data-v2.js';
+import {BOSS_OPEN,bellCount} from '../data/lore.js';
 import {combatRewards,gainCard,goMap,endRun} from './run.js';
 import {flyCard} from '../ui/fx.js';
 import {impactDelay} from '../ui/vfx.js';
@@ -55,6 +56,7 @@ export function startCombat(kind,enc,opts={}){
  // Opening cards go to the top of the draw pile (design §2.1).
  const open=cb.draw.filter(c=>c.open||CARDS[c.id].open);if(open.length){cb.draw=open.concat(cb.draw.filter(c=>!open.includes(c)))}
  enc.forEach(k=>spawn(k));cb.bossKey=(cb.ens.find(e=>e.boss)||{}).key||null;
+ {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':'🪸 ')+t);callout(t,'lore')}} // lore: the boss speaks first (bible §16 items 7-9)
  const cls=W.run.cls;
  if(cls==='duel')cb.mom=DU.start_mom;
  if(cls==='carto'&&!hasRelic('trailboots')){
@@ -113,7 +115,7 @@ function afterEnemyDamage(e,f){const t=EN[e.key];if(e.hp>0&&t.onDamaged)t.onDama
 // Unblockable self HP loss (Brine Rot, Reckless...). guard:true lets Guard absorb it (Scald, Barbs).
 export function loseHp(n,o={}){const cb=W.cb;if(o.guard&&cb){const b=Math.min(cb.p.block,n);cb.p.block-=b;n-=b}if(n<=0)return;W.run.hp-=n;if(cb){floatText('p','-'+n);cb.pshake=Date.now()}if(W.run.hp<=0)cheatDeath()}
 export function heal(n){W.run.hp=Math.min(W.run.max,W.run.hp+Math.max(0,Math.floor(n)));if(W.cb&&n>0)floatText('p','+'+Math.floor(n)+'❤','h')}
-// onPlayerDeath (§4.2): relics first (Siren Scale), then potions (Second Tide). Returns true if the death was cancelled.
+// onPlayerDeath (§4.2): relics first (Tidewrack Scale), then potions (Second Tide). Returns true if the death was cancelled.
 export function cheatDeath(){if(W.run.hp>0)return true;const ctx=fire('playerDeath',{});if(ctx.cancel&&W.run.hp>0){return true}return false}
 // ================= Tide (Tidecaller, v2.1) =================
 export const isHigh=()=>W.cb.tide>=TI.high, isLow=()=>W.cb.tide<=TI.low;
@@ -161,7 +163,7 @@ export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=i
   parry(n){const p=Math.floor(mod('parry',{card:ci,f},n*f.mult));cb.parry+=p;floatText('p','Parry '+p,'b');return p},
   mom(n){return gainMom(n)},gainEnergy(n){gainEnergy(n)},loseHp(n){loseHp(n)},heal(n){heal(n)},
   addCard(id,pile,opts){return addCard(id,pile,opts)},
-  nextTurn(fn){cb.nextTurnQ.push(fn)},thisTurn(l){return thisTurn(l)},
+  nextTurn(fn,meta){if(meta)fn.meta=meta;cb.nextTurnQ.push(fn)},thisTurn(l){return thisTurn(l)},
   chart(n,then){chart(n,then)},choose(title,opts){choose(title,opts)},
   wpCount:()=>expCount(),topType:()=>{const t=cb.draw[0];return t?CARDS[t.id].t:null},
   intent:()=>{const t=f.tg;if(!t)return null;const m=intentOf(t);return {attacking:!!m.a,total:m.a?eAtk(t,m.a)*(m.h||1):0}}};

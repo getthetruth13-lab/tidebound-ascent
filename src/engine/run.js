@@ -10,6 +10,7 @@ import {fire,mod} from '../core/bus.js';
 import {saveRun,clearRun} from '../save.js';
 import {initRun as lampInit,noteSeen,settleRun} from './lamplight.js';
 import {loadProfile,lockedFor} from '../progress.js';
+import {eventText} from '../data/lore.js';
 import {render,markCardsSeen} from '../ui/render.js';
 // ================= economy tables (design-v2 §1.1, §1.4, §1.5) =================
 export const ECON={startGold:99,potionSlots:3,
@@ -116,7 +117,7 @@ export function resolveUnknown(){const run=W.run,q=run.qOdds;const node=run.map[
  if(out==='fight')return fight({fromQ:true});if(out==='treasure')return openChest();if(out==='shop')return openShop();
  const ev=pickEvent();if(!ev)return fight({fromQ:true});noteSeen('event',ev.id);
  if(ev.pool==='shrine')run.shrinesThisAct[ev.id]=1;else run.seenEvents[ev.id]=1;
- W.S={screen:'event',ev,t:Date.now()};render()}
+ W.S={screen:'event',ev:{...ev,t:eventText(ev.id,ev.t)},t:Date.now()};render()}
 export function eventOK(ev){const run=W.run;if(ev.pool==='shrine'?run.shrinesThisAct[ev.id]:run.seenEvents[ev.id])return false;if(ev.act&&ev.act!==run.act)return false;return !ev.req||ev.req()}
 export function pickEvent(){const act=EVENTS.filter(e=>e.pool!=='shrine'&&eventOK(e)),sh=EVENTS.filter(e=>e.pool==='shrine'&&eventOK(e));
  let list=rnd('events')<.75?act:sh;if(!list.length)list=list===act?sh:act;return list.length?pick(list,'events'):null}

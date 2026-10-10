@@ -302,7 +302,7 @@
 @media(max-height:360px){.tb-plate{min-height:80px;padding-top:10px;padding-bottom:10px;gap:1px}.tb-spr{height:48vh}}
 
 /* Per-hero sprite fit (--sc scale, --tx shift): the Duelist's wide lunging canvas is scaled to match the others and shifted left so the rapier stays on screen. */
-.tb-pick{--sc:1;--tx:0px}.tb-pick[data-cls="duel"]{--sc:1.2;--tx:-3.6vw}.tb-pick[data-cls="tide"]{--sc:1.04}.tb-pick[data-cls="echo"]{--sc:1.04}
+.tb-pick{--sc:1;--tx:0px}.tb-pick[data-cls="duel"]{--sc:1;--tx:3.2vw}.tb-pick[data-cls="duel"] .tb-spr{max-width:none;width:auto;height:min(52vh,235px);margin:0 -40%;align-self:center}.tb-pick[data-cls="tide"]{--sc:1.04}.tb-pick[data-cls="echo"]{--sc:1.04}
 .tb-spr{transform:translateX(var(--tx)) scale(var(--sc))}
 .tb-pick:hover .tb-spr,.tb-pick:focus-visible .tb-spr,.tb-pick.on .tb-spr{transform:translate(var(--tx),-7px) scale(calc(var(--sc)*1.035))}
 .tb-pick:active .tb-spr{transform:translate(var(--tx),-3px) scale(calc(var(--sc)*1.01))}
@@ -397,3 +397,63 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 .tb-main-content .tb-menu{position:static;width:100%;flex:none;gap:clamp(0px,.4dvh,3px)}
 .tb-main-content .tb-mi{min-height:clamp(32px,8dvh,44px);padding:3px 30px;font-size:clamp(17px,4.8dvh,24px)}
 .tb-main-content .tb-mi small{margin-top:5px;line-height:1.25;margin-bottom:3px}
+
+/* ===== The Second Dawn: layered main-menu scene (lore bible §17.4). CSS / SVG placeholders over named art slots. ===== */
+.ml-scene{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.ml-layer{position:absolute;inset:0}
+.ml-layer .ml-art,.lp-tower>.ml-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lp-tower>.ml-art{object-fit:contain;object-position:bottom}
+.lp-tower{overflow:visible}.lp-tower .ml-layer{overflow:visible}
+.lp-tower rect.odd.lit{fill:#d9f2da;filter:drop-shadow(0 0 4px #9fe3b0)}
+.lp-tower .lamproom.glint{fill:#2a2418;animation:lp-flick 5s ease-in-out infinite alternate}
+.lp-tower.dark rect,.lp-tower.dark .lamproom{fill:#0b1118;filter:none;animation:none}
+.lp-tower .ml-ring{fill:none;stroke:#79e0a4;stroke-width:1.1;opacity:.55;filter:drop-shadow(0 0 3px #46c37e);animation:ml-breathe 9s ease-in-out infinite}
+.lp-tower .ml-ring.in{opacity:.32;animation-delay:-3s}
+.lp-tower .ml-pale{stroke:#dfeee4;stroke-width:.7;opacity:.55;filter:drop-shadow(0 0 2px #dfeee4);stroke-dasharray:3 2;animation:ml-pulse 6s linear infinite}
+@keyframes ml-breathe{0%,100%{opacity:.25;transform:scale(.97)}50%{opacity:.6;transform:scale(1.03)}}
+@keyframes ml-pulse{to{stroke-dashoffset:-20}}
+.lp-tower .ml-ring{transform-origin:50px 296px;transform-box:fill-box}
+.ml-steps{position:absolute;left:0;right:0;bottom:0;height:17%}
+.ml-steps::before{content:"";position:absolute;inset:0;background:linear-gradient(to top,#04070bf2 0 28%,transparent 28% 30%,#070c12ee 30% 55%,transparent 55% 57%,#0b1118d8 57% 80%,transparent 80%);opacity:.9}
+.ml-gl{position:absolute;width:calc(7px*var(--s,1));height:calc(10px*var(--s,1));border-radius:3px 3px 2px 2px;background:radial-gradient(circle at 50% 40%,#fff1c2,#ffbf47 55%,#7a4a14);box-shadow:0 0 calc(8px*var(--s,1)) 2px #ffb34766;animation:lp-flick 3.6s ease-in-out var(--d,0s) infinite alternate;transform:translateX(-50%)}
+.ml-gl::before{content:"";position:absolute;left:25%;right:25%;top:-3px;height:3px;border:1px solid #c9a24a;border-bottom:0;border-radius:3px 3px 0 0}
+.ml-gl .ml-art{position:absolute;inset:-60%;width:220%;height:220%}
+.ml-gl.r0{bottom:2%}.ml-gl.r1{bottom:6.5%;opacity:.85}.ml-gl.r2{bottom:11%;opacity:.7}
+.reduce-motion .ml-gl,.reduce-motion .lp-tower .ml-ring,.reduce-motion .lp-tower .ml-pale,.reduce-motion .ml-shape{animation:none}
+/* ending variants */
+.ml-dawn{background:linear-gradient(to top,#ffd27a66,#ffd27a00 14%) 0 62%/100% 20% no-repeat}
+.ml-end-light .ml-dawn{background:linear-gradient(to top,#f3b95a77,#f3b95a00) 0 58%/100% 14% no-repeat}
+.ml-shape{background:radial-gradient(ellipse 28% 5% at 38% 74%,#010305bb,transparent 100%);animation:ml-shape 16s ease-in-out infinite alternate}
+@keyframes ml-shape{from{transform:translateX(-6%)}to{transform:translateX(9%)}}
+.ml-stars{background:radial-gradient(1.4px 1.4px at 8% 12%,#fff,transparent),radial-gradient(1px 1px at 22% 30%,#dfe9ff,transparent),radial-gradient(1.4px 1.4px at 37% 8%,#fff,transparent),radial-gradient(1px 1px at 51% 22%,#cfe0ff,transparent),radial-gradient(1.6px 1.6px at 66% 11%,#fff,transparent),radial-gradient(1px 1px at 79% 28%,#dfe9ff,transparent),radial-gradient(1.4px 1.4px at 90% 9%,#fff,transparent),radial-gradient(1px 1px at 14% 44%,#fff,transparent),radial-gradient(1px 1px at 72% 45%,#cfe0ff,transparent),radial-gradient(1.2px 1.2px at 44% 40%,#fff,transparent)}
+.ml-end-lens .ml-gl{opacity:.12;box-shadow:none;background:#2a2f36;animation:none}
+.ml-end-cut .ml-dawn.cut{background:radial-gradient(ellipse 70% 38% at 50% 64%,#ffe3a0aa,#ffc66a55 45%,transparent 75%)}
+.ml-end-cut .ml-gl{animation:ml-lift 18s linear var(--d,0s) infinite}
+@keyframes ml-lift{from{transform:translate(-50%,0);opacity:.9}to{transform:translate(-50%,-70vh);opacity:0}}
+.tb-main:has(.ml-end-lens) .tb-sea{filter:saturate(.7) brightness(.5)}
+.tb-main:has(.ml-end-cut) .tb-sea{filter:saturate(1.05) brightness(1) sepia(.28)}
+.tb-main:has(.ml-end-light) .tb-sea{filter:saturate(1) brightness(.88) sepia(.12)}
+/* intro scene 5: a few faint lanterns on the lowest steps (lore bible F02) */
+.in-lanterns{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);width:70%;height:6%;pointer-events:none}
+.in-lanterns i{position:absolute;width:5px;height:7px;border-radius:2px;background:#ffd98a;box-shadow:0 0 8px 2px #ffb34777;opacity:0;animation:in-lan 3s 9.5s ease-out forwards}
+.in-lanterns i:nth-child(1){left:6%;bottom:30%}.in-lanterns i:nth-child(2){left:27%;bottom:0;animation-delay:10.2s}.in-lanterns i:nth-child(3){left:51%;bottom:45%;animation-delay:10.8s}.in-lanterns i:nth-child(4){left:73%;bottom:10%;animation-delay:11.3s}.in-lanterns i:nth-child(5){left:93%;bottom:35%;animation-delay:11.9s}
+@keyframes in-lan{to{opacity:.55}}
+.tb-intro.calm .in-lanterns i{animation-duration:.01s!important;animation-delay:0s!important}
+/* Ledger pages (the 8 reveal stages) */
+.lp-pagehead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:0 14px 4px;font:italic 400 13px var(--serif);color:var(--cream-dim)}
+.lp-pagehead span{font:600 10px var(--font-display);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);white-space:nowrap}
+.lp-pages{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:2px 12px 10px;overflow:auto;max-height:calc(100dvh - 130px)}
+.lp-page{position:relative;padding:8px 10px 8px;border-radius:3px;background:linear-gradient(#e7dbb5,#cdbf91);color:#2a2214;box-shadow:0 2px 6px #000a,inset 0 0 18px #7a5c2a55;font:400 12px/1.25 var(--serif)}
+.lp-page h3{font:700 12px var(--font-display);letter-spacing:.06em;text-transform:uppercase;margin:0 0 4px;color:#3a2a10}
+.lp-page p{margin:0 0 4px}.lp-page .lp-pn{position:absolute;right:7px;top:4px;font:700 18px var(--font-display);color:#7a5c2a55}
+.lp-page.cut::before{content:"";position:absolute;left:-1px;right:-1px;top:-5px;height:9px;background:linear-gradient(135deg,transparent 40%,#e7dbb5 40%) 0 0/9px 9px repeat-x;filter:drop-shadow(0 -1px 0 #000a)}
+.lp-stub{position:absolute;left:6px;right:6px;top:2px;height:3px;border-top:2px dashed #3a2a1066}
+.lp-page.sealed{background:linear-gradient(#26303a,#171e26);color:var(--cream-dim);box-shadow:0 2px 6px #000a,inset 0 0 14px #000a}
+.lp-page.sealed h3{color:#8b97a0}.lp-page.sealed .lp-pn{color:#ffffff22}
+.lp-page.deep:not(.sealed){background:linear-gradient(#dfe6d2,#b9c7ab)}
+@media (max-height:420px){.lp-pages{grid-template-columns:repeat(4,1fr);gap:6px}.lp-page{font-size:11px;padding:6px 8px}.lp-page h3{font-size:11px}}
+.tb-main .tb-main-content{z-index:2}
+.ml-steps{height:11%}
+.tb-ledger .lp-pagehead{position:absolute;left:0;right:0;top:108px}
+.tb-ledger .lp-pages{position:absolute;left:0;right:0;top:134px;bottom:0;max-height:none}
+@media (max-height:420px){.tb-cols p{font-size:13px;line-height:1.22}.tb-cols{gap:6px 16px}}

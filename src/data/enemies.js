@@ -5,6 +5,7 @@
 import {registerEnemies} from '../core/registry.js';
 import {W} from '../core/state.js';
 import {DATA} from './generated/data-v2.js';
+import {BELL_LINES} from './lore.js';
 import {addSt,alive,countAlive,log,callout,spawn} from '../engine/combat.js';
 const V=DATA.v21.sim.enemies;
 const hp=k=>V[k].hp.slice();
@@ -12,8 +13,8 @@ const tend=()=>alive().filter(x=>x.key==='tendril');
 registerEnemies({
  slug:{n:'Brine Slug',e:'🐌',hp:hp('slug'),ai:e=>e.t%2?{b:5,lbl:'Slime Shell'}:{a:11,lbl:'Lash'}},
  gull:{n:'Gull Thief',e:'🐦',hp:hp('gull'),ai:e=>e.t>=2?{steal:10,lbl:'Snatch & flee'}:{a:7,h:2,lbl:'Peck'}},
- knight:{n:'Rust Knight',e:'🤖',hp:hp('knight'),ai:e=>e.t===0?{s:2,lbl:'Sharpen'}:{a:16,lbl:'Cleave'}},
- pod:{n:'Spore Pod',e:'🍄',hp:hp('pod'),ai:e=>e.t>=2?{a:V.pod.burst,boom:1,lbl:'BURST'}:{none:1,lbl:e.t===0?'Swelling…':'Ripening…'}},
+ knight:{n:'Wrack Knight',e:'🤖',hp:hp('knight'),ai:e=>e.t===0?{s:2,lbl:'Sharpen'}:{a:16,lbl:'Cleave'}},
+ pod:{n:'Brine Cyst',e:'🍄',hp:hp('pod'),ai:e=>e.t>=2?{a:V.pod.burst,boom:1,lbl:'BURST'}:{none:1,lbl:e.t===0?'Swelling…':'Ripening…'}},
  wisp:{n:'Glimmer Wisp',e:'🏮',hp:hp('wisp'),ai:e=>e.t%2?{a:13,lbl:'Flare'}:{w:2,lbl:'Dazzle'}},
  crab:{n:'Coral Crab',e:'🦀',hp:hp('crab'),b0:6,ai:e=>e.t%2?{a:9,b:4,lbl:'Pinch'}:{b:8,lbl:'Shell Up'}},
  leech:{n:'Tide Leech',e:'🪱',hp:[24,28],ai:e=>e.t%2?{a:3,brittle:1,lbl:'Latch'}:{a:5,heal:5,lbl:'Drink'}},
@@ -31,7 +32,7 @@ registerEnemies({
   ai:e=>{const P=e.ph===2?[{a:22,lbl:'Crack'},{a:10,ring:2,lbl:'Shatter Wave'},{a:18,s:V.bell.toll_might,lbl:'Toll'}]:[{a:18,s:V.bell.toll_might,lbl:'Toll'},{a:6,h:3,lbl:'Reverberate'},{b:15,w:2,lbl:'Deep Hum'}];return P[(e.ci++)%3]},
   // Phase 2 at <= 80 HP: clears debuffs, +2 Might, and starts on Crack — even when it cracks during its own turn (Parry; Playtester bug 2).
   onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.next=EN_bell().ai(e);if(W.cb.acting===e)e.keepNext=true;
-   log('🔔 The Bell CRACKS! Phase 2: +2 Might, debuffs cleared');callout('THE BELL CRACKS!','boss')}}},
+   log('🔔 The Bell CRACKS! Phase 2: +2 Might, debuffs cleared');log('🔔 '+BELL_LINES.crack);callout('THE BELL CRACKS!','boss')}}},
  matriarch:{n:'The Kelp Matriarch',e:'🪸',hp:[90,90],boss:1,
   passive:{n:'Rooted',text:'At the end of each of her turns, she gains 4 Guard per living Tendril.',endTurn:e=>{const n=tend().length;if(n){e.block+=4*n;e.blkT=Date.now()}}},
   onSpawn:e=>{if(W.cb){spawn('tendril',{summoned:true});spawn('tendril',{summoned:true})}},
@@ -43,6 +44,6 @@ import {EN} from '../core/registry.js';
 const EN_bell=()=>EN.bell;
 
 // v2.2 enemy behaviour block (data-v2.json v21.sim.world.behaviour): normal enemies open with Guard (b0); scripted ones cycle
-// their intents with Guard attached (Slug Lash/Withdraw, Wisp Dazzle/Flare, Rust Knight Sharpen → Cleave ×2 → re-Sharpen).
+// their intents with Guard attached (Slug Lash/Withdraw, Wisp Dazzle/Flare, Wrack Knight Sharpen → Cleave ×2 → re-Sharpen).
 {const BEH=(DATA.v21.sim.world||{}).behaviour||{};for(const [k,b] of Object.entries(BEH)){const t=EN[k];if(!t)continue;if(b.b0!=null)t.b0=b.b0;
  if(Array.isArray(b.script)&&b.script.length){const sc=b.script;t.ai=e=>({...sc[e.t%sc.length]})}}}

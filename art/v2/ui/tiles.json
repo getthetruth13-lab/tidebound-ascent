@@ -693,6 +693,141 @@
    ],
    "desc": "End screen banner, a single lantern burning on in the dark (loss)",
    "ready": false
+  },
+  "lore-ferryman": {
+   "path": "art/v2/ui/tiles/lore-ferryman.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Ferryman portrait, small, shown at the crossing: a hooded oarsman who never looks up, lantern at the bow",
+   "ready": false
+  },
+  "lore-page-sealed": {
+   "path": "art/v2/ui/tiles/lore-page-sealed.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Sealed Ledger page icon: a folded page tied with wet cord",
+   "ready": false
+  },
+  "lore-torn-page": {
+   "path": "art/v2/ui/tiles/lore-torn-page.webp",
+   "size": [
+    256,
+    256
+   ],
+   "desc": "Torn Ledger Page icon: a page with a visible cut stub along the top edge",
+   "ready": false
+  },
+  "lore-page-frame": {
+   "path": "art/v2/ui/tiles/lore-page-frame.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Logbook page frame: parchment with a cut stub, iron corner rivets",
+   "ready": false
+  },
+  "menu-sky": {
+   "path": "art/v2/ui/tiles/menu-sky.webp",
+   "size": [
+    832,
+    384
+   ],
+   "desc": "Menu layer: the last hour before dawn over a black Pale Sea; left two-thirds kept clear for buttons",
+   "ready": false
+  },
+  "menu-sea": {
+   "path": "art/v2/ui/tiles/menu-sea.webp",
+   "size": [
+    832,
+    384
+   ],
+   "desc": "Menu layer: black water, plain (stages 0-5)",
+   "ready": false
+  },
+  "menu-lighthouse": {
+   "path": "art/v2/ui/tiles/menu-lighthouse.webp",
+   "size": [
+    300,
+    900
+   ],
+   "desc": "Menu layer: the Pale Lighthouse, right third, eight windows spiralling up (windows are lit in code over this art)",
+   "ready": false
+  },
+  "menu-ring": {
+   "path": "art/v2/ui/tiles/menu-ring.webp",
+   "size": [
+    600,
+    120
+   ],
+   "desc": "Menu layer: a faint green ring on the water around the lighthouse base (stage 6+, after the twist). Never a body, eye or limb.",
+   "ready": false
+  },
+  "menu-line": {
+   "path": "art/v2/ui/tiles/menu-line.webp",
+   "size": [
+    60,
+    900
+   ],
+   "desc": "Menu layer: a thin pale line from the lamp down into the sea (stage 7+, after the twist)",
+   "ready": false
+  },
+  "menu-steps": {
+   "path": "art/v2/ui/tiles/menu-steps.webp",
+   "size": [
+    832,
+    120
+   ],
+   "desc": "Menu layer: the Foot final steps in the foreground, dark stone, wet",
+   "ready": false
+  },
+  "menu-ghost": {
+   "path": "art/v2/ui/tiles/menu-ghost.webp",
+   "size": [
+    64,
+    96
+   ],
+   "desc": "Menu layer: one ghost lantern on a step (the game places one per lifetime death, capped at 40)",
+   "ready": false
+  },
+  "menu-dawn-light": {
+   "path": "art/v2/ui/tiles/menu-dawn-light.webp",
+   "size": [
+    832,
+    160
+   ],
+   "desc": "Menu ending layer, Light It: a gold dawn rim on the horizon",
+   "ready": false
+  },
+  "menu-shape": {
+   "path": "art/v2/ui/tiles/menu-shape.webp",
+   "size": [
+    832,
+    160
+   ],
+   "desc": "Menu ending layer, Light It: a dark shape faintly moving under the water",
+   "ready": false
+  },
+  "menu-stars": {
+   "path": "art/v2/ui/tiles/menu-stars.webp",
+   "size": [
+    832,
+    260
+   ],
+   "desc": "Menu ending layer, Break the Lens: a starfield, first stars in two hundred years",
+   "ready": false
+  },
+  "menu-dawn-cut": {
+   "path": "art/v2/ui/tiles/menu-dawn-cut.webp",
+   "size": [
+    832,
+    384
+   ],
+   "desc": "Menu ending layer, Cut the Line: a true dawn, no green ring, no line, lanterns lifting off the steps",
+   "ready": false
   }
  }
 }

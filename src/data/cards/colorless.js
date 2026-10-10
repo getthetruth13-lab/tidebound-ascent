@@ -20,7 +20,7 @@ X('saltrub',{e:'🧂',d:'Remove all your debuffs. Sink.',p:f=>{const s=W.cb.p.st
 X('bilgepump',{e:'🪣',d:'Sink up to 2 cards in your hand. Draw {2|3}.',p:f=>{const cb=W.cb;let k=0;const draw=()=>f.draw(f.v(2,3));
  const step=()=>{if(k>=2||!cb.hand.length||f.echo)return draw();ask(f,'Bilge Pump: Sink a card ('+(2-k)+' left)?',[{l:'✔️ Done',f:draw},...cb.hand.map(ci=>({l:'🫧 Sink '+(CARDS[ci.id].e||'')+' '+cname(ci),f:()=>{const i=cb.hand.indexOf(ci);if(i>=0){cb.hand.splice(i,1);sinkCard(ci,'bilgepump');log('🪣 Sank '+cname(ci))}k++;step()}}))])};step()}});
 X('gullsdue',{e:'🪙',d:'Deal {8|11}. If this kills, gain {12|15} gold.',p:f=>{f.dmg(f.v(8,11));if(f.killed){const g=f.v(12,15);W.run.gold+=g;floatText('p','+'+g+' gold','');callout('+'+g+' 🪙','potion')}}});
-X('shanty',{e:'🎶',d:'Next turn, gain 1 Energy and draw 1.',p:f=>{W.cb.nextDraw++;f.nextTurn(()=>{gainEnergy(1);log('🎶 Sea Shanty: +1 Energy')});floatText('p','🎶 next turn: +1⚡ +1 card','e')}});
+X('shanty',{e:'🎶',d:'Next turn, gain 1 Energy and draw 1.',p:f=>{W.cb.nextDraw++;f.nextTurn(()=>{gainEnergy(1);log('🎶 Sea Shanty: +1 Energy')},{energy:1});floatText('p','🎶 next turn: +1⚡ +1 card','e')}});
 X('krakengrasp',{e:'🐙',tg:1,d:'The target loses {8|12} Might this turn. Sink.',p:f=>{const t=f.tg;if(!t)return;const n=f.v(8,12);t.st.mightTmp=(t.st.mightTmp||0)-n;floatText(t.uid,'−'+n+' Might','');callout('KRAKEN\'S GRASP −'+n,'potion')}});
 X('tidalbore',{e:'🌊',d:'Deal {30|40} to ALL. Sink.',p:f=>{callout('TIDAL BORE','crest');f.all(f.v(30,40))}});
 X('orders',{e:'📜',xu:0,d:'Draw 3. The next card you play this turn costs 0.{ Sink.|}',p:f=>{const src=f.ci;f.draw(3);

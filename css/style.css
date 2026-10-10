@@ -910,3 +910,16 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 .dais .nexts .nx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8;padding-left:14px}.dais .nexts .nx.next{opacity:1;color:#fff3cf}
 .tip#detail.narrow{font-size:11px;padding:5px 6px}.tip#detail.narrow .desc{font-size:11px;line-height:1.2}.tip#detail.narrow .btn{min-height:34px;font-size:12px}
 @media(min-height:600px){.dais{zoom:1.25}}
+/* ===== The Second Dawn (lore bible v3): Ferryman at the crossing, Wren's tally ===== */
+.travel .ferry{display:flex;align-items:center;gap:8px;max-width:min(560px,86vw);margin:8px auto 0;padding:4px 10px;border-radius:6px;background:#05080ccc;border:1px solid #3a4a50;text-align:left}
+.travel .ferry .emb{flex:none;width:30px;height:30px;font-size:16px}
+.travel .ferry q{font:italic 400 13px/1.25 var(--serif,serif);color:var(--cream-dim,#cdbf9a);quotes:none}
+.wrenline{font:italic 400 12px/1.2 var(--serif,serif);color:var(--cream-dim,#cdbf9a)}
+.fit-shop .shophead .wrenline{font-size:10px}
+.nmf{cursor:help;border-bottom:1px dotted #8a9a9a66}
+.co.c-lore{font:italic 600 clamp(15px,3.2vw,24px)/1.2 var(--serif);letter-spacing:.02em;color:#e9dcb8;max-width:80vw;text-align:center;text-shadow:0 0 10px #000,0 2px 4px #000}
+
+/* Fix t441: deck/pick/upgrade/shop card grids must scroll by touch drag. Only cards that are dragged (combat hand, chart slots) block panning. */
+.card{touch-action:pan-x pan-y}
+.hand .card,.cslot .card,.cslot{touch-action:none}
+.page.fit>.grid,.ov .box{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}

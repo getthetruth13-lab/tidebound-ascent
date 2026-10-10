@@ -26,5 +26,5 @@ D('coup',{e:'💀',d:'Deal {12|15}. If this is a Flourish and kills, gain 1 Ener
 D('engarde',{e:'🎌',d:'At the start of your turn, if you have no Momentum, gain 1.',power:{on:{turnStart(inst){if(W.cb.mom<1)gainMom(1-W.cb.mom)}}}});
 D('perfect',{e:'✨',d:'Parry {10|14}. If it triggers, gain 2 Momentum next turn.',p:f=>{f.parry(f.v(10,14));
  const turn=W.cb.turn;
- forCombat({id:'perfect',on:{parry(inst){if(W.cb.turn!==turn||inst.dead)return;inst.dead=true;W.cb.nextTurnQ.push(()=>{gainMom(2);log('✨ Perfect Parry: +2 Momentum')})},turnStart(inst){if(W.cb.turn>turn)inst.dead=true}}})}});
+ forCombat({id:'perfect',on:{parry(inst){if(W.cb.turn!==turn||inst.dead)return;inst.dead=true;{const q=()=>{gainMom(2);log('✨ Perfect Parry: +2 Momentum')};q.meta={mom:2};W.cb.nextTurnQ.push(q)}},turnStart(inst){if(W.cb.turn>turn)inst.dead=true}}})}});
 D('cuts',{e:'🩸',d:'Deal {2|3} for each Attack played this combat (max 30). Sink.',p:f=>{const n=Math.min(30,W.cb.stat.attacksCombat);if(n)f.dmg(f.v(2,3),n);else log('No Attacks yet!')}});

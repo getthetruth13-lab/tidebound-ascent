@@ -13,7 +13,7 @@ const SCENES=[
  [['It did not set. It sank.','Down beneath the Pale Sea, dragging the world’s light into the deep.'],12],
  [['Each year, the water rose higher, devouring the shores.'],9],
  [['But now, the ocean draws back.','The ancient stair has risen: a city of landings, given back by the tide.'],10],
- [['At the summit lies the lamp that can call the Drowned Sun back.','But the climb is a vertical grave.'],12],
+ [['At the summit lies the lamp that can call the Drowned Sun back, or so the old keepers swore.','But the climb is a vertical grave.'],12],
  [['Four souls stand upon the salt-slick stone, ready to brave the ascent.','Choose your Lampbearer.'],14]];
 export const INTRO_SCENES=SCENES.length;
 let timer=0;
@@ -27,7 +27,7 @@ export function introScr(){const n=Math.max(1,Math.min(SCENES.length,W.S.scene|0
  return `<div class="tb-scr tb-intro${calm()?' calm':''}" id="intro" onclick="introNext()">
  ${p?`<div class="in-img out s${p}" style="background-image:url(${IMG(p)})"></div>`:''}
  <div class="in-img in s${n}" style="background-image:url(${IMG(n)})"></div>
- ${n===5?`<div class="in-mist m1"></div><div class="in-mist m2"></div><div class="in-heroes">${ORDER.map((k,i)=>spriteImg(k,'in-hero h'+i)).join('')}</div>`:''}
+ ${n===5?`<div class="in-mist m1"></div><div class="in-mist m2"></div><div class="in-lanterns" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div><div class="in-heroes">${ORDER.map((k,i)=>spriteImg(k,'in-hero h'+i)).join('')}</div>`:''}
  <div class="in-vig"></div>
  <div class="in-text" id="introtext" key="${n}">${textHTML(n)}</div>
  <div class="in-dots">${SCENES.map((_,i)=>`<i class="${i+1===n?'on':''}"></i>`).join('')}</div>

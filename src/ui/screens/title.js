@@ -8,7 +8,7 @@ import {bgHTML,frameOpen,frameClose} from './frame.js';
 import {selectScr} from './select.js';
 import {learnScr} from './learn.js';
 import {introScr,newGame} from './intro.js';
-import {lampPickScr,ledgerScr,totalPending} from './lamp.js';
+import {lampPickScr,ledgerScr,totalPending,menuSceneHTML} from './lamp.js';
 import {loadProfile} from '../../progress.js';
 const RUN_KEY='tidebound.run.v2';
 function ago(t){if(!t)return'';const m=Math.max(0,Math.round((Date.now()-t)/60000));if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';return Math.round(h/24)+' d ago'}
@@ -59,7 +59,7 @@ export function titleScr(){const v=W.S.view||'main';
  const sv=loadRunData(),K=sv&&CLASSES[sv.run.cls];
  const pend=totalPending(loadProfile()),nsl=listSlots().length;
  const mi=(id,label,act,opt={})=>`<button class="tb-mi${opt.off?' off':''}" id="${id}"${opt.off?' disabled':` onclick="${act}"`}><i class="tb-flame" aria-hidden="true"></i><b>${label}</b>${opt.sub?`<small>${opt.sub}</small>`:''}${opt.dot?`<em class="lp-dot">${opt.dot}</em>`:''}<u aria-hidden="true"></u></button>`;
- return `<div class="tb-scr tb-title tb-main">${bgHTML()}
+ return `<div class="tb-scr tb-title tb-main">${bgHTML()}${menuSceneHTML(window.__menuLore)}
  <div class="tb-main-content">${logoHTML()}
  <nav class="tb-menu" aria-label="Main menu">
  ${mi('continue','Continue','continueRun()',{off:!K,sub:K?`${K.n} · Floor ${sv.run.floor}/15`:''})}

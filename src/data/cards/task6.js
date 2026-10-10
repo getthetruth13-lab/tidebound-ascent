@@ -13,7 +13,7 @@ T('brinedrench',{e:'💦',d:'Deal {6|8}. Apply {3|4} Drenched. Surge 1.',p:f=>{f
 T('drawtide',{e:'🌀',req:()=>W.cb.tide>2,d:'Spend all Tide above 2: deal {4|5} for each Tide spent.',p:f=>{const n=spendTide(W.cb.tide-2);if(n>0){log('🌀 Draw the Tide: spent '+n);f.dmg(f.v(4,5)*n)}}});
 T('tithe',{e:'🐚',req:()=>W.cb.tide>=3,d:'Spend 3 Tide: gain {16|21} Guard and draw 1.',p:f=>{if(spendTide(3)<3)return;f.blk(f.v(16,21));f.draw(1)}});
 T('moonlock',{e:'🔒',d:'The Tide won\'t drift at the start of your next turn. At High or Low Tide: also gain {8|11} Guard and, next turn, 1 Energy.',p:f=>{const cb=W.cb;cb.holdDrift=true;log('🔒 Moonlock: the Tide will hold');
- if(f.highNow()||f.lowNow()){f.blk(f.v(8,11));f.nextTurn(()=>{gainEnergy(1);log('🔒 Moonlock: +1 Energy')})}}});
+ if(f.highNow()||f.lowNow()){f.blk(f.v(8,11));f.nextTurn(()=>{gainEnergy(1);log('🔒 Moonlock: +1 Energy')},{energy:1})}}});
 // Bank the Crest: while in play, reaching 10 Banks a Crest (max 3). Release = Tide meter button; a full Bank (3) releases itself at turn start.
 T('bankcrest',{e:'🏦',power:{mod:{bankCrest(){return true},drawCount(inst,ctx,v){return W.cb&&W.cb.banks?Math.max(1,v-1):v}},
  on:{turnStart(inst){if(W.cb&&W.cb.banks>=3)releaseBank()}}}});

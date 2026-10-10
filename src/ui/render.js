@@ -3,7 +3,7 @@ import {daisHTML} from './classdais.js';
 import {placeDetail} from './place.js';
 // ui/render.js — all screens as HTML strings. Inline handlers call the globals main.js exposes.
 // Player-facing terminology follows design-v2 §0.3 (Guard, Might, Soaked, Exposed, Sink).
-import {barHTML,statusRowHTML} from './combatant.js';
+import {barHTML,statusRowHTML,playerStates} from './combatant.js';
 import {CARD_ART,assetEntry,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE} from '../assets.js';
 import {syncAudio} from '../audio.js';
 import {syncEnv,envFxSettingLabel} from './env.js';
@@ -26,6 +26,7 @@ import {decorateKeywords} from './kwtip.js';
 import {decorateCardRefs} from './cardref.js';
 import {tileHTML,tilesRow,relicTile,potionTile,optionHTML,emblemHTML,splitLabel,esc as tesc} from './tiles.js';
 import {lampSummaryHTML,tasksHTML,lampBtnLabel} from './screens/lamp.js';
+import {relicFlavour,ferrymanLine,bellCount,wrenLine,WREN_SIDE,currentTier,ENEMY_FLAVOUR} from '../data/lore.js';
 export const TH={tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist',status:'',curse:'',colorless:''};
 const RARN={s:'Starter',c:'Common',u:'Uncommon',r:'Rare',x:'Special'};
 const esc=s=>String(s).replace(/"/g,'&quot;');
@@ -76,11 +77,11 @@ function popHTML(){const S=W.S;
   return `<div class="pop potpop" id="potpop" onclick="event.stopPropagation()"><div class="itemhead">${slotHTML('potions',id,'itemart',p.e)}<div><b>${p.n}</b> <span class="muted">${RARN[p.rarity]}${p.cls?' · '+CLASSES[p.cls].n:''}</span><div>${p.d}</div></div></div>
   ${tg&&can&&W.cb?`<div class="muted">Targets: ${curTgt()?curTgt().n:'—'} (tap an enemy first to change)</div>`:''}<div class="row"><button class="btn pri" id="drinkbtn" ${can?'':'disabled'} onclick="drinkPotion(${S.potion});W.S.potion=null;render()">${can?'🧪 Drink':why}</button><button class="btn" id="discardpot" onclick="discardPotion(${S.potion})">🗑️ Discard</button><button class="btn" onclick="closePop()">✕</button></div></div>`}
  if(S.relicView){const ch=S.relicView.startsWith('charm:');const d=ch?CHARMS[S.relicView.slice(6)]:RELICS[S.relicView];const r=!ch&&W.run.relics.find(x=>x.id===S.relicView);
-  if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${slotHTML('relics',S.relicView,'itemart',d.e)}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${d.flavour}</div>`:''}</div>`}
+  if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${slotHTML('relics',S.relicView,'itemart',d.e)}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${relicFlavour(d.id||S.relicView,d.flavour)}</div>`:''}</div>`}
  return ''}
 export function openOv(k){if(drag)return;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
 export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(blkT,700),who)}
-export function badges(block,blkT,st){return statusRowHTML(st)}
+export function badges(block,blkT,st,extra){return statusRowHTML(st,extra)}
 // Floating numbers (R12): size scales with the amount (22-40 px), stacked numbers fan out, Guard uses its icon, and a number waits for the swing to connect (x.d).
 const FLN=/^([+-]?)(\d+)/;
 export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x.who===who&&now-x.t<900+(x.d||0));
@@ -164,12 +165,13 @@ function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){
 function enemyX(i,n,g){const a=n>=3?.54:.57,b=n>=3?.89:.84;return Math.round(g.vw*(n===1?.70:a+(b-a)*i/(n-1)))}
 export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,enemyMaxWidth:(n||1)>=3?g.vw*.165:0};const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
  const role=e.boss?'boss':e.elite?'elite':'normal';const vi=W.cb.ens.slice(0,i).filter(x=>x.key===e.key).length;
- const name=`${e.n}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}${e.passive?` <span class="pas" title="${esc(e.passive.n+': '+e.passive.text)}">${e.passive.n==='Rooted'?iconHTML('status','rooted','🌿'):'🌿'}${e.passive.n}</span>`:''}`;
+ const flav=ENEMY_FLAVOUR[e.key],nm0=flav?`<span class="nmf" data-info="${tesc(e.n+': '+flav)}">${e.n}</span>`:e.n;
+ const name=`${nm0}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}${e.passive?` <span class="pas" title="${esc(e.passive.n+': '+e.passive.text)}">${e.passive.n==='Rooted'?iconHTML('status','rooted','🌿'):'🌿'}${e.passive.n}</span>`:''}`;
  return figureHTML({sp:spriteFor('enemies',e.key,vi),role,ph:e.e,g,x:enemyX(k==null?i:k,n||1,g),shake:sh,intent:intentHTML(e),name,hp:hpbar(e.hp,e.max,e.block,e.blkT,'e'+e.uid),
   badgesH:badges(0,0,{...e.st,...(e.passive?.n==='Rooted'?{rooted:1}:{})}),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
 export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const sh=motionEnabled()?null:anim(W.cb.pshake,400);
  return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.25),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
-  badgesH:badges(0,0,{...W.cb.p.st,...(W.cb.parry&&!W.cb.parryUsed?{parry:W.cb.parry}:{})}),fx:fxHTML('p'),cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
+  badgesH:badges(0,0,{...W.cb.p.st,...(W.cb.parry&&!W.cb.parryUsed?{parry:W.cb.parry}:{})},playerStates()),fx:fxHTML('p'),cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
 export function tipHTML(){const cb=W.cb;
  if(cb.sel!=null&&cb.hand[cb.sel]){const ci=cb.hand[cb.sel],d=CARDS[ci.id];const can=canPlay(ci),nt=needsTarget(ci);const t=nt?curTgt():null;
   const why=d.unplay?'Unplayable':cost(ci)>cb.energy?'Not enough Energy':'Can\'t play now';
@@ -246,7 +248,8 @@ function tcA1(){const e=ENV.envs.tc_a1;const m=e&&e.art&&e.art.mid&&e.art.mid[0]
 function travelScr(){const ok=Date.now()-(W.S.t||0)>1000;const T=tcA1(),[px,py,pw,ph]=T.panel,pc=(a,b)=>(a/b*100).toFixed(2)+'%';
  return `<div class="page travel" onclick="skipTravel()"><div class="tcard tcplate" style="aspect-ratio:${T.w}/${T.h}"><img class="tcimg" src="${T.src}" alt="" draggable="false" onerror="this.parentNode.classList.add('noimg');this.remove()">
  <div class="tcpanel" style="left:${pc(px,T.w)};top:${pc(py,T.h)};width:${pc(pw,T.w)};height:${pc(ph,T.h)}"><h1>${T.title}</h1><div class="sub">${T.sub}</div></div></div>
- <div class="boss muted tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div><div class="skip muted">${ok?'Tap to begin':'…'}</div></div>`}
+ <div class="boss muted tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>
+ <div class="ferry" id="ferryman" data-info="${tesc('The Ferryman: He carries every Lampbearer to the Stair\'s foot, and never looks up.')}">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div><div class="skip muted">${ok?'Tap to begin':'…'}</div></div>`}
 export function skipTravel(){if(W.S.screen!=='travel')return;if(Date.now()-(W.S.t||0)<1000&&!window.FAST)return;W.S={screen:'map'};
  if(W.run&&W.run.lamp&&!W.run.lamp.shown&&W.run.floor===0){W.run.lamp.shown=true;W.S.ov='tasks'} // Lantern Tasks are shown once, when the climb begins
  render()}
@@ -270,7 +273,7 @@ function chestScr(){const S=W.S;let h=topBar()+`<h2>💎 ${S.name}</h2>`;
 function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();
  const card=(it,sh,i)=>`<div class="shopitem${it.sold?' sold':''}${it.sale?' sale':''}${anim(it.noT,400)?' no':''}">${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`buy('${sh}',${i})`,can:g>=it.price})}<span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':(it.sale?'<s>'+Math.round(it.base)+'</s> ':'')+'💰 '+it.price}</span>${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
  const icon=(it,sh,i,group,def)=>`<button class="shopicon${it.sold?' sold':''}${it.right?' right':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="buy('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}">${slotHTML(group,it.id,'',def.e)}<span class="inm">${def.n}</span><span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':'💰 '+it.price}</span>${it.right?'<i class="shoptag">SHOP</i>':''}</button>`;
- return topBar()+`<div class="shophead"><h2>🏮 Wren's Driftwood Bazaar</h2><span class="muted">hold a card to enlarge · scroll the card shelf ➜</span></div>
+ return topBar()+`<div class="shophead"><h2>🏮 Wren's Driftwood Bazaar</h2><span class="muted">hold a card to enlarge · scroll the card shelf ➜</span><em class="wrenline" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE)}">${wrenLine(bellCount(W.run.seed),currentTier())}</em></div>
  <div class="shelf cards" id="cardshelf"><div class="shlbl">Cards</div>${S.cards.map((it,i)=>card(it,'cards',i)).join('')}<div class="shlbl">Colourless<br><span class="muted">(extra class cards until Phase 2)</span></div>${S.colorless.map((it,i)=>card(it,'colorless',i)).join('')}</div>
  <div class="shelfrow"><div class="shelf relics"><div class="shlbl">Relics</div>${S.relics.map((it,i)=>icon(it,'relics',i,'relics',RELICS[it.id])).join('')}</div>
  <div class="shelf potions"><div class="shlbl">Potions</div>${S.potions.map((it,i)=>icon(it,'potions',i,'potions',POTIONS[it.id])).join('')}</div>

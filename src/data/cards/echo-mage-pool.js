@@ -34,7 +34,7 @@ E('tremolo',{e:'〰️',sus:1,d:'Deal {3|4} twice. Sustain {1|2} (per hit).',p:f
 E('glissando',{e:'🎹',d:'Deal 3, +{2|3} for each card played this turn.',p:f=>f.dmg(3+f.v(2,3)*playedBefore())});
 E('lullaby',{e:'🌙',tg:1,d:'Apply {2|3} Soaked. <b>Resound:</b> apply 2 more.',p:f=>f.weak(f.v(2,3)+(f.echo?2:0))});
 E('refrain',{e:'🔁',moor:1,d:'Deal {6|9}. Moor.',fx:[['dmg',6,9]]});
-E('restnote',{e:'💤',xu:0,d:'Next turn, gain 1 Energy.{ Sink.|} Faint.',p:f=>{f.nextTurn(()=>{gainEnergy(1);log('💤 Rest Note: +1 Energy')});floatText('p','💤 +1⚡ next turn','e')}});
+E('restnote',{e:'💤',xu:0,d:'Next turn, gain 1 Energy.{ Sink.|} Faint.',p:f=>{f.nextTurn(()=>{gainEnergy(1);log('💤 Rest Note: +1 Energy')},{energy:1});floatText('p','💤 +1⚡ next turn','e')}});
 E('echoshard',{e:'🔹',d:'Deal {5|7}. <b>Resound:</b> also deal {5|7} to ALL.',p:f=>{f.dmg(f.v(5,7));if(f.echo)f.all(f.v(5,7))}});
 E('soundwall',{e:'🧱',d:'Gain {12|15} Guard. <b>Resound:</b> gain {18|22} instead.',p:f=>f.blk(f.echo?f.v(18,22):f.v(12,15))});
 E('pizzicato',{e:'🎻',d:'Deal {2|3}. Draw 1. Faint.',fx:[['dmg',2,3],['draw',1]]});
@@ -80,7 +80,7 @@ E('grandpause',{e:'⏸️',d:'Gain {10|14} Guard. End your turn (Echo still happ
 E('coda',{e:'🎯',d:'Can only be played if you played 3+ cards this turn. Deal {14|18}.',req:f=>W.cb.stat.playedTurn>=3,fx:[['dmg',14,18]]});
 E('tuningblade',{e:'🗡️',sus:2,moor:1,d:'Deal {7|9}. Sustain {2|3}. Moor.',p:f=>{f.dmg(f.v(7,9));susUp(f,1)}});
 E('swellchord',{e:'🎶',d:'Gain {3|4} Guard for each card played this turn (counting this). Faint.',p:f=>f.blk(f.v(3,4)*(playedBefore()+1))});
-E('phaseshift',{e:'🌀',d:'Draw {2|3}. <b>Resound:</b> also gain 1 Energy next turn.',p:f=>{f.draw(f.v(2,3));if(f.echo){f.nextTurn(()=>{gainEnergy(1);log('🌀 Phase Shift: +1 Energy')});floatText('p','🌀 +1⚡ next turn','e')}}});
+E('phaseshift',{e:'🌀',d:'Draw {2|3}. <b>Resound:</b> also gain 1 Energy next turn.',p:f=>{f.draw(f.v(2,3));if(f.echo){f.nextTurn(()=>{gainEnergy(1);log('🌀 Phase Shift: +1 Energy')},{energy:1});floatText('p','🌀 +1⚡ next turn','e')}}});
 // ---------------- Rare ----------------
 E('eternal',{e:'♾️',d:'At the start of your turn, return last turn\'s Echoed card from discard to your hand.',power:{on:{
  echo(inst,ctx){inst.le={ci:ctx.card,turn:W.cb.turn}},
