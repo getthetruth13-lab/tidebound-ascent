@@ -66,3 +66,12 @@ function scrubAt(x){const hand=document.getElementById('hand');if(!hand)return;
  if(c){peekCard(c);if(drag){drag.el=c;drag.i=+c.dataset.i;drag.bx=+c.dataset.x;drag.by=+c.dataset.y}}
 }
 document.addEventListener('pointermove',ev=>{if(ev.pointerType!=='mouse'||drag)return;const hand=document.getElementById('hand');if(!hand)return;const r=hand.getBoundingClientRect();if(ev.clientY>=innerHeight*.65&&ev.clientX>=r.left&&ev.clientX<=r.right&&W.cb&&!W.cb.busy&&!W.cb.mode)scrubAt(ev.clientX);else if(peek)clearPeek()});
+
+// t472: names are hidden in combat; a small name tip shows only while a mouse hovers or a finger holds a figure (flavour after a longer hold).
+{let nmEl=null,nmT=0;const off=()=>{clearTimeout(nmT);if(nmEl){nmEl.classList.remove('nameon','namelong');nmEl=null}};
+ const on=f=>{if(drag||nmEl===f)return;off();nmEl=f;f.classList.add('nameon');nmT=setTimeout(()=>{if(nmEl===f)f.classList.add('namelong')},650)};
+ const fig=ev=>ev.target&&ev.target.closest?ev.target.closest('.combat .en,.combat .hero'):null;
+ document.addEventListener('pointerover',ev=>{if(ev.pointerType!=='mouse')return;const f=fig(ev);if(f)on(f);else off()});
+ document.addEventListener('pointerdown',ev=>{if(ev.pointerType==='mouse')return;const f=fig(ev);if(f)on(f);else off()},true);
+ for(const t of ['pointerup','pointercancel'])document.addEventListener(t,ev=>{if(ev.pointerType!=='mouse')off()},true);
+ document.addEventListener('pointerleave',off);document.addEventListener('pointerout',ev=>{if(ev.pointerType==='mouse'&&nmEl&&!nmEl.contains(ev.relatedTarget))off()});}

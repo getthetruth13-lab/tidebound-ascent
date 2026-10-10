@@ -991,3 +991,18 @@ body.scene-choice .wrap{background:transparent}
 body.combat-motion #endbtn:active{transform:translateY(3px) scale(.94);filter:brightness(1.35)}
 .combo-pop{font-size:clamp(30px,calc(var(--fs) * 1.2),48px)!important;color:#ffe5ac!important;text-shadow:0 2px 3px #000,0 0 8px #713d20;font-weight:900}
 @media(prefers-reduced-motion:reduce){#endbtn:active{transform:none}.turn-sweep{animation:turn-still 750ms linear both}}
+
+/* Task t472: StS-style low hand. Cards ~40% of screen tall, bottom ~38% off-screen at rest; touched/dragged card lifts fully into view. */
+@media (orientation:landscape){
+ .combat .hand{--hcw:min(calc(40vh*5/7),15vw)}
+ .combat .hand .card{width:var(--hcw);margin-left:calc(var(--hcw)/-2);bottom:calc(var(--hcw)*-.53)}
+}
+/* t472: no name plates in combat; tiny themed name tip while hovered / held, above the HP bar at the figure's feet */
+.combat .plate .nm{position:absolute!important;bottom:calc(100% + 4px);top:auto;left:50%!important;transform:translateX(-50%)!important;width:max-content!important;min-width:0!important;max-width:220px;
+ padding:2px 8px;border-radius:6px;background:#070a10e6;border:1px solid #b8955a99;font:700 11px/14px var(--font-display)!important;color:#e9dcb8;white-space:nowrap;
+ opacity:0;visibility:hidden;pointer-events:none;transition:none;z-index:40}
+.combat .hero .plate .nm .hn{display:inline;margin:0;padding:0;border:0;background:none}
+.combat .nameon .plate .nm{opacity:1;visibility:visible}
+.combat .plate .nm .nmfl{display:none}
+.combat .namelong .plate .nm{white-space:normal;width:200px!important;text-align:center}
+.combat .namelong .plate .nm .nmfl{display:block;font:italic 500 10.5px/13px var(--font-body);color:#cfc3a3;margin-top:2px}
