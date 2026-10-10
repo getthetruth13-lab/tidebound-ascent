@@ -23,7 +23,7 @@ D('press',{e:'🏃',d:'Deal {7|10}. Your Momentum doesn\'t fade at the end of th
 D('secondwind',{e:'🌬️',d:'Gain {3|4} Guard per Momentum (min {3|4}). Doesn\'t spend it.',p:f=>f.blk(f.v(3,4)*Math.max(1,W.cb.mom))});
 D('disarm',{e:'🫳',tg:1,d:'Target loses {2|3} Might for this combat. Sink.',p:f=>{const t=f.tg;if(t){addSt(t,'str',-f.v(2,3));log('🫳 '+t.n+' loses '+f.v(2,3)+' Might')}}});
 D('coup',{e:'💀',d:'Deal {12|15}. If this is a Flourish and kills, gain 1 Energy and draw 2.',p:f=>{const t=f.tg;f.dmg(f.v(12,15));if(f.flourish&&t&&t.hp<=0){f.gainEnergy(1);f.draw(2);log('💀 Coup! +1 Energy, draw 2')}}});
-D('engarde',{e:'🎌',d:'Start each turn with 1 Momentum.',power:{on:{turnStart(inst){if(W.cb.mom<1)gainMom(1-W.cb.mom)}}}});
+D('engarde',{e:'🎌',d:'At the start of your turn, if you have no Momentum, gain 1.',power:{on:{turnStart(inst){if(W.cb.mom<1)gainMom(1-W.cb.mom)}}}});
 D('perfect',{e:'✨',d:'Parry {10|14}. If it triggers, gain 2 Momentum next turn.',p:f=>{f.parry(f.v(10,14));
  const turn=W.cb.turn;
  forCombat({id:'perfect',on:{parry(inst){if(W.cb.turn!==turn||inst.dead)return;inst.dead=true;W.cb.nextTurnQ.push(()=>{gainMom(2);log('✨ Perfect Parry: +2 Momentum')})},turnStart(inst){if(W.cb.turn>turn)inst.dead=true}}})}});

@@ -23,7 +23,7 @@ E('gracenote',{e:'🎵',d:'Add {2|3} Notes to your hand. Faint.',p:f=>notes(f.v(
 E('chime',{e:'🔔',d:'Choose: deal {9|12}; or deal {4|6} and draw 1.',p:f=>ask(f,'Chime',[{l:'Deal '+f.v(9,12),f:()=>f.dmg(f.v(9,12))},{l:'Deal '+f.v(4,6)+'; draw 1',f:()=>{f.dmg(f.v(4,6));f.draw(1)}}])});
 E('belltone',{e:'🛎️',sus:2,d:'Gain {5|7} Guard. Sustain {2|3}.',p:f=>{f.blk(f.v(5,7));susUp(f,1)}});
 E('staccato',{e:'🎶',d:'Deal {2|3} three times.',fx:[['dmg',2,3,3]]});
-E('hollowecho',{e:'🕳️',d:'Deal {6|8}. <b>Resound:</b> hits ALL enemies instead.',p:f=>{if(f.echo)f.all(f.v(6,8));else f.dmg(f.v(6,8))}});
+E('hollowecho',{e:'🕳️',d:'Deal {6|8}. <b>Resound:</b> it hits ALL enemies instead.',p:f=>{if(f.echo)f.all(f.v(6,8));else f.dmg(f.v(6,8))}});
 E('drone',{e:'🐝',sus:3,d:'Deal {4|6}. Sustain {3|4}.',p:f=>{f.dmg(f.v(4,6));susUp(f,1)}});
 E('pianissimo',{e:'🤏',d:'Gain {3|5} Guard. Faint.',fx:[['block',3,5]]});
 E('counterpt',{e:'🎼',sus:1,d:'Deal {5|7}. Gain {5|7} Guard. Sustain 1.',fx:[['dmg',5,7],['block',5,7]]});
@@ -49,9 +49,9 @@ E('murmur',{e:'🗣️',sus:1,d:'Gain {4|6} Guard. Draw 1. Sustain 1.',fx:[['blo
 E('arpeggio',{e:'🎹',d:'Deal 3 to a random enemy {4|5} times.',p:f=>{for(let i=0;i<f.v(4,5);i++){const t=randAlive();if(!t)break;hit(t,f.num(3),f)}}});
 E('cadence',{e:'🎼',d:'Deal {6|8}. If you played 3+ cards this turn, deal {6|8} more.',p:f=>f.dmg(f.v(6,8),playedBefore()>=3?2:1)});
 // ---------------- Uncommon ----------------
-E('sostenuto',{e:'🎐',d:'Sustain growth is +1 higher.',power:{mod:{sustain(inst,ctx,v){return v+stacks(inst)}}}});
+E('sostenuto',{e:'🎐',d:'Each Sustain grows by 1 more.',power:{mod:{sustain(inst,ctx,v){return v+stacks(inst)}}}});
 E('choir',{e:'👥',d:'At the start of your turn, add {1|2} Note{|s} to your hand.',power:{on:{turnStart(inst){notes((inst.up?2:1)*stacks(inst))}}}});
-E('metronome',{e:'⏱️',d:'Every 4th card you play each turn draws 1.',power:{on:{cardPlayed(inst,ctx){if(ctx.nThisTurn%4===0){drawCards(stacks(inst));floatText('p','⏱️ tick: draw','')}}}}});
+E('metronome',{e:'⏱️',d:'Every 4th card you play each turn, draw 1.',power:{on:{cardPlayed(inst,ctx){if(ctx.nThisTurn%4===0){drawCards(stacks(inst));floatText('p','⏱️ tick: draw','')}}}}});
 // Fermata: the card played just before the Marked card. A per-turn play history would make this exact (engine request);
 // here: if the Mark comes later we catch it on the Mark; if it already happened we read the discard pile order.
 E('fermata',{e:'𝄐',d:'This turn, your Echo also repeats the card you played just before your Marked card. Faint.',p:f=>{const c=W.cb;let prev=null,prevTgt=null;
@@ -73,7 +73,7 @@ E('waveform',{e:'📈',sus:3,d:'Deal {5|7}. Sustain {3|4}. <b>Resound:</b> draw 
 E('harmonics',{e:'🎛️',sus:3,d:'Gain {8|10} Guard. Sustain {3|4}.',p:f=>{f.blk(f.v(8,10));susUp(f,1)}});
 E('tempo',{e:'⏩',d:'Gain 1 Energy.{| Also draw 1.} Sink. Faint.',p:f=>{f.gainEnergy(1);if(f.u)f.draw(1)}});
 E('chorusline',{e:'🎤',d:'Draw 1 for every 2 cards played this turn (max {3|4}). Faint.',p:f=>{const n=Math.min(f.v(3,4),Math.floor(playedBefore()/2));if(n)f.draw(n);else log('🎤 Chorus Line: play 2 cards first')}});
-E('dissonance',{e:'🔀',d:'Deal {9|12}. If the target has Exposed, apply 2 Soaked. <b>Resound:</b> hits ALL.',p:f=>{const ts=f.echo?alive():[f.tg].filter(Boolean);
+E('dissonance',{e:'🔀',d:'Deal {9|12}. If the target has Exposed, apply 2 Soaked. <b>Resound:</b> it hits ALL.',p:f=>{const ts=f.echo?alive():[f.tg].filter(Boolean);
  const exp=new Set(ts.filter(t=>t.st.vuln));if(f.echo)f.all(f.v(9,12));else f.dmg(f.v(9,12));exp.forEach(t=>{if(t.hp>0)f.weak(2,t)})}});
 E('grandpause',{e:'⏸️',d:'Gain {10|14} Guard. End your turn (Echo still happens).',p:f=>{f.blk(f.v(10,14));if(f.echo)return;const c=W.cb,turn=c.turn;
  callout('GRAND PAUSE','echo');queueMicrotask(()=>{if(W.cb===c&&c.turn===turn&&!c.busy&&!c.mode)endTurn()})}});

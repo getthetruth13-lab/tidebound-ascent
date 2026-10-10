@@ -65,7 +65,7 @@ registerEvents([
   {l:'🚶 Leave',f:goMap}]},
  {id:'stranger',pool:'act',act:1,n:'Campfire Stranger',e:'🔥',t:'On a dry landing, a stranger by a small fire waves you over. "Sit. Rest. Or let me sharpen something."',o:[
   {l:'❤️ Rest: heal 15 HP',f:()=>{heal(15);done('🔥 Campfire Stranger','You rest and feel restored. +15 HP.')}},
-  {l:'⬆️ Let him sharpen: upgrade a random card',f:()=>{const c=pickable('upgrade');if(c.length){const x=pick(c,'events');x.up=true;done('🔥 Campfire Stranger',`The stranger improves <b>${cname(x)}</b>.`)}else done('🔥 Campfire Stranger','Nothing left to improve.')}}]},
+  {l:'⬆️ Let him sharpen a card: upgrade a random card',f:()=>{const c=pickable('upgrade');if(c.length){const x=pick(c,'events');x.up=true;done('🔥 Campfire Stranger',`The stranger improves <b>${cname(x)}</b>.`)}else done('🔥 Campfire Stranger','Nothing left to improve.')}}]},
  {id:'crabmarket',pool:'act',act:1,n:'Crab Market',e:'🦀',t:'Crabs haggle over shiny things on a flat rock. One clacks at your potion belt.',o:[
   {l:'🧪 Sell a potion: +50 gold',ok:()=>run().potions.some(Boolean),f:()=>{const opts=run().potions.map((p,i)=>p?{l:`${POTIONS[p].e} ${POTIONS[p].n}`,f:()=>{run().potions[i]=null;gainGold(50);done('🦀 Crab Market','The crabs pay in old coins. +50 gold.')}}:null).filter(Boolean);
    choice('Sell which potion?','',opts.concat([{l:'↩️ Back',f:()=>{W.S.ev=EV('crabmarket');render()}}]))}},
@@ -87,7 +87,7 @@ registerEvents([
   {l:'🪞 Gaze: gain Mirror of Brine (duplicate a non-Rare card)',f:()=>{gainRelic('brinemirror');if(W.S.screen==='event')goMap()}},
   {l:'💥 Shatter it: remove a card and lose 5 HP',ok:()=>run().hp>5&&pickable('remove').length>0,f:()=>{const S=W.S;openPick('remove','🪞 Shatter: remove a card (−5 HP)',()=>{hurt(5);goMap()},()=>{W.S=S;render()})}},
   {l:'🚶 Leave',f:goMap}]},
- {id:'loom',pool:'act',act:1,n:"Saltwife's Loom",e:'🧶',t:'In a keeper’s recess, an old woman weaves nets from salt and moonlight. "I can unpick a rule from you, or weave you a charm."',o:[
+ {id:'loom',pool:'act',act:1,n:"Saltwife's Loom",e:'🧶',t:'In a keeper\'s recess, an old woman weaves nets from salt and moonlight. "I can unpick a rule from you, or weave you a charm."',o:[
   {l:()=>{const id=RULEBENDER[run().cls];return `🧵 Unpick the pattern: lose 6 Max HP, gain ${RELICS[id].e} ${RELICS[id].n}`},ok:()=>!run().relics.some(r=>r.id===RULEBENDER[run().cls])&&run().max>6,
    f:()=>{loseMaxHp(6);const id=RULEBENDER[run().cls];gainRelic(id);done("🧶 Saltwife's Loom",`<b>${RELICS[id].e} ${RELICS[id].n}</b>: ${RELICS[id].d}`)}},
   {l:'🪢 Weave a Charm (lasts the whole run)',f:()=>choice('Choose a Charm',"\"Pick one. It'll stay with you.\"",['springcurrent','salvagersluck','lightpurse'].map(id=>({l:`${CHARMS[id].e} ${CHARMS[id].n}: ${CHARMS[id].d}`,f:()=>{gainCharm(id);goMap()}})))},

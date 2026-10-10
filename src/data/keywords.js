@@ -7,15 +7,21 @@ import {DATA} from './generated/data-v2.js';
 const T=DATA.v21.sim.core.tide,E=DATA.v21.sim.core.echo,K=DATA.v21.sim.core.carto;
 const kw={...GLOSSARY};
 kw['Bearing']=kw['Bearing (Attack / Skill)'];delete kw['Bearing (Attack / Skill)'];
+const echoFrac=({.5:'half',.25:'quarter'})[E.unmarked_fallback]||(Math.round(E.unmarked_fallback*100)+'%');
+const rankBonus=(K.rank_dmg||[0,K.per_rank,K.per_rank*2,K.per_rank*3]).slice(1);
 Object.assign(kw,{
+ 'Tide':`A meter from 0 to 10, starting at 5. Surge raises it and Recede lowers it. ${T.high} or more is High Tide and ${T.low} or less is Low Tide. Reaching 10 causes a Crest: deal ${T.crest_dmg} to ALL, then the Tide resets to 5 with its arrow pointing down. Reaching 0 causes an Undertow: gain ${T.undertow_blk} Guard and draw ${T.undertow_draw}, then the Tide resets to 5 with its arrow pointing up.`,
+ 'Drift':`From your second turn on, after you draw, the Tide moves ${T.drift} in the direction of its arrow. Ride it into a Crest or Undertow, or push against it.`,
+ 'Echo':`Once per turn, you may Mark a non-Power, non-Faint card as you play it (tap the bell). At the end of your turn it repeats for free at its original target, or a random enemy if that one is gone. It gains +${E.bonus_per_card_after} per card played after the Mark (max +${E.bonus_cap}). If you Mark nothing, your last non-Power, non-Faint card Echoes at ${echoFrac} strength. At most ${E.cap} Echo repeats per turn.`,
+ 'Advance':`Once per turn, for free, tap a Waypoint to give it +1 Rank (max ${K.rank_max}). Damage bonus at Ranks 1–${K.rank_max}: +${rankBonus.join(' / +')}.`,
  'Surge':'Raise the Tide by X. Its arrow then points up.',
  'Recede':'Lower the Tide by X. Its arrow then points down.',
  'High Tide':`The Tide is ${T.high} or more (checked when the card is played).`,
  'Low Tide':`The Tide is ${T.low} or less (checked when the card is played).`,
  'Crest':`The Tide reaches 10: deal ${T.crest_dmg} to ALL enemies, then the Tide resets to 5 with its arrow pointing down.`,
  'Undertow':`The Tide reaches 0: gain ${T.undertow_blk} Guard and draw ${T.undertow_draw}, then the Tide resets to 5 with its arrow pointing up.`,
- 'Mark':`Once per turn, tap the bell before playing a card to Mark it. It Echoes at the end of your turn, +${E.bonus_per_card_after} per card played after it (max +${E.bonus_cap}).`,
- 'Rank':`Each Waypoint has a Rank from 0 to ${K.rank_max}. Damage bonuses at Ranks 1–${K.rank_max}: +${(K.rank_dmg||[0,K.per_rank,K.per_rank*2,K.per_rank*3]).slice(1).join(" / +")}. Lost when it leaves its slot.`,
+ 'Mark':`Once per turn, tap the bell before playing a non-Power, non-Faint card to Mark it. It Echoes at the end of your turn, +${E.bonus_per_card_after} per card played after it (max +${E.bonus_cap}).`,
+ 'Rank':`Each Waypoint has a Rank from 0 to ${K.rank_max}. Damage bonuses at Ranks 1–${K.rank_max}: +${rankBonus.join(" / +")}. Lost when it leaves its slot.`,
  'Fast Waypoint':'Triggers once as soon as it is placed, including when replacing a Waypoint, then again at the start of each turn.',
  'Spend':'Spend N Tide: lower the Tide by N as part of the card. The card cannot be played if the Tide is too low. Spending can cause a Tideturn or an Undertow.',
  'Drenched X':'Enemy status. Whenever the Tide turns, Crests or Undertows, the enemy loses X HP (Guard cannot stop it). Falls by 1 at the end of its turn. Max 12.',

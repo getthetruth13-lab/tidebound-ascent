@@ -20,7 +20,7 @@ const B={
  coraldust:{use:(f,t)=>addSt(t,'vuln',3)},
  sparkphial:{use:f=>gainEnergy(2)},
  kelpbroth:{outside:1,use:f=>heal(Math.floor(W.run.max*.15))},
- moondraught:{use:f=>{const opts=[0,2,4,5,6,8,10].map(v=>({l:(v===10?'🌊 Tide 10: Crest':v===0?'🌀 Tide 0: Undertow':'🌙 Tide '+v),tile:'choice-tide-set',sum:v===10?'Crest':v===0?'Undertow':'',f:()=>{setTide(v,'potion');log('🌙 Moon Draught: Tide '+v)}}));choose('🌙 Moon Draught: set the Tide',opts)}},
+ moondraught:{d:'Choose a Tide value: 0, 2, 4, 5, 6, 8 or 10. Choosing 10 triggers a Crest; choosing 0 triggers an Undertow.',use:f=>{const opts=[0,2,4,5,6,8,10].map(v=>({l:(v===10?'🌊 Tide 10: Crest':v===0?'🌀 Tide 0: Undertow':'🌙 Tide '+v),tile:'choice-tide-set',sum:v===10?'Crest':v===0?'Undertow':'',f:()=>{setTide(v,'potion');log('🌙 Moon Draught: Tide '+v)}}));choose('🌙 Moon Draught: set the Tide',opts)}},
  resvial:{use:f=>f.thisTurn({id:'resvial',mod:{echoPlan(i,ctx,p){return {...p,repeats:p.repeats+2}}}})},
  chartwater:{use:f=>{const cb=W.cb;if(cb.slots.length<cb.nslots){const ws=Object.values(CARDS).filter(c=>c.cls==='carto'&&c.t==='W'&&(c.r==='c'||c.r==='s'));const w=mk(pick(ws,'combat').id,false,{temp:true});cb.slots.push(w);log('🗺️ Chartwater: '+cname(w)+' placed (temporary)')}chart(6)}},
  adrenalsalt:{use:f=>{gainMom(3);f.parry(8)}},

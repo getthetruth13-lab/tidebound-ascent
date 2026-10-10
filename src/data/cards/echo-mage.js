@@ -27,5 +27,5 @@ E('recall',{e:'↩️',xu:1,d:'Return the last card you played (not a Reprise) t
  if(f.u)f.draw(1)}});
 E('amplify',{e:'📢',d:'Your next Echo this turn is doubled. Faint.',p:f=>f.thisTurn({id:'amplify',mod:{echoPlan(inst,ctx,p){return p.mult>1||ctx.slot===2?p:{...p,mult:2}}}})});
 E('standing',{e:'〰️',d:'Your first Echo each turn happens one extra time.',power:{mod:{echoPlan(inst,ctx,p){return ctx.slot===2?p:{...p,repeats:p.repeats+1}}}}});
-E('silence',{e:'🤫',tg:1,d:'Remove all Guard from target. Apply 2 Exposed. <b>Resound:</b> also apply 2 Soaked.',p:f=>{const t=f.tg;if(!t)return;t.block=0;f.vuln(2);if(f.echo)f.weak(2)}});
+E('silence',{e:'🤫',tg:1,d:'Remove all Guard from the target. Apply 2 Exposed. <b>Resound:</b> also apply 2 Soaked.',p:f=>{const t=f.tg;if(!t)return;t.block=0;f.vuln(2);if(f.echo)f.weak(2)}});
 E('crescendo',{e:'🎺',sus:5,d:'Deal {10|14}. Sustain 5.',fx:[['dmg',10,14]]});
