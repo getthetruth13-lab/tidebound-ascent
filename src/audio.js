@@ -34,7 +34,7 @@ function startTrack(){if(!unlocked||!context||current||document.hidden)return;co
  el.play().then(()=>{if(current===voice)ramp(voice,level('musicVolume'),1.5)}).catch(()=>{if(current===voice)retire()});
 }
 export function syncAudio(){syncUIState();const s=W.S.screen;
- const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?'menu':W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:'map'):null;
+ const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='start'||W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:'map'):null;
  if(next!==context){retire();context=next;startTrack()}
  if(s==='end'&&lastScreen!==s)playSound(W.run&&W.run.won?'victory':'defeat');lastScreen=s;
 }
@@ -56,7 +56,7 @@ Object.assign(tones,{
  travel:[140,220,.22,.045,.5,650],room:[165,247,.28,.045,.04,850],
  pile:[180,290,.16,.04,.65,900],tooltip:[350,280,.065,.025,.06,750],
  enlarge:[210,350,.15,.045,.3,900],pickup:[200,310,.1,.04,.4,850],drop:[250,160,.1,.045,.3,750],
- levelUp:[220,440,.42,.065,.035,1000],taskComplete:[330,495,.32,.055,.035,1000]
+ sparkle:[1500,3000,.5,.06,.015,6000],flip:[320,180,.12,.05,.1,900],levelUp:[220,440,.42,.065,.035,1000],taskComplete:[330,495,.32,.055,.035,1000]
 });
 export function playSound(name){if(!ctx||ctx.state!=='running'||!level('sfxVolume'))return;const now=ctx.currentTime;
  if(now-(recent[name]??-10)<.055)return;recent[name]=now;
@@ -68,7 +68,7 @@ export function playSound(name){if(!ctx||ctx.state!=='running'||!level('sfxVolum
  for(let i=0;i<samples.length;i++)samples[i]=(Math.random()*2-1)*noiseMix;
  const noise=ctx.createBufferSource();noise.buffer=buffer;osc.connect(filter);noise.connect(filter);filter.connect(gain);gain.connect(master);
  osc.start(now);noise.start(now);osc.stop(now+duration);noise.stop(now+duration);osc.onended=()=>{osc.disconnect();noise.disconnect();filter.disconnect();gain.disconnect()};
- if(name==='victory'||name==='reward'||name==='room'||name==='levelUp'||name==='taskComplete'){const bell=ctx.createOscillator();bell.frequency.value=from*1.5;bell.connect(gain);bell.start(now+.08);bell.stop(now+duration);bell.onended=()=>bell.disconnect()}
+ if(name==='victory'||name==='reward'||name==='room'||name==='levelUp'||name==='taskComplete'||name==='sparkle'){const bell=ctx.createOscillator();bell.frequency.value=from*1.5;bell.connect(gain);bell.start(now+.08);bell.stop(now+duration);bell.onended=()=>bell.disconnect()}
 }
 // Observe real state changes, so rerenders and rejected actions stay silent.
 let uiState=null,seenSummary=null,taskRun=null,doneTasks=new Set();

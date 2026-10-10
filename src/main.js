@@ -12,6 +12,7 @@ import * as runMod from './engine/run.js';
 import * as render from './ui/render.js';
 import * as input from './ui/input.js';
 import './ui/chartdrag.js';
+import './ui/foil.js';
 import {loadTiles,tileUrls} from './ui/tiles.js';
 import * as fx from './ui/fx.js';
 import * as save from './save.js';
@@ -40,6 +41,7 @@ window.G={get S(){return W.S},get run(){return W.run},get cb(){return W.cb},CARD
  TASKS:lampEngine.TASKS,progress,lampEngine,lampData,
  run$:runMod,combat$:combat,cards$:cards,debugEnv:env.debugEnv,envState:env.envState,quality:env.quality};
 if(save.settings.fastAnim&&window.FAST==null)window.FAST=1;
+W.S={screen:'title',view:title.bootView()};
 assets.applyTextures();title.applyMotion();env.initEnv();
 initAudio();
 render.render();

@@ -1,0 +1,91 @@
+/* ==== Claude Task 14: physical collectible card face. Loaded last; overrides the older card rules in style.css.
+   Frame = CSS only (no per-card images, no heavy filters): a thick bevelled border coloured by TYPE, tinted by class,
+   rarity trim (iron / silver / gold), a name banner, cost gem, dark-ink rules box, foil sheen, collector line. ==== */
+.card{--tc:#6b2a2e;--tc2:#3a1519;--trim:#7d8594;--trim2:#454b57;--gem:#c9453c;
+ border-radius:5.2cqw;filter:none;box-shadow:0 .8cqw 2.2cqw #000b;background:#07090d}
+.card.tA{--tc:#7a2b2f;--tc2:#34121a;--gem:#d4493f}
+.card.tS{--tc:#245a6e;--tc2:#0e2631;--gem:#3fa6c8}
+.card.tP{--tc:#5d3a8c;--tc2:#241540;--gem:#9a6ae0}
+.card.tW{--tc:#7a5a2c;--tc2:#2f2210;--gem:#d9a441}
+.card.tC,.card.curse{--tc:#3c4a2a;--tc2:#11170c;--gem:#7a2a5e}
+.card.tT,.card.status{--tc:#454a54;--tc2:#16181d;--gem:#8a909c}
+.card.r-u{--trim:#cfd8e6;--trim2:#6c7788}
+.card.r-r{--trim:#f2c14e;--trim2:#8a5f1c}
+/* frame layers */
+.card>.cfr{position:absolute;inset:0;border-radius:5.2cqw;pointer-events:none;z-index:0;
+ background:radial-gradient(120% 70% at 50% 0,color-mix(in srgb,var(--class-primary,#8fa3c7) 28%,transparent),transparent 70%),
+  linear-gradient(165deg,color-mix(in srgb,var(--tc) 88%,#fff 6%),var(--tc2) 62%,#07090d);
+ box-shadow:inset 0 0 0 .7cqw var(--trim2),inset 0 0 0 1.5cqw var(--tc2),inset 0 0 0 2cqw var(--trim),inset 0 0 0 2.6cqw #05070b,
+  inset 0 1.2cqw 1.6cqw #fff3,inset 0 -1.6cqw 2cqw #0009}
+.card>.cfr::after{content:"";position:absolute;inset:2.6cqw;border-radius:3.4cqw;background:repeating-linear-gradient(115deg,#ffffff06 0 1px,transparent 1px 3px),radial-gradient(90% 40% at 50% 100%,#0008,transparent)}
+.card.r-r>.cfr{box-shadow:inset 0 0 0 .7cqw #5a3b0c,inset 0 0 0 1.5cqw #f9dd8a,inset 0 0 0 2cqw var(--trim2),inset 0 0 0 2.8cqw #120d04,inset 0 1.2cqw 1.6cqw #fff6,inset 0 -1.6cqw 2cqw #0009,inset 0 0 5cqw #f2c14e30}
+.card>.art,.card .name,.card .type,.card .text,.card .cost,.card .rarity,.card .setno,.card .rline,.card .bell,.card .openpip{z-index:1}
+.card>.art{left:7.2%;top:13.4%;width:85.6%;height:46.3%;border-radius:1.6cqw;box-shadow:0 0 0 .5cqw #05070b,0 0 0 .9cqw var(--trim2),0 0 0 1.3cqw #05070b,inset 0 0 3cqw #0009}
+.card>.art.ph-art{border-radius:1.6cqw}
+/* name banner across the top of the art, pointed ends, Cinzel */
+.card .name{left:15%;width:82%;top:3.6%;height:8.4%;padding:0 3.2%;clip-path:polygon(0 18%,3% 0,97% 0,100% 18%,100% 82%,97% 100%,3% 100%,0 82%);
+ background:linear-gradient(180deg,#fff3 0,#0000 28%),linear-gradient(180deg,color-mix(in srgb,var(--tc) 60%,#1b222c),#0b0e14);
+ font:700 max(10px,calc(var(--nf,11cqw)*.66))/1 var(--font-display);letter-spacing:-.01em;color:#f4eddc;text-shadow:0 1px 1px #000,0 0 3px #000}
+.card .name::before{content:"";position:absolute;inset:0;clip-path:inherit;border-bottom:.45cqw solid var(--trim);border-top:.25cqw solid #fff4;pointer-events:none}
+.card .name .up{color:#8ff0b4;margin-left:.1em}
+.card.nocost .name{left:8%;width:84%}
+/* cost gem: faceted, glowing */
+.card .cost{left:11%;top:8.6%;width:15.5cqw;height:15.5cqw;z-index:3;border-radius:50%;
+ background:radial-gradient(circle at 34% 28%,#fff9 0 8%,transparent 24%),radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--gem) 80%,#fff 12%),var(--gem) 45%,color-mix(in srgb,var(--gem) 40%,#000) 100%);
+ box-shadow:0 0 0 .7cqw var(--trim),0 0 0 1.3cqw #05070b,0 0 3.2cqw .6cqw color-mix(in srgb,var(--gem) 75%,transparent),inset 0 -1.2cqw 1.6cqw #0007;
+ font:700 10.5cqw/1 var(--font-number);color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000}
+.card .cost:empty{display:none}
+.card .cost.cheap{color:#b6ffd0}.card .cost.dear{color:#ffb4a8}
+/* type tag under the art */
+.card .type{left:22%;width:56%;top:60.4%;height:4.6%;border-radius:2cqw;z-index:2;background:linear-gradient(#0b0e14,#151b24);box-shadow:0 0 0 .4cqw var(--trim2),0 .4cqw .8cqw #0008;
+ color:#e7dcc0;font:600 max(10px,4.4cqw)/1 var(--font-display)!important;letter-spacing:.14em}
+/* rules box: dark ink slate, small crisp Crimson Pro, keywords gold */
+.card .text{left:8.6%;width:82.8%;top:67.4%;height:26.2%;border-radius:2.2cqw;
+ background:radial-gradient(120% 90% at 50% 0,#222b38,transparent 70%),repeating-linear-gradient(0deg,#ffffff05 0 1px,transparent 1px 3px),linear-gradient(#141a23,#0a0e14);
+ box-shadow:inset 0 0 0 .5cqw #05070b,inset 0 0 0 .9cqw color-mix(in srgb,var(--trim2) 70%,#000),inset 0 1cqw 2.4cqw #0009;
+ font:500 max(11px,var(--tf,7cqw))/1.22 var(--font-body);letter-spacing:.005em;color:#e8e1cf;text-shadow:0 1px 0 #000a}
+.card .text b,.card .text .kw{color:#ffd978;font-weight:700}
+.card .upv{color:#7ee8a8;font-weight:700}
+.card .dn{color:#ff8f86;font-weight:700}
+.card .sus{color:#7ee8a8}
+.hand .card .text{font-size:max(10px,var(--tf,7cqw))}
+.insp .card .text{font-size:max(15px,var(--tf,8cqw))!important}
+.card.curse .text{color:#ecd0e2}
+/* rarity symbol + collector line */
+.card .rarity{top:96.3%;z-index:2;filter:drop-shadow(0 0 1px #000)}
+.card .setno{position:absolute;left:11%;top:94.7%;height:3.4%;display:flex;align-items:center;font:600 2.9cqw/1 var(--font-display);letter-spacing:.12em;color:color-mix(in srgb,var(--trim) 85%,#fff);opacity:.8;text-shadow:0 1px 1px #000;white-space:nowrap;pointer-events:none}
+.card.r-r .setno{color:#f6d98a;opacity:.95}
+/* upgraded: "+" in the name and a faint green glow */
+.card[data-up="1"]{box-shadow:0 .8cqw 2.2cqw #000b,0 0 3cqw .2cqw #6fe0a055}
+/* unplayable / can't afford: dimmed */
+.card.unp{filter:grayscale(.55) brightness(.68)}
+.hand .card.sel{filter:drop-shadow(0 0 4px var(--status-energy))}
+.hand .card.drag.armed{filter:drop-shadow(0 0 8px var(--status-energy))}
+.hand.marking .card.markable,.hand.flourishing .card.flourishable{filter:drop-shadow(0 0 7px var(--class-primary))}
+.hand.marking .card:not(.markable),.hand.flourishing .card:not(.flourishable){filter:brightness(.65)}
+/* foil / holo sheen: rare (strong) + uncommon (subtle). Position follows pointer/drag (--mx,--my) or device tilt (--tx,--ty). */
+.card>.foil{display:none;position:absolute;inset:0;border-radius:5.2cqw;pointer-events:none;z-index:4;opacity:.0;transition:opacity .25s;
+ background:linear-gradient(115deg,transparent 28%,#ff8fd433 38%,#ffe48a55 46%,#8ffff033 54%,#9fa8ff33 62%,transparent 72%) var(--fx,50%) 0/260% 100%,
+  radial-gradient(circle at var(--mx,50%) var(--my,30%),#fff5 0,transparent 32%)}
+.card.r-r>.foil{display:block;opacity:.55}
+.card.r-u>.foil{display:block;opacity:.18}
+.card.r-r:hover>.foil,.card.r-r.drag>.foil,.card.r-r.sel>.foil,.card.foiling>.foil{opacity:.9}
+.card.r-u:hover>.foil,.card.r-u.drag>.foil,.card.r-u.sel>.foil,.card.foiling>.foil{opacity:.4}
+.rewgrid .card.r-r>.foil,.insp .card.r-r>.foil,.shopitem .card.r-r>.foil{animation:foilidle 4.5s ease-in-out infinite}
+@keyframes foilidle{0%,100%{background-position:20% 0,50% 50%}50%{background-position:80% 0,50% 50%}}
+/* NEW seal */
+.card>.newseal{position:absolute;right:-3cqw;top:11cqw;z-index:6;width:19cqw;height:19cqw;border-radius:50%;display:flex;align-items:center;justify-content:center;transform:rotate(12deg);
+ font:700 5.4cqw/1 var(--font-display);letter-spacing:.08em;color:#2a1a02;background:radial-gradient(circle at 35% 30%,#fff2b4,#f2c14e 55%,#a36c14);box-shadow:0 0 0 .7cqw #5a3b0c,0 .8cqw 1.6cqw #000b,0 0 3cqw #f2c14e88;pointer-events:none}
+/* card back */
+.cardback{position:relative;width:var(--gw,160px);aspect-ratio:5/7;container-type:inline-size;border-radius:5.2cqw;background:radial-gradient(circle at 50% 50%,#1d3a46,#0a1219 70%);
+ box-shadow:inset 0 0 0 .7cqw #454b57,inset 0 0 0 1.5cqw #0b1117,inset 0 0 0 2cqw #cfd8e6,inset 0 0 0 2.8cqw #05070b,0 .8cqw 2.2cqw #000b;overflow:hidden}
+.cardback::before{content:"";position:absolute;inset:7cqw;border-radius:3cqw;border:.5cqw solid #cfd8e655;background:repeating-linear-gradient(45deg,#ffffff08 0 1px,transparent 1px 5px),repeating-linear-gradient(-45deg,#ffffff08 0 1px,transparent 1px 5px)}
+.cardback .cbem{position:absolute;left:50%;top:50%;width:40cqw;height:40cqw;transform:translate(-50%,-50%)}
+.rcw{position:relative;width:var(--gw);perspective:700px;display:block}
+.rcw>.card{width:100%}
+.rcw>.cardback{position:absolute;inset:0;width:100%;opacity:0;pointer-events:none;z-index:7}
+@media (max-width:520px){.grid .rcw{max-width:190px}}
+.cardback.hide{display:none}
+/* burst flash for rares */
+.rarebeam{position:fixed;pointer-events:none;z-index:90;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;background:radial-gradient(circle,#fff8d0cc,#f2c14e66 35%,transparent 70%)}
+@media (prefers-reduced-motion:reduce){.card>.foil{animation:none!important}}

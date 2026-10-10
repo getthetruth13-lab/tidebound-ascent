@@ -32,11 +32,11 @@ registerEnemies({
   // Phase 2 at <= 80 HP: clears debuffs, +2 Might, and starts on Crack — even when it cracks during its own turn (Parry; Playtester bug 2).
   onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.next=EN_bell().ai(e);if(W.cb.acting===e)e.keepNext=true;
    log('🔔 The Bell CRACKS! Phase 2: +2 Might, debuffs cleared');callout('THE BELL CRACKS!','boss')}}},
- matriarch:{n:'The Kelp Matriarch',e:'🪸',hp:[120,120],boss:1,
+ matriarch:{n:'The Kelp Matriarch',e:'🪸',hp:[90,90],boss:1,
   passive:{n:'Rooted',text:'At the end of each of her turns, gains 4 Guard per living Tendril.',endTurn:e=>{const n=tend().length;if(n){e.block+=4*n;e.blkT=Date.now()}}},
   onSpawn:e=>{if(W.cb){spawn('tendril',{summoned:true});spawn('tendril',{summoned:true})}},
-  ai:e=>{const k=(e.ci++)%3;return k===0?{a:9,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'}:k===1?{grow:1,fx:grow,lbl:'Grow'}:{a:5,h:2,lbl:'Crushing Embrace'}},
-  onDamaged:e=>{if(!e.bloomed&&e.hp<=75){e.bloomed=true;spawn('tendril',{summoned:true});spawn('tendril',{summoned:true});addSt(e,'str',2);log('🌸 The Matriarch BLOOMS: 2 Tendrils, +2 Might');callout('BLOOM!','boss')}}},
+  ai:e=>{const k=(e.ci++)%3;return k===0?{a:12,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'}:k===1?{grow:1,fx:grow,lbl:'Grow'}:{a:6,h:2,lbl:'Crushing Embrace'}},
+  onDamaged:e=>{if(!e.bloomed&&e.hp<=45){e.bloomed=true;spawn('tendril',{summoned:true});spawn('tendril',{summoned:true});addSt(e,'str',2);log('🌸 The Matriarch BLOOMS: 2 Tendrils, +2 Might');callout('BLOOM!','boss')}}},
 });
 function grow(e){tend().forEach(t=>addSt(t,'str',1));if(tend().length<2)spawn('tendril',{summoned:true});log('🌿 Grow: Tendrils +1 Might')}
 import {EN} from '../core/registry.js';

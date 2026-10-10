@@ -236,13 +236,24 @@ export const holdLeft=()=>Math.max(0,holdUntil-performance.now());
 export function holdFor(ms){holdUntil=performance.now()+ms}
 function reveal(sel,from,dur,gap,delay,tilt){const els=$$(sel);els.forEach((el,i)=>{if(!el.animate)return;const rot=tilt?(i%2?1:-1)*(3+i):0;
  el.animate([{translate:`${from[0]}px ${from[1]}px`,scale:from[2]||'.92',rotate:`${rot}deg`,opacity:0},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],{duration:dur,delay:delay+i*gap,easing:'cubic-bezier(.2,.9,.3,1.1)',fill:'backwards'})})}
+// Card rewards: cards start face-down, flip in one by one; rares get a light burst and a sparkle.
+function flipReveal(delay){const ws=$$('.rewgrid .rcw');ws.forEach((w,i)=>{const card=w.querySelector('.card'),back=w.querySelector('.cardback');if(!card||!back||!card.animate)return;
+ const t0=delay+i*190,half=170,rare=card.classList.contains('r-r');
+ back.animate([{opacity:1,transform:'rotateY(0deg)'},{opacity:1,transform:'rotateY(90deg)'}],{duration:half,delay:t0,easing:'ease-in',fill:'both'}).finished.then(()=>back.remove(),()=>back.remove());
+ card.animate([{transform:'rotateY(-90deg)'},{transform:'rotateY(0deg)'}],{duration:half+60,delay:t0+half,easing:'ease-out',fill:'backwards'});
+ later(t0,()=>playSound('flip'));
+ if(rare)later(t0+half+80,()=>{const r=rectOf(card);playSound('sparkle');emit('burst',r.x,r.y,COL.gold,26);ring(r.x,r.y,COL.gold,170,560);
+  card.classList.add('foiling');card.style.setProperty('--fx','0%');card.animate([{filter:'brightness(2.2)'},{filter:'brightness(1)'}],{duration:520,easing:'ease-out'});
+  const beam=document.createElement('div');beam.className='rarebeam';beam.style.left=r.x+'px';beam.style.top=r.y+'px';document.body.appendChild(beam);
+  beam.animate([{opacity:.95,transform:'scale(.3)'},{opacity:0,transform:'scale(2.6)'}],{duration:620,easing:'ease-out'}).finished.then(()=>beam.remove(),()=>beam.remove());
+  setTimeout(()=>card.classList.remove('foiling'),900)})})}
 function syncScreens(){if(!motionOn())return;const S=W.S,s=S.screen;
  const key=(s==='reward'?'r'+(S.cardsOpen!=null?'c'+S.cardsOpen:S.swap!=null?'s':'rows'):s==='chest'?'x'+(S.opened?'o':'c'):(s==='title'&&S.view==='lamp'&&S.got)?'lamp':'');
  if(!key||(revealed===S&&revealKey===key))return;revealed=S;revealKey=key;const hold=holdLeft();
  if(key==='rrows'||key==='xo'){reveal('.rewtiles .tile',[0,26,'.9'],340,95,hold+40);
   if(key==='xo'){const c=$('.chestwrap');if(c){const r=rectOf(c);later(hold+10,()=>{emit('burst',r.x,r.y,COL.gold,22);ring(r.x,r.y,COL.gold,140,520);vignette('gold',.4,520)});
    c.animate([{filter:'brightness(3)',scale:'1.12'},{filter:'brightness(1.4)',scale:'1.04',offset:.4},{filter:'none',scale:'1'}],{duration:520,delay:hold,easing:'ease-out',fill:'backwards'})}}}
- else if(key.startsWith('rc'))reveal('.rewgrid .card',[0,60,'.85'],380,95,hold+30,true);
+ else if(key.startsWith('rc'))flipReveal(hold+30);
  else if(key==='lamp'){const els=$$('.lp-offer.got .tile,.lp-offer.got .lp-pick');els.forEach(el=>{const r=rectOf(el);later(120,()=>{emit('burst',r.x,r.y,COL.gold,22);ring(r.x,r.y,COL.gold,120,520)})});vignette('gold',.35,520)}
 }
 // capture-phase click hooks: flights start before the click's own handler re-renders the screen

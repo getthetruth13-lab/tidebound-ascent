@@ -1,0 +1,75 @@
+# --- Dependencies ---
+node_modules/
+
+# --- Local / machine state ---
+.backup/
+.reported
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+__pycache__/
+*.pyc
+.cache/
+
+# --- Logs & backups ---
+*.log
+*.bak
+*.bak.*
+*.bak.html
+*~
+
+# --- Depth maps, ML intermediates, ONNX models ---
+*.npy
+*.onnx
+*.pt
+*.pth
+*depth.npy
+*depth.png
+*-depth.npy
+*-depth.png
+
+# --- Art intermediates (keep shipped webp/jpg/png used by the game) ---
+art/v2/_src/
+art/v2/_archive/
+art/v2/_archive*/
+art/v2/bg/_src/
+art/v2/sprites/_archive/
+art/environments/**/_src/
+art/v3-tests/
+
+# --- Screenshots & test dump folders ---
+screenshots/
+screenshot.png
+tests/**/*-results/
+tests/**/results/
+*.jsonl
+
+# --- Playtests: keep top-level reports + harness code; drop screenshot/log dumps ---
+playtests/screens-*/
+playtests/screenshots/
+playtests/task*/
+playtests/codex*/
+playtests/hero-*/
+playtests/v21/
+playtests/harness/results/
+playtests/harness/live/
+playtests/harness/screens/
+playtests/harness-design/results/
+playtests/harness-design/live/
+playtests/harness-design/calib/
+playtests/*.jpg
+playtests/*.jpeg
+playtests/*.png
+playtests/*.webp
+playtests/**/*.log
+playtests/**/*.jsonl
+
+# --- Secrets / credentials (never commit) ---
+.env
+.env.*
+*.pem
+*.key
+*credentials*
+*oauth*token*
+.claude-oauth-token

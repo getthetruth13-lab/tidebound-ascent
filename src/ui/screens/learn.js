@@ -7,7 +7,7 @@ import {bgHTML,frameOpen,frameClose} from './frame.js';
 import {spriteImg} from './select.js';
 import {introStart} from './intro.js';
 const CORE=[
- ['The climb','Climb 15 floors of the Drowned Stair along the Tidewater Chart. Choose your path through fights, elites, events, merchants and camps. A boss waits at the top.'],
+ ['The climb','Climb 15 floors of the Wrack Terraces, the foot of the Drowned Stair, along the Tidewater Chart. Choose your path through fights, elites, events, merchants and camps. A boss waits at the top.'],
  ['Your turn','You start each turn with 3 Energy and 5 cards. Tap a card to lift it, tap it again (or drag it upward) to play it. Hold a card to enlarge it.'],
  ['Guard and intents','Guard soaks damage and fades at the start of your turn. Above each enemy, an intent shows what it will do next, so you can plan your defence.'],
  ['Rewards','Won fights give gold, sometimes a relic or potion, and a choice of three cards. Skipping a card is allowed: a lean deck is a strong deck.'],

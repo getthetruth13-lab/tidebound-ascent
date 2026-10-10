@@ -63,7 +63,7 @@ registerEvents([
  {id:'sunkenchest',pool:'act',act:1,n:'Sunken Chest',e:'🧰',t:'A barnacled chest rests between the rocks. Something with claws is guarding it.',o:[
   {l:'💰 Pry it open: +40 gold, then fight a Coral Crab',f:()=>{gainGold(40);eventFight(['crab'],{event:'sunkenchest'})}},
   {l:'🚶 Leave',f:goMap}]},
- {id:'stranger',pool:'act',act:1,n:'Campfire Stranger',e:'🔥',t:'A stranger by a small fire waves you over. "Sit. Rest. Or let me sharpen something."',o:[
+ {id:'stranger',pool:'act',act:1,n:'Campfire Stranger',e:'🔥',t:'On a dry landing, a stranger by a small fire waves you over. "Sit. Rest. Or let me sharpen something."',o:[
   {l:'❤️ Rest: heal 15 HP',f:()=>{heal(15);done('🔥 Campfire Stranger','You rest and feel restored. +15 HP.')}},
   {l:'⬆️ Let him sharpen: upgrade a random card',f:()=>{const c=pickable('upgrade');if(c.length){const x=pick(c,'events');x.up=true;done('🔥 Campfire Stranger',`The stranger improves <b>${cname(x)}</b>.`)}else done('🔥 Campfire Stranger','Nothing left to improve.')}}]},
  {id:'crabmarket',pool:'act',act:1,n:'Crab Market',e:'🦀',t:'Crabs haggle over shiny things on a flat rock. One clacks at your potion belt.',o:[
@@ -71,7 +71,7 @@ registerEvents([
    choice('Sell which potion?','',opts.concat([{l:'↩️ Back',f:()=>{W.S.ev=EV('crabmarket');render()}}]))}},
   {l:'🏺 Buy a mystery jar (50 gold): a random potion',ok:()=>run().gold>=50&&freeSlot(),f:()=>{run().gold-=50;const p=randomPotion('events');addPotion(p);done('🦀 Crab Market',`Inside the jar: <b>${POTIONS[p].e} ${POTIONS[p].n}</b>.`)}},
   {l:'🚶 Leave',f:goMap}]},
- {id:'gullnest',pool:'act',act:1,n:'Gull Nest',e:'🪺',t:'A huge nest of driftwood and stolen trinkets. Something golden glints inside.',o:[
+ {id:'gullnest',pool:'act',act:1,n:'Gull Nest',e:'🪺',t:'On a broken parapet sits a huge nest of driftwood and stolen trinkets. Something golden glints inside.',o:[
   {l:'🐤 Raid the nest: gain Golden Gull, then fight 2 Gull Thieves (no card reward)',f:()=>{gainRelic('goldengull');eventFight(['gull','gull'],{noCards:true,event:'gullnest'})}},
   {l:'🥚 Take one egg: +30 gold, lose 4 HP',ok:()=>run().hp>4,f:()=>{gainGold(30);hurt(4);done('🪺 Gull Nest','You sell the egg later. +30 gold, −4 HP.')}},
   {l:'🚶 Leave',f:goMap}]},
@@ -83,11 +83,11 @@ registerEvents([
   {l:'💰 Pay 25 gold: he upgrades 2 random cards',ok:()=>run().gold>=25,f:()=>{run().gold-=25;const c=shuffle(pickable('upgrade'),'events').slice(0,2);c.forEach(x=>x.up=true);done('🧔 Shipwrecked Sailor',c.length?`He sharpens <b>${c.map(cname).join('</b> and <b>')}</b>.`:'Nothing to sharpen.')}},
   {l:'🗡️ Rob him: +40 gold and a Brine Rot curse',f:()=>{gainGold(40);gainCurse('brinerot');done('🧔 Shipwrecked Sailor','You take his purse. It smells of rot. (+40 gold, Curse: Brine Rot)')}},
   {l:'🍞 Share rations: lose 6 HP, gain a random Rare card',ok:()=>run().hp>6,f:()=>{hurt(6);const id=randomCard('r');gainCard(id);done('🧔 Shipwrecked Sailor',`He presses a worn card into your hand: <b>${CARDS[id].n}</b>.`)}}]},
- {id:'mirror',pool:'act',act:1,n:'Tideglass Mirror',e:'🪞',t:'A mirror of sea-glass stands in the surf. Your reflection blinks first.',req:()=>run().deck.length>=6,o:[
+ {id:'mirror',pool:'act',act:1,n:'Tideglass Mirror',e:'🪞',t:'In a flooded chamber, a mirror of sea-glass stands in the surf. Your reflection blinks first.',req:()=>run().deck.length>=6,o:[
   {l:'🪞 Gaze: gain Mirror of Brine (duplicate a non-Rare card)',f:()=>{gainRelic('brinemirror');if(W.S.screen==='event')goMap()}},
   {l:'💥 Shatter it: remove a card and lose 5 HP',ok:()=>run().hp>5&&pickable('remove').length>0,f:()=>{const S=W.S;openPick('remove','🪞 Shatter: remove a card (−5 HP)',()=>{hurt(5);goMap()},()=>{W.S=S;render()})}},
   {l:'🚶 Leave',f:goMap}]},
- {id:'loom',pool:'act',act:1,n:"Saltwife's Loom",e:'🧶',t:'An old woman weaves nets from salt and moonlight. "I can unpick a rule from you, or weave you a charm."',o:[
+ {id:'loom',pool:'act',act:1,n:"Saltwife's Loom",e:'🧶',t:'In a keeper’s recess, an old woman weaves nets from salt and moonlight. "I can unpick a rule from you, or weave you a charm."',o:[
   {l:()=>{const id=RULEBENDER[run().cls];return `🧵 Unpick the pattern: lose 6 Max HP, gain ${RELICS[id].e} ${RELICS[id].n}`},ok:()=>!run().relics.some(r=>r.id===RULEBENDER[run().cls])&&run().max>6,
    f:()=>{loseMaxHp(6);const id=RULEBENDER[run().cls];gainRelic(id);done("🧶 Saltwife's Loom",`<b>${RELICS[id].e} ${RELICS[id].n}</b>: ${RELICS[id].d}`)}},
   {l:'🪢 Weave a Charm (lasts the whole run)',f:()=>choice('Choose a Charm',"\"Pick one. It'll stay with you.\"",['springcurrent','salvagersluck','lightpurse'].map(id=>({l:`${CHARMS[id].e} ${CHARMS[id].n}: ${CHARMS[id].d}`,f:()=>{gainCharm(id);goMap()}})))},

@@ -1,4 +1,4 @@
-// ui/screens/heroes.js: presentation text for the four climbers (character select, Learn to Play).
+// ui/screens/heroes.js: presentation text for the four Lampbearers (character select, Learn to Play).
 // Voice and facts follow design-v2 "WORLD LORE & VOICE" (L.1 premise, L.2 why you climb). Mechanic numbers come from CLASSES[k].rule.
 export const SPRITE_OF={tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist'};
 export const ORDER=['tide','echo','carto','duel'];
@@ -6,7 +6,7 @@ export const HEROES={
  tide:{epithet:'Moon-Sworn Keeper of the Tides',
   blurb:'A patient caster who bends the sea itself: raise it, lower it, and let it break over every foe.',
   lore:['The sea once answered every word the keepers spoke. Then the sun sank, and the water forgot its manners.',
-   'You kept the moon-tables at Saltmere until the lowest tide in a generation bared the Drowned Stair.',
+   'You kept the moon-tables at Saltmere until the lowest tide in a generation bared the Drowned Stair, a mountain-city of landings.',
    'The moonshell at your belt still hums in time with the waves.',
    'You climb to make the sea answer to you again.'],
   plain:'A tide meter runs from 0 to 10 and drifts every turn. Surge and Recede cards push it. Reach 10 for a Crest that hits every enemy; reach 0 for an Undertow that gives Guard and a card.',

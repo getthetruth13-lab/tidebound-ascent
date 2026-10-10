@@ -10,7 +10,7 @@ import {fire,mod} from '../core/bus.js';
 import {saveRun,clearRun} from '../save.js';
 import {initRun as lampInit,noteSeen,settleRun} from './lamplight.js';
 import {loadProfile,lockedFor} from '../progress.js';
-import {render} from '../ui/render.js';
+import {render,markCardsSeen} from '../ui/render.js';
 // ================= economy tables (design-v2 §1.1, §1.4, §1.5) =================
 export const ECON={startGold:99,potionSlots:3,
  gold:{fight:[10,20],elite:[25,35],boss:[90,110]},
@@ -177,9 +177,9 @@ export function claimRow(i){const S=W.S;const row=S.rows&&S.rows[i];if(!row||row
  else if(row.k==='potion'){if(addPotion(row.id))row.done=true;else{S.swap=i}}
  else if(row.k==='cards'){S.cardsOpen=i}
  render()}
-export function rewCard(j){const S=W.S;const row=S.rows[S.cardsOpen];if(!row)return;gainCard(row.cards[j]);row.done=true;row.took=row.cards[j];S.cardsOpen=null;render()}
+export function rewCard(j){const S=W.S;const row=S.rows[S.cardsOpen];if(!row)return;markCardsSeen(row.cards);gainCard(row.cards[j]);row.done=true;row.took=row.cards[j];S.cardsOpen=null;render()}
 export function rewCloseCards(){W.S.cardsOpen=null;render()}
-export function rewSkipCards(){const S=W.S;const row=S.rows[S.cardsOpen];if(row){row.done=true;row.skipped=true}S.cardsOpen=null;
+export function rewSkipCards(){const S=W.S;const row=S.rows[S.cardsOpen];if(row){markCardsSeen(row.cards);row.done=true;row.skipped=true}S.cardsOpen=null;
  render()}
 // full potion slots: swap the new potion for one you hold, or discard it
 export function potionSwap(slot){const S=W.S;const row=S.rows&&S.rows[S.swap];if(!row)return;if(slot>=0){W.run.potions[slot]=row.id}row.done=true;S.swap=null;render()}

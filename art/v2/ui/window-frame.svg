@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
-<!-- Tidebound Ascent shared window frame (9-slice, slice=32). Replace with painted art later: same 96x96 layout, corners 32x32, edges 32 wide. -->
+<!-- The Drowned Sun shared window frame (9-slice, slice=32). Replace with painted art later: same 96x96 layout, corners 32x32, edges 32 wide. -->
 <defs>
 <linearGradient id="br" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2c27c"/><stop offset=".5" stop-color="#9a7640"/><stop offset="1" stop-color="#5a4222"/></linearGradient>
 <linearGradient id="ir" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a5262"/><stop offset=".5" stop-color="#2a303b"/><stop offset="1" stop-color="#181c24"/></linearGradient>

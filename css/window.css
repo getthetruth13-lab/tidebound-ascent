@@ -1,4 +1,4 @@
-/* Tidebound Ascent: ONE shared ornate window + button system (Claude Task 9). Loaded last, after tiles.css.
+/* The Drowned Sun: ONE shared ornate window + button system (Claude Task 9). Loaded last, after tiles.css.
    Frame = art/v2/ui/window-frame.svg (9-slice: bronze/iron band, riveted edges, filigree corners with a sea-glass gem).
    Painted art can replace that file later with no code change (same 96x96 layout). */
 :root{--win-frame:url(../art/v2/ui/window-frame.svg);--win-bw:9px;

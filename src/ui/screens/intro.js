@@ -12,9 +12,9 @@ export const INTRO_URLS=[1,2,3,4].map(IMG);
 const SCENES=[
  [['It did not set. It sank.','Down beneath the Pale Sea, dragging the world’s light into the deep.'],12],
  [['Each year, the water rose higher, devouring the shores.'],9],
- [['But now, the ocean draws back.','The ancient stair has risen.'],10],
+ [['But now, the ocean draws back.','The ancient stair has risen: a city of landings, given back by the tide.'],10],
  [['At the summit lies the lamp that can call the Drowned Sun back.','But the climb is a vertical grave.'],12],
- [['Four souls stand upon the salt-slick stone, ready to brave the ascent.','Choose your climber.'],14]];
+ [['Four souls stand upon the salt-slick stone, ready to brave the ascent.','Choose your Lampbearer.'],14]];
 export const INTRO_SCENES=SCENES.length;
 let timer=0;
 const calm=()=>!!settings.reduceMotion;
@@ -32,7 +32,7 @@ export function introScr(){const n=Math.max(1,Math.min(SCENES.length,W.S.scene|0
  <div class="in-text" id="introtext" key="${n}">${textHTML(n)}</div>
  <div class="in-dots">${SCENES.map((_,i)=>`<i class="${i+1===n?'on':''}"></i>`).join('')}</div>
  <button class="tb-btn sm in-skip" id="introskip" onclick="event.stopPropagation();introSkip()">Skip ›</button>
- <div class="in-tap">${n===SCENES.length?'Tap to choose your climber':'Tap to continue'}</div></div>`}
+ <div class="in-tap">${n===SCENES.length?'Tap to choose your Lampbearer':'Tap to continue'}</div></div>`}
 export function introStart(replay){W.S={screen:'title',view:'intro',scene:1,prev:0,replay:!!replay};render()}
 export function introNext(){if(W.S.screen!=='title'||W.S.view!=='intro')return;const n=W.S.scene;
  if(n>=SCENES.length)return introDone();W.S={...W.S,scene:n+1,prev:n};render()}

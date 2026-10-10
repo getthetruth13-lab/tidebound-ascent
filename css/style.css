@@ -1,5 +1,5 @@
 @import url("./anim.css");
-/* Tidebound Ascent: UI styles. Palette mirrors art/palette.css (art/palette.json is the source of truth). */
+/* The Drowned Sun: UI styles. Palette mirrors art/palette.css (art/palette.json is the source of truth). */
 
 /* ===== palette (inlined from art/palette.css so the file works offline / file://) ===== */
 :root{--ui-bg-0:#0b0e14;--ui-bg-1:#131822;--ui-bg-2:#1c2230;--ui-bg-3:#262e3f;--ui-line:#36405a;--ui-outline:#05070b;--ui-rim:#8fa3c7;--ui-text:#eef1f6;--ui-text-muted:#aab3c5;--ui-text-dim:#8590a6;--ui-parchment:#efe3c6;--ui-ink:#1a2230;
@@ -738,3 +738,17 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 .tbtn.rel{border-color:#6ec6e8;color:#bfeaff;position:relative}
 .tbtn.rel::after{content:'';position:absolute;inset:-1px;border-radius:9px;box-shadow:0 0 8px #6ec6e8;opacity:0;pointer-events:none;animation:relpulse 1.4s ease-in-out infinite}
 @keyframes relpulse{50%{opacity:1}}
+
+/* Task 15: map "you are here" lantern marker + subtler shimmer on reachable nodes; chest glow */
+.node.cur{z-index:2;box-shadow:none}
+.node.cur::before{content:'';position:absolute;inset:-9px;border-radius:50%;pointer-events:none;border:2px solid #ffd98acc;background:radial-gradient(circle,#ffd98a55 0,#ffd98a22 55%,transparent 72%);box-shadow:0 0 14px 4px #ffc45e88;animation:lantern 2.2s ease-in-out infinite}
+.node.cur .nodeic{animation:herebob 2.2s ease-in-out infinite}
+.node.cur::after{content:'✦';position:absolute;right:-8px;top:-12px;font-size:13px;color:#fff1c2;text-shadow:0 0 6px #ffc45e;pointer-events:none;animation:herespark 1.6s ease-in-out infinite}
+@keyframes lantern{0%,100%{transform:scale(.92);opacity:.75}50%{transform:scale(1.18);opacity:1}}
+@keyframes herebob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes herespark{0%,100%{opacity:0;transform:scale(.5) rotate(0)}50%{opacity:1;transform:scale(1.1) rotate(45deg)}}
+.node.av::before{animation:shimmer 2.4s ease-in-out infinite}
+@keyframes shimmer{0%,100%{opacity:.15}50%{opacity:.6}}
+.reduce-motion .node.cur::before,.reduce-motion .node.cur .nodeic,.reduce-motion .node.cur::after,.reduce-motion .node.av::before{animation:none}
+.reduce-motion .node.cur::after{opacity:1}
+.chestwrap{background:radial-gradient(ellipse 40% 70% at 50% 45%,#ffd98a33,transparent 70%)}

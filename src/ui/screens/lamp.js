@@ -10,6 +10,7 @@ import {TASKS,taskProgress} from '../../engine/lamplight.js';
 import {emblemHTML,relicTile,potionTile,esc as tesc} from '../tiles.js';
 import {render,cardHTML,TH} from '../render.js';
 import {bgHTML,frameOpen,frameClose} from './frame.js';
+import {deathLine} from '../../data/places.js';
 const RARN={s:'Starter',c:'Common',u:'Uncommon',r:'Rare',x:'Special'};
 const esc=s=>String(s).replace(/"/g,'&quot;');
 const TRACK_NAME=t=>t==='climb'?'Stair Climb':CLASSES[t].n+' Lamp';
@@ -75,7 +76,7 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
 export function lampSummaryHTML(sum){if(!sum)return '';const K=CLASSES[sum.cls],{lampBar:lb,climbBar:cb}=sum;
  const bar=(label,from,to,emb,emo)=>{const up=to.lvl>from.lvl;return `<div class="lp-row${up?' up':''}"><span class="lp-med">${emblemHTML(emb,emo,'pip')}<b>${to.lvl}</b></span><div class="lp-rb"><span class="lp-rl">${label}${up?` <em class="lvup">level up!</em>`:''}</span><div class="lp-bar anim" style="--from:${from.pct}%;--to:${up?100:to.pct}%"><i></i></div></div></div>`};
  let n=0;
- return `<div class="lp-sum"><div class="lp-banner">${emblemHTML(sum.won?'lamp-banner-win':'lamp-banner-lose',sum.won?'🏮':'🕯️','strip')}<div class="lp-bt"><h3>🏮 Lamplight</h3><div class="lp-story">${sum.won?'The lamp room answers.':`The tide took you on floor ${sum.floor}. Your lantern burns on.`}</div></div></div>
+ return `<div class="lp-sum"><div class="lp-banner">${emblemHTML(sum.won?'lamp-banner-win':'lamp-banner-lose',sum.won?'🏮':'🕯️','strip')}<div class="lp-bt"><h3>🏮 Lamplight</h3><div class="lp-story">${sum.won?'The lamp room answers.':`${deathLine(sum.floor,sum.boss)} Your lantern burns on.`}</div></div></div>
   <table class="lp-lines">${sum.lines.map(l=>`<tr style="--i:${n++}"><td>${l.label}</td><td>+${l.pts}</td></tr>`).join('')}${sum.mults.map(m=>`<tr class="mul" style="--i:${n++}"><td>${m.label}</td><td>×${+m.x.toFixed(2)}</td></tr>`).join('')}<tr class="tot" style="--i:${n++}"><td>Total</td><td class="lp-count" style="--v:${sum.total}">+<b>${sum.total}</b></td></tr></table>
   ${bar(K.n+' Lamp',lb.from,lb.to,'lamp-class-'+sum.cls,K.e)}${bar('Stair Climb',cb.from,cb.to,'lamp-climb','🗼')}
   <div class="lp-tasks">${sum.tasks.map(t=>`<span class="lp-tsk${t.done?' ok':''}">${emblemHTML('lamp-task-'+(TASKS[t.id].cls||'any'),t.done?'🏮':'🕯️','pip')}${t.done?'✔':'○'} ${t.n}</span>`).join('')}</div>

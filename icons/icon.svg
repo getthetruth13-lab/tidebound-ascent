@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
- <title>Tidebound Ascent icon</title>
+ <title>The Drowned Sun icon</title>
  <!-- palette: ui-bg-0 #0b0e14, tidecaller #2fb8c4 #155a80 #a6f2e8 #0a2a3d, rarity-rare #f2c14e, ui-outline #05070b -->
  <defs>
   <radialGradient id="bg" cx=".4" cy=".3" r=".9"><stop offset="0" stop-color="#155a80"/><stop offset=".6" stop-color="#0a2a3d"/><stop offset="1" stop-color="#0b0e14"/></radialGradient>

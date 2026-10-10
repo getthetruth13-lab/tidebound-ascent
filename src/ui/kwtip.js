@@ -1,7 +1,7 @@
 // ui/kwtip.js: keyword tooltips. After every render, keywords and statuses in card, relic, potion, event and tip text
 // are underlined; tap / long-press (touch) or hover (mouse) shows a small themed popup with a 1-2 line rule.
 // The list is built from the KW glossary (data/keywords.js), so new keywords appear automatically.
-import {KW,CARDS} from '../core/registry.js';
+import {KW,CARDS,RELICS} from '../core/registry.js';
 import {cardHTML,fitCards} from './render.js';
 const EXTRA={ // statuses and terms the glossary spreads across other entries
  Landmark:'A Waypoint at Rank 3. Landmarks count twice for Expedition cards.',
@@ -42,7 +42,8 @@ function showCard(el){const id=el.dataset.card;if(!CARDS[id])return false;
  let y=r.top+r.height/2-tr.height/2;y=Math.max(6,Math.min(H-tr.height-6,y));
  ctip.style.left=x+'px';ctip.style.top=y+'px';clearTimeout(timer);timer=setTimeout(hideTip,6500);return true}
 export function showTip(el){if(el.dataset.card)return showCard(el);if(ctip)ctip.classList.remove('on');const c=contentOf(el);if(!c||!c.text){return false}
- const t=ensure();t.innerHTML=`${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>`;t.classList.add('on');anchor=el;shownAt=Date.now();
+ const t=ensure();const sl=el.matches('.relic,.potion,.shopicon')&&el.querySelector('.slot');const rl=el.dataset.relic&&RELICS[el.dataset.relic];
+ t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${rl.flavour}</em>`:''}</div></div>`:`${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>`;t.classList.toggle('item',!!sl);t.classList.add('on');anchor=el;shownAt=Date.now();
  const r=el.getBoundingClientRect(),W=innerWidth,H=innerHeight,tr=t.getBoundingClientRect();
  let x=r.left+r.width/2-tr.width/2;x=Math.max(6,Math.min(W-tr.width-6,x));
  let y=r.top-tr.height-8;if(y<6)y=Math.min(H-tr.height-6,r.bottom+8);

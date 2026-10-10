@@ -55,7 +55,7 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
  if(s==='reward'||s==='pick'||s==='msg'||s==='potpick')return {...(last||{id:bandEnv(act,floor),grade:'normal'}),dim:.55};
  if(s==='end')return {...(last||{id:bandEnv(act,floor)}),grade:'boss',dim:.5};
  const room={event:'event',shop:'shop',rest:'rest',chest:'treasure'}[s];
- if(room)return {id:(ENV.screenScene[room]||{})[act]||(ENV.screenScene[room]||{})[1],grade:'room',dim:{event:.5,shop:.3,rest:.25,treasure:.2}[room]};
+ if(room)return {id:(ENV.screenScene[room]||{})[act]||(ENV.screenScene[room]||{})[1],grade:'room',dim:{event:.5,shop:.3,rest:.25,treasure:.8}[room]};
  return {id:bandEnv(act,Math.min(14,floor+(run.pos.r>=0?1:0))),grade:'map',dim:.4}}
 // Called after every render(): touches the DOM only when the key changes.
 export function syncEnv(){if(!root)return;const k=envKeyFor();const sig=`${k.id}|${k.band||''}|${k.grade}|${k.dim||0}|${quality()}`;anchor();

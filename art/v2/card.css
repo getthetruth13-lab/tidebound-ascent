@@ -1,4 +1,4 @@
-/* Tidebound Ascent v2 card component. Needs palette.css. Rects come from frames/layout.json (percent block). */
+/* The Drowned Sun v2 card component. Needs palette.css. Rects come from frames/layout.json (percent block). */
 .card { position: relative; width: 250px; aspect-ratio: 5/7; container-type: inline-size; filter: drop-shadow(0 8px 14px #000c); }
 .card .art   { position: absolute; left: 6.8%; top: 14%; width: 86.4%; height: 46.286%; object-fit: cover; border-radius: 1%; }
 .card .frame { position: absolute; inset: 0; width: 100%; height: 100%; }

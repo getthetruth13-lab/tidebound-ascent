@@ -67,7 +67,7 @@ export function settleRun(run,won){const L=run.lamp;if(!L||L.settled)return L&&L
  p.xp[cls]=before.lamp+total;p.climb=before.climb+total;p.runs[cls]=(p.runs[cls]||0)+1;if(won)p.wins[cls]=(p.wins[cls]||0)+1;p.tasks+=tasksDone.length;
  for(const k of newFirsts){const [kind,id]=k.split(':');(p.seen[kind]||(p.seen[kind]={}))[id]=1}
  p.best[cls]=Math.max(p.best[cls]||0,total);saveProfile(p);
- L.summary={cls,won:!!won,floor:floors,lines,mults,sub,total,before,after:{lamp:p.xp[cls],climb:p.climb},
+ L.summary={cls,won:!!won,floor:floors,boss:run.boss,lines,mults,sub,total,before,after:{lamp:p.xp[cls],climb:p.climb},
   lampBar:{from:barOf(before.lamp,LAMP_XP),to:barOf(p.xp[cls],LAMP_XP)},climbBar:{from:barOf(before.climb,CLIMB_XP),to:barOf(p.climb,CLIMB_XP)},
   lampPending:lampPending(p,cls),climbPending:climbPending(p),tasks:L.tasks.map(t=>({id:t.id,n:TASKS[t.id].n,done:t.done}))};
  return L.summary}
