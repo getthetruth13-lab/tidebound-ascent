@@ -97,5 +97,5 @@ export function lighthouseHTML(){const p=loadProfile(),n=climbLevel(p),full=n>=C
   <path d="M28 296 L40 70 H60 L72 296 Z" fill="url(#lpbody)" stroke="#05070b" stroke-width="1.2"/><path d="M36 70 H64 L68 62 H32 Z" fill="#3a4654" stroke="#05070b"/>
   <rect class="lamproom${full?' lit':''}" x="39" y="42" width="22" height="20" rx="2"/><path d="M36 42 L50 26 L64 42 Z" fill="#232c37" stroke="#05070b"/><rect x="48.5" y="16" width="3" height="11" fill="#232c37"/>${win}</svg>
   <span class="lp-cap">Stair ${n}/${CLIMB_XP.length}</span></div>`}
-export const lampChip=cls=>{const p=loadProfile();const l=lampLevel(p,cls),pend=lampPending(p,cls);return `<span class="lp-chip" data-lamp="${cls}">🏮 Lamp ${l}${pend?'<em>●</em>':''}</span>`};
+export const lampChip=cls=>{const p=loadProfile();const l=lampLevel(p,cls),pend=lampPending(p,cls);return `<span class="lp-chip" data-lamp="${cls}"><svg class="lp-lamp-icon" viewBox="0 0 32 28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 24H24M17 20V24M8 10Q16 6 25 10L23 17Q18 23 11 17Z M9 11Q1 5 3 13Q4 17 11 16M24 11L30 7Q30 13 23 15M12 8L17 3L21 8M17 3V1"/><path d="M12 11Q17 8 22 11L20 16H14Z" fill="currentColor" opacity=".4"/></svg>Lamp ${l}${pend?'<em>●</em>':''}</span>`};
 export {totalPending};

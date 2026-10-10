@@ -9,7 +9,7 @@ export function enemyAt(x,y){for(const el of document.elementsFromPoint(x,y)){co
 // ----- long-press (450 ms, < 10 px movement) or right-click enlarges ANY card (hand, reward, shop, piles) -----
 export const LONGPRESS_MS=450;
 let lp=null,eatClick=false;
-function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))return W.cb.hand[+i];return {id:el.dataset.id,uid:+el.dataset.uid,up:el.dataset.up==='1'}}
+function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))return W.cb.hand[+i];const uid=+el.dataset.uid;const piles=W.cb?[W.cb.hand,W.cb.draw,W.cb.disc,W.cb.exh,W.cb.slots]:[];if(W.run)piles.push(W.run.deck);const live=uid>0?piles.flat().find(c=>c&&c.uid===uid&&c.id===el.dataset.id):null;return {...live,id:el.dataset.id,uid,up:el.dataset.up==='1'}}
 export const cancelLongPress=()=>{if(lp){clearTimeout(lp.t);lp=null}clearTimeout(hh);hh=0};
 let hh=0,holdTouch=false;
 function inspectNow(el,touch){if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);drag=null}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el))}

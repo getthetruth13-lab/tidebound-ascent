@@ -105,12 +105,18 @@
 .tb-top h2{margin:0;font:700 clamp(17px,5.6vh,24px) var(--font-display);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);text-shadow:0 2px 8px #000,0 0 14px #000}
 .tb-top .tb-btn{min-width:88px}.tb-sp{min-width:88px}
 .tb-line{position:absolute;left:0;right:0;top:48px;bottom:4px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(4px,1.6vw,22px);padding:0 10px}
-.tb-pick{position:relative;flex:0 1 auto;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;height:100%;background:none;border:0;padding:0 2px;cursor:pointer;color:var(--cream);-webkit-tap-highlight-color:transparent}
+.tb-pick{position:relative;flex:1 1 0;max-width:280px;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;height:100%;background:none;border:0;padding:0 2px;cursor:pointer;color:var(--cream);-webkit-tap-highlight-color:transparent}
 .tb-spr{display:block;height:min(52vh,235px);width:auto;max-width:100%;object-fit:contain;transition:transform .25s ease,filter .25s ease;filter:drop-shadow(0 6px 8px #000c) brightness(.86);transform-origin:50% 100%}
-.tb-glow{position:absolute;left:8%;right:8%;bottom:52px;height:26px;border-radius:50%;background:radial-gradient(ellipse,var(--class-primary) 0,transparent 68%);opacity:.18;transition:opacity .25s;filter:blur(5px)}
-.tb-plate{display:flex;flex-direction:column;align-items:center;margin-top:5px;padding:4px 8px 5px;min-width:120px;border:1px solid var(--iron-3);border-radius:5px;background:linear-gradient(180deg,#171c25ee,#0b0e14f2);box-shadow:0 0 0 1px #05070b,0 4px 10px #000a;transition:border-color .2s,box-shadow .2s}
-.tb-plate b{font:700 14px/1.1 var(--font-display);letter-spacing:.09em;text-transform:uppercase;color:var(--class-accent)}
-.tb-plate i{font:italic 400 12px/1.15 var(--serif);color:var(--cream-dim);text-align:center;white-space:nowrap}
+.tb-glow{position:absolute;left:8%;right:8%;bottom:85px;height:26px;border-radius:50%;background:radial-gradient(ellipse,var(--class-primary) 0,transparent 68%);opacity:.18;transition:opacity .25s;filter:blur(5px)}
+.tb-plate{position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;min-height:94px;margin-top:5px;padding:15px 12px 13px;border:1px solid #827158;border-radius:10px;background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--class-primary) 30%,transparent),transparent 85%),linear-gradient(180deg,#121719f5,#06090bf5);box-shadow:inset 0 0 0 3px #15191a,inset 0 0 0 4px #a493684d,inset 0 0 20px #0008,0 4px 10px #000b;transition:border-color .2s,box-shadow .2s}
+.tb-plate-trim{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);pointer-events:none;overflow:visible}
+.plate-rim{fill:none;stroke:#aa9670;stroke-width:1;filter:drop-shadow(0 1px 1px #000)}
+.plate-scroll{fill:none;stroke:#938060;stroke-width:1;stroke-linecap:round}
+.plate-gem{fill:var(--class-accent);stroke:#8d8061;stroke-width:1;filter:drop-shadow(0 0 2px var(--class-primary))}
+.tb-plate b{font:700 clamp(14px,1.85vw,22px)/1.15 var(--font-display);letter-spacing:.035em;text-transform:uppercase;color:var(--class-accent);text-shadow:0 0 9px var(--class-primary),0 2px 3px #000}
+.tb-plate i{font:italic 400 clamp(12px,1.6vw,17px)/1.15 var(--serif);color:var(--cream);text-align:center;text-wrap:balance}
+.tb-plate .lp-chip{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:13px;text-transform:uppercase;color:var(--cream)}
+.lp-lamp-icon{width:25px;height:22px;color:var(--class-accent);filter:drop-shadow(0 0 4px var(--class-primary));flex-shrink:0}
 .tb-pick:hover .tb-spr,.tb-pick:focus-visible .tb-spr,.tb-pick.on .tb-spr{transform:translateY(-7px) scale(1.035);filter:drop-shadow(0 0 12px var(--class-primary)) drop-shadow(0 6px 8px #000c) brightness(1.12)}
 .tb-pick:hover .tb-glow,.tb-pick:focus-visible .tb-glow,.tb-pick.on .tb-glow{opacity:.75}
 .tb-pick:hover .tb-plate,.tb-pick:focus-visible .tb-plate,.tb-pick.on .tb-plate{border-color:var(--class-primary);box-shadow:0 0 0 1px #05070b,0 0 14px var(--class-primary),0 4px 10px #000a}
@@ -264,3 +270,16 @@
 .lp-rl{width:auto;white-space:nowrap;font-size:11.5px}.lp-row{margin-top:3px}
 .lp-tasks{flex-direction:row;flex-wrap:wrap;gap:2px 10px;font-size:11px;margin-top:3px}
 .lp-btns{margin-top:4px}.lp-btns .btn{min-height:34px;padding:2px 6px;font-size:12px}
+
+/* Codex 7: engraved class plates; vector metalwork stays crisp on phone DPR. */
+.tb-line{gap:clamp(6px,1.3vw,18px);padding:0 18px;bottom:12px}
+.tb-pick{flex:1 1 0;width:25%;padding:0}
+.tb-plate{position:relative;isolation:isolate;box-sizing:border-box;width:100%;min-width:0;min-height:94px;justify-content:center;gap:3px;padding:13px 8px 12px;border:0;border-radius:12px;background:radial-gradient(ellipse at 50% 0,color-mix(in srgb,var(--class-secondary) 82%,#000),transparent 85%),linear-gradient(110deg,var(--class-deep),#07090ddd,var(--class-deep));box-shadow:inset 0 0 16px #000,0 5px 12px #000c;transition:filter .2s,box-shadow .2s}
+.tb-plate b{font-size:clamp(14px,1.9vw,22px);letter-spacing:.045em;color:var(--class-primary);text-shadow:0 1px 2px #000,0 0 10px color-mix(in srgb,var(--class-primary) 55%,transparent)}
+.tb-plate i{font-size:clamp(11px,1.42vw,16px);line-height:1.2;white-space:normal;color:#dfd0b0}
+.lp-lamp-icon{display:inline-block;width:32px;height:25px;vertical-align:middle;fill:var(--class-secondary,#5e4220);stroke:var(--class-primary,#efd9a8);stroke-width:2;filter:drop-shadow(0 0 4px var(--class-primary,#d29a3e))}
+.lp-lamp-icon ellipse{fill:var(--class-accent,#efd9a8);stroke:none}
+.tb-plate .lp-chip{display:flex;align-items:center;justify-content:center;gap:4px;margin:0;padding:0;border:0;background:none;font:600 13px var(--font-display);text-transform:uppercase;color:var(--class-accent)}
+.tb-pick:hover .tb-plate,.tb-pick:focus-visible .tb-plate,.tb-pick.on .tb-plate{filter:brightness(1.2);box-shadow:inset 0 0 16px #000,0 0 15px color-mix(in srgb,var(--class-primary) 65%,transparent),0 5px 12px #000c}
+.tb-hero h2{color:var(--class-primary);text-shadow:0 2px 4px #000,0 0 10px var(--class-secondary)}
+@media(max-height:360px){.tb-plate{min-height:80px;padding-top:10px;padding-bottom:10px;gap:1px}.tb-spr{height:48vh}}
