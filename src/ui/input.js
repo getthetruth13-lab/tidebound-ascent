@@ -2,7 +2,7 @@
 import {W} from '../core/state.js';
 import {needsTarget} from '../engine/cards.js';
 import {alive,canPlay,playCard,tapCard} from '../engine/combat.js';
-import {layoutHand,render,openInspect} from './render.js';
+import {layoutHand,render,openInspect,closeInspect} from './render.js';
 // ================= pointer / touch input: tap-to-select, drag-to-play =================
 export let drag=null;
 export function enemyAt(x,y){for(const el of document.elementsFromPoint(x,y)){const en=el.closest&&el.closest('.en');if(en)return +en.dataset.en}return null}
@@ -10,12 +10,20 @@ export function enemyAt(x,y){for(const el of document.elementsFromPoint(x,y)){co
 export const LONGPRESS_MS=450;
 let lp=null,eatClick=false;
 function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))return W.cb.hand[+i];return {id:el.dataset.id,uid:+el.dataset.uid,up:el.dataset.up==='1'}}
-function inspectNow(el){if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);drag=null}eatClick=true;lp=null;openInspect(cardOf(el))}
+export const cancelLongPress=()=>{if(lp){clearTimeout(lp.t);lp=null}clearTimeout(hh);hh=0};
+let hh=0,holdTouch=false;
+function inspectNow(el,touch){if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);drag=null}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el))}
 document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}const any=ev.target.closest&&ev.target.closest('.card');if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
- lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any)},LONGPRESS_MS)}},true);
+ lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,ev.pointerType==='touch'||ev.pointerType==='pen')},LONGPRESS_MS)}},true);
 document.addEventListener('pointermove',ev=>{if(lp&&Math.hypot(ev.clientX-lp.x0,ev.clientY-lp.y0)>10){clearTimeout(lp.t);lp=null}},true);
-document.addEventListener('pointerup',()=>{if(lp){clearTimeout(lp.t);lp=null}},true);
+document.addEventListener('pointerup',()=>{if(lp){clearTimeout(lp.t);lp=null}if(holdTouch){holdTouch=false;closeInspect()}},true); // touch: releasing the finger closes the enlarged card
+document.addEventListener('pointercancel',()=>{if(holdTouch){holdTouch=false;closeInspect()}},true);
+// Desktop hover-hold: resting the mouse on a card (1.5 s in the hand, 0.9 s elsewhere) enlarges it, like right-click.
+document.addEventListener('pointerover',ev=>{if(ev.pointerType!=='mouse')return;clearTimeout(hh);hh=0;const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('#inspect,#cardtip,.cslot.lift')||ev.buttons)return;
+ const hand=!!c.closest('.hand');hh=setTimeout(()=>{hh=0;if(!c.isConnected||!c.matches(':hover')||drag||(hand&&(c.classList.contains('sel')||c.classList.contains('drag')))||(W.cb&&W.cb.busy&&hand))return;inspectNow(c,false)},hand?1500:900)},true);
+document.addEventListener('pointerdown',()=>{clearTimeout(hh);hh=0},true);
+document.addEventListener('pointerout',ev=>{if(ev.pointerType==='mouse'&&(!ev.relatedTarget||!ev.relatedTarget.closest||ev.relatedTarget.closest('.card')!==ev.target.closest('.card'))){clearTimeout(hh);hh=0}},true);
 document.addEventListener('click',ev=>{if(eatClick){eatClick=false;ev.stopPropagation();ev.preventDefault()}},true);
 document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
 document.addEventListener('pointerdown',ev=>{const c=ev.target.closest&&ev.target.closest('.hand .card');if(!c||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;

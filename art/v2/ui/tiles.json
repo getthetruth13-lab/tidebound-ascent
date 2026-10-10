@@ -1,0 +1,698 @@
+{
+ "note": "Tile / emblem art slots. Drop a webp at \"path\", run `node tools/make-tiles-manifest.cjs` (sets ready:true), done. Until then the game draws a themed placeholder emblem with the right name.",
+ "tiles": {
+  "opt-leave": {
+   "path": "art/v2/ui/tiles/opt-leave.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a worn stair step leading on, lantern light behind",
+   "ready": false
+  },
+  "opt-blood": {
+   "path": "art/v2/ui/tiles/opt-blood.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a bleeding hand over a still pool",
+   "ready": false
+  },
+  "opt-gold": {
+   "path": "art/v2/ui/tiles/opt-gold.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a heap of salt-green coins",
+   "ready": false
+  },
+  "opt-gamble": {
+   "path": "art/v2/ui/tiles/opt-gamble.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: two bone dice on wet stone",
+   "ready": false
+  },
+  "opt-upgrade": {
+   "path": "art/v2/ui/tiles/opt-upgrade.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: an anvil with a glowing seam",
+   "ready": false
+  },
+  "opt-transform": {
+   "path": "art/v2/ui/tiles/opt-transform.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a card half turning into a sea-glass shard",
+   "ready": false
+  },
+  "opt-card": {
+   "path": "art/v2/ui/tiles/opt-card.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a single face-down painted card",
+   "ready": false
+  },
+  "opt-fight": {
+   "path": "art/v2/ui/tiles/opt-fight.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: crossed rusted blades in kelp",
+   "ready": false
+  },
+  "opt-heal": {
+   "path": "art/v2/ui/tiles/opt-heal.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a cupped hand with a warm light",
+   "ready": false
+  },
+  "opt-gift": {
+   "path": "art/v2/ui/tiles/opt-gift.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a knotted bundle on a driftwood altar",
+   "ready": false
+  },
+  "opt-relic": {
+   "path": "art/v2/ui/tiles/opt-relic.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a glowing relic on a velvet cloth",
+   "ready": false
+  },
+  "opt-potion": {
+   "path": "art/v2/ui/tiles/opt-potion.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a stoppered vial with a swirl",
+   "ready": false
+  },
+  "opt-curse": {
+   "path": "art/v2/ui/tiles/opt-curse.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a black thorned shell",
+   "ready": false
+  },
+  "opt-remove": {
+   "path": "art/v2/ui/tiles/opt-remove.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a card being cut by shears",
+   "ready": false
+  },
+  "opt-other": {
+   "path": "art/v2/ui/tiles/opt-other.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a question mark carved in coral",
+   "ready": false
+  },
+  "opt-back": {
+   "path": "art/v2/ui/tiles/opt-back.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Option icon: a hand closing a book",
+   "ready": false
+  },
+  "camp-mend": {
+   "path": "art/v2/ui/tiles/camp-mend.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Camp action: a small campfire with a warm bedroll",
+   "ready": false
+  },
+  "camp-temper": {
+   "path": "art/v2/ui/tiles/camp-temper.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Camp action: a hammer and anvil by the fire",
+   "ready": false
+  },
+  "camp-cook": {
+   "path": "art/v2/ui/tiles/camp-cook.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Camp action: a pot over the flames",
+   "ready": false
+  },
+  "camp-scour": {
+   "path": "art/v2/ui/tiles/camp-scour.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Camp action: a pumice stone scrubbing a card",
+   "ready": false
+  },
+  "camp-trawl": {
+   "path": "art/v2/ui/tiles/camp-trawl.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Camp action: a grapnel hook hauling up a net",
+   "ready": false
+  },
+  "camp-annotate": {
+   "path": "art/v2/ui/tiles/camp-annotate.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Camp action: an open logbook with ink",
+   "ready": false
+  },
+  "reward-gold": {
+   "path": "art/v2/ui/tiles/reward-gold.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Reward tile: a pile of gold coins and salt crystals",
+   "ready": false
+  },
+  "reward-cards": {
+   "path": "art/v2/ui/tiles/reward-cards.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Reward tile: three fanned cards",
+   "ready": false
+  },
+  "reward-relic": {
+   "path": "art/v2/ui/tiles/reward-relic.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Reward tile fallback: a relic on a cloth",
+   "ready": false
+  },
+  "reward-potion": {
+   "path": "art/v2/ui/tiles/reward-potion.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Reward tile fallback: a potion on a shelf",
+   "ready": false
+  },
+  "chest-closed": {
+   "path": "art/v2/ui/tiles/chest-closed.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Closed sunken chest, barnacled, dark teal",
+   "ready": false
+  },
+  "chest-open": {
+   "path": "art/v2/ui/tiles/chest-open.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Open chest with light spilling out",
+   "ready": false
+  },
+  "choice-tide-low": {
+   "path": "art/v2/ui/tiles/choice-tide-low.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a dark new moon over still water (Tide 3)",
+   "ready": false
+  },
+  "choice-tide-mid": {
+   "path": "art/v2/ui/tiles/choice-tide-mid.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a half moon on a calm sea (Tide 5)",
+   "ready": false
+  },
+  "choice-tide-high": {
+   "path": "art/v2/ui/tiles/choice-tide-high.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a full moon over a towering wave (Tide 7)",
+   "ready": false
+  },
+  "choice-tide-set": {
+   "path": "art/v2/ui/tiles/choice-tide-set.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a moon and a dial on the sea",
+   "ready": false
+  },
+  "choice-surge": {
+   "path": "art/v2/ui/tiles/choice-surge.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a wave rising",
+   "ready": false
+  },
+  "choice-recede": {
+   "path": "art/v2/ui/tiles/choice-recede.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a wave pulling back",
+   "ready": false
+  },
+  "choice-moonpull": {
+   "path": "art/v2/ui/tiles/choice-moonpull.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a moon drawing the tide up",
+   "ready": false
+  },
+  "choice-keep": {
+   "path": "art/v2/ui/tiles/choice-keep.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a Waypoint flag standing safe",
+   "ready": false
+  },
+  "choice-destroy": {
+   "path": "art/v2/ui/tiles/choice-destroy.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Combat choice: a Waypoint flag shattering",
+   "ready": false
+  },
+  "event-tidalwheel": {
+   "path": "art/v2/ui/tiles/event-tidalwheel.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Tidal Wheel",
+   "ready": false
+  },
+  "event-anvil": {
+   "path": "art/v2/ui/tiles/event-anvil.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Barnacle Anvil",
+   "ready": false
+  },
+  "event-spring": {
+   "path": "art/v2/ui/tiles/event-spring.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Cleansing Spring",
+   "ready": false
+  },
+  "event-changeling": {
+   "path": "art/v2/ui/tiles/event-changeling.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Changeling Pool",
+   "ready": false
+  },
+  "event-offering": {
+   "path": "art/v2/ui/tiles/event-offering.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Offering Tide",
+   "ready": false
+  },
+  "event-wishing": {
+   "path": "art/v2/ui/tiles/event-wishing.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Wishing Undertow",
+   "ready": false
+  },
+  "event-tidepool": {
+   "path": "art/v2/ui/tiles/event-tidepool.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Tidepool Shrine",
+   "ready": false
+  },
+  "event-cartomancer": {
+   "path": "art/v2/ui/tiles/event-cartomancer.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Wandering Cartomancer",
+   "ready": false
+  },
+  "event-sunkenchest": {
+   "path": "art/v2/ui/tiles/event-sunkenchest.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Sunken Chest",
+   "ready": false
+  },
+  "event-stranger": {
+   "path": "art/v2/ui/tiles/event-stranger.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Campfire Stranger",
+   "ready": false
+  },
+  "event-crabmarket": {
+   "path": "art/v2/ui/tiles/event-crabmarket.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Crab Market",
+   "ready": false
+  },
+  "event-gullnest": {
+   "path": "art/v2/ui/tiles/event-gullnest.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Gull Nest",
+   "ready": false
+  },
+  "event-inkgrotto": {
+   "path": "art/v2/ui/tiles/event-inkgrotto.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Ink Grotto",
+   "ready": false
+  },
+  "event-sailor": {
+   "path": "art/v2/ui/tiles/event-sailor.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Shipwrecked Sailor",
+   "ready": false
+  },
+  "event-mirror": {
+   "path": "art/v2/ui/tiles/event-mirror.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Tideglass Mirror",
+   "ready": false
+  },
+  "event-loom": {
+   "path": "art/v2/ui/tiles/event-loom.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Event scene (4:3 painting): Saltwife's Loom",
+   "ready": false
+  },
+  "event-generic": {
+   "path": "art/v2/ui/tiles/event-generic.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Fallback event scene: a lantern-lit shoreline",
+   "ready": false
+  },
+  "lamp-lantern-lit": {
+   "path": "art/v2/ui/tiles/lamp-lantern-lit.webp",
+   "size": [
+    128,
+    192
+   ],
+   "desc": "A lit brass lantern, warm glow (level pip)",
+   "ready": false
+  },
+  "lamp-lantern-dark": {
+   "path": "art/v2/ui/tiles/lamp-lantern-dark.webp",
+   "size": [
+    128,
+    192
+   ],
+   "desc": "The same lantern, cold and unlit",
+   "ready": false
+  },
+  "lamp-track-card": {
+   "path": "art/v2/ui/tiles/lamp-track-card.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Lamp track reward marker: card",
+   "ready": false
+  },
+  "lamp-track-relic": {
+   "path": "art/v2/ui/tiles/lamp-track-relic.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Lamp track reward marker: relic",
+   "ready": false
+  },
+  "lamp-track-potion": {
+   "path": "art/v2/ui/tiles/lamp-track-potion.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Lamp track reward marker: potion",
+   "ready": false
+  },
+  "lamp-track-mixed": {
+   "path": "art/v2/ui/tiles/lamp-track-mixed.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Lamp track reward marker: mixed",
+   "ready": false
+  },
+  "lamp-track-all": {
+   "path": "art/v2/ui/tiles/lamp-track-all.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Lamp track reward marker: all",
+   "ready": false
+  },
+  "lamp-lock-card": {
+   "path": "art/v2/ui/tiles/lamp-lock-card.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Locked card silhouette, dark and chained, no readable detail",
+   "ready": false
+  },
+  "lamp-lock-relic": {
+   "path": "art/v2/ui/tiles/lamp-lock-relic.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Locked relic silhouette, dark and chained, no readable detail",
+   "ready": false
+  },
+  "lamp-lock-potion": {
+   "path": "art/v2/ui/tiles/lamp-lock-potion.webp",
+   "size": [
+    384,
+    384
+   ],
+   "desc": "Locked potion silhouette, dark and chained, no readable detail",
+   "ready": false
+  },
+  "lamp-cardback": {
+   "path": "art/v2/ui/tiles/lamp-cardback.webp",
+   "size": [
+    500,
+    700
+   ],
+   "desc": "Card back for locked cards: dark lantern glyph on teal-black",
+   "ready": false
+  },
+  "lamp-task-any": {
+   "path": "art/v2/ui/tiles/lamp-task-any.webp",
+   "size": [
+    256,
+    256
+   ],
+   "desc": "Lantern Task card art (any): a small lantern with a compass motif",
+   "ready": false
+  },
+  "lamp-task-tide": {
+   "path": "art/v2/ui/tiles/lamp-task-tide.webp",
+   "size": [
+    256,
+    256
+   ],
+   "desc": "Lantern Task card art (tide): a small lantern with a wave motif",
+   "ready": false
+  },
+  "lamp-task-echo": {
+   "path": "art/v2/ui/tiles/lamp-task-echo.webp",
+   "size": [
+    256,
+    256
+   ],
+   "desc": "Lantern Task card art (echo): a small lantern with a sound ring motif",
+   "ready": false
+  },
+  "lamp-task-carto": {
+   "path": "art/v2/ui/tiles/lamp-task-carto.webp",
+   "size": [
+    256,
+    256
+   ],
+   "desc": "Lantern Task card art (carto): a small lantern with a map motif",
+   "ready": false
+  },
+  "lamp-task-duel": {
+   "path": "art/v2/ui/tiles/lamp-task-duel.webp",
+   "size": [
+    256,
+    256
+   ],
+   "desc": "Lantern Task card art (duel): a small lantern with a blade motif",
+   "ready": false
+  },
+  "lamp-class-tide": {
+   "path": "art/v2/ui/tiles/lamp-class-tide.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Class Lamp emblem: tide",
+   "ready": false
+  },
+  "lamp-class-echo": {
+   "path": "art/v2/ui/tiles/lamp-class-echo.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Class Lamp emblem: echo",
+   "ready": false
+  },
+  "lamp-class-carto": {
+   "path": "art/v2/ui/tiles/lamp-class-carto.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Class Lamp emblem: carto",
+   "ready": false
+  },
+  "lamp-class-duel": {
+   "path": "art/v2/ui/tiles/lamp-class-duel.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Class Lamp emblem: duel",
+   "ready": false
+  },
+  "lamp-climb": {
+   "path": "art/v2/ui/tiles/lamp-climb.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Stair Climb emblem: the Pale Lighthouse",
+   "ready": false
+  },
+  "lamp-banner-win": {
+   "path": "art/v2/ui/tiles/lamp-banner-win.webp",
+   "size": [
+    832,
+    160
+   ],
+   "desc": "End screen banner, the lamp room blazing (win)",
+   "ready": false
+  },
+  "lamp-banner-lose": {
+   "path": "art/v2/ui/tiles/lamp-banner-lose.webp",
+   "size": [
+    832,
+    160
+   ],
+   "desc": "End screen banner, a single lantern burning on in the dark (loss)",
+   "ready": false
+  }
+ }
+}

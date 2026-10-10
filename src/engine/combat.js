@@ -58,7 +58,7 @@ export function startCombat(kind,enc,opts={}){
  if(cls==='duel')cb.mom=DU.start_mom;
  if(cls==='carto'&&!hasRelic('trailboots')){
   const pool=['signal','cache','lookout'];
-  if(hasRelic('sextant'))cb.startQ.push(()=>choose('Brass Sextant: choose your starting Waypoint (upgraded, Rank 1)',shuffle(pool.slice(),cs).map(id=>({l:`${CARDS[id].e} ${CARDS[id].n}+`,f:()=>{placeStartWp(id,true,1)}}))));
+  if(hasRelic('sextant'))cb.startQ.push(()=>choose('Brass Sextant: choose your starting Waypoint (upgraded, Rank 1)',shuffle(pool.slice(),cs).map(id=>({l:`${CARDS[id].e} ${CARDS[id].n}+`,card:{id,up:true,rank:1},cap:'Rank 1 · upgraded',f:()=>{placeStartWp(id,true,1)}}))));
   else placeStartWp(pick(pool,cs),false,0);
   if(hasRelic('staratlas'))placeStartWp(pick(pool,cs),false,0);
  }
@@ -186,13 +186,14 @@ export function placeWp(ci){const cb=W.cb;const put=()=>{if(cb.cairn){ci.rank=cb
 export function choose(title,opts){W.cb.mode={k:'choice',title,opts}}
 export function chart(n,then0){const cb=W.cb;const then=()=>{fire('chartDone',{n});then0&&then0()};refill(n);cb.mode={k:'chart',n:Math.min(n,cb.draw.length),then,moved:false};fire('chart',{n});if(!cb.mode||!cb.mode.n){if(cb.mode&&cb.mode.k==='chart')cb.mode=null;then&&then()}}
 export function pickSlot(title,then){W.cb.mode={k:'slot',title,then}}
-export function modeAct(a,i){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)return;
+export function modeAct(a,i,j){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)return;
  const done=()=>{if(m.thenStart&&!cb.mode){if(W.cb===cb)return nextStart()}return after()};
  if(m.k==='choice'){cb.mode=null;m.opts[i].f();return done()}
  if(m.k==='slot'){cb.mode=null;m.then(i);return done()}
  if(m.k==='chart'){const d=cb.draw;
   if(a==='up'&&i>0)[d[i-1],d[i]]=[d[i],d[i-1]];
   if(a==='dn'&&i<m.n-1)[d[i+1],d[i]]=[d[i],d[i+1]];
+  if(a==='mv'&&i!==j&&i>=0&&j>=0&&i<m.n&&j<m.n)d.splice(j,0,d.splice(i,1)[0]); // drag-and-drop reorder (ui/chartdrag.js)
   if(a==='bot'&&!m.moved){d.push(d.splice(i,1)[0]);m.moved=true;m.n--}
   if(a==='done'){cb.mode=null;log('🗺️ Charted');m.then&&m.then();return done()}
   render()}}

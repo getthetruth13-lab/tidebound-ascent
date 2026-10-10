@@ -30,6 +30,8 @@ export const TASKS={
  flourish30:{cls:'duel',n:'Flourish for 30 or more in one hit',ev:{damageDealt:c=>!!(c.f&&c.f.flourish)&&c.amount>=30}},
  bleed10:{cls:'duel',n:'Put 10 Bleed on one enemy',ev:{statusApplied:c=>c.key==='bleed'&&!c.player&&(c.target.st.bleed||0)>=10}},
  parry3:{cls:'duel',n:'Parry 3 times in one fight',ev:{parry:(c,t)=>t&&(t.parries=(t.parries||0)+1)>=3}}};
+// Live progress [have, goal] for the counting tasks while a fight is on (null = a yes/no task). Shown on the Lantern Tasks cards.
+export function taskProgress(id){const cb=W.cb;if(!cb)return null;const st=cb.stat||{},t=cb.lamp||{};const m={crest3:[st.crests,3],undertow2:[st.undertows,2],echo3:[st.echoesTurn,3],parry3:[t.parries,3]}[id];return m?[Math.min(m[0]||0,m[1]),m[1]]:null}
 // 1 any-class task + 2 for the class. Own seeded rng (never the run's streams), so tasks never change maps, rewards or rolls.
 export function rollTasks(cls,seed){let a=hash32(seed+'|tasks');const rnd=()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296};
  const pick=l=>l.splice(Math.floor(rnd()*l.length),1)[0];const mine=Object.keys(TASKS).filter(k=>TASKS[k].cls===cls),any=Object.keys(TASKS).filter(k=>TASKS[k].cls==='any');

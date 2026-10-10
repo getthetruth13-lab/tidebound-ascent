@@ -11,6 +11,8 @@ import * as combat from './engine/combat.js';
 import * as runMod from './engine/run.js';
 import * as render from './ui/render.js';
 import * as input from './ui/input.js';
+import './ui/chartdrag.js';
+import {loadTiles,tileUrls} from './ui/tiles.js';
 import * as fx from './ui/fx.js';
 import * as save from './save.js';
 import * as bus from './core/bus.js';
@@ -42,6 +44,7 @@ assets.applyTextures();title.applyMotion();env.initEnv();
 initAudio();
 render.render();
 assets.loadCardArt().then(n=>{if(n)render.render()});
+loadTiles().then(n=>{if(n)render.render()});
 
 // Landscape lock where the platform allows it (installed PWA / fullscreen / Capacitor); harmless elsewhere.
 addEventListener('pointerdown',()=>{try{const o=screen.orientation;if(o&&o.lock&&(matchMedia('(display-mode: standalone)').matches||document.fullscreenElement))o.lock('landscape').catch(()=>{})}catch(_){}},{once:true});
@@ -49,7 +52,7 @@ addEventListener('pointerdown',()=>{try{const o=screen.orientation;if(o&&o.lock&
 // Offline support: register the service worker and ask it to cache everything this page loaded + all art in the asset map.
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
  navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(reg=>{
-  const urls=performance.getEntriesByType('resource').map(e=>e.name).filter(u=>u.startsWith(location.origin)).concat([...assets.assetURLs(),...env.envURLs(1)].map(u=>new URL(u,location.href).href));
+  const urls=performance.getEntriesByType('resource').map(e=>e.name).filter(u=>u.startsWith(location.origin)).concat([...assets.assetURLs(),...env.envURLs(1),...tileUrls()].map(u=>new URL(u,location.href).href));
   (reg.active||navigator.serviceWorker.controller)&&reg.active.postMessage({type:'precache',urls});
  }).catch(e=>console.warn('SW registration failed',e));
 }

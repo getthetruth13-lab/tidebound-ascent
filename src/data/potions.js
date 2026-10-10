@@ -20,7 +20,7 @@ const B={
  coraldust:{use:(f,t)=>addSt(t,'vuln',3)},
  sparkphial:{use:f=>gainEnergy(2)},
  kelpbroth:{outside:1,use:f=>heal(Math.floor(W.run.max*.15))},
- moondraught:{use:f=>{const opts=[0,2,4,5,6,8,10].map(v=>({l:(v===10?'🌊 10 (Crest)':v===0?'🌀 0 (Undertow)':'Tide '+v),f:()=>{setTide(v,'potion');log('🌙 Moon Draught: Tide '+v)}}));choose('🌙 Moon Draught: set the Tide',opts)}},
+ moondraught:{use:f=>{const opts=[0,2,4,5,6,8,10].map(v=>({l:(v===10?'🌊 Tide 10: Crest':v===0?'🌀 Tide 0: Undertow':'🌙 Tide '+v),tile:'choice-tide-set',sum:v===10?'Crest':v===0?'Undertow':'',f:()=>{setTide(v,'potion');log('🌙 Moon Draught: Tide '+v)}}));choose('🌙 Moon Draught: set the Tide',opts)}},
  resvial:{use:f=>f.thisTurn({id:'resvial',mod:{echoPlan(i,ctx,p){return {...p,repeats:p.repeats+2}}}})},
  chartwater:{use:f=>{const cb=W.cb;if(cb.slots.length<cb.nslots){const ws=Object.values(CARDS).filter(c=>c.cls==='carto'&&c.t==='W'&&(c.r==='c'||c.r==='s'));const w=mk(pick(ws,'combat').id,false,{temp:true});cb.slots.push(w);log('🗺️ Chartwater: '+cname(w)+' placed (temporary)')}chart(6)}},
  adrenalsalt:{use:f=>{gainMom(3);f.parry(8)}},
@@ -28,7 +28,7 @@ const B={
  driftglass:{use:f=>{const cb=W.cb;const pool=Object.values(CARDS).filter(c=>c.cls==='colorless'&&c.r!=='x'); // tokens (Note, Flotsam...) are never offered
   // Phase 2 adds the colourless pool; until then Driftglass offers 3 class cards (judgment call, see README).
   const src=pool.length?pool:Object.values(CARDS).filter(c=>c.cls===W.run.cls&&c.r!=='s');
-  const three=shuffle(src.slice(),'combat').slice(0,3);choose('🫙 Driftglass: add a card (costs 0 this turn)',three.map(c=>({l:`${c.e||''} ${c.n}`,f:()=>{addCard(c.id,'hand',{cost0Turn:true});log('🫙 '+c.n+' added')}})))}},
+  const three=shuffle(src.slice(),'combat').slice(0,3);choose('🫙 Driftglass: add a card (costs 0 this turn)',three.map(c=>({l:`${c.e||''} ${c.n}`,card:{id:c.id},cap:'Costs 0 this turn',f:()=>{addCard(c.id,'hand',{cost0Turn:true});log('🫙 '+c.n+' added')}})))}},
  temperoil:{use:f=>{W.cb.hand.forEach(c=>{c.tmpUp=true});log('🛢️ Temper Oil: hand upgraded for this combat')}},
  secondtide:{passive:1,can:()=>false,on:{playerDeath(id,ctx){if(ctx.cancel)return;const i=W.run.potions.indexOf('secondtide');if(i<0)return;W.run.potions[i]=null;W.run.hp=Math.max(1,Math.floor(W.run.max*.3));ctx.cancel=true;log('🌊 Second Tide: you rise again!');callout('SECOND TIDE!','potion')}},use:f=>{}},
  tidalflask:{use:f=>{for(let i=0;i<W.run.potions.length;i++)if(!W.run.potions[i])W.run.potions[i]=randomPotion();log('⚗️ Tidal Flask: potions refilled')}},

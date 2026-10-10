@@ -17,7 +17,7 @@ export const RELIC_ICON={moonshell:'🐚',tuningfork:'🎐',sextant:'🧭',glove
 // Per-relic behaviour. Anything not listed is a P3 boss relic that ships in Phase 3 (meta only, `stub:true`).
 const B={
  // ---- starters ----
- moonshell:{on:{combatStart(r){r.c={};if(W.run.cls!=='tide')return;W.cb.startQ.push(()=>choose('🐚 Moon Shell: choose the starting Tide',[3,5,7].map(v=>({l:(v>5?'🌕 ':v<5?'🌑 ':'🌗 ')+'Tide '+v,f:()=>{W.cb.tide=v;log('🐚 Moon Shell: the Tide starts at '+v)}}))))},
+ moonshell:{on:{combatStart(r){r.c={};if(W.run.cls!=='tide')return;W.cb.startQ.push(()=>choose('🐚 Moon Shell: choose the starting Tide',[3,5,7].map(v=>({l:(v>5?'🌕 ':v<5?'🌑 ':'🌗 ')+'Tide '+v,tile:v>5?'choice-tide-high':v<5?'choice-tide-low':'choice-tide-mid',sum:v>5?'Start near High Tide.':v<5?'Start near Low Tide.':'Start balanced.',f:()=>{W.cb.tide=v;log('🐚 Moon Shell: the Tide starts at '+v)}}))))},
   crest(r){if(!r.c.e){r.c.e=1;gainEnergy(1);flash(r);log('🐚 Moon Shell: +1 Energy')}},undertow(r){if(!r.c.e){r.c.e=1;gainEnergy(1);flash(r);log('🐚 Moon Shell: +1 Energy')}}}},
  tuningfork:{on:{combatStart(r){r.c={}}},mod:{echoPlan(r,ctx,p){if(ctx.slot===2||r.c&&r.c.used||p.mult>1)return p;if(!ctx.preview){r.c.used=1;flash(r)}return {...p,mult:2,fork:1}}}},
  sextant:{}, // engine: startCombat offers the choice of 3 starting Waypoints (upgraded, Rank 1)

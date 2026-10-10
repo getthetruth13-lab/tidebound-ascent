@@ -15,6 +15,8 @@ import {drag} from './input.js';
 import {mapHTML} from './map.js';
 import {titleScr} from './screens/title.js';
 import {decorateKeywords} from './kwtip.js';
+import {decorateCardRefs} from './cardref.js';
+import {tileHTML,tilesRow,relicTile,potionTile,optionHTML,emblemHTML,splitLabel,esc as tesc} from './tiles.js';
 import {lampSummaryHTML,tasksHTML,lampBtnLabel} from './screens/lamp.js';
 export const TH={tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist',status:'',curse:'',colorless:''};
 const RARN={s:'Starter',c:'Common',u:'Uncommon',r:'Rare',x:'Special'};
@@ -155,6 +157,7 @@ export function tipHTML(){const cb=W.cb;
  if(cb.insp!=null&&cb.ens[cb.insp]&&cb.ens[cb.insp].hp>0){const e=cb.ens[cb.insp];return `<div class="tip" id="detail"><b>${e.e} ${e.n}</b> <span class="muted">${e.hp}/${e.max}</span><br>${intentText(e)}</div>`}
  return ''}
 function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<1300);return c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:''}
+const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
 export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}">`+topBar();
  h+=`<div class="subbar"><div class="classbar">${classBar()}</div></div>`;
  const g=sceneGeom();const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
@@ -166,10 +169,11 @@ export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W
  <div class="ctl"><div><div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy"><span>${cb.energy}/${cb.maxE}</span></div><button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile">${iconHTML('hud','draw','📚')} ${cb.draw.length}</button></div>
  <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk (removed for this combat)">${iconHTML('hud','sunk','⚓')} ${cb.exh.length}</button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile">${iconHTML('hud','discard','🗑️')} ${cb.disc.length}</button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>${cb.busy?'Enemy…':'End Turn'}</button></div></div></div>`;
  const m=cb.mode;
- if(m&&m.k==='choice')h+=`<div class="ov"><div class="box"><h2>${m.title}</h2>${m.opts.map((o,i)=>`<button class="btn opt" onclick="modeAct('choice',${i})">${lbl(o)}</button>`).join('')}</div></div>`;
- if(m&&m.k==='slot')h+=`<div class="ov"><div class="box"><h2>${m.title}</h2>${cb.slots.map((w,i)=>`<button class="btn opt slotpick" onclick="modeAct('slot',${i})">${CARDS[w.id].e} ${cname(w)}${w.rank?' (Rank '+w.rank+')':''}${w.temp?' (starting)':''}</button>`).join('')}</div></div>`;
- if(m&&m.k==='chart'){let rows='';for(let i=0;i<m.n;i++){const ci=cb.draw[i];rows+=`<div class="row"><b>#${i+1}</b><span class="nm">${CARDS[ci.id].e} ${cname(ci)} <span class="muted">${cost(ci)}⚡ ${TYPEN[CARDS[ci.id].t]}</span></span><button class="mini" onclick="modeAct('up',${i})">▲</button><button class="mini" onclick="modeAct('dn',${i})">▼</button><button class="mini" ${m.moved?'disabled':''} onclick="modeAct('bot',${i})">⤓ Bottom</button></div>`}
-  h+=`<div class="ov"><div class="box"><h2>🗺️ Chart: reorder the top of your draw pile</h2><div class="muted">#1 is drawn first. You may send one card to the bottom.</div>${rows}<button class="btn pri full" id="chartdone" onclick="modeAct('done')">Done</button></div></div>`}
+ if(m&&m.k==='choice')h+=`<div class="ov"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
+ if(m&&m.k==='slot')h+=`<div class="ov"><div class="box tilebox" id="slotbox">${titleHTML(m.title)}<div class="tiles chtiles slottiles" style="--n:${cb.slots.length}">${cb.slots.map((w,i)=>`<div class="tcard opt slotpick">${cardHTML(w,{click:`modeAct('slot',${i})`})}<span class="tcap">${w.rank?'Rank '+w.rank:'Rank 0'}${w.temp?' · starting':''}</span></div>`).join('')}</div></div></div>`;
+ if(m&&m.k==='chart'){const n=m.n;const cards=Array.from({length:n},(_,i)=>{const ci=cb.draw[i];return `<div class="cslot${i===0?' first':''}" data-i="${i}"><span class="cnum">${i===0?'<b>1</b> drawn first':'<b>'+(i+1)+'</b>'}</span>${cardHTML({...ci,uid:ci.uid},{})}<span class="cmv"><button class="cmvb" aria-label="Earlier" onclick="modeAct('up',${i})" ${i===0?'disabled':''}>◀</button><button class="cmvb" aria-label="Later" onclick="modeAct('dn',${i})" ${i===n-1?'disabled':''}>▶</button></span></div>`}).join('');
+  h+=`<div class="ov"><div class="box chartbox" id="chartbox"><h2>🗺️ Chart: set the order of your next draws</h2><div class="muted csub">Drag cards left or right. The leftmost card is drawn first. Drop one in the Bottom slot to send it under the pile.</div>
+  <div class="chartrow" style="--n:${n}"><div class="cards" id="chartcards">${cards}</div><div class="cright"><div class="cbottom${m.moved?' used':''}" id="chartbottom"><span class="cbi">⤓</span><b>Bottom</b><i>${m.moved?'Card sent down':'Drop 1 card here'}</i></div><button class="btn pri" id="chartdone" onclick="modeAct('done')">Done</button></div></div></div></div>`}
  return h+'</div>'}
 export function tgt(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return;const e=cb.ens[i];if(!e||e.hp<=0)return;cb.tgt=i;
  if(cb.sel!=null&&cb.hand[cb.sel]&&needsTarget(cb.hand[cb.sel])){const s=cb.sel;return window.playCard(s)}
@@ -220,22 +224,21 @@ export function skipTravel(){if(W.S.screen!=='travel')return;if(Date.now()-(W.S.
  if(W.run&&W.run.lamp&&!W.run.lamp.shown&&W.run.floor===0){W.run.lamp.shown=true;W.S.ov='tasks'} // Lantern Tasks are shown once, when the climb begins
  render()}
 // ---------------- rewards / chests ----------------
-function rowHTML(r,i,click){const done=r.done;let ic='',t='';
- if(r.k==='gold'){ic='💰';t=`${r.n} gold ${r.note||''}`}
- else if(r.k==='relic'){const d=RELICS[r.id];ic=slotHTML('relics',r.id,'ri',d.e);t=`<b>${d.n}</b> <span class="muted">${d.tierName}</span><br><span class="rd">${d.d}</span>`}
- else if(r.k==='potion'){const p=POTIONS[r.id];ic=slotHTML('potions',r.id,'ri',p.e);t=`<b>${p.n}</b> <span class="muted">potion</span><br><span class="rd">${p.d}</span>`}
- else if(r.k==='cards'){ic='🂠';t=r.took?`Took <b>${CARDS[r.took].n}</b>`:r.skipped?'Skipped card':`<b>Choose a card</b> <span class="muted">(${r.cards.length})</span>`}
- return `<button class="rrow ${r.k}${done?' done':''}" data-row="${i}" ${done?'disabled':`onclick="${click}(${i})"`}><span class="ric">${ic}</span><span class="rt">${t}</span>${done?'<span class="ck">✔</span>':''}</button>`}
+function rowHTML(r,i,click){const done=!!r.done,c=done?'':`${click}(${i})`;
+ if(r.k==='gold')return tileHTML({id:'reward-gold',emoji:'💰',name:`${r.n} gold`,sum:r.note||'Into your purse.',cls:'k-gold',click:c,done,disabled:done,tid:'row'+i,info:`${r.n} gold: spend it at the merchant.`});
+ if(r.k==='relic')return relicTile(r.id,{click:c,done,disabled:done,sum:RELICS[r.id].d});
+ if(r.k==='potion')return potionTile(r.id,{click:c,done,disabled:done});
+ return tileHTML({id:'reward-cards',emoji:'🂠',name:r.took?`Took ${CARDS[r.took].n}`:r.skipped?'Skipped':'Choose a card',sum:r.took||r.skipped?'':`Add 1 of ${r.cards.length} to your deck.`,cls:'k-cards',click:c,done,disabled:done,tid:'row'+i,info:'Card reward: pick one card for your deck, or skip.'})}
 function rewardScr(){const S=W.S;let h=topBar()+`<h2>${S.title}</h2>`;
  if(S.cardsOpen!=null){const row=S.rows[S.cardsOpen];const boss=S.kind==='boss';
   h+=`<div class="sub">Choose a card to add to your deck <span class="muted">(hold a card to enlarge)</span></div><div class="grid rewgrid">${row.cards.map((id,j)=>cardHTML({id,uid:-1-j,up:false},{click:`rewCard(${j})`})).join('')}</div>
   <div class="actions"><button class="btn" onclick="rewCloseCards()">↩ Back</button><button class="btn" id="skipcard" onclick="rewSkipCards()">Skip card</button></div>`;return h}
  if(S.swap!=null){const row=S.rows[S.swap],p=POTIONS[row.id];
-  h+=`<div class="sub">Your potion slots are full. Swap <b>${p.e} ${p.n}</b> for one you hold, or discard it.</div><div class="swaps">${W.run.potions.map((id,s)=>`<button class="btn opt" onclick="potionSwap(${s})">Replace ${POTIONS[id].e} ${POTIONS[id].n}</button>`).join('')}<button class="btn opt" id="discardnew" onclick="potionSwap(-1)">🗑️ Discard ${p.n}</button></div>`;return h}
- h+=`<div class="rrows">${S.rows.map((r,i)=>rowHTML(r,i,'claimRow')).join('')}</div><div class="actions"><button class="btn pri" id="proceed" onclick="rewDone()">${S.kind==='boss'?'🏆 Finish the act':'Proceed ➜'}</button></div>`;return h}
+  h+=`<div class="sub">Your potion slots are full. Swap <b>${p.e} ${p.n}</b> for one you hold, or discard it.</div>${tilesRow([...W.run.potions.map((id,s)=>potionTile(id,{click:`potionSwap(${s})`,tag:'Replace',cls:'swap'})),tileHTML({id:'opt-remove',emoji:'🗑️',name:`Discard ${p.n}`,sum:'Leave it behind.',click:'potionSwap(-1)',cls:'k-discard',tid:'discardnew'})],'swaptiles')}`;return h}
+ h+=`${tilesRow(S.rows.map((r,i)=>rowHTML(r,i,'claimRow')),'rewtiles')}<div class="actions"><button class="btn pri" id="proceed" onclick="rewDone()">${S.kind==='boss'?'🏆 Finish the act':'Proceed ➜'}</button></div>`;return h}
 function chestScr(){const S=W.S;let h=topBar()+`<h2>💎 ${S.name}</h2>`;
- if(!S.opened)return h+`<div class="chestwrap"><button class="chest ${S.chest}" id="openchest" onclick="openChestLid()"><span class="lid">🧰</span><span class="muted">Tap to open</span></button></div><div class="actions"><button class="btn" onclick="goMap()">Leave it</button></div>`;
- return h+`<div class="chestwrap open ${S.chest}" style="${anim(S.openT,600)||''}"><span class="lid">✨</span></div><div class="rrows">${S.rows.map((r,i)=>rowHTML(r,i,'claimRow')).join('')}</div><div class="actions"><button class="btn pri" id="proceed" onclick="goMap()">Proceed ➜</button></div>`}
+ if(!S.opened)return h+`<div class="chestwrap"><button class="chest ${S.chest}" id="openchest" onclick="openChestLid()">${emblemHTML('chest-closed','🧰','big')}<span class="muted">Tap to open</span></button></div><div class="actions"><button class="btn" onclick="goMap()">Leave it</button></div>`;
+ return h+`<div class="chestwrap open ${S.chest}" style="${anim(S.openT,600)||''}">${emblemHTML('chest-open','✨','big')}</div>${tilesRow(S.rows.map((r,i)=>rowHTML(r,i,'claimRow')),'rewtiles')}<div class="actions"><button class="btn pri" id="proceed" onclick="goMap()">Proceed ➜</button></div>`}
 // ---------------- merchant (4 shelves + Scrub; prices rolled on entry) ----------------
 function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();
  const card=(it,sh,i)=>`<div class="shopitem${it.sold?' sold':''}${it.sale?' sale':''}${anim(it.noT,400)?' no':''}">${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`buy('${sh}',${i})`,can:g>=it.price})}<span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':(it.sale?'<s>'+Math.round(it.base)+'</s> ':'')+'💰 '+it.price}</span>${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
@@ -246,15 +249,17 @@ function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();
  <div class="shelf potions"><div class="shlbl">Potions</div>${S.potions.map((it,i)=>icon(it,'potions',i,'potions',POTIONS[it.id])).join('')}</div>
  <div class="shelf svc"><button class="btn" id="scrub" onclick="shopRemove()" ${S.scrubbed||g<sp?'disabled':''}>✂️ Scrub a card<br>💰 ${sp}${S.scrubbed?' (used)':''}</button><button class="btn pri" id="leaveshop" onclick="goMap()">Leave ➜</button></div></div>`}
 // ---------------- camp / event / pick / misc ----------------
-function restScr(){return topBar()+`<div class="roomhead"><h2>🔥 Stairwell Camp</h2><div class="sub">The fire crackles. Choose one.</div></div><div class="campopts">${campOptions().map(o=>`<button class="btn camp${o.k==='mend'?' pri':''}" data-camp="${o.k}" onclick="campDo('${o.k}')"><b>${o.l}</b><span>${o.d}</span></button>`).join('')}</div>`}
-function eventScr(){const e=W.S.ev;return topBar()+`<div class="evpanel"><div class="evimg">${e.e}</div><div class="evtxt"><h2>${e.sub||e.n}</h2><p>${e.t}</p><div class="evopts">${e.o.map((o,i)=>`<button class="btn opt" onclick="evOpt(${i})" ${o.ok&&!o.ok()?'disabled':''}>${lbl(o)}</button>`).join('')}</div></div></div>`}
+const CAMP_EMO={mend:'❤️',temper:'⬆️',cook:'🍲',scour:'🪨',trawl:'⚓',annotate:'📘'};
+function restScr(){return topBar()+`<div class="roomhead"><h2>🔥 Stairwell Camp</h2><div class="sub">The fire crackles. Choose one.</div></div>${tilesRow(campOptions().map(o=>{const sp=splitLabel(o.l);return tileHTML({id:'camp-'+o.k,emoji:CAMP_EMO[o.k]||sp.emoji||'🔥',name:sp.name,sum:o.d,info:`${sp.name}: ${o.d}`,click:`campDo('${o.k}')`,cls:'k-camp'+(o.k==='mend'?' pri':''),tid:'camp-'+o.k})}),'camptiles')}`}
+function eventScr(){const e=W.S.ev;const opts=e.o.map((o,i)=>optionHTML(o,`evOpt(${i})`,{disabled:!!(o.ok&&!o.ok()),i}));
+ return topBar()+`<div class="evpanel"><div class="evimg">${emblemHTML('event-'+(e.id||'generic'),e.e,'scene')}</div><div class="evtxt"><h2>${e.sub||e.n}</h2><p>${e.t}</p></div></div>${tilesRow(opts,'evtiles')}`}
 function pickScr(){const S=W.S;const list=window.pickable(S.mode,S.filter);return topBar()+`<h2>${S.title}</h2>${S.mode==='upgrade'?'<div class="sub">Cards are shown with their upgrade (green).</div>':''}<div class="grid">${list.map(c=>cardHTML(S.mode==='upgrade'?{...c,up:true}:c,{click:`pickCard(${c.uid})`})).join('')}</div><div class="actions">${S.cancel?'<button class="btn full" id="pickcancel" onclick="pickCancel()">Cancel</button>':'<button class="btn full" id="pickskip" onclick="pickCancel()">Skip</button>'}</div>`}
-function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;return topBar()+`<h2>${S.title}</h2><div class="sub">Pick up to ${Math.min(3,free)} (free slots: ${free}).</div><div class="swaps">${S.ids.map((id,j)=>`<button class="btn opt${S.chosen.includes(j)?' on':''}" onclick="potPickToggle(${j})">${POTIONS[id].e} <b>${POTIONS[id].n}</b>: ${POTIONS[id].d}</button>`).join('')}</div><div class="actions"><button class="btn pri" id="potpickdone" onclick="potPickDone()">Done</button></div>`}
+function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;return topBar()+`<h2>${S.title}</h2><div class="sub">Pick up to ${Math.min(3,free)} (free slots: ${free}).</div>${tilesRow(S.ids.map((id,j)=>potionTile(id,{click:`potPickToggle(${j})`,on:S.chosen.includes(j)})),'pottiles')}<div class="actions"><button class="btn pri" id="potpickdone" onclick="potPickDone()">Done</button></div>`}
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
  return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${run.won?'🏆':'🪦'}</div><h1>${run.won?'Act 1 cleared!':'Defeated'}</h1><p class="sub">${run.won?`${K.e} ${K.n} silenced ${EN[run.boss].n}.`:`${K.e} ${K.n} fell on floor ${run.floor} of 15.`}</p>
  <div class="panel">Seed ${run.seed} · ${mins} min · Enemies ${run.kills} · Elites ${st.elites.reduce((a,b)=>a+b,0)} · Relics ${run.relics.length} · Deck ${run.deck.length} · Gold ${run.gold} · Biggest hit ${st.maxHit}</div><button class="btn pri full" id="restart" onclick="W.S={screen:'title'};render()">🔄 Play again</button></div>${lampSummaryHTML(sum)}</div>`}
 // ---------------- render ----------------
-export function render(){if(drag)return;const a=document.getElementById('app');let h='';const s=W.S.screen;
+export function render(){if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;
  if(s==='title')h=titleScr();
  else if(s==='travel')h=travelScr();
  else if(s==='map')h=`<div class="page mappage">`+topBar()+mapHTML(true)+'</div>';
@@ -274,7 +279,7 @@ export function render(){if(drag)return;const a=document.getElementById('app');l
   h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box"><h2>${t} (${list.length})</h2><div class="grid small">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div><button class="btn full">Close</button></div></div>`}
  if(inspecting)h+=inspectHTML();
  a.innerHTML=h;
- decorateKeywords(a);fitCards(a);
+ decorateCardRefs(a);decorateKeywords(a);fitCards(a);
  if(s==='combat')layoutHand();
  syncEnv();syncAudio();syncCombatAnimations();
  if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}

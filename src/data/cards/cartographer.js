@@ -20,7 +20,7 @@ K('cache',{e:'📦',wpGuard:1,d:'Waypoint: at the start of your turn, gain {3|4}
 // Cohesion pass: Lookout now draws 1 (it used to queue a Chart prompt every turn).
 K('lookout',{e:'🗼',d:'Waypoint: at the start of your turn, draw 1.{| Also apply 1 Soaked to the strongest enemy.}',wp:f=>{W.cb.wpDraw++;if(f.u){const t=strongest();if(t)addSt(t,'weak',1)}}});
 K('shortcut',{e:'🪜',d:'Draw the card at position {3|3 or 4} of your draw pile. It costs 0 this turn.',p:f=>{const cb=W.cb;const take=k=>{refill(k+1);if(cb.draw.length>k){const c=cb.draw.splice(k,1)[0];c.tmp0=true;cb.hand.push(c);log('🪜 Shortcut to '+cname(c))}else if(cb.draw.length){const c=cb.draw.pop();c.tmp0=true;cb.hand.push(c)}};
- refill(4);if(f.u&&cb.draw.length>3)f.choose('Shortcut: which card?',[{l:'#3 '+cname(cb.draw[2]),f:()=>take(2)},{l:'#4 '+cname(cb.draw[3]),f:()=>take(3)}]);else take(2)}});
+ refill(4);if(f.u&&cb.draw.length>3)f.choose('Shortcut: which card?',[{l:'#3 '+cname(cb.draw[2]),card:{id:cb.draw[2].id,up:cb.draw[2].up},cap:'#3 in the pile',f:()=>take(2)},{l:'#4 '+cname(cb.draw[3]),card:{id:cb.draw[3].id,up:cb.draw[3].up},cap:'#4 in the pile',f:()=>take(3)}]);else take(2)}});
 K('landslide',{e:'⛰️',d:'Deal {8|10} + 2 per Waypoint to ALL. <b>Expedition.</b>',p:f=>f.all(f.v(8,10)+2*f.wpCount())});
 K('watch',{e:'🏯',d:'Waypoint: at the start of your turn, apply 1 Exposed to a random enemy.',wp:f=>{const t=randAlive();if(t)addSt(t,'vuln',1)}});
 // v2.2 (data-v2.json `v22`): Waystation Advances another random Waypoint each turn (upgraded: you choose, after the draw).
@@ -28,7 +28,7 @@ K('waystation',{e:'🚉',d:'Waypoint: at the start of your turn, Advance another
  const ok=cb.slots.filter(x=>x!==w&&(x.rank||0)<CORE.carto.rank_max);if(!ok.length)return;
  if(!f.u||ok.length===1)return rankUp(pick(ok,'combat'),'Waystation');
  thisTurn({id:'waystation',on:{afterDraw(inst){if(inst.dead)return;inst.dead=true;const ok2=cb.slots.filter(x=>x!==w&&(x.rank||0)<CORE.carto.rank_max);if(!ok2.length)return;
-  choose('Waystation: Advance which Waypoint?',ok2.map(x=>({l:(CARDS[x.id].e||'')+' '+cname(x)+' (Rank '+(x.rank||0)+' → '+((x.rank||0)+1)+')',f:()=>rankUp(x,'Waystation')})))}}})}});
+  choose('Waystation: Advance which Waypoint?',ok2.map(x=>({l:(CARDS[x.id].e||'')+' '+cname(x)+' (Rank '+(x.rank||0)+' → '+((x.rank||0)+1)+')',card:{id:x.id,up:x.up,rank:x.rank},cap:'Rank '+(x.rank||0)+' → '+((x.rank||0)+1),f:()=>rankUp(x,'Waystation')})))}}})}});
 K('triang',{e:'📐',xu:0,d:'Trigger all your Waypoints.{ Sink.|}',p:f=>{const cb=W.cb;cb.wpDraw=0;[...cb.slots].forEach(trigWp);const d=cb.wpDraw;cb.wpDraw=0;if(d)drawCards(d)}});
 K('camp',{e:'🏰',wpGuard:1,d:'Waypoint: at the start of your turn, gain {5|6} Guard.',wp:f=>f.blk(f.v(5,6))});
 K('foreknow',{e:'🔮',d:'If the top card of your draw pile is an Attack, deal {6|9}. If it\'s a Skill, gain {6|9} Guard. Then draw it.',p:f=>{refill(1);const t=W.cb.draw[0];if(!t)return;const ty=CARDS[t.id].t;if(ty==='A')f.dmg(f.v(6,9));else if(ty==='S')f.blk(f.v(6,9));drawCards(1)}});

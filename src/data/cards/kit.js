@@ -31,7 +31,7 @@ export const lowest=()=>alive().sort((a,b)=>a.hp-b.hp)[0];
 export function destroyWp(f,title,then,{optional=false}={}){const c=W.cb;if(!c.slots.length){if(then)then(null);return}
  const go=i=>{const w=removeWp(i,'destroyed');if(w){log('💥 '+cname(w)+' destroyed');floatText('p','💥 '+CARDS[w.id].n,'')}if(then)then(w)};
  if(f.echo||c.ending||c.mode){go(pick([...c.slots.keys()],'combat'));return}
- if(optional){choose(title,[{l:'Keep my Waypoints',f:()=>{if(then)then(null)}},...c.slots.map((w,i)=>({l:'💥 Destroy '+(CARDS[w.id].e||'')+' '+cname(w)+((w.rank||0)?' (Rank '+w.rank+')':''),f:()=>go(i)}))]);return}
+ if(optional){choose(title,[{l:'🛡️ Keep my Waypoints: destroy nothing',tile:'choice-keep',f:()=>{if(then)then(null)}},...c.slots.map((w,i)=>({l:'💥 Destroy '+(CARDS[w.id].e||'')+' '+cname(w)+((w.rank||0)?' (Rank '+w.rank+')':''),card:{id:w.id,up:w.up,rank:w.rank},cap:'💥 Destroy'+((w.rank||0)?' · Rank '+w.rank:''),f:()=>go(i)}))]);return}
  pickSlot(title,go)}
 // A Waypoint gains +1 Rank outside the free Advance (Grand Expedition, Waystation): same feedback and 'advance' event.
 export function rankUp(w,why){const c=W.cb;if(!w||!c.slots.includes(w)||(w.rank||0)>=CA.rank_max)return false;w.rank=(w.rank||0)+1;c.stat.advances++;w.advT=Date.now();
