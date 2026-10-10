@@ -23,12 +23,12 @@
 .card>.art{left:7.2%;top:13.4%;width:85.6%;height:46.3%;border-radius:1.6cqw;box-shadow:0 0 0 .5cqw #05070b,0 0 0 .9cqw var(--trim2),0 0 0 1.3cqw #05070b,inset 0 0 3cqw #0009}
 .card>.art.ph-art{border-radius:1.6cqw}
 /* name banner across the top of the art, pointed ends, Cinzel */
-.card .name{left:15%;width:82%;top:3.6%;height:8.4%;padding:0 3.2%;clip-path:polygon(0 18%,3% 0,97% 0,100% 18%,100% 82%,97% 100%,3% 100%,0 82%);
+.card .name{left:15%;width:82%;top:3.6%;height:8.4%;padding:0 5%;clip-path:polygon(0 18%,3% 0,97% 0,100% 18%,100% 82%,97% 100%,3% 100%,0 82%);
  background:linear-gradient(180deg,#fff3 0,#0000 28%),linear-gradient(180deg,color-mix(in srgb,var(--tc) 60%,#1b222c),#0b0e14);
  font:700 max(10px,calc(var(--nf,11cqw)*.66))/1 var(--font-display);letter-spacing:-.01em;color:#f4eddc;text-shadow:0 1px 1px #000,0 0 3px #000}
 .card .name::before{content:"";position:absolute;inset:0;clip-path:inherit;border-bottom:.45cqw solid var(--trim);border-top:.25cqw solid #fff4;pointer-events:none}
 .card .name .up{color:#8ff0b4;margin-left:.1em}
-.card.nocost .name{left:8%;width:84%}
+.card.nocost .name{left:8%;width:84%;padding:0 3.2%}
 /* cost gem: faceted, glowing */
 .card .cost{left:11%;top:8.6%;width:15.5cqw;height:15.5cqw;z-index:3;border-radius:50%;
  background:radial-gradient(circle at 34% 28%,#fff9 0 8%,transparent 24%),radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--gem) 80%,#fff 12%),var(--gem) 45%,color-mix(in srgb,var(--gem) 40%,#000) 100%);

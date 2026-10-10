@@ -704,11 +704,10 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
  .fit-shop .shelf.cards .shopitem{flex:1 1 0;min-width:0;width:auto}
  .fit-shop .shelf.cards .shlbl{flex:none}
 }
-/* Grown rules cover the frame's type band, so the label rides the top of the panel instead of disappearing. */
-.card.grown .type{display:flex!important;z-index:4;top:var(--tt,62%);height:12px;background:#121820f2;font-size:max(10px,5.2cqw)!important;line-height:12px}
-.card.grown .text{padding-top:13px}
-.insp .card .text{font-size:max(15px,var(--tf,8cqw))!important}
-.shopitem .card .name{font-size:max(12px,var(--nf,12px))!important}
+/* Text areas stay inside their printed frame bounds at every card size. */
+.card .name,.card .cost,.card .type,.card .text{box-sizing:border-box;min-width:0;min-height:0}
+.card .type{white-space:nowrap;line-height:1}
+.card .text>span{max-width:100%;overflow-wrap:anywhere}
 .combat .intentw .intent .debn .deb{font-size:13px;letter-spacing:.01em;color:#e4d4ff}
 /* map_a1 parchment sheet strip (2100x1440 @2x) tiling vertically behind the scrolling chart */
 .mappage .parch{background:radial-gradient(ellipse at 50% 50%,transparent 60%,#3a2a1866 100%),var(--map-sheet,none) center top/100% auto repeat-y,linear-gradient(170deg,#f5ead0,var(--ui-parchment) 40%,#e2d0a6)}

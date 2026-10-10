@@ -37,9 +37,9 @@ function cardArtHTML(id,d,full){if(assetEntry('cards',id))return slotHTML('cards
 const plain=h=>String(h).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
 function restLineHTML(ci,d){const t=plain(d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci));if(!t)return'';const first=(t.match(/^[^.]*\.?/)||[t])[0];
  return `<span class="rline" data-full="${esc(t)}" data-first="${esc(first)}">${esc(t)}</span>`}
-// Name size at rest: fits the frame's title plate (74.8% of the card) — long names shrink, never below 9.5cqw.
-const nameFit=n=>Math.max(11,Math.min(12.5,74/(Math.max(6,n.length)*.53))); // floor ~10px at rest in the hand; fitCards() condenses longer names
-// Rules text size: as large as fits the dark text panel; the lift scale makes it >= 15 CSS px on screen when touched.
+// Preferred title size; the measured fitter handles the final frame dimensions.
+const nameFit=n=>Math.max(11,Math.min(12.5,74/(Math.max(6,n.length)*.53))); // fitCards() shrinks longer names within the plate
+// Preferred rules size; fitCards() keeps the complete text inside the rules panel.
 export const textFit=t=>{const len=String(t).replace(/<[^>]+>/g,'').length;return Math.max(5.8,Math.min(9.6,60/Math.sqrt(Math.max(20,len))))};
 // Collector line: "DS 042/173" = set mark + stable number among all cards (registry order) / total.
 const SETMARK={tide:'TC',echo:'EM',carto:'CA',duel:'DU'};let setIdx=null;
@@ -301,27 +301,36 @@ export function render(){if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))re
  if(s==='combat')layoutHand();
  syncEnv();syncAudio();syncCombatAnimations();
  if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
-// Measure-and-fit every rendered card face. Names condense (scaleX >= .62) instead of dropping below 10px.
-// Rules text never goes under 10px CSS in the hand, 11px off the hand, or 15px in the inspector. If it still overflows,
-// .tight tightens the leading and the dark panel grows up over the art. A resting hand card shows one 10px rules line
-// when that line fits; otherwise the line reads "Tap to read" and a tap lifts the card instantly.
-export function fitCards(root=document){for(const c of root.querySelectorAll('.card')){const n=c.querySelector('.name>.nmi');
-  if(n){n.style.transform='';const Wn=n.parentNode.clientWidth-2,w=n.offsetWidth;if(Wn>0&&w>Wn)n.style.transform=`scaleX(${Math.max(.5,Wn/w).toFixed(3)})`}
-  const rl=c.querySelector('.rline');if(rl){rl.classList.remove('nofit','covered')}
-  const t=c.querySelector('.text');if(t&&t.clientHeight){t.classList.remove('tight');t.style.top='';t.style.height='';c.classList.remove('grown');c.style.removeProperty('--tt');
-   const cw=Math.max(1,c.clientWidth);const floorPx=c.closest('.insp')?15:c.closest('.hand')?10:11;const minTf=floorPx/cw*100;
-   let tf=parseFloat(t.style.getPropertyValue('--tf'))||7.5;if(tf<minTf){tf=minTf;t.style.setProperty('--tf',tf.toFixed(2)+'cqw')}
-   const over=()=>t.scrollHeight>t.clientHeight+1;
-   if(over()){for(let k=0;k<24&&over()&&tf>minTf+0.04;k++){tf=Math.max(minTf,tf-.25);t.style.setProperty('--tf',tf.toFixed(2)+'cqw')}
-    if(over())t.classList.add('tight');
-    // 13.4% clears the name plate (ends ~11.7%) and the cost gem. Each step gives the rules 1.5% more of the card
-    // and keeps the panel's bottom edge put. A last squeeze of leading stays at the 10px floor.
-    for(let k=1;k<=40&&over();k++){const top=Math.max(13.4,68.571-k*1.5);t.style.top=top+'%';t.style.height=(94.857-top)+'%';c.classList.add('grown');c.style.setProperty('--tt',top+'%');if(top<=13.4)break}
-    if(over()){t.style.lineHeight='1';t.style.letterSpacing='-.015em'}}}
-  if(rl&&rl.offsetWidth){const Wr=rl.clientWidth;const fits=()=>rl.scrollWidth<=Wr+1;
-   rl.textContent=rl.dataset.full||'';if(!fits()){rl.textContent=rl.dataset.first||'';if(!fits()){rl.textContent='Tap to read';rl.classList.add('nofit');if(!fits())rl.textContent='Tap'}}}
-  if(rl&&c.classList.contains('grown')&&t){const cr=c.getBoundingClientRect();const vis=(innerHeight-cr.top)/Math.max(1,cr.height)*100;if(parseFloat(t.style.top)<vis-1)rl.classList.add('covered')}}}
+// Fit text within the printed frame areas; never grow a panel into the illustration.
+export function fitCards(root=document){for(const c of root.querySelectorAll('.card')){
+  const transform=c.style.transform,transition=c.style.transition;c.style.transition='none';c.style.transform='none';
+  c.classList.remove('grown');c.style.removeProperty('--tt');
+  for(const selector of ['.name','.cost','.type','.text']){
+    const box=c.querySelector(selector);if(!box||!box.clientHeight)continue;
+    box.style.removeProperty('font-size');box.style.removeProperty('line-height');
+    box.style.removeProperty('letter-spacing');box.style.top='';box.style.height='';
+    box.classList.remove('tight');
+    const child=box.firstElementChild;
+    if(selector==='.name'&&child)child.style.transform='';
+    const style=getComputedStyle(box),px=parseFloat(style.fontSize);
+    const width=box.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+    const height=box.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
+    const fits=()=>{const range=document.createRange();range.selectNodeContents(box);
+      const rects=[...range.getClientRects()],r=box.getBoundingClientRect();
+      const sx=r.width/box.offsetWidth,sy=r.height/box.offsetHeight;
+      return box.scrollWidth<=box.clientWidth+1&&box.scrollHeight<=box.clientHeight+1&&
+        rects.every(q=>q.width<=width*sx+.5&&q.height<=height*sy+.5&&q.top>=r.top+parseFloat(style.paddingTop)*sy-.5&&q.bottom<=r.bottom-parseFloat(style.paddingBottom)*sy+.5);
+    };
+    let lo=.5,hi=px;
+    if(!fits()){for(let i=0;i<14;i++){const mid=(lo+hi)/2;box.style.setProperty('font-size',mid+'px','important');if(fits())lo=mid;else hi=mid}
+      box.style.setProperty('font-size',lo+'px','important');}
+  }
+  c.style.transform=transform;c.style.transition=transition;
+  const rl=c.querySelector('.rline');if(rl&&rl.offsetWidth){rl.classList.remove('nofit','covered');rl.textContent=rl.dataset.full||'';
+    if(rl.scrollWidth>rl.clientWidth+1){rl.textContent=rl.dataset.first||'';if(rl.scrollWidth>rl.clientWidth+1){rl.textContent='Tap to read';rl.classList.add('nofit')}}}
+}}
 if(typeof document!=='undefined'&&document.fonts)document.fonts.ready.then(()=>{const a=document.getElementById('app');if(a){fitCards(a);if(document.getElementById('hand'))layoutHand()}});
+if(typeof window!=='undefined'){let resizeFrame;window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{fitCards(document);layoutHand()})})}
 // ===== long-press (or right-click) to enlarge any card =====
 export let inspecting=null;
 export function openInspect(ci){inspecting=ci;render()}
