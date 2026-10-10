@@ -2,7 +2,7 @@
 // Rules: modal choices are centred over the empty middle of the battlefield (css .ov.battle); tooltips and detail
 // panels pick the candidate spot beside their anchor that covers the fewest combatants / HP + status plates / intents /
 // resting hand / End Turn / class display. Nothing is ever placed over those if any free spot exists.
-const OBST='.combat .fig>.slot>img.spr,.combat .fig>.sprph,.combat .plate,.combat .intentw,.combat .hand .card:not(.sel),.combat .ctl,.combat .topbar,.combat .dais';
+const OBST='.combat .fig>.slot>img.spr,.combat .fig>.sprph,.combat .plate,.combat .intentw,.combat .hand .card:not(.sel),.combat .ctl button,.combat .ctl .pile,.combat .topbar,.combat .dais';
 const inter=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
 export function obstacles(skip){if(!document.querySelector('.combat'))return [];
  return [...document.querySelectorAll(OBST)].filter(e=>!(skip&&(e===skip||(e.classList.contains('dais')&&e.contains(skip))))).map(e=>e.getBoundingClientRect()).filter(r=>r.width>2&&r.height>2)}
@@ -20,16 +20,6 @@ export function pickSpot(w,h,anchor,anchorEl){const W=innerWidth,H=innerHeight,m
  return best}
 // Put the in-scene detail panel (selected-card / enemy inspect) in the free middle, clear of every combatant.
 export function placeDetail(){const t=document.getElementById('detail');if(!t||!document.querySelector('.combat'))return;
- // Dedicated play shelf above the right-hand controls, outside the fan and
- // below all combatant panels. Its position never depends on the selected card.
- if(t.querySelector('#playbtn')){
-  const w=188,x=innerWidth-w-6,y=Math.round(innerHeight*.67);
-  const controls=[...document.querySelectorAll('.combat .ctl button')].map(e=>e.getBoundingClientRect()).filter(r=>r.right>x);
-  const bottom=Math.min(innerHeight-6,...controls.map(r=>r.top))-5;
-  const parent=t.offsetParent?.getBoundingClientRect()||{left:0,top:0};
-  Object.assign(t.style,{left:(x-parent.left)+'px',top:(y-parent.top)+'px',right:'auto',width:w+'px',maxWidth:w+'px',maxHeight:Math.max(48,bottom-y)+'px',overflow:'auto'});return;
- }
-
  t.style.left='0px';t.style.top='0px';t.style.right='auto';const r=t.getBoundingClientRect(),sc=t.offsetParent?t.offsetParent.getBoundingClientRect():{left:0,top:0};
  const hero=document.querySelector('.combat .hero .fig'),en=[...document.querySelectorAll('.combat .en .fig')];
  const hr=hero?hero.getBoundingClientRect():null,er=en.map(e=>e.getBoundingClientRect());

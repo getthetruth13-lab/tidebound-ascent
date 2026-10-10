@@ -2,6 +2,7 @@
 // Ordering contract: design/content-impl-plan.md §2 ("Turn / play ordering contract"). Rule numbers: DATA.v21.sim.core.
 import {CARDS,EN,POTIONS} from '../core/registry.js';
 import {W,nextId,pick,rng,shuffle,R} from '../core/state.js';
+import {spriteCount} from '../assets.js';
 import {cname,cost,desc,isEx,isUp,isX,mk,needsTarget,plain} from './cards.js';
 import {runCard} from './effects.js';
 import {fire,mod,thisTurn} from '../core/bus.js';
@@ -41,7 +42,8 @@ export function tick(st,hold){['weak','vuln','brittle','drench','reson'].forEach
 // ================= enemies =================
 export function spawn(key,o={}){const t=EN[key];const hp=rng(t.hp[0],t.hp[1],cs);
  const e={key,n:t.n,e:t.e,hp,max:hp,block:t.b0||0,st:Object.assign({},t.st0||{}),t:0,ci:0,ph:1,uid:nextId(),elite:t.elite,boss:t.boss,summoned:!!o.summoned,passive:t.passive||null};
- e.k=W.cb.ens.filter(x=>x.key===key).length;W.cb.ens.push(e);e.next=t.ai(e);if(t.onSpawn)t.onSpawn(e);return e}
+ e.k=W.cb.ens.filter(x=>x.key===key).length;if(t.randomSprite){const nv=spriteCount('enemies',key);if(nv>1)e.sv=R(nv,'sprites')} // own stream: never shifts combat rolls
+ W.cb.ens.push(e);e.next=t.ai(e);if(t.onSpawn)t.onSpawn(e);return e}
 export function countAlive(key){return alive().filter(x=>x.key===key).length}
 // ================= combat start =================
 export function startCombat(kind,enc,opts={}){
@@ -226,8 +228,9 @@ export function tideAct(a){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  if((a==='up'||a==='down')&&hasRelic('tidetable')&&!cb.tideBtnUsed){cb.tideBtnUsed=true;flash(relic('tidetable'));tideShift(a==='up'?1:-1,'relic');return after()}
  if(a==='flip'&&hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir){cb.wheelUsed=true;cb.tideDir=-cb.tideDir;flash(relic('helmwheel'));log('☸️ Helmsman\'s Wheel: drift arrow flipped');return after()}}
 export function canPlay(ci){const cb=W.cb;const d=CARDS[ci.id];if(!d||cb.busy||cb.mode||d.unplay)return false;if(cost(ci)>cb.energy)return false;if(d.req&&!d.req(F(ci,{})))return false;return mod('canPlay',{card:ci},true)}
-export function tapCard(i){const cb=W.cb;if(cb.busy||cb.mode)return;if(cb.sel===i)return playCard(i);cb.sel=i;cb.insp=null;render()}
-export function playSel(){if(W.cb.sel!=null)playCard(W.cb.sel)}
+export function tapCard(i){const cb=W.cb;if(cb.busy||cb.mode)return;cb.sel=i;cb.insp=null;render()}
+// Retained for old debug callers; only the drag release UI commits a card.
+export function playSel(){}
 // UI toggles for the active class choices (applied to the next card you play)
 export function armFlourish(){const cb=W.cb;if(!cb||cb.busy)return;cb.armFlourish=!cb.armFlourish&&cb.mom>=flourishMin();render()}
 export function armMark(){const cb=W.cb;if(!cb||cb.busy||!canMark())return;cb.armMark=!cb.armMark;render()}

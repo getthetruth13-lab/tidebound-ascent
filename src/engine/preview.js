@@ -15,11 +15,11 @@ export function previewCard(i,target=W.cb?.tgt,opts={}){
   W.previewing=true;W.cb.tgt=target;
   if(!canPlay(W.cb.hand[i]))return null;
   const before=W.cb.ens.map(e=>({uid:e.uid,hp:e.hp,block:e.block,st:{...e.st}}));
-  const guard=W.cb.p.block,st={...W.cb.p.st};
+  const playerHp=W.run.hp,guard=W.cb.p.block,st={...W.cb.p.st};
   playCard(i,{...opts});if(W.cb.previewEndTurn)endTurn();
   const delta=(a,b)=>Object.fromEntries(Object.entries(b).filter(([k,n])=>n>(a[k]||0)).map(([k,n])=>[k,n-(a[k]||0)]));
   return {enemies:before.map(e=>{const after=W.cb.ens.find(a=>a.uid===e.uid)||e;
    return {uid:e.uid,hp:e.hp,max:after.max,loss:Math.max(0,e.hp-after.hp),guardLoss:Math.max(0,e.block-after.block),lethal:after.hp<=0,statuses:delta(e.st,after.st)};
-  }),guard:Math.max(0,W.cb.p.block-guard),statuses:delta(st,W.cb.p.st),pending:!!W.cb.mode};
+  }),playerHp:W.run.hp,playerLoss:Math.max(0,playerHp-W.run.hp),playerHeal:Math.max(0,W.run.hp-playerHp),guard:Math.max(0,W.cb.p.block-guard),statuses:delta(st,W.cb.p.st),pending:!!W.cb.mode};
  }finally{restore()}
 }

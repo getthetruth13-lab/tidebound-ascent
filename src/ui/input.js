@@ -13,7 +13,7 @@ let lp=null,eatClick=false;
 function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))return W.cb.hand[+i];const uid=+el.dataset.uid;const piles=W.cb?[W.cb.hand,W.cb.draw,W.cb.disc,W.cb.exh,W.cb.slots]:[];if(W.run)piles.push(W.run.deck);const live=uid>0?piles.flat().find(c=>c&&c.uid===uid&&c.id===el.dataset.id):null;return {...live,id:el.dataset.id,uid,up:el.dataset.up==='1'}}
 export const cancelLongPress=()=>{if(lp){clearTimeout(lp.t);lp=null}clearTimeout(hh);hh=0};
 let hh=0,holdTouch=false;
-function inspectNow(el,touch){clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);drag=null}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el))}
+function inspectNow(el,touch){clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el))}
 document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}const any=ev.target.closest&&ev.target.closest('.card');if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,ev.pointerType==='touch'||ev.pointerType==='pen')},LONGPRESS_MS)}},true);
@@ -28,25 +28,54 @@ document.addEventListener('pointerout',ev=>{if(ev.pointerType==='mouse'&&(!ev.re
 document.addEventListener('click',ev=>{if(eatClick){eatClick=false;ev.stopPropagation();ev.preventDefault()}},true);
 document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
 document.addEventListener('pointerdown',ev=>{const c=ev.target.closest&&ev.target.closest('.hand .card');if(!c||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;
- if(ev.button!=null&&ev.button>0)return;drag={el:c,i:+c.dataset.i,x0:ev.clientX,y0:ev.clientY,id:ev.pointerId,moved:false,bx:+c.dataset.x||0,by:+c.dataset.y||0};
+ if(ev.button!=null&&ev.button>0)return;rafPending=null;drag={el:c,i:+c.dataset.i,x0:ev.clientX,y0:ev.clientY,id:ev.pointerId,moved:false,bx:+c.dataset.x||0,by:+c.dataset.y||0};
  peekCard(c);
  try{c.setPointerCapture(ev.pointerId)}catch(_){}});
 export let rafPending=null;
 document.addEventListener('pointermove',ev=>{const d=drag;if(!d||ev.pointerId!==d.id)return;if(d.moved)ev.preventDefault();rafPending=ev;if(d.raf)return;d.raf=requestAnimationFrame(()=>{d.raf=0;if(drag===d&&rafPending)dragMove(d,rafPending)})},{passive:false});
-export function dragMove(d,ev){const dx=ev.clientX-d.x0,dy=ev.clientY-d.y0;
- if(!d.moved){if(dy>-38){scrubAt(ev.clientX);return}clearPeek();cancelLongPress();d.moved=true;d.el.classList.remove('sel');d.el.classList.add('drag');W.cb.sel=null;const t=document.getElementById('detail');if(t)t.remove()}
- d.el.style.transform=`translate(${d.bx+dx}px,${d.by+dy+(+d.el.dataset.ly||0)*.6}px) scale(${Math.max(1.12,(+d.el.dataset.zl||1.2)*.75).toFixed(3)})`;
- const ci=W.cb.hand[d.i];const en=enemyAt(ev.clientX,ev.clientY);showOutcome(d.i,en==null?W.cb.tgt:en);document.querySelectorAll('.en.hot').forEach(x=>x.classList.remove('hot'));
- const handTop=document.getElementById('hand').getBoundingClientRect().top;const up=ev.clientY<handTop-20;
- if(ci&&needsTarget(ci)){if(en!=null)document.querySelector(`.en[data-en="${en}"]`).classList.add('hot');document.querySelector('.foes').classList.toggle('armed',en==null&&up)}
- d.el.classList.toggle('armed',ci&&(needsTarget(ci)?en!=null:up))}
-export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)return;drag=null;clearPeek();if(d.raf)cancelAnimationFrame(d.raf);
+function clearTargets(){document.querySelectorAll('.drop-valid,.drop-invalid,.drop-over,.en.hot,.foes.armed').forEach(e=>e.classList.remove('drop-valid','drop-invalid','drop-over','hot','armed'));clearOutcome()}
+function dropTarget(ci,x,y){
+ const upper=y>48&&y<innerHeight*.65;
+ const blocked=document.elementsFromPoint(x,y).some(e=>e.closest?.('.topbar,.dais,.ctl button,.ov,.pop'));
+ if(blocked)return null;
+ if(needsTarget(ci)){
+  const en=enemyAt(x,y);if(en!=null&&W.cb.ens[en]?.hp>0&&!W.cb.ens[en].fled)return en;
+  const live=alive();if(live.length===1){const el=document.querySelector(`.en[data-en="${W.cb.ens.indexOf(live[0])}"]`),r=el.getBoundingClientRect();
+   if(upper||(x>=r.left-45&&x<=r.right+45&&y>=r.top-45&&y<=r.bottom+45&&y<innerHeight*.72))return W.cb.ens.indexOf(live[0]);}
+  return null;
+ }
+ const hero=document.querySelector('.hero').getBoundingClientRect();
+ return upper||(x>=hero.left-45&&x<=hero.right+45&&y>=hero.top-45&&y<=hero.bottom+45&&y<innerHeight*.72)?'hero':null;
+}
+export function dragMove(d,ev){const dy=ev.clientY-d.y0;
+ d.x=ev.clientX;d.y=ev.clientY;
+ if(!d.moved){if(dy>-24){scrubAt(ev.clientX);return}clearPeek();cancelLongPress();d.moved=true;d.el.classList.remove('sel');d.el.classList.add('drag');W.cb.sel=null;W.cb.insp=null;const t=document.getElementById('detail');if(t)t.remove()}
+ // Keep the painted card beside the pointer so the aimed-at HP/intent remains visible.
+ const scale=Math.max(1.12,(+d.el.dataset.zl||1.2)*.75),cw=d.el.offsetWidth,ch=d.el.offsetHeight;
+ const hand=document.getElementById('hand').getBoundingClientRect();
+ const cx=ev.clientX>innerWidth*.5?ev.clientX-cw*scale/2-45:ev.clientX+cw*scale/2+45;
+ const x=Math.max(cw*scale/2+4,Math.min(innerWidth-cw*scale/2-4,cx));
+ const y=Math.max(ch*scale/2+44,Math.min(innerHeight-ch*scale/2-8,ev.clientY-40));
+ const baseY=hand.bottom-(parseFloat(getComputedStyle(d.el).bottom)||0)-ch/2;
+ d.el.style.transform=`translate(${x-hand.left-hand.width/2}px,${y-baseY}px) scale(${scale.toFixed(3)})`;
+ const ci=W.cb.hand[d.i];clearTargets();if(!ci)return;
+ const playable=canPlay(ci),target=playable?dropTarget(ci,d.x,d.y):null,nt=needsTarget(ci);
+ document.querySelectorAll('.en').forEach(e=>e.classList.add(playable&&nt&&W.cb.ens[+e.dataset.en].hp>0&&!W.cb.ens[+e.dataset.en].fled?'drop-valid':'drop-invalid'));
+ const hero=document.querySelector('.hero');hero.classList.add(playable&&!nt?'drop-valid':'drop-invalid');
+ if(target!=null){const el=target==='hero'?hero:document.querySelector(`.en[data-en="${target}"]`);el.classList.add('drop-over');if(target!=='hero')el.classList.add('hot');showOutcome(d.i,target==='hero'?W.cb.tgt:target)}
+ d.el.classList.toggle('armed',target!=null);
+}
+export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)return;
+ if(d.raf)cancelAnimationFrame(d.raf);
+ // Pointer release can arrive before the queued animation-frame move.
+ if(!cancel&&rafPending&&rafPending.pointerId===d.id)dragMove(d,rafPending);
+ drag=null;rafPending=null;clearPeek();clearTargets();eatClick=true;
  if(cancel||!W.cb){if(W.cb)render();return}
  if(!d.moved)return tapCard(d.i);
- const ci=W.cb.hand[d.i];const en=enemyAt(ev.clientX,ev.clientY);const handTop=document.getElementById('hand').getBoundingClientRect().top;const up=ev.clientY<handTop-20;
- if(ci&&canPlay(ci)){if(needsTarget(ci)){let t=en;if(t==null&&up&&alive().length===1)t=W.cb.ens.indexOf(alive()[0]);if(t!=null&&W.cb.ens[t].hp>0){W.cb.tgt=t;return playCard(d.i)}}
-  else if(up)return playCard(d.i)}
- render()}
+ const ci=W.cb.hand[d.i],target=ci&&canPlay(ci)?dropTarget(ci,ev.clientX,ev.clientY):null;
+ if(target!=null){if(target!=='hero')W.cb.tgt=target;return playCard(d.i)}
+ render();
+}
 document.addEventListener('pointerup',ev=>endDrag(ev,false));
 document.addEventListener('pointercancel',ev=>endDrag(ev,true));
 addEventListener('resize',()=>{if(W.S.screen==='combat'&&!drag)requestAnimationFrame(()=>render())});// figure positions are viewport px

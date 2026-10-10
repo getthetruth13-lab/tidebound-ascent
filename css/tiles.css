@@ -181,3 +181,33 @@
 .battle .chartrow .cards{gap:6px}
 .battle .chartbox .csub{font-size:11px}
 .battle .tilebox .tart{max-width:100%}
+
+.battle .tcap{font-size:10px;line-height:1.2;text-align:center;max-width:100%;overflow-wrap:anywhere}
+.combat .ov.battle .box.chartbox{--choice-card:min(150px,calc((52dvh - 150px)*5/7))}
+.battle .tilebox .opt{margin-top:0}
+/* Content-sized choice windows; readable real cards, never a full-width empty frame. */
+.combat .ov.battle{height:auto;max-height:calc(100dvh - 150px);padding:8px;background:none}
+.combat .ov.battle .box.tilebox,.combat .ov.battle .box.chartbox{width:fit-content;min-width:0;max-width:calc(100vw - 32px);max-height:none;--choice-art:clamp(64px,14vh,100px);--choice-card:min(132px,calc((100dvh - 250px)*5/7))}
+.battle .tilebox .tile{flex:0 1 180px;width:180px}
+.battle .tilebox .tcard{flex:none;--gw:var(--choice-card)}
+.battle .chartrow{--gw:min(132px,calc((100dvh - 280px)*5/7))}
+.battle .tilebox .tiles{max-width:calc(100vw - 60px)}
+.battle .tilebox .tart .slot>img{object-fit:contain;object-position:center}
+/* Other floating windows and event panels use their content's intrinsic width. */
+body .pop{width:fit-content;max-width:min(440px,92vw)}
+.fit-event .evpanel{width:fit-content;max-width:min(820px,94vw)}
+.tart .slot>.ph{background:transparent}
+/* Codex 19 additions: bigger art slots, tide label fit, menu layering */
+.evpanel .evimg .emb{width:min(40vw,calc((100dvh - 270px)*1.5));height:auto;aspect-ratio:3/2;min-width:128px;--ta:min(120px,calc((100dvh - 270px)*.8))}
+.travel .ferry .emb{width:96px;height:96px;font-size:44px}
+.travel .ferry{max-width:min(620px,90vw)}
+.tg-lbl{max-width:100%;overflow:hidden;font-size:8px}.tg-lbl b{font-size:7.5px;letter-spacing:0;overflow:hidden;text-overflow:clip}.tg-lbl i{display:block;white-space:normal}
+.lp-tower:has(>.ml-art) svg{position:relative;z-index:2;filter:none}
+.lp-tower:has(>.ml-art)>.ml-art{z-index:1}
+.lp-tower:has(>.ml-art) svg path,.lp-tower:has(>.ml-art) svg rect:not(.lit):not(.glint){display:none}
+.ml-steps>.ml-layer .ml-art{object-position:center bottom}
+.shop-wren{position:absolute;right:4px;bottom:0;height:min(46vh,220px);aspect-ratio:2/3;pointer-events:none;z-index:0;display:none}
+.shop-wren .emb{width:100%;height:100%;background:none;border:0;box-shadow:none}
+.shop-wren:has(img){display:block}
+@media (min-width:1200px){.shop-wren{height:min(52vh,420px)}}
+.tg-side{width:32px}.dais-tide .dais-body{gap:3px}

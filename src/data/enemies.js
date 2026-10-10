@@ -28,7 +28,7 @@ registerEnemies({
  eel:{n:'Twin Eel',e:'🐍',hp:hp('eel'),elite:1,ai:e=>(e.t+e.k)%2?{b:8,lbl:'Coil'}:{a:12,lbl:'Strike'},
   onDeath:e=>{alive().filter(x=>x.key==='eel').forEach(x=>{addSt(x,'str',3);log('🐍 The other eel rages: +3 Might')})}},
  // ---- bosses (Act 1 pool: 1 of 2, chosen per run and shown on the map) ----
- bell:{n:'The Leviathan Bell',e:'🔔',hp:hp('bell'),boss:1,
+ bell:{n:'The Leviathan Bell',e:'🔔',hp:hp('bell'),boss:1,randomSprite:1,
   ai:e=>{const P=e.ph===2?[{a:22,lbl:'Crack'},{a:10,ring:2,lbl:'Shatter Wave'},{a:18,s:V.bell.toll_might,lbl:'Toll'}]:[{a:18,s:V.bell.toll_might,lbl:'Toll'},{a:6,h:3,lbl:'Reverberate'},{b:15,w:2,lbl:'Deep Hum'}];return P[(e.ci++)%3]},
   // Phase 2 at <= 80 HP: clears debuffs, +2 Might, and starts on Crack — even when it cracks during its own turn (Parry; Playtester bug 2).
   onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.next=EN_bell().ai(e);if(W.cb.acting===e)e.keepNext=true;

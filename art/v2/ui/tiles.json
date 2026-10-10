@@ -694,6 +694,15 @@
    "desc": "End screen banner, a single lantern burning on in the dark (loss)",
    "ready": false
   },
+  "shop-wren": {
+   "path": "art/v2/ui/tiles/shop-wren.webp",
+   "size": [
+    400,
+    600
+   ],
+   "desc": "Wren, Quartermaster of the Driftwood Bazaar, full figure on mid-grey (cutout), shown at the right of the shop",
+   "ready": false
+  },
   "lore-ferryman": {
    "path": "art/v2/ui/tiles/lore-ferryman.webp",
    "size": [

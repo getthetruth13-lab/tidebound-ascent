@@ -40,8 +40,8 @@ export const ASSETS={
  figures:{tide:V+'sprites/tidecaller.webp',echo:V+'sprites/echo-mage.webp',carto:V+'sprites/cartographer.webp',duel:V+'sprites/duelist.webp'},
  enemies:{slug:win('brine-slug'),gull:win('gull-thief','50% 35%'),knight:win('rust-knight','50% 35%'),pod:win('spore-pod'),wisp:win('glimmer-wisp','50% 40%'),
   crab:win('coral-crab','50% 55%'),captain:win('drowned-captain','50% 30%'),warden:win('mirror-warden','50% 35%'),eel:win('twin-eels'),
-  // Bell: transparent v2 sprite (art/v2/sprites/leviathan-bell.webp), contained in its window.
-  bell:{src:'art/v2/sprites/leviathan-bell.webp',fit:'contain',pos:'50% 60%'}},
+  // Bell (The Knell): map boss node always uses variant A (art/v2/sprites/knell-a.webp), contained in its window.
+  bell:{src:'art/v2/sprites/knell-a.webp',fit:'contain',pos:'50% 60%'}},
  cards:{},
  // Card-art placeholders until per-card art exists: the class card painting cropped 4:3 into the frame's art window.
  cardPH:Object.fromEntries([['tide','tidecaller'],['echo','echo-mage'],['carto','cartographer'],['duel','duelist'],['curse','curse'],['status','status'],['colorless','colorless']]
@@ -49,7 +49,7 @@ export const ASSETS={
  // Battle sprites (ids in data/sprites.js, generated from art/v2/sprites/sprites.json). Enemies without a sprite file use a placeholder.
  sprites:{figures:{tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist'},
   enemies:{slug:'brine-slug',gull:'gull-thief',knight:'rust-knight',pod:'spore-pod',wisp:'glimmer-wisp',crab:'coral-crab',captain:'drowned-captain',
-   warden:'mirror-warden',eel:['twin-eels-a','twin-eels-b'],bell:'leviathan-bell',leech:'tide-leech',lurker:'kelp-lurker',tendril:'kelp-tendril',matriarch:'kelp-matriarch'}},
+   warden:'mirror-warden',eel:['twin-eels-a','twin-eels-b'],bell:['knell-a','knell-b'],leech:'tide-leech',lurker:'kelp-lurker',tendril:'kelp-tendril',matriarch:'kelp-matriarch'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.
@@ -69,6 +69,9 @@ export function assetEntry(group,key){const g=ASSETS[group];let v=g&&g[key];if(!
  if(typeof v==='string')v={src:v};else if(Array.isArray(v))v={src:v[0],srcset:v.map((s,i)=>`${s} ${i+1}x`).join(', ')};
  return {src:v.src,srcset:v.srcset||'',sizes:v.sizes||'',fit:v.fit||FIT_DEFAULT[group]||'cover',pos:v.pos,win:!!v.win}}
 // Battle sprite for a class (group 'figures') or enemy key; idx picks between variants (Twin Eels a/b). null = no sprite file.
+// Sprite variants: an array of ids = variants. Index comes from e.sv (random per encounter, set in spawn() for
+// enemies with randomSprite:1, seeded 'sprites' RNG stream) or else the instance index (e.g. twin eels A/B).
+export function spriteCount(group,key){const id=ASSETS.sprites[group]&&ASSETS.sprites[group][key];return Array.isArray(id)?id.length:1}
 export function spriteFor(group,key,idx=0){let id=ASSETS.sprites[group]&&ASSETS.sprites[group][key];if(Array.isArray(id))id=id[idx%id.length];const m=id&&SPRITES[id];return m?{id,...m}:null}
 export {SPRITE_BASELINE};
 // An icon from a group (hud / status) with an emoji fallback when the slot is empty or the file fails.

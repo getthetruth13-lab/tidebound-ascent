@@ -903,7 +903,7 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 /* modal choices: centred over the empty middle of the battlefield, lighter backdrop so combatants stay visible */
 .combat .ov.battle{position:absolute;inset:auto 0 0;background:linear-gradient(transparent,#0008);align-items:flex-end;padding:6px;height:52%;box-sizing:border-box}
 .combat .ov.battle .box{max-height:100%}
-.combat .ov.battle .box.tilebox,.combat .ov.battle .box.chartbox{width:min(96vw,880px);max-width:96vw;max-height:100%;overflow:visible;padding:6px 10px;--choice-art:min(100px,calc(52dvh - 106px));--choice-card:min(150px,calc((52dvh - 85px)*5/7))}
+.combat .ov.battle .box.tilebox,.combat .ov.battle .box.chartbox{width:min(96vw,880px);max-width:96vw;max-height:100%;overflow:visible;padding:6px 10px;--choice-art:min(100px,calc(52dvh - 166px));--choice-card:min(150px,calc((52dvh - 120px)*5/7))}
 @media (orientation:portrait){.dais{position:relative;left:auto;top:auto;width:auto;max-height:none;margin:4px 8px}}
 .dais .nexts{display:flex;flex-direction:column;gap:0;font-size:10px;line-height:1.2;border-top:1px solid #d8a44655;padding-top:3px;white-space:normal}
 .dais .nexts b{font:700 9px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:#d8a446;margin-left:2px}
@@ -1011,7 +1011,7 @@ body.combat-motion #endbtn:active{transform:translateY(3px) scale(.94);filter:br
  .combat>.topbar{background:none!important;box-shadow:none!important;border:0!important;min-height:40px}
  .combat>.topbar::after,.combat>.topbar::before{display:none!important}
  .combat>.topbar .stat,.combat>.topbar .mini,.combat>.topbar button{text-shadow:0 1px 2px #000,0 0 6px #000}
- body.env-combat #env-front{opacity:.45}
+ body.env-combat #env-front{opacity:.45!important}
  body.env-combat #env .envstack{top:auto!important;bottom:0!important}
  .combat .dais{background:none!important;border:0!important;box-shadow:none!important;width:96px;top:44px;padding:2px;transform-origin:0 0;transform:scale(.86)}
  .combat .dais::before,.combat .dais::after,.combat .dais .dais-art{display:none}
@@ -1027,3 +1027,14 @@ body.combat-motion #endbtn:active{transform:translateY(3px) scale(.94);filter:br
  .combat #exhpile{position:absolute;right:calc(4px + env(safe-area-inset-right));bottom:54px;pointer-events:auto}
  .combat #endbtn{position:absolute;right:calc(64px + env(safe-area-inset-right));bottom:72px;min-width:104px;min-height:48px;pointer-events:auto}
 }
+
+/* Choice headings use the frame budget rather than the general modal spacing. */
+.combat .ov.battle .box>h2{font-size:15px;line-height:1.1;padding:2px 24px;margin:0 auto 3px}
+.combat .ov.battle .box>.csub{font-size:12px;line-height:1.1;margin:0 0 3px}
+/* Task 19 addendum: clean foreground corners and left-edge energy. */
+body.env-combat #env-front{display:none}
+.combat #orb{left:calc(16px + env(safe-area-inset-left));bottom:74px}
+.hand .card.drag{pointer-events:none}
+.combat .drop-valid .fig{filter:drop-shadow(0 0 5px #65d6bb)}
+.combat .drop-over .fig{filter:drop-shadow(0 0 9px #ffe6a4)}
+.combat .drop-invalid{opacity:.55}
