@@ -1,6 +1,7 @@
 // data/lore.js: "The Second Dawn", the locked story (design/lore/LORE-BIBLE.md v3). Act 1 slice plus the shared systems.
 // Pure data and tiny pure helpers (no DOM, no engine): usable from the UI, the engine and the tests.
 // OVERRIDE (Spencer, 2026-10-10): the Bell is a plain, ancient, weathered bronze bell. It is NOT a jawbone. The dread comes from what it rings for.
+// KNELL (Spencer, 2026-10-10): the Act 1 Bell boss is "The Knell" (id `bell` unchanged): a faceless drowned bell-ringer of the old Keeper order, chained to the Bell, swinging it as a weapon.
 // Voice (bible §15): objects first, present tense, second person, about 12 words, never say "Undermoon" before Tier 3, the death line never changes.
 import {climbLevel,loadProfile,deathsOf} from '../progress.js';
 import {hash32} from '../core/state.js';
@@ -36,7 +37,7 @@ export const bellOpening=n=>`${cap(WORD[n])} today. You will hear ${WORD[n+1]}.`
 export const wrenLine=(n,tier=0)=>tier>=3?`"${cap(WORD[n])} came through today. You're the ${ORD[n+1]}. My tally runs longer than the Ledger's."`:`"${cap(WORD[n])} came through today. You're the ${ORD[n+1]}."`;
 export const WREN_SIDE='Every lamp on her stall has turned to face the Stair.';
 export const BELL_LINES={
- toll:'The Bell tolls once. It is counting.',
+ toll:'The Knell swings the Bell. It tolls once. It is counting.',
  // Phase 2 "Ringing": the Ringing curse is the Bell's note, still in your ears.
  crack:'The crack does not silence it. The note changes. It sounds like your name.',
  // The deferred Great Toll gets the "counts" reading (not built yet; text kept here so the move ships with the right voice).
@@ -109,7 +110,7 @@ export const ENEMY_FLAVOUR={
  gull:'Gulls will not fly above Bellwater Court. They keep to the sea side of the mountain.',
  knight:'Calcified keel-blade, barnacled plate. It still holds the landing it was told to hold.',
  pod:'A brine cyst, swollen with scalding mineral water. It only wants to be somewhere else.',
- bell:'Ancient bronze, green with verdigris, kelp hanging from its lip. It does not warn any more. It counts.',
+ bell:'The last ringer of the old Keeper order, faceless, chained to a plain bronze Bell as tall as a door. He swings it like a maul. It does not warn any more. It counts.',
  matriarch:'Edda, last gardener of the terraces. She roots into the stone to hold it together, and faces the green moon in the cistern.'};
 export const BOSS_OPEN={
  bell:n=>bellOpening(n),
