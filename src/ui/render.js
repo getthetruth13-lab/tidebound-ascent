@@ -1,5 +1,6 @@
 // ui/render.js — all screens as HTML strings. Inline handlers call the globals main.js exposes.
 // Player-facing terminology follows design-v2 §0.3 (Guard, Might, Soaked, Exposed, Sink).
+import {barHTML,statusRowHTML} from './combatant.js';
 import {CARD_ART,assetEntry,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE} from '../assets.js';
 import {syncAudio} from '../audio.js';
 import {syncEnv,envFxSettingLabel} from './env.js';
@@ -74,13 +75,8 @@ function popHTML(){const S=W.S;
   if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${slotHTML('relics',S.relicView,'itemart',d.e)}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${d.flavour}</div>`:''}</div>`}
  return ''}
 export function openOv(k){if(drag)return;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
-export function hpbar(h,m,blk,blkT,who){const sh=blkT!=null&&anim(blkT,700);return `<div class="hpbar${blk?' blk':''}"${who!=null?` data-who="${who}" data-hp="${Math.max(0,h)}" data-max="${m}"`:''}>${blk?`<span class="hpblk${sh?' shim':''}" ${sh?`style="${sh}"`:''} data-kw="Guard" title="Guard: ${esc(KW.Guard||'')}">${iconHTML('status','block','🛡️')}<b>${blk}</b></span>`:''}${who!=null?`<i class="gh" style="transform:scaleX(${Math.max(0,h/m)})"></i>`:''}<i style="transform:scaleX(${Math.max(0,h/m)})"></i><span>${Math.max(0,h)}/${m}</span></div>`}
-// Status badges with glossary names (tap/hover shows the rule).
-const ST={str:['💪','Might'],dex:['🪨','Poise'],weak:['💧','Soaked'],vuln:['💔','Exposed'],brittle:['🧊','Brittle'],bleed:['🩸','Bleed'],drench:['💧','Drenched'],reson:['🔔','Resonating'],shell:['🐚','Shell'],barbs:['🌵','Barbs'],ward:['🛡️','Rebuff'],mending:['💚','Mending']};
-export function badges(block,blkT,st){const p=[];
- for(const k in st){const v=st[k];if(!v||!ST[k])continue;const [ic,nm]=ST[k];const deb=(k==='str'&&v<0)||['weak','vuln','brittle','bleed','drench','reson'].includes(k);
-  const kw=KW[nm]||KW[nm+' X']||'';p.push(`<span class="bd ${deb?'debuff':'buff'}" data-kw="${nm}" title="${nm} ${v}: ${esc(kw)}">${iconHTML('status',k,ic)}${v}</span>`)}
- return `<div class="badges">${p.join('')}</div>`}
+export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(blkT,700),who)}
+export function badges(block,blkT,st){return statusRowHTML(st)}
 // Floating numbers (R12): size scales with the amount (22-40 px), stacked numbers fan out, Guard uses its icon, and a number waits for the swing to connect (x.d).
 const FLN=/^([+-]?)(\d+)/;
 export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x.who===who&&now-x.t<900+(x.d||0));

@@ -31,7 +31,7 @@ export function decorateKeywords(root=document){if(!root.querySelectorAll)return
 let tip=null,ctip=null,timer=0,anchor=null,shownAt=0;
 function ensure(){if(!tip){tip=document.createElement('div');tip.id='kwtip';tip.setAttribute('role','tooltip');document.body.appendChild(tip)}return tip}
 export function hideTip(){clearTimeout(timer);anchor=null;if(tip)tip.classList.remove('on');if(ctip)ctip.classList.remove('on')}
-function contentOf(el){if(el.dataset.kw){const k=el.dataset.kw;return {title:k,text:shortText(k)||KW[k]||KW[k+' X']||''}}
+function contentOf(el){if(el.dataset.sinfo)return {title:el.dataset.sname||el.dataset.kw,text:el.dataset.sinfo};if(el.dataset.kw){const k=el.dataset.kw;return {title:k,text:shortText(k)||KW[k]||KW[k+' X']||''}}
  if(el.dataset.info){const i=el.dataset.info,c=i.indexOf(': ');return c>0?{title:i.slice(0,c),text:i.slice(c+2)}:{title:'',text:i}}return null}
 function showCard(el){const id=el.dataset.card;if(!CARDS[id])return false;
  if(!ctip){ctip=document.createElement('div');ctip.id='cardtip';ctip.setAttribute('role','tooltip');document.body.appendChild(ctip)}

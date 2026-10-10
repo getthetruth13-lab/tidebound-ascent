@@ -124,8 +124,13 @@ function discardHand(){if(!enabled()||!W.cb)return;const pile=$('#discpile');if(
 // ---------- screen shake on #scene (transform only; reduced motion gets the vignette instead) ----------
 function shakeNow(amp){if(!enabled())return;entry(300,el=>play($('.scene'),shakeFrames(amp),300,el,0,'linear')).apply(0)}
 // ---------- hp bars: delayed ghost chunk, flash on loss, heal motes ----------
-let hpMem={},lastEnergy=null,lastTide=null,lastTurn=0;
-function syncBars(){for(const bar of $$('.hpbar[data-who]')){const who=bar.dataset.who,hp=+bar.dataset.hp,mx=+bar.dataset.max||1,prev=hpMem[who];hpMem[who]=hp;
+let hpMem={},blkMem={},lastEnergy=null,lastTide=null,lastTurn=0;
+function syncGuard(bar,who){const b=+bar.dataset.blk||0,prev=blkMem[who];blkMem[who]=b;if(prev==null||prev===b)return;
+ if(b>prev){const sh=bar.querySelector('.hpblk');if(sh)entry(450,el=>{const n=$(`.hpbar[data-who="${who}"] .hpblk`);if(n)play(n,[{transform:'scale(.4)',filter:'brightness(2.4)'},{transform:'scale(1.25)',offset:.6},{transform:'scale(1)',filter:'none'}],450,el,0,'cubic-bezier(.2,1.4,.4,1)')})}
+ else if(prev>0&&b===0)entry(520,el=>{const bb=$(`.hpbar[data-who="${who}"]`);if(!bb)return;
+  let g=bb.querySelector('.guardbreak');if(!g){g=document.createElement('span');g.className='guardbreak';g.innerHTML=document.querySelector('.hpblk .sti')?.outerHTML||'<svg class="sti" viewBox="0 0 24 28"><path d="M12 1.5L2.5 5v8c0 6.5 4 11 9.5 13.5C17.5 24 21.5 19.5 21.5 13V5z" fill="currentColor"/></svg>';bb.appendChild(g)}
+  const a=play(g,[{transform:'scale(1) rotate(0)',opacity:1,filter:'brightness(2)'},{transform:'scale(1.3) rotate(-8deg)',opacity:.9,offset:.3},{transform:'translate(-6px,18px) scale(.6) rotate(-30deg)',opacity:0}],520,el,0,'ease-in');if(a)a.onfinish=()=>g.remove();else g.remove()})}
+function syncBars(){for(const bar of $$('.hpbar[data-who]')){const who=bar.dataset.who,hp=+bar.dataset.hp,mx=+bar.dataset.max||1,prev=hpMem[who];hpMem[who]=hp;syncGuard(bar,who);
   if(prev==null||prev===hp)continue;
   if(hp<prev){const from=Math.min(1,prev/mx),to=Math.max(0,hp/mx);
    entry(750,el=>{const b=$(`.hpbar[data-who="${who}"]`);if(!b)return;
@@ -147,8 +152,8 @@ function syncResources(){const cb=W.cb;if(!cb)return;
 export function syncCombatAnimations(){
  const active=W.S.screen==='combat'&&W.cb;
  document.body.classList.toggle('combat-motion',!!active&&enabled());
- if(!active){pending=[];syncScreens();if(combat){combat=null;hpMem={};lastEnergy=lastTide=null}return}
- if(combat!==W.cb){combat=W.cb;pending=[];entries=entries.filter(e=>e.keep);hpMem={};lastEnergy=lastTide=null;lastTurn=0;firstDrawn=false;enterCombat()}
+ if(!active){pending=[];syncScreens();if(combat){combat=null;hpMem={};blkMem={};lastEnergy=lastTide=null}return}
+ if(combat!==W.cb){combat=W.cb;pending=[];entries=entries.filter(e=>e.keep);hpMem={};blkMem={};lastEnergy=lastTide=null;lastTurn=0;firstDrawn=false;enterCombat()}
  if(!enabled()){const recs=pending;pending=[];entries=[];document.querySelectorAll('.combat-action,.action-ghost,.echo-card').forEach(n=>n.remove());
   // reduced motion: no movement, just a short edge flash when the hero is hit
   if(fxOn())for(const r of recs)if(r.k==='herohit'){vignette(r.amount>0?'red':'blue',r.amount>0?.4:.26,300);break}
