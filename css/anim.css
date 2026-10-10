@@ -1,8 +1,8 @@
 /* Combat life affects only artwork: intents, HP and touch targets stay anchored. */
 .combat-motion .hero .spr,.combat-motion .en .spr{transform-origin:50% 100%;animation:combat-breathe var(--idle-period,4400ms) ease-in-out var(--idle-phase,0ms) infinite}
-@keyframes combat-breathe{0%,100%{transform:translateY(0) rotate(-.35deg) scale(1)}50%{transform:translateY(-1px) rotate(.35deg) scale(1.006,1.012)}}
+@keyframes combat-breathe{0%,100%{transform:translateY(0) rotate(-.5deg) skewX(-.8deg) scale(1)}50%{transform:translateY(-3px) rotate(.5deg) skewX(.8deg) scale(1.008,1.015)}}
 .combat-motion .en[data-key="wisp"] .spr,.combat-motion .en[data-key="gull"] .spr{animation-name:combat-hover}
-@keyframes combat-hover{50%{transform:translateY(-3px) rotate(1deg) scale(1.01)}}
+@keyframes combat-hover{50%{transform:translateY(-5px) rotate(1.4deg) scale(1.015)}}
 .combat-motion .spr-slot::after{content:'';position:absolute;left:42%;top:38%;width:15%;height:18%;pointer-events:none;background:radial-gradient(ellipse,var(--class-accent,var(--env-rim,#8fa3c7)),transparent 70%);opacity:.07;animation:accent-breathe var(--idle-period,4400ms) ease-in-out var(--idle-phase,0ms) infinite}
 @keyframes accent-breathe{50%{opacity:.17}}
 .combat-action{position:fixed;z-index:35;pointer-events:none;width:100px;height:70px;margin:-35px -50px;--action-color:#a6f2e8;border:2px solid var(--action-color);border-radius:50%;opacity:0;animation:action-ring 480ms ease-out forwards}
@@ -25,7 +25,28 @@
 .action-ghost{position:fixed;pointer-events:none;z-index:34;animation:ghost-echo 520ms ease-out forwards}
 .action-ghost .fig,.action-ghost .spr-slot{animation:none!important;transform:none!important}
 @keyframes ghost-echo{0%{opacity:.4;transform:translateX(-8px)}100%{opacity:0;transform:translateX(36px)}}
-.action-ghost.death-sink{animation-name:ghost-death}
+.action-ghost.death-sink{animation:none;transform-origin:50% 100%}
 @keyframes ghost-death{0%{opacity:.85}100%{opacity:0;transform:translateY(22px) scale(.94,.85)}}
 .echo-card{position:fixed!important;left:27%!important;top:30%!important;width:65px!important;pointer-events:none!important;z-index:34!important;animation:ghost-echo 520ms ease-out forwards!important}
-@media(prefers-reduced-motion:reduce){.hero .spr,.en .spr,.spr-slot::after{animation:none!important}.combat-action,.action-ghost,.echo-card{display:none!important}.fig.shake,.fig.lunge,.flycard{animation:none!important}}
+/* R9 acting-enemy highlight: the acting foe lifts, the others dim */
+.foes.has-act .en{opacity:.7;transition:opacity .15s}
+.foes.has-act .en.act{opacity:1;translate:0 -6px;z-index:2}
+.fig{transform-origin:50% 100%}
+/* R1 persistent FX layer (src/ui/vfx.js): never re-rendered */
+#fxlayer{position:fixed;inset:0;z-index:36;pointer-events:none;overflow:hidden}
+#fxcv{position:absolute;inset:0;width:100%;height:100%}
+#fxlayer .vig{position:absolute;inset:0;opacity:0}
+#fxlayer .vig.red{background:radial-gradient(ellipse at 50% 50%,transparent 52%,#8e1b1f 100%)}
+#fxlayer .vig.blue{background:radial-gradient(ellipse at 50% 50%,transparent 55%,#7fb8e8 100%)}
+#fxlayer .vig.gold{background:radial-gradient(ellipse at 50% 50%,transparent 50%,#d8a446 100%)}
+.fxring{position:absolute;transform:translate(-50%,-50%);border:2px solid #7fd0c8;border-radius:50%;opacity:0}
+.flyicon{position:absolute;font-size:26px;line-height:1;filter:drop-shadow(0 0 6px #d8a446)}
+.flyicon img{height:30px;width:auto}
+.cardback{position:fixed;z-index:70;width:26px;height:36px;border-radius:4px;pointer-events:none;background:linear-gradient(135deg,#1c2b3a,#0d1621);border:1.5px solid #7fd0c8;box-shadow:0 0 6px #7fd0c855}
+.travelmark{position:fixed;z-index:70;width:14px;height:14px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff4c8,#d8a446 60%,transparent 72%);box-shadow:0 0 12px 3px #d8a44699}
+.xfade{will-change:opacity}
+.action-ghost.death-sink{will-change:transform,opacity,filter}
+@media(prefers-reduced-motion:reduce){.hero .spr,.en .spr,.spr-slot::after{animation:none!important}.combat-action,.action-ghost,.echo-card,.cardback,.travelmark,.flyicon{display:none!important}.fig.shake,.flycard{animation:none!important}.foes.has-act .en.act{translate:none}}
+body.reduce-motion .cardback,body.reduce-motion .travelmark,body.reduce-motion .flyicon{display:none}
+
+.hpbar>i.gh{background:linear-gradient(#f3d2c4,#d99a8a);opacity:.9}

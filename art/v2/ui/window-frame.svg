@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+<!-- Tidebound Ascent shared window frame (9-slice, slice=32). Replace with painted art later: same 96x96 layout, corners 32x32, edges 32 wide. -->
+<defs>
+<linearGradient id="br" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2c27c"/><stop offset=".5" stop-color="#9a7640"/><stop offset="1" stop-color="#5a4222"/></linearGradient>
+<linearGradient id="ir" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a5262"/><stop offset=".5" stop-color="#2a303b"/><stop offset="1" stop-color="#181c24"/></linearGradient>
+<radialGradient id="gem" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#b9fff4"/><stop offset=".5" stop-color="#2fb8c4"/><stop offset="1" stop-color="#0a2a3d"/></radialGradient>
+<g id="bandsH" transform="scale(1 1.55)"><rect x="0" y="0" width="32" height="2" fill="#05070b"/><rect x="0" y="2" width="32" height="3" fill="url(#br)"/><rect x="0" y="5" width="32" height="1.2" fill="#140e07"/><rect x="0" y="6.2" width="32" height="6" fill="url(#ir)"/><rect x="0" y="12.2" width="32" height="1" fill="#d9b46a"/><rect x="0" y="13.2" width="32" height="1.4" fill="#05070b" opacity=".7"/></g>
+<g id="edge"><use href="#bandsH"/><circle cx="16" cy="14" r="2.6" fill="#d9b46a" stroke="#05070b" stroke-width=".8"/><circle cx="15.2" cy="13.2" r="1" fill="#fff6d0"/></g>
+<g id="corner">
+<use href="#bandsH"/><g transform="matrix(0 1 1 0 0 0)"><use href="#bandsH"/></g>
+<g transform="translate(14 14) scale(1.12) translate(-14 -14)"><path d="M30 7.5 C26 7.5 25 12 21 12 M7.5 30 C7.5 26 12 25 12 21" fill="none" stroke="#d9b46a" stroke-width="1.3" stroke-linecap="round"/>
+<circle cx="30.5" cy="7.5" r="1.6" fill="#d9b46a"/><circle cx="7.5" cy="30.5" r="1.6" fill="#d9b46a"/>
+<path d="M2 2 H22 L24 6 L6 24 L2 22 Z" fill="none"/>
+<path d="M14 2 L26 14 L14 26 L2 14 Z" fill="url(#br)" stroke="#05070b" stroke-width="1.2"/>
+<path d="M14 5.5 L22.5 14 L14 22.5 L5.5 14 Z" fill="#140e07" stroke="#f0d890" stroke-width=".8"/>
+<circle cx="14" cy="14" r="4.3" fill="url(#gem)" stroke="#05070b" stroke-width=".8"/><circle cx="12.6" cy="12.6" r="1.1" fill="#fff" opacity=".8"/></g>
+</g>
+</defs>
+<use href="#corner"/>
+<g transform="translate(32 0)"><use href="#edge"/></g>
+<g transform="rotate(90 48 48)"><g transform="translate(0 0)"><use href="#corner"/></g><g transform="translate(32 0)"><use href="#edge"/></g></g>
+<g transform="rotate(180 48 48)"><use href="#corner"/><g transform="translate(32 0)"><use href="#edge"/></g></g>
+<g transform="rotate(270 48 48)"><use href="#corner"/><g transform="translate(32 0)"><use href="#edge"/></g></g>
+</svg>

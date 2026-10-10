@@ -142,12 +142,17 @@ h2{font:700 20px var(--font-display);margin:6px 0 8px;text-align:center}
 @keyframes shimx{to{transform:translateX(110%)}}
 .shake{animation:sh .4s}
 @keyframes sh{0%,100%{transform:none}20%{transform:translateX(-7px) rotate(-2deg)}50%{transform:translateX(6px) rotate(1deg)}80%{transform:translateX(-3px)}}
-.fl{position:absolute;left:50%;top:30%;transform:translateX(-50%);font:800 26px var(--font-number);color:var(--status-damage);pointer-events:none;animation:fl .9s ease-out forwards;text-shadow:0 2px 3px #000,0 0 8px #000;z-index:9;white-space:nowrap}
+.fl{position:absolute;left:50%;top:30%;translate:var(--ox,0) var(--oy,0);transform:translateX(-50%);font:800 var(--fs,26px)/1 var(--font-number);color:var(--status-damage);pointer-events:none;animation:fl .95s cubic-bezier(.2,.8,.3,1) both;-webkit-text-stroke:3px #120708;paint-order:stroke fill;text-shadow:0 2px 3px #000;z-index:9;white-space:nowrap;display:flex;align-items:center;gap:3px}
+.fl .uic{height:.9em;width:auto;-webkit-text-stroke:0}
+.fl.big{color:#ff9a7a}
 .fl.b{color:var(--status-block)}
-@keyframes fl{0%{opacity:0;transform:translate(-50%,10px) scale(.6)}15%{opacity:1;transform:translate(-50%,0) scale(1.25)}100%{opacity:0;transform:translate(-50%,-60px) scale(1)}}
-.banner{position:absolute;left:0;right:0;top:38%;text-align:center;font:700 clamp(26px,6vw,46px) var(--font-display);letter-spacing:2px;pointer-events:none;z-index:40;animation:ban .9s ease-out forwards;opacity:0;background:linear-gradient(90deg,transparent,#0b0e14dd 25%,#0b0e14dd 75%,transparent);padding:10px 0;color:var(--tidecaller-accent)}
+.fl.h{color:#a8e08a}
+.fl.bleed{color:#d1453b}
+.fl.e{color:var(--status-energy)}
+@keyframes fl{0%{opacity:0;transform:translate(-50%,12px) scale(.5)}12%{opacity:1;transform:translate(-50%,0) scale(1.45)}24%{transform:translate(-50%,-4px) scale(.95)}34%{transform:translate(-50%,-8px) scale(1.08)}100%{opacity:0;transform:translate(-50%,-62px) scale(1)}}
+.banner{position:absolute;left:50%;top:9%;translate:-50% 0;text-align:center;font:700 clamp(14px,3.2vw,20px) var(--font-display);letter-spacing:2px;pointer-events:none;z-index:40;animation:ban .56s ease-out both;opacity:0;background:linear-gradient(90deg,transparent,#0b0e14cc 18%,#0b0e14cc 82%,transparent);padding:3px 26px;white-space:nowrap;color:var(--tidecaller-accent)}
 .banner.en{color:var(--status-damage)}
-@keyframes ban{0%{opacity:0;transform:scaleY(.2)}15%,70%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes ban{0%{opacity:0;transform:translateY(-8px) scaleX(.7)}22%,70%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-4px)}}
 .tip{position:absolute;left:6px;top:6px;max-width:min(52%,380px);background:#0b0e14ee;border:1px solid var(--ui-line);border-radius:10px;padding:8px 10px;font-size:13px;z-index:35;box-shadow:0 6px 18px #000}
 .tip .kws{font-size:12px;color:var(--ui-text-muted);margin-top:4px}
 .tip .btn{min-height:40px;padding:6px 10px;margin-top:6px;width:100%}
@@ -209,13 +214,14 @@ h2{font:700 20px var(--font-display);margin:6px 0 8px;text-align:center}
 .mapwrap{position:relative;margin:0 auto}
 .mapwrap svg{position:absolute;left:0;top:0;overflow:visible}
 .node{position:absolute;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:#f3e3bf;border:2px solid #4a3a22;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:default;box-shadow:0 2px 4px #6e4a2866;padding:0}
-.node.av{border:3px solid var(--duelist-secondary);cursor:pointer;animation:pulse 1.2s infinite}
+.node.av{border:3px solid var(--duelist-secondary);cursor:pointer}
+.node.av::before{content:'';position:absolute;inset:-3px;border-radius:50%;box-shadow:0 0 0 7px #7c1f2c88;opacity:0;pointer-events:none;animation:pulse 1.2s infinite}
 .node.vis{background:#c9b48a}
 .node.vis::after{content:'';position:absolute;inset:-5px;border:3px solid var(--duelist-secondary);border-radius:50%;opacity:.8;transform:rotate(-12deg) scaleX(1.1)}
 .node.cur{box-shadow:0 0 0 4px #1a223055}
 .node.dim{opacity:.4}
 .node.boss{width:64px;height:64px;font-size:32px;border-width:3px}
-@keyframes pulse{50%{box-shadow:0 0 0 7px #7c1f2c55}}
+@keyframes pulse{50%{opacity:.7}}
 .end{text-align:center;padding-top:40px}.end .big{font-size:80px}
 .cls{display:flex;gap:12px;align-items:center;background:var(--class-deep);border:2px solid var(--class-secondary);border-radius:14px;padding:10px;margin-bottom:10px;cursor:pointer;width:100%;text-align:left}
 .cls:hover{border-color:var(--class-primary)}
@@ -425,8 +431,9 @@ body.env-on .page{background:transparent}
 .chip.marked{border-color:var(--echo-mage-primary);color:var(--echo-mage-accent)}
 .dbl{color:var(--echo-mage-accent)}
 .wp.full{display:inline-flex;flex-direction:column;align-items:center;gap:1px;cursor:default;color:var(--ui-text);line-height:1.1}
-.wp.adv{cursor:pointer;box-shadow:0 0 0 1px var(--status-energy);animation:advp 1.6s ease-in-out infinite}
-@keyframes advp{50%{box-shadow:0 0 8px 1px var(--status-energy)}}
+.wp.adv{cursor:pointer;box-shadow:0 0 0 1px var(--status-energy);position:relative}
+.wp.adv::after{content:'';position:absolute;inset:-2px;border-radius:9px;box-shadow:0 0 8px 1px var(--status-energy);opacity:0;pointer-events:none;animation:advp 1.6s ease-in-out infinite}
+@keyframes advp{50%{opacity:1}}
 .wp.land{border-color:var(--rarity-rare);background:linear-gradient(var(--cartographer-deep),#4a3414)}
 .wp.trig{animation:wptrig .6s ease-out}
 @keyframes wptrig{0%{transform:scale(1.2);box-shadow:0 0 12px var(--cartographer-primary)}}
@@ -728,5 +735,6 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 .node .revb{position:absolute;right:-7px;bottom:-5px;font-size:13px;font-style:normal;background:#0b0e14e6;border:1px solid #a98bff;border-radius:50%;width:19px;height:19px;display:flex;align-items:center;justify-content:center;line-height:1}
 .legend .revleg{font-style:normal;margin-right:2px}
 .chip.marked .pv{color:#ffd98a;font-weight:800;margin-left:2px}
-.tbtn.rel{border-color:#6ec6e8;color:#bfeaff;animation:relpulse 1.4s ease-in-out infinite}
-@keyframes relpulse{50%{box-shadow:0 0 8px #6ec6e8}}
+.tbtn.rel{border-color:#6ec6e8;color:#bfeaff;position:relative}
+.tbtn.rel::after{content:'';position:absolute;inset:-1px;border-radius:9px;box-shadow:0 0 8px #6ec6e8;opacity:0;pointer-events:none;animation:relpulse 1.4s ease-in-out infinite}
+@keyframes relpulse{50%{opacity:1}}

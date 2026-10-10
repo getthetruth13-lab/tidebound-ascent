@@ -8,6 +8,7 @@ import {fire,mod,thisTurn} from '../core/bus.js';
 import {DATA} from '../data/generated/data-v2.js';
 import {combatRewards,gainCard,goMap,endRun} from './run.js';
 import {flyCard} from '../ui/fx.js';
+import {impactDelay} from '../ui/vfx.js';
 import {render} from '../ui/render.js';
 export const CORE=DATA.v21.sim.core;
 const DU=CORE.duel,TI=CORE.tide,EC=CORE.echo,CA=CORE.carto;
@@ -20,7 +21,7 @@ export function curTgt(){let t=W.cb.ens[W.cb.tgt];if(!t||t.hp<=0||t.fled){t=aliv
 export const might=()=>W.cb?(W.cb.p.st.str||0):0;
 export function log(s){if(W.cb){W.cb.log.unshift(s);W.cb.log.length=Math.min(W.cb.log.length,6)}}
 // Floating combat text (damage/Guard numbers). Visual only; kept separate from the bus's turn-scoped W.cb.fx.
-export function floatText(who,txt,cls){if(!W.cb)return;const now=Date.now();W.cb.vfx=W.cb.vfx.filter(x=>now-x.t<2000);W.cb.vfx.push({who,txt,cls:cls||'',t:now})}
+export function floatText(who,txt,cls){if(!W.cb)return;const now=Date.now();W.cb.vfx=W.cb.vfx.filter(x=>now-x.t<2000);W.cb.vfx.push({who,txt,cls:cls||'',t:now,d:impactDelay(who)})}
 // Big combo call-outs ("CREST!", "FLOURISH ×3", "ECHO ×2"...): clear feedback when combos trigger. Never blocks input.
 export function callout(txt,cls){if(!W.cb)return;const now=Date.now();W.cb.callouts=(W.cb.callouts||[]).filter(x=>now-x.t<1400);W.cb.callouts.push({txt,cls:cls||'',t:now})}
 // Relic feedback: pulse the relic icon in the top bar.
@@ -315,11 +316,11 @@ export function intentOf(e){const t=EN[e.key];const m=t.intent?t.intent(e):e.nex
 export function enemyHitPlayer(e,d){const cb=W.cb;
  if(cb.parry>0&&!cb.parryUsed){cb.parryUsed=true;const red=Math.min(cb.parry,d);d-=red;const back=Math.floor(cb.parry*mod('parryReflect',{enemy:e},DU.parry_back_frac));
   log(`⚔️ Parry! −${red}, ${back} back to ${e.n}`);callout('PARRY! ↩ '+back,'parry');if(back)dmgEnemy(e,back);cb.retort=true;fire('parry',{enemy:e,reflected:back,reduced:red})}
- const b=Math.min(cb.p.block,d);cb.p.block-=b;const rest=d-b;W.run.hp-=rest;floatText('p',rest>0?'-'+rest:'🛡'+b,rest>0?'':'b');cb.pshake=Date.now();
+ const b=Math.min(cb.p.block,d);cb.p.block-=b;const rest=d-b;W.run.hp-=rest;floatText('p',rest>0?'-'+rest:'🛡'+b,rest>0?'':'b');cb.pshake=Date.now();fire('playerHit',{enemy:e,amount:rest,blocked:b});
  if(rest>0&&W.run.cls==='duel'&&cb.mom>0){const lose=mod('momLoss',{},DU.lose_on_unblocked);cb.mom=Math.max(0,cb.mom-lose);log('💢 Hit: −'+lose+' Momentum')}
  if(rest>0)fire('playerDamaged',{enemy:e,amount:rest});
  if(W.run.hp<=0)cheatDeath()}
-export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=intentOf(e);e.lastAct=m;if(m.b)e.blkT=Date.now();if(m.lbl)log(`${e.e} ${e.n}: ${m.lbl}`);
+export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=intentOf(e);e.lastAct=m;fire('enemyAct',{enemy:e,intent:m});if(m.b)e.blkT=Date.now();if(m.lbl)log(`${e.e} ${e.n}: ${m.lbl}`);
  if(m.b)e.block+=m.b;if(m.s)addSt(e,'str',m.s);
  if(m.a){e.atkT=Date.now();for(let h=0;h<(m.h||1);h++){if(W.run.hp<=0||e.hp<=0||!W.cb)break;enemyHitPlayer(e,eAtk(e,m.a))}fire('playerAttacked',{enemy:e})}
  if(!W.cb||e.hp<=0&&!m.boom)return;
@@ -335,19 +336,21 @@ export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=inten
  if(m.fx)m.fx(e)}
 function endOfEnemyTurn(e){const t=EN[e.key];if(t.passive&&t.passive.endTurn)t.passive.endTurn(e);
  if(e.st.shell)e.block+=e.st.shell;if(e.st.mending&&e.hp>0){const h=Math.min(e.st.mending,e.max-e.hp);e.hp+=h;if(h)floatText(e.uid,'+'+h,'h')}}
+const TELEGRAPH=250; // ms the acting enemy crouches and flashes before it strikes (skipped when FAST)
 export function enemyPhase(){const cb=W.cb;if(!cb)return;
  // Start of the enemy turn: the player's Soaked / Exposed / Brittle wear off by 1.
  tick(cb.p.st);
- const list=cb.ens.slice();let k=0;
+ const list=cb.ens.slice();let k=0;const telegraphed=new Set();
  const step=()=>{if(!W.cb||W.cb!==cb)return;
   while(k<list.length&&(list[k].hp<=0||list[k].fled))k++;
   if(k>=list.length)return finish();
-  const e=list[k++];if(!(e.passive&&e.passive.keepGuard))e.block=0;act(e);if(!W.cb)return;cb.acting=null;e.t++;if(e.hp>0)endOfEnemyTurn(e);tick(e.st,e.hold);e.hold=null;delete e.st.mightTmp;
+  const e=list[k++];cb.tele=e;if(!window.FAST&&!telegraphed.has(e)){telegraphed.add(e);k--;fire('enemyTelegraph',{enemy:e});render();return setTimeout(step,TELEGRAPH)}
+  if(!(e.passive&&e.passive.keepGuard))e.block=0;act(e);if(!W.cb)return;cb.acting=null;e.t++;if(e.hp>0)endOfEnemyTurn(e);tick(e.st,e.hold);e.hold=null;delete e.st.mightTmp;
   if(e.hp>0&&!e.fled){if(e.keepNext)e.keepNext=false;else e.next=EN[e.key].ai(e)}
   if(W.run.hp<=0&&!cheatDeath())return lose();
   if(!alive().length)return finish();
   if(window.FAST)return step();render();setTimeout(step,260)};
- const finish=()=>{if(!W.cb)return;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
+ const finish=()=>{if(!W.cb)return;cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
  step()}
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
  const allFled=cb.ens.some(e=>e.fled)&&cb.ens.every(e=>e.fled||e.summoned);

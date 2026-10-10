@@ -1,5 +1,5 @@
 // data/cards/tidecaller.js — Tidecaller Phase 1 cards (behaviour). Names/costs/types/rarity/flavour come from data-v2.json via card().
-// v2.1: High Tide 6+, Low Tide 4-, Crest 12 to ALL, Undertow 12 Guard + draw 1, Tide drifts 1 at the start of each turn.
+// v2.1: High Tide 6+, Low Tide 4-, Crest 14 to ALL, Undertow 12 Guard + draw 1, Tide drifts 1 at the start of each turn.
 import {W} from '../../core/state.js';
 import {card} from './loader.js';
 import {alive,log,setTide,addSt} from '../../engine/combat.js';
@@ -23,6 +23,6 @@ T('pressure',{e:'⛈️',d:'Gain {12|15} Guard. <b>High Tide:</b> gain 1 Might. 
 // Cohesion pass: Slack Water is now a choice (it used to freeze the Tide, which killed combos).
 T('slack',{e:'🛶',d:'Surge 2 or Recede 2 (choose). Draw {2|3}.',p:f=>{f.draw(f.v(2,3));f.choose('Slack Water',[{l:'⬆️ Surge 2',tile:'choice-surge',sum:'Raise the Tide by 2.',f:()=>f.surge(2)},{l:'⬇️ Recede 2',tile:'choice-recede',sum:'Lower the Tide by 2.',f:()=>f.recede(2)}])}});
 T('whirl',{e:'🌪️',d:'Deal {3|4} to ALL, 3 times. Surge 1 per hit.',p:f=>{for(let i=0;i<3;i++){if(!alive().length)break;f.all(f.v(3,4));f.surge(1)}}});
-T('spring',{e:'🌕',d:'Crest deals 24 instead of 10.',power:{mod:{crest(inst,ctx,c){return {...c,dmg:24}}}}}); // v2.2: payoff kept at 24 (Crest base 10)
+T('spring',{e:'🌕',d:'Crest deals 24 instead of 14.',power:{mod:{crest(inst,ctx,c){return {...c,dmg:24}}}}}); // v2.2: payoff kept at 24 (Crest base 14)
 T('neap',{e:'🌑',d:'Undertow grants 24 Guard and draws 2.',power:{mod:{undertow(inst,ctx,u){return {...u,guard:u.guard*2,draw:Math.max(u.draw,2)}}}}});
 T('tsunami',{e:'🌊',d:'Deal {4|5}× the Tide to ALL. Set the Tide to 0.',p:f=>{f.all(f.v(4,5)*W.cb.tide);f.setTide(0)}});

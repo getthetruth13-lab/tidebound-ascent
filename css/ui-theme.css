@@ -283,3 +283,9 @@
 .tb-pick:hover .tb-plate,.tb-pick:focus-visible .tb-plate,.tb-pick.on .tb-plate{filter:brightness(1.2);box-shadow:inset 0 0 16px #000,0 0 15px color-mix(in srgb,var(--class-primary) 65%,transparent),0 5px 12px #000c}
 .tb-hero h2{color:var(--class-primary);text-shadow:0 2px 4px #000,0 0 10px var(--class-secondary)}
 @media(max-height:360px){.tb-plate{min-height:80px;padding-top:10px;padding-bottom:10px;gap:1px}.tb-spr{height:48vh}}
+
+/* Duelist: wide lunging canvas gets letterboxed; scale up to match other heroes */
+.tb-spr[src*="duelist"]{transform:scale(1.28);transform-origin:50% 100%}
+.tb-pick:hover .tb-spr[src*="duelist"],.tb-pick:focus-visible .tb-spr[src*="duelist"],.tb-pick.on .tb-spr[src*="duelist"]{transform:translateY(-7px) scale(1.325)}
+.tb-pick:active .tb-spr[src*="duelist"]{transform:translateY(-3px) scale(1.293)}
+.tb-hspr[src*="duelist"]{transform:scale(1.28);transform-origin:50% 100%}

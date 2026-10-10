@@ -10,58 +10,58 @@
  "sprites": {
   "tidecaller": {
    "file": "sprites/tidecaller.webp",
-   "w": 921,
-   "h": 884,
-   "bytes": 195300,
+   "w": 776,
+   "h": 924,
+   "bytes": 199290,
    "role": "hero",
    "facing": "right",
    "anchor": {
-    "x": 0.375,
+    "x": 0.444,
     "y": 1.0
    },
-   "screenHeightPct": 49,
+   "screenHeightPct": 52,
    "hoverPx": 0
   },
   "echo-mage": {
    "file": "sprites/echo-mage.webp",
-   "w": 756,
-   "h": 884,
-   "bytes": 198852,
+   "w": 742,
+   "h": 904,
+   "bytes": 146848,
    "role": "hero",
    "facing": "right",
    "anchor": {
-    "x": 0.381,
+    "x": 0.446,
     "y": 1.0
    },
-   "screenHeightPct": 49,
+   "screenHeightPct": 50,
    "hoverPx": 0
   },
   "cartographer": {
    "file": "sprites/cartographer.webp",
-   "w": 592,
-   "h": 884,
-   "bytes": 151782,
+   "w": 553,
+   "h": 864,
+   "bytes": 188944,
    "role": "hero",
    "facing": "right",
    "anchor": {
-    "x": 0.469,
+    "x": 0.476,
     "y": 1.0
    },
-   "screenHeightPct": 49,
+   "screenHeightPct": 47,
    "hoverPx": 0
   },
   "duelist": {
    "file": "sprites/duelist.webp",
-   "w": 1171,
+   "w": 1176,
    "h": 894,
-   "bytes": 162486,
+   "bytes": 153270,
    "role": "hero",
    "facing": "right",
    "anchor": {
-    "x": 0.427,
+    "x": 0.4,
     "y": 1.0
    },
-   "screenHeightPct": 49,
+   "screenHeightPct": 57,
    "hoverPx": 0
   },
   "brine-slug": {

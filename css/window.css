@@ -1,0 +1,82 @@
+/* Tidebound Ascent: ONE shared ornate window + button system (Claude Task 9). Loaded last, after tiles.css.
+   Frame = art/v2/ui/window-frame.svg (9-slice: bronze/iron band, riveted edges, filigree corners with a sea-glass gem).
+   Painted art can replace that file later with no code change (same 96x96 layout). */
+:root{--win-frame:url(../art/v2/ui/window-frame.svg);--win-bw:9px;
+ --iron-tex:linear-gradient(rgba(18,14,10,.82),rgba(10,8,6,.93)),url(../art/v2/textures/parchment-dark.webp) center/300px;
+ --bronze-1:#c79a55;--bronze-2:#8a6434;--bronze-3:#4c3519;--engrave:#1b1209}
+
+/* ----- window frame: every modal / popup / panel ----- */
+.ov .box,.pop,.evpanel,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win{
+ position:relative;border:var(--win-bw) solid transparent;border-image:var(--win-frame) 32 fill/28px/8px round;border-radius:0;
+ background:var(--iron-tex);box-shadow:0 10px 34px #000d,0 0 0 1px #0008;color:var(--cream)}
+.ov .box{width:fit-content;min-width:min(300px,88vw);max-width:min(94vw,780px);padding:8px 12px 10px;max-height:calc(100dvh - 34px);margin:0 auto}
+.ov .box.tilebox,.ov .box.chartbox{max-width:min(94vw,860px);background:var(--iron-tex);border:var(--win-bw) solid transparent;border-image:var(--win-frame) 32 fill/28px/8px round;box-shadow:0 10px 34px #000d;padding:6px 12px 10px;overflow:auto}
+.ov .box.mapbox{max-width:min(94vw,900px)}
+.ov{padding:16px}
+.pop{border-width:5px;border-image:var(--win-frame) 32 fill/16px/4px round;padding:8px 12px}
+.tip,#kwtip{border:5px solid transparent;border-image:var(--win-frame) 32 fill/14px/3px round;border-radius:0;background:var(--iron-tex)}
+.evpanel{padding:10px 16px}
+.toast{background:var(--iron-tex);border:5px solid transparent;border-image:var(--win-frame) 32 fill/12px/2px round;border-radius:0;padding:2px 10px;color:var(--cream);font-family:var(--font-display);font-size:12px;letter-spacing:.03em}
+.toast.t-potion{filter:hue-rotate(120deg) saturate(1.3)}.toast.t-curse{filter:hue-rotate(-40deg) saturate(1.6)}.toast.t-gold{filter:brightness(1.15)}
+
+/* ----- decorative title plate ----- */
+.ov .box>h2,.msgp h2,.pop>h2,.tb-frame>h2,.tb-hero>h2,.win>h2,.ov .box>.wintitle{
+ position:relative;display:block;width:fit-content;max-width:100%;margin:-2px auto 6px;padding:3px 30px 4px;text-align:center;
+ font:700 17px/1.15 var(--font-display);letter-spacing:.07em;text-transform:uppercase;color:#f3d995;text-shadow:0 1px 0 #000,0 0 8px #d9b46a44;
+ background:linear-gradient(180deg,#3a2c17,#1d150b 60%,#2a1f10);border:1px solid #05070b;border-radius:3px;box-shadow:inset 0 0 0 1px #c79a5588,inset 0 1px 0 #f0d89066,0 2px 6px #000a}
+.ov .box>h2::before,.ov .box>h2::after,.msgp h2::before,.msgp h2::after,.tb-frame>h2::before,.tb-frame>h2::after,.win>h2::before,.win>h2::after{
+ content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-4.5px;background:radial-gradient(circle at 35% 30%,#b9fff4,#2fb8c4 55%,#0a2a3d);border:1px solid #05070b;transform:rotate(45deg);box-shadow:0 0 0 1px #c79a55}
+.ov .box>h2::before,.msgp h2::before,.tb-frame>h2::before,.win>h2::before{left:9px}.ov .box>h2::after,.msgp h2::after,.tb-frame>h2::after,.win>h2::after{right:9px}
+.ov .box .csub,.ov .box>.muted,.ov .box>.sub{text-align:center;margin:0 0 6px;font-size:13px;color:var(--cream-dim)}
+
+/* ----- themed buttons: bronze, engraved, gold-trimmed ----- */
+.btn,.tb-btn,.mini,.tbtn,.cmvb,.tb-x{
+ background:linear-gradient(180deg,#5a4224 0%,#3a2a15 48%,#2a1e0f 52%,#3a2a15 100%);color:#f1dfb0;border:1px solid #0a0704;border-radius:7px;
+ box-shadow:inset 0 0 0 1px #c79a55aa,inset 0 2px 0 #f0d89055,inset 0 -2px 3px #0009,0 2px 4px #000a;
+ text-shadow:0 -1px 0 #000,0 1px 0 #ffffff1a;font-family:var(--font-display);letter-spacing:.05em;text-transform:uppercase;font-weight:700;transition:filter .1s,transform .08s,box-shadow .12s}
+.btn{font-size:13px;padding:6px 14px;min-height:40px}
+.btn:hover,.tb-btn:hover,.mini:hover,.tbtn:hover,.cmvb:hover,.btn:focus-visible,.tb-btn:focus-visible{filter:brightness(1.18);box-shadow:inset 0 0 0 1px #f0d890,inset 0 2px 0 #fff3,inset 0 -2px 3px #0009,0 0 12px #d9b46a66,0 2px 4px #000a;border-color:#0a0704}
+.btn:active,.tb-btn:active,.mini:active,.tbtn:active,.cmvb:active{transform:translateY(1px) scale(.985);filter:brightness(.9);box-shadow:inset 0 0 0 1px #c79a55aa,inset 0 3px 6px #000c}
+.btn:disabled,.tb-btn:disabled,.mini:disabled,.tbtn:disabled{opacity:.45;filter:grayscale(.7) brightness(.8);cursor:default;transform:none;box-shadow:inset 0 0 0 1px #6a5a4088,inset 0 -2px 3px #0009}
+.btn.pri,.tb-btn.pri,.btn.pri:hover{background:linear-gradient(180deg,#e0b765 0%,#b88a42 48%,#8a6228 52%,#a87a38 100%);color:#1c1206;border-color:#0a0704;
+ box-shadow:inset 0 0 0 1px #fff0b8,inset 0 2px 0 #fff8,inset 0 -2px 3px #5a3a0a,0 0 10px #d9b46a44,0 2px 4px #000a;text-shadow:0 1px 0 #ffe9a8aa}
+.tb-btn.danger{background:linear-gradient(180deg,#9a3a38,#6a1c1e 50%,#4a1014);color:#ffe3d0;box-shadow:inset 0 0 0 1px #e0a070aa,inset 0 2px 0 #fff3,inset 0 -2px 3px #0009,0 2px 4px #000a}
+.tb-btn span,.btn.camp span{text-transform:none;font-family:var(--serif);font-weight:400;text-shadow:none}
+.mini{border-radius:9px;font-size:13px}
+.mini .uic{filter:drop-shadow(0 1px 1px #000)}
+.tbtn{color:#f1dfb0;border-color:#0a0704}
+.btn.camp{background:linear-gradient(180deg,#2d2314,#17110a)}
+.pop .row .btn,.ov .box .btn.full{width:auto;min-width:150px;display:block;margin:8px auto 0}
+
+/* ----- compact content inside windows ----- */
+.lp-taskbox{padding-bottom:8px}.lp-taskbox>.btn{width:auto;min-width:160px;margin:6px auto 0;display:block}
+.ov .box .tiles,.ov .box .chtiles{gap:10px;justify-content:center}
+.ov .box>.row,.ov .box>.actions{justify-content:center}
+
+/* tile cards inside windows: bronze-framed, not flat slate */
+.tile{background:linear-gradient(180deg,#2a2013,#15100a 80%);border:1px solid #0a0704;box-shadow:inset 0 0 0 1px #8a6434cc,inset 0 0 18px #000a,0 4px 10px #000a}
+.tile:hover:not(:disabled),.tile:focus-visible{box-shadow:inset 0 0 0 1px #f0d890,0 0 18px #d9b46a66,0 10px 18px #000c;border-color:#0a0704}
+.tile.pri{background:linear-gradient(180deg,#26434a,#0f1c20 80%);box-shadow:inset 0 0 0 1px #4fc3cd,inset 0 0 18px #000a,0 4px 10px #000a}
+.tile.static:hover{box-shadow:inset 0 0 0 1px #8a6434cc,inset 0 0 18px #000a,0 4px 10px #000a}
+.lp-tasktiles .lp-task{width:clamp(140px,calc((100vw - 120px)/var(--n,3)),190px)}
+.lp-task.lit{box-shadow:inset 0 0 0 1px #ffd98a,0 0 18px #ffb34766,0 6px 14px #000a}
+
+/* ----- inline panels, page headings, HUD (same system, lighter weight) ----- */
+.panel,.lp-sum,.endr>div:first-child{border:5px solid transparent;border-image:var(--win-frame) 32 fill/16px/3px round;border-radius:0;background:var(--iron-tex);box-shadow:0 6px 18px #000c}
+.roomhead h2,.shophead h2,.page>h2,.end h1,.endl h1{position:relative;display:inline-block;margin:2px auto 4px;padding:3px 26px 4px;font-size:17px;letter-spacing:.07em;text-transform:uppercase;color:#f3d995;
+ background:linear-gradient(180deg,#3a2c17,#1d150b 60%,#2a1f10);border:1px solid #05070b;border-radius:3px;box-shadow:inset 0 0 0 1px #c79a5588,inset 0 1px 0 #f0d89066,0 2px 6px #000a}
+.roomhead,.shophead{text-align:center}
+.topbar{border-bottom:2px solid #8a6434;box-shadow:0 2px 0 #05070b,0 6px 12px #000a}
+.end h1,.endl h1{font-size:22px}
+.cardtip,#cardtip .card{filter:none}
+.page>h2,.roomhead h2,.shophead h2{display:block;width:fit-content;max-width:90%;margin:4px auto}
+
+/* title-flow frames use the same window: drop the old studs, tighten padding, plate the heading */
+.tb-orn{display:none}
+.tb-frame,.tb-hero{max-height:calc(100dvh - 12px)}
+.tb-inner{padding:6px 14px 8px}
+.tb-inner>h2{position:relative;display:block;width:fit-content;max-width:100%;margin:-2px auto 6px;padding:3px 30px 4px;font-size:18px;letter-spacing:.08em;color:#f3d995;
+ background:linear-gradient(180deg,#3a2c17,#1d150b 60%,#2a1f10);border:1px solid #05070b;border-radius:3px;box-shadow:inset 0 0 0 1px #c79a5588,inset 0 1px 0 #f0d89066,0 2px 6px #000a}
+.tb-inner>h2::before,.tb-inner>h2::after{content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-4.5px;background:radial-gradient(circle at 35% 30%,#b9fff4,#2fb8c4 55%,#0a2a3d);border:1px solid #05070b;transform:rotate(45deg);box-shadow:0 0 0 1px #c79a55}
+.tb-inner>h2::before{left:9px}.tb-inner>h2::after{right:9px}
+.tb-cols{gap:6px 18px}.tb-cols p{font-size:13.5px;line-height:1.22}
