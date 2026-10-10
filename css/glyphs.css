@@ -1,0 +1,12 @@
+/* Drowned-bronze line glyphs (src/ui/glyphs.js): the only pictographs the player sees. Size follows the surrounding font. */
+.gi{display:inline-block;position:relative;width:1.05em;height:1.05em;vertical-align:-.17em;font-style:normal;line-height:1;color:#c9a066;flex:none;
+ filter:drop-shadow(0 1px 0 rgba(0,0,0,.65)) drop-shadow(0 0 .12em rgba(201,160,102,.35))}
+.gi svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.gi img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.gi:has(img) svg{visibility:hidden}
+/* accent tints keep meaning readable without colour emoji */
+.gi[data-g=blood],.gi[data-g=heart],.gi[data-g=flame]{color:#c4604a}
+.gi[data-g=drop],.gi[data-g=wave],.gi[data-g=spiral],.gi[data-g=moon]{color:#7fb6b0}
+.gi[data-g=coin],.gi[data-g=purse],.gi[data-g=bolt],.gi[data-g=lantern],.gi[data-g=candle],.gi[data-g=star],.gi[data-g=spark]{color:#e0b867}
+.ph .gi,.emb .gi,.tart .gi{width:1em;height:1em}
+.ph .gi svg,.emb .gi svg{stroke-width:1.4}

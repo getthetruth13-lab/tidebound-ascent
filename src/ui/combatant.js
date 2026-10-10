@@ -17,6 +17,7 @@ const ICON={
  barbs:S('<path d="M12 1l2.5 8 8-2.5-5.5 6.5 5.5 6.5-8-2.5L12 23l-2.5-8-8 2.5L7 11 1.5 4.5l8 2.5z"/>'), // thorn burst: Barbs
  ward:S('<circle cx="12" cy="12" r="9"/>','<circle cx="12" cy="12" r="5" fill="none" stroke="#05070b" stroke-width="1.6"/>'), // bubble ward: Rebuff
  mending:S('<path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z"/>'), // cross: Mending
+ parry:S('<path d="M4 20L18 6M15 3l6 6M3 17l4 4"/><path d="M20 20L6 6M9 3L3 9M21 17l-4 4"/>','<path d="M4 20L18 6M20 20L6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>'),
  mightTmp:S('<path d="M12 22L3 10h6V2h6v8h6z"/>'), // down arrow: Might lost this turn
  rooted:S('<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10"/>','<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>')
 };
@@ -34,6 +35,7 @@ const STATUS={
  barbs:T('Barbs','buff','Barbs X','Stays until the end of combat.'),
  ward:T('Rebuff','buff','Rebuff X','Each debuff it blocks uses up 1 stack.'),
  mending:T('Mending','buff','Mending X','Stays until the end of combat.'),
+ parry:T('Parry','buff',null,'Blocks the first enemy Attack this turn and reflects half. Lasts until the end of the enemy turn.'),
  mightTmp:T('Temporary Might','buff',null,'Removed at the end of its next turn.'),
  rooted:T('Rooted','buff',null,'Passive: stays throughout combat.')
 };
@@ -46,7 +48,7 @@ function iconOf(k){const a=assetSrc('status',k);return `<span class="status-art"
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 const sentence=t=>{const s=(t||'').split(/(?<=[.!?])\s+/);return s.slice(0,2).join(' ')};
 export function statusText(k,v){const d=STATUS[k];if(!d)return '';
- const rule=(d.kw&&(KW[d.kw]||KW[d.kw.replace(/ X$/,'')]))||(k==='mightTmp'?'Changes Attack damage by the shown amount.':k==='rooted'?'Gains 4 Guard per living Tendril at the end of her turn.':'');
+ const rule=(d.kw&&(KW[d.kw]||KW[d.kw.replace(/ X$/,'')]))||(k==='mightTmp'?'Changes Attack damage by the shown amount.':k==='rooted'?'Gains 4 Guard per living Tendril at the end of her turn.':k==='parry'?'Reduces the first enemy Attack against you this turn by this much and reflects half of it back.':'');
  return `${v>0?'×'+v+' ':'−'+Math.abs(v)+' '}${esc(sentence(rule))} Duration: ${esc(d.dur)}`}
 export function statusRowHTML(st){const p=[];
  for(const k of ORDER){let v=st&&st[k];if(!v||!STATUS[k])continue;const d=STATUS[k];

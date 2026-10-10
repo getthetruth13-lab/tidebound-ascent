@@ -14,6 +14,7 @@ import * as input from './ui/input.js';
 import './ui/chartdrag.js';
 import './ui/foil.js';
 import {loadTiles,tileUrls} from './ui/tiles.js';
+import {installGlyphs} from './ui/glyphs.js';
 import * as fx from './ui/fx.js';
 import * as save from './save.js';
 import * as bus from './core/bus.js';
@@ -26,6 +27,8 @@ import * as lamp from './ui/screens/lamp.js';
 import * as lampEngine from './engine/lamplight.js';
 import * as progress from './progress.js';
 import * as lampData from './data/lamplight.js';
+
+installGlyphs();
 
 // Inline onclick="..." handlers in rendered HTML (and the test scripts) call these by name.
 for(const m of [assets,cards,combat,runMod,render,fx,save,bus,env,title,select,learn,intro,lamp])for(const [k,v] of Object.entries(m))if(typeof v==='function')window[k]=v;

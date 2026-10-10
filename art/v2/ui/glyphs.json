@@ -1,0 +1,707 @@
+{
+ "note": "Glyph art slots (replace SVG glyphs). Drop a webp at \"path\", run node tools/make-glyphs-manifest.cjs.",
+ "glyphs": {
+  "coin": {
+   "path": "art/v2/ui/glyphs/coin.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: coin (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "purse": {
+   "path": "art/v2/ui/glyphs/purse.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: purse (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "drop": {
+   "path": "art/v2/ui/glyphs/drop.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: drop (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "blood": {
+   "path": "art/v2/ui/glyphs/blood.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: blood (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "flame": {
+   "path": "art/v2/ui/glyphs/flame.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: flame (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "lantern": {
+   "path": "art/v2/ui/glyphs/lantern.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: lantern (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "candle": {
+   "path": "art/v2/ui/glyphs/candle.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: candle (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "bell": {
+   "path": "art/v2/ui/glyphs/bell.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: bell (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "bolt": {
+   "path": "art/v2/ui/glyphs/bolt.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: bolt (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "wave": {
+   "path": "art/v2/ui/glyphs/wave.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: wave (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "spiral": {
+   "path": "art/v2/ui/glyphs/spiral.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: spiral (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "boot": {
+   "path": "art/v2/ui/glyphs/boot.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: boot (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "walker": {
+   "path": "art/v2/ui/glyphs/walker.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: walker (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "stone": {
+   "path": "art/v2/ui/glyphs/stone.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: stone (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "mountain": {
+   "path": "art/v2/ui/glyphs/mountain.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: mountain (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "map": {
+   "path": "art/v2/ui/glyphs/map.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: map (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "pin": {
+   "path": "art/v2/ui/glyphs/pin.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: pin (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "compass": {
+   "path": "art/v2/ui/glyphs/compass.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: compass (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "shell": {
+   "path": "art/v2/ui/glyphs/shell.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: shell (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "lock": {
+   "path": "art/v2/ui/glyphs/lock.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: lock (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "note": {
+   "path": "art/v2/ui/glyphs/note.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: note (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "arrowup": {
+   "path": "art/v2/ui/glyphs/arrowup.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: arrowup (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "arrowdown": {
+   "path": "art/v2/ui/glyphs/arrowdown.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: arrowdown (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "arrowright": {
+   "path": "art/v2/ui/glyphs/arrowright.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: arrowright (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "undo": {
+   "path": "art/v2/ui/glyphs/undo.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: undo (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "cycle": {
+   "path": "art/v2/ui/glyphs/cycle.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: cycle (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "sword": {
+   "path": "art/v2/ui/glyphs/sword.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: sword (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "hammer": {
+   "path": "art/v2/ui/glyphs/hammer.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: hammer (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "trident": {
+   "path": "art/v2/ui/glyphs/trident.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: trident (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "shield": {
+   "path": "art/v2/ui/glyphs/shield.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: shield (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "skull": {
+   "path": "art/v2/ui/glyphs/skull.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: skull (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "heart": {
+   "path": "art/v2/ui/glyphs/heart.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: heart (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "eye": {
+   "path": "art/v2/ui/glyphs/eye.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: eye (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "moon": {
+   "path": "art/v2/ui/glyphs/moon.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: moon (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "star": {
+   "path": "art/v2/ui/glyphs/star.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: star (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "spark": {
+   "path": "art/v2/ui/glyphs/spark.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: spark (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "sun": {
+   "path": "art/v2/ui/glyphs/sun.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: sun (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "gem": {
+   "path": "art/v2/ui/glyphs/gem.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: gem (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "flask": {
+   "path": "art/v2/ui/glyphs/flask.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: flask (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "pot": {
+   "path": "art/v2/ui/glyphs/pot.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: pot (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "scroll": {
+   "path": "art/v2/ui/glyphs/scroll.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: scroll (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "book": {
+   "path": "art/v2/ui/glyphs/book.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: book (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "feather": {
+   "path": "art/v2/ui/glyphs/feather.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: feather (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "anchor": {
+   "path": "art/v2/ui/glyphs/anchor.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: anchor (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "scissors": {
+   "path": "art/v2/ui/glyphs/scissors.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: scissors (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "dice": {
+   "path": "art/v2/ui/glyphs/dice.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: dice (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "tower": {
+   "path": "art/v2/ui/glyphs/tower.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: tower (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "house": {
+   "path": "art/v2/ui/glyphs/house.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: house (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "tent": {
+   "path": "art/v2/ui/glyphs/tent.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: tent (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "door": {
+   "path": "art/v2/ui/glyphs/door.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: door (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "crab": {
+   "path": "art/v2/ui/glyphs/crab.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: crab (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "fish": {
+   "path": "art/v2/ui/glyphs/fish.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: fish (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "bird": {
+   "path": "art/v2/ui/glyphs/bird.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: bird (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "paw": {
+   "path": "art/v2/ui/glyphs/paw.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: paw (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "leaf": {
+   "path": "art/v2/ui/glyphs/leaf.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: leaf (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "ghost": {
+   "path": "art/v2/ui/glyphs/ghost.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: ghost (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "mask": {
+   "path": "art/v2/ui/glyphs/mask.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: mask (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "figure": {
+   "path": "art/v2/ui/glyphs/figure.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: figure (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "hand": {
+   "path": "art/v2/ui/glyphs/hand.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: hand (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "crown": {
+   "path": "art/v2/ui/glyphs/crown.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: crown (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "chest": {
+   "path": "art/v2/ui/glyphs/chest.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: chest (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "flag": {
+   "path": "art/v2/ui/glyphs/flag.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: flag (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "check": {
+   "path": "art/v2/ui/glyphs/check.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: check (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "cross": {
+   "path": "art/v2/ui/glyphs/cross.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: cross (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "question": {
+   "path": "art/v2/ui/glyphs/question.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: question (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "wind": {
+   "path": "art/v2/ui/glyphs/wind.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: wind (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "cloud": {
+   "path": "art/v2/ui/glyphs/cloud.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: cloud (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "hourglass": {
+   "path": "art/v2/ui/glyphs/hourglass.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: hourglass (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "gear": {
+   "path": "art/v2/ui/glyphs/gear.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: gear (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "knot": {
+   "path": "art/v2/ui/glyphs/knot.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: knot (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "ruler": {
+   "path": "art/v2/ui/glyphs/ruler.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: ruler (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "mirror": {
+   "path": "art/v2/ui/glyphs/mirror.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: mirror (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "card": {
+   "path": "art/v2/ui/glyphs/card.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: card (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "play": {
+   "path": "art/v2/ui/glyphs/play.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: play (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "rewind": {
+   "path": "art/v2/ui/glyphs/rewind.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: rewind (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "pause": {
+   "path": "art/v2/ui/glyphs/pause.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: pause (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "fast": {
+   "path": "art/v2/ui/glyphs/fast.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: fast (transparent, centred, ~10% margin)",
+   "ready": false
+  },
+  "sigil": {
+   "path": "art/v2/ui/glyphs/sigil.webp",
+   "size": [
+    128,
+    128
+   ],
+   "desc": "Drowned bronze line icon: sigil (transparent, centred, ~10% margin)",
+   "ready": false
+  }
+ }
+}
