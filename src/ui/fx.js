@@ -11,7 +11,7 @@ export function anim(ts,dur){const age=Date.now()-(ts||0);return age<dur?`animat
 // A positioned, inert copy of a rendered hand card (body-level, so it survives render()).
 export function cloneCard(el,rect){const r=rect||el.getBoundingClientRect();const g=el.cloneNode(true);g.classList.remove('sel','drag','unp');g.classList.add('flycard');
  for(const a of ['data-i','data-uid','id'])g.removeAttribute(a);g.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));g.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));g.removeAttribute('onclick');g.setAttribute('aria-hidden','true');
- Object.assign(g.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',transform:'none',transition:'none'});document.body.appendChild(g);return {g,r}}
+ Object.assign(g.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',transform:'none',transition:'none',willChange:'transform,opacity'});document.body.appendChild(g);return {g,r}}
 // Card play (R7): 60 ms anticipation (lift 8 px, scale 1.1), then a type-specific flight with a class-coloured trail and a landing flash.
 //   Attack: fast and straight, lands at IMPACT_MS (the swing connects then).  Skill: floats to the hero and shimmers.  Power: slow glowing ascent.
 export const IMPACT_MS=160;
@@ -30,8 +30,9 @@ export function flyCard(ci,target){if(!motionOn())return;const el=document.query
   :type==='S'
   ?[{transform:'none',opacity:1},{transform:'translateY(-8px) scale(1.1)',opacity:1,offset:k,easing:'ease-in-out'},{transform:`translate(${tx*.55}px,${ty*.55-26}px) scale(.8) rotate(${rot/2}deg)`,opacity:.95,offset:.7},{transform:`translate(${tx}px,${ty-6}px) scale(.4)`,opacity:0}]
   :[{transform:'none',opacity:1,filter:'none'},{transform:'translateY(-10px) scale(1.12)',opacity:1,filter:'brightness(1.3)',offset:k,easing:'ease-in-out'},{transform:`translate(${tx*.6}px,${ty*.6-40}px) scale(.95)`,opacity:1,filter:'brightness(1.5)',offset:.6},{transform:`translate(${tx}px,${ty-10}px) scale(.45)`,opacity:0,filter:'brightness(1.8)'}];
- const exhaust=isEx(ci);let raf=0;
- const trail=()=>{if(!g.isConnected)return;const q=g.getBoundingClientRect();emit('trail',q.left+q.width/2,q.top+q.height/2,col);raf=requestAnimationFrame(trail)};raf=requestAnimationFrame(trail);
+ const exhaust=isEx(ci);let raf=0,lastTrail=-Infinity;
+ // Sample particle positions at 30 Hz; the card itself still animates at display rate.
+ const trail=now=>{if(!g.isConnected)return;if(now-lastTrail>=1000/30){lastTrail=now;const q=g.getBoundingClientRect();emit('trail',q.left+q.width/2,q.top+q.height/2,col)}raf=requestAnimationFrame(trail)};raf=requestAnimationFrame(trail);
  const end=()=>{cancelAnimationFrame(raf);g.remove();
   if(type==='A'){ring(dest.x,dest.y,col,64,300)}else if(type==='S'){ring(dest.x,dest.y,COL.pale,80,380);emit('guard',dest.x,dest.y)}else{ring(dest.x,dest.y,COL.gold,110,520);emit('burst',dest.x,dest.y,COL.gold,16)}
   if(exhaust)emit('death',dest.x,dest.y,r.width*.6,r.height*.6,10)};

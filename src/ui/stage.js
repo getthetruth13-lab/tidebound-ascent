@@ -10,6 +10,7 @@ const PROFILES={
  a1_shore:{groundY:.56,grade:'saturate(.88) brightness(.94)',light:-1,haze:.08},
  a1_cloister:{groundY:.55,grade:'saturate(.82) brightness(.90)',light:-1,haze:.10},
  a1_bellcourt:{groundY:.56,grade:'saturate(.90) sepia(.08) brightness(.96)',light:1,haze:.07},
+ a1_lair_row:{groundY:.56,grade:'saturate(.88) brightness(.93)',light:1,haze:.09},
  a1_lair_kelp:{groundY:.55,grade:'saturate(.83) brightness(.88)',light:-1,haze:.11}
 };
 export function stageProfile(){const id=envKeyFor().id,e=ENV.envs[id]||{};return {groundY:.55,grade:'saturate(.88) brightness(.93)',light:-1,haze:.08,...PROFILES[id],rim:e.rim||'#8fa3c7',air:e.tint?.col||e.pal?.[1]||'#587c83'}}

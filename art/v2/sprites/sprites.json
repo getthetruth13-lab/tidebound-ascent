@@ -182,7 +182,7 @@
    "h": 844,
    "bytes": 196512,
    "role": "elite",
-   "facing": "left",
+   "facing": "right",
    "anchor": {
     "x": 0.468,
     "y": 1.0
@@ -274,6 +274,90 @@
     "y": 1.0
    },
    "screenHeightPct": 34,
+   "hoverPx": 0
+  },
+  "mender": {
+   "file": "sprites/mender.webp",
+   "w": 877,
+   "h": 1224,
+   "bytes": 181114,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.612,
+    "y": 1.0
+   },
+   "screenHeightPct": 36,
+   "hoverPx": 0
+  },
+  "heap": {
+   "file": "sprites/heap.webp",
+   "w": 1250,
+   "h": 805,
+   "bytes": 191212,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.506,
+    "y": 1.0
+   },
+   "screenHeightPct": 30,
+   "hoverPx": 0
+  },
+  "limpet": {
+   "file": "sprites/limpet.webp",
+   "w": 650,
+   "h": 515,
+   "bytes": 65950,
+   "role": "summon",
+   "facing": "left",
+   "anchor": {
+    "x": 0.368,
+    "y": 1.0
+   },
+   "screenHeightPct": 24,
+   "hoverPx": 0
+  },
+  "novice": {
+   "file": "sprites/novice.webp",
+   "w": 671,
+   "h": 1224,
+   "bytes": 174858,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.674,
+    "y": 1.0
+   },
+   "screenHeightPct": 46,
+   "hoverPx": 0
+  },
+  "tenant": {
+   "file": "sprites/tenant.webp",
+   "w": 1041,
+   "h": 1022,
+   "bytes": 162180,
+   "role": "boss",
+   "facing": "left",
+   "anchor": {
+    "x": 0.55,
+    "y": 1.0
+   },
+   "screenHeightPct": 78,
+   "hoverPx": 0
+  },
+  "penitent": {
+   "file": "sprites/penitent.webp",
+   "w": 592,
+   "h": 1024,
+   "bytes": 144016,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.664,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
    "hoverPx": 0
   }
  }

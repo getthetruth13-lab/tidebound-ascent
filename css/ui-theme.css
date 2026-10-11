@@ -457,34 +457,25 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 .tb-ledger .lp-pagehead{position:absolute;left:0;right:0;top:108px}
 .tb-ledger .lp-pages{position:absolute;left:0;right:0;top:134px;bottom:0;max-height:none}
 @media (max-height:420px){.tb-cols p{font-size:13px;line-height:1.22}.tb-cols{gap:6px 16px}}
-/* ---- Painted title video + image main menu (art/v2/title). Stage keeps the 16:9 art whole; a blurred copy fills the bars. ---- */
+/* ---- v3 title video + main menu: full-bleed stage (cover), but never cropping more than 16.5% of height, since the baked title (frame y 9.7%) to TAP TO BEGIN bottom (92.8%) needs 83.1%. At 19.5:9 that leaves ~0.9% dark edges each side, feathered by the mask. Menu plate shares the stage so the swap is seamless. ---- */
 .tb-vid,.tb-imgmenu{background:#03060a;overflow:hidden}
-.tv-fill{position:absolute;inset:-6%;background:center/cover no-repeat;filter:blur(18px) brightness(.55);transform:scale(1.05)}
-.tv-stage{position:absolute;left:50%;top:50%;width:min(100vw,calc(100dvh*16/9));aspect-ratio:16/9;transform:translate(-50%,-50%)}
+.tv-stage{position:absolute;left:50%;aspect-ratio:16/9;width:min(max(100vw,calc(100dvh*16/9)),calc(100dvh/.835*16/9));top:calc((100dvh - min(max(100vw,calc(100dvh*16/9)),calc(100dvh/.835*16/9))*9/16)*.56);transform:translateX(-50%);-webkit-mask-image:linear-gradient(90deg,transparent,#000 1.2%,#000 98.8%,transparent);mask-image:linear-gradient(90deg,transparent,#000 1.2%,#000 98.8%,transparent)}
 .tv-video,.tv-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-select:none}
-.tv-stage::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 6vmin 4vmin #03060a inset}
-.tm-nav{position:absolute;inset:0}
-.tm-hot{position:absolute;background:transparent;border:0;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:40%;transition:background .18s,box-shadow .18s}
-.tm-hot:hover,.tm-hot:focus-visible{outline:none;background:radial-gradient(ellipse 52% 50% at 50% 50%,rgba(255,214,140,.16),rgba(255,190,90,.06) 60%,transparent 75%);mix-blend-mode:screen}
-.tm-hot:active{background:radial-gradient(ellipse 52% 50% at 50% 50%,rgba(255,226,160,.32),rgba(255,190,90,.1) 60%,transparent 78%);mix-blend-mode:screen}
-.tm-hot.off{cursor:default;pointer-events:none;background:radial-gradient(ellipse 50% 46% at 50% 50%,rgba(3,6,10,.78),rgba(3,6,10,.6) 60%,transparent 80%);mix-blend-mode:normal}
-.tm-hot .lp-dot{right:22%;top:10%}
-.tm-sub{position:absolute;left:0;right:0;text-align:center;transform:translateY(-35%);font:italic 400 clamp(10px,1.6dvh,14px) var(--serif);color:#a99f84;text-shadow:0 1px 2px #000;pointer-events:none;opacity:.85}
 .tb-start.tb-vid.leaving{opacity:0}
-
-/* ---- v2: menu = video frame 0 + live engraved words (two columns under the skull emblem). Sizes in stage units (cqh). ---- */
-.tb-imgmenu .tv-stage{container-type:size}
-.tm-words{position:absolute;left:0;right:0;top:77.2%;height:19.5%;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;column-gap:13%;align-items:center}
-.tm-w{position:relative;background:none;border:0;padding:0 .6cqh;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;font:600 4.1cqh/1 'Cinzel',var(--font-display),serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;height:100%;display:flex;align-items:center}
-.tm-w.l{justify-content:flex-end}.tm-w.r{justify-content:flex-start}
-.tm-w span{background:linear-gradient(180deg,#f0d6a6 0%,#c99a62 48%,#8e6238 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .25cqh .3cqh rgba(0,0,0,.95)) drop-shadow(0 0 1.2cqh rgba(0,0,0,.7));transition:filter .18s}
-.tm-w:hover span,.tm-w:focus-visible span{filter:drop-shadow(0 .25cqh .3cqh rgba(0,0,0,.95)) drop-shadow(0 0 1.4cqh rgba(255,196,110,.55));outline:none}
-.tm-w:focus-visible{outline:none}
-.tm-w:active span{filter:drop-shadow(0 0 .6cqh rgba(255,226,160,.9)) drop-shadow(0 0 2cqh rgba(255,190,90,.6))}
+/* Mockup layout in viewport units: title+emblem y 6-48%, words column y 52-93%. */
+.tm-emb{position:absolute;left:50%;top:6dvh;height:42dvh;object-fit:contain;transform:none;margin-left:calc(-42dvh*740/515/2);width:calc(42dvh*740/515);pointer-events:none;user-select:none;filter:drop-shadow(0 0 1.5dvh rgba(60,170,200,.18));will-change:transform}
+.tm-words{position:absolute;left:0;right:0;top:52dvh;height:41dvh;display:grid;grid-template-rows:repeat(6,1fr);justify-items:center;align-items:center}
+.tm-w{position:relative;background:none;border:0;padding:0 2dvh;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;font:600 4.9dvh/1 'Cinzel',var(--font-display),serif;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;height:100%;display:flex;align-items:center;outline:none}
+.tm-w span{background:linear-gradient(180deg,#f0d3a8 0%,#c9976a 50%,#8d6040 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .3dvh .3dvh rgba(0,0,0,.95)) drop-shadow(0 0 1.4dvh rgba(0,0,0,.7));transition:filter .18s}
+.tm-w:hover span,.tm-w:focus-visible span{filter:drop-shadow(0 .3dvh .3dvh rgba(0,0,0,.95)) drop-shadow(0 0 1.6dvh rgba(255,196,110,.55))}
+.tm-w:active span,.tm-w.tm-hit span{background-image:linear-gradient(180deg,#fff6dc 0%,#ffd890 50%,#e09a52 100%);filter:drop-shadow(0 0 .4dvh #fff2c8) drop-shadow(0 0 1.2dvh rgba(255,210,120,1)) drop-shadow(0 0 3dvh rgba(255,170,70,.95)) drop-shadow(0 0 6dvh rgba(255,140,50,.7))}
+.tm-w.tm-hit{animation:tmHit .2s ease-out}
+@keyframes tmHit{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1.03)}}
 .tm-w.off{cursor:default;pointer-events:none;opacity:.38}
-.tm-w .lp-dot{position:relative;right:auto;top:auto;margin-left:.8cqh;transform:translateY(-40%)}
-.tm-fade .tm-w{animation:tmIn .9s ease-out both;animation-delay:calc(.12s + var(--i)*.07s)}
+.tm-w .lp-dot{position:relative;right:auto;top:auto;margin-left:1dvh;transform:translateY(-40%)}
+.tm-fade .tm-w{animation:tmIn .9s ease-out both;animation-delay:calc(.45s + var(--i)*.08s)}
 .tm-fade .tm-w.off{animation-name:tmInOff}
-@keyframes tmIn{from{opacity:0;transform:translateY(.8cqh)}to{opacity:1;transform:none}}
+@keyframes tmIn{from{opacity:0;transform:translateY(1dvh)}to{opacity:1;transform:none}}
 @keyframes tmInOff{from{opacity:0}to{opacity:.38}}
 .reduce-motion .tm-fade .tm-w{animation-duration:.01s;animation-delay:0s}
+#tbdip{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:99999}

@@ -350,7 +350,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Barnacle Anvil",
-   "ready": false
+   "ready": true
   },
   "event-spring": {
    "path": "art/v2/ui/tiles/event-spring.webp",
@@ -395,7 +395,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Tidepool Shrine",
-   "ready": false
+   "ready": true
   },
   "event-cartomancer": {
    "path": "art/v2/ui/tiles/event-cartomancer.webp",
@@ -413,7 +413,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Sunken Chest",
-   "ready": false
+   "ready": true
   },
   "event-stranger": {
    "path": "art/v2/ui/tiles/event-stranger.webp",
@@ -431,7 +431,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Crab Market",
-   "ready": false
+   "ready": true
   },
   "event-gullnest": {
    "path": "art/v2/ui/tiles/event-gullnest.webp",
@@ -449,7 +449,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Ink Grotto",
-   "ready": false
+   "ready": true
   },
   "event-sailor": {
    "path": "art/v2/ui/tiles/event-sailor.webp",
@@ -458,7 +458,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Shipwrecked Sailor",
-   "ready": false
+   "ready": true
   },
   "event-mirror": {
    "path": "art/v2/ui/tiles/event-mirror.webp",
@@ -467,7 +467,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Tideglass Mirror",
-   "ready": false
+   "ready": true
   },
   "event-loom": {
    "path": "art/v2/ui/tiles/event-loom.webp",

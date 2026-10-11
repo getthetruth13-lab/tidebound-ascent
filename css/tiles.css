@@ -211,3 +211,14 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 .shop-wren:has(img){display:block}
 @media (min-width:1200px){.shop-wren{height:min(52vh,420px)}}
 .tg-side{width:32px}.dais-tide .dais-body{gap:3px}
+/* Task 26: phone-height Moon Shell / start-of-fight choices stay compact so enemies and intents remain visible above them. */
+@media (max-height:520px){
+ .combat .ov.battle{padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+ .combat .ov.battle .box.tilebox{--choice-art:38px;padding:4px 10px 6px}
+ .combat .ov.battle .box.tilebox>h2{font-size:13px;padding:1px 18px;margin:0 auto 1px}
+ .combat .ov.battle .box.tilebox>.csub{display:none}
+ .combat .ov.battle .box.tilebox .tiles{gap:6px;padding:2px 0 0}
+ .combat .ov.battle .box.tilebox .tile{flex:0 1 150px;width:150px;padding:3px 4px;gap:1px}
+ .combat .ov.battle .box.tilebox .tname{font-size:12px}
+ .combat .ov.battle .box.tilebox .tsum{font-size:11px;line-height:1.15}
+}

@@ -50,10 +50,10 @@ function onEvent(event,ctx){const run=W.run,L=run&&run.lamp;if(!L||L.settled)ret
  else if(event==='relicGained')noteSeen('relic',ctx.relic.id);
  else if(event==='gainCard')noteSeen('card',ctx.card.id);
  for(const task of L.tasks){if(task.done)continue;const h=TASKS[task.id]&&TASKS[task.id].ev[event];if(!h)continue;let ok=false;try{ok=h(ctx,t)}catch(_){}if(ok)taskDone(task)}}
-observeEvents(onEvent);
+observeEvents(onEvent,{replay:true});
 // ================= settle =================
 // Called once by endRun. Adds the run's Lamplight to the class Lamp and the Stair Climb, commits first-time sightings, and keeps an itemised summary for the end screen.
-export function settleRun(run,won){const L=run.lamp;if(!L||L.settled)return L&&L.summary||null;
+export function settleRun(run,won){if(W.previewing)return null;const L=run.lamp;if(!L||L.settled)return L&&L.summary||null;
  const p=loadProfile(),cls=run.cls;L.settled=true;
  const floors=Math.max(0,Math.min(15,run.floor||0)),tasksDone=L.tasks.filter(t=>t.done),newFirsts=L.firsts.filter(k=>{const [kind,id]=k.split(':');return !(p.seen[kind]&&p.seen[kind][id])});
  const lines=[{k:'floors',label:`Floors reached (${floors})`,pts:floors*EARN.floor},{k:'fights',label:`Fights won (${L.fights})`,pts:L.fights*EARN.fight},

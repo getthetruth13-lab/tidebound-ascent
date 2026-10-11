@@ -3,6 +3,7 @@
 import {W} from './core/state.js';
 import {settings,saveSettings} from './save.js';
 import {observeEvents} from './core/bus.js';
+import {fxOn} from './ui/vfx.js';
 let ctx,master,unlocked=false,manifest={},context=null,current=null,lastScreen=null,initialized=false;
 const bags={},lastTrack={},voices=new Set(),recent={};
 const level=k=>settings.audioMuted?0:Math.max(0,Math.min(1,Number(settings[k])||0));
@@ -31,7 +32,7 @@ function startTrack(){if((!unlocked&&context!=='menu')||!context||current||docum
  el.ontimeupdate=()=>{if(!el.loop&&current===voice&&Number.isFinite(el.duration)&&el.duration-el.currentTime<=2&&el.currentTime>0){retire();startTrack()}};
  // A missing track must not spin through an unavailable playlist forever.
  el.onerror=()=>{if(current===voice)retire()};
- el.play().then(()=>{if(current===voice&&unlocked)ramp(voice,level('musicVolume'),1.5)}).catch(()=>{voice.blocked=true});
+ el.play().then(()=>{if(current===voice&&unlocked)ramp(voice,level('musicVolume'),2)}).catch(()=>{voice.blocked=true});
 }
 export function syncAudio(){syncUIState();const s=W.S.screen;
  const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:'map'):null;
@@ -60,7 +61,7 @@ Object.assign(tones,{
  enlarge:[210,350,.15,.045,.3,900],pickup:[200,310,.1,.04,.4,850],drop:[250,160,.1,.045,.3,750],
  sparkle:[1500,3000,.5,.06,.015,6000],flip:[320,180,.12,.05,.1,900],levelUp:[220,440,.42,.065,.035,1000],taskComplete:[330,495,.32,.055,.035,1000]
 });
-export function playSound(name,pitch=1){if(!ctx||ctx.state!=='running'||!level('sfxVolume'))return;const now=ctx.currentTime;
+export function playSound(name,pitch=1){if(W.replaying||!ctx||ctx.state!=='running'||!level('sfxVolume'))return;const now=ctx.currentTime;
  if(now-(recent[name]??-10)<.055)return;recent[name]=now;
  const [f,t,duration,peak=.12,noiseMix=.22,cutoff=1100]=tones[name]||tones.tap;
  const from=f*pitch,to=t*pitch;
@@ -142,7 +143,9 @@ export function initAudio(){
  document.addEventListener('keydown',unlock,{once:true});
  document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const node=e.target.closest?.('.node');if(node&&!node.contains(e.relatedTarget))playSound('mapHover')});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){retire();for(const voice of voices){if(voice.frame)cancelAnimationFrame(voice.frame);voice.el.pause();voice.el.removeAttribute('src');voice.el.load()}voices.clear();if(ctx)ctx.suspend().catch(()=>{})}else if(unlocked){if(ctx)ctx.resume().catch(()=>{});startTrack()}});
- observeEvents((event,c)=>{queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={cardPlayed:'play',shuffle:'shuffle',guardGained:'guard',enemyKilled:'death',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward'};
+ observeEvents((event,c)=>{queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={cardPlayed:'play',shuffle:'shuffle',guardGained:'guard',enemyKilled:'death',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward',potionUsed:'confirm'};
+ if(!fxOn()&&!document.hidden){const combo={crest:'crest',undertow:'guard',echo:'echo',flourish:'flourish',parry:'guard',waypointPlaced:'rank',waypointTrigger:'rank',advance:(c.wp?.rank||0)>=3?'landmark':'rank'};if(combo[event])playSound(combo[event])}
+ if(event==='playerHit'&&c.blocked>0&&!c.amount)playSound('guard');
  if(event==='damageDealt'&&c.amount>0)playSound(c.amount>=15?'heavy':'light');
  else if(event==='statusApplied'&&((c.n>0&&['weak','vuln','brittle','soaked','bleed','sink'].includes(c.key))||(c.n<0&&['str','dex'].includes(c.key))))playSound('debuff');
  else if(event==='combatEnd'&&!c.escaped)playSound(c.won?'victory':'defeat');else if(sounds[event])playSound(sounds[event]);

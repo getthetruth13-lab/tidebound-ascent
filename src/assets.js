@@ -50,8 +50,8 @@ export const ASSETS={
  sprites:{figures:{tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist'},
   enemies:{slug:'brine-slug',gull:'gull-thief',knight:'rust-knight',pod:'spore-pod',wisp:'glimmer-wisp',crab:'coral-crab',captain:'drowned-captain',
    warden:'mirror-warden',eel:['twin-eels-a','twin-eels-b'],bell:['knell-a','knell-b'],leech:'tide-leech',lurker:'kelp-lurker',tendril:'kelp-tendril',matriarch:'kelp-matriarch',
-   // PLACEHOLDER sprites (Codex Task 20): real art for these five drops in by changing the id here; see design/ACT1-ROSTER-ADDITIONS.md §4.
-   penitent:'drowned-captain',mender:'gull-thief',heap:'coral-crab',limpet:'spore-pod',novice:'rust-knight',tenant:'kelp-matriarch'}},
+   // Task 21 delivery sprites: all six passed technical and game-fit art review.
+   penitent:'penitent',mender:'mender',heap:'heap',limpet:'limpet',novice:'novice',tenant:'tenant'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.

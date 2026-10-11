@@ -25,9 +25,9 @@ export function sources(event){const out=[],cb=W.cb,run=W.run;
  if(cb&&cb.hand&&(HAND_EVENTS.has(event)||HAND_MODS.has(event)))for(const c of cb.hand){const def=CARDS[c.id];if(def)out.push({kind:'hand',def,inst:c})}
  if(run&&run.potions)for(const id of run.potions){const def=id&&POTIONS[id];if(def&&(def.on||def.mod))out.push({kind:'potion',def,inst:id})}
  return out}
-const observers=new Set();
-export function observeEvents(listener){observers.add(listener);return ()=>observers.delete(listener)}
-export function fire(event,ctx={}){if(W.previewing)ctx.preview=true;for(const s of sources(event)){const h=s.def.on&&s.def.on[event];if(h)h(s.inst,ctx,s);if(ctx.cancel)break}if(!W.previewing)for(const listener of observers){try{listener(event,ctx)}catch(e){console.warn("Event observer failed",e)}}return ctx}
+const observers=new Set(),replayObservers=new WeakSet();
+export function observeEvents(listener,{replay=false}={}){observers.add(listener);if(replay)replayObservers.add(listener);return ()=>observers.delete(listener)}
+export function fire(event,ctx={}){if(W.previewing)ctx.preview=true;for(const s of sources(event)){const h=s.def.on&&s.def.on[event];if(h)h(s.inst,ctx,s);if(ctx.cancel)break}if(!W.previewing)for(const listener of observers){if(W.replaying&&!replayObservers.has(listener))continue;try{listener(event,ctx)}catch(e){console.warn("Event observer failed",e)}}return ctx}
 export function mod(name,ctx,value){for(const s of sources(name)){const h=s.def.mod&&s.def.mod[name];if(h){const v=h(s.inst,ctx,value,s);if(v!==undefined)value=v}}return value}
 // Turn-scoped listener helper: thisTurn({on:{cardPlayed(){...}}}) — expires at end of the player's turn.
 export function thisTurn(listener){if(W.cb)W.cb.fx.push(listener);return listener}

@@ -110,14 +110,19 @@ export const ENEMY_FLAVOUR={
  gull:'Gulls will not fly above Bellwater Court. They keep to the sea side of the mountain.',
  knight:'Calcified keel-blade, barnacled plate. It still holds the landing it was told to hold.',
  pod:'A brine cyst, swollen with scalding mineral water. It only wants to be somewhere else.',
- bell:'The last ringer of the old Keeper order, faceless, chained to a plain bronze Bell as tall as a door. He swings it like a maul. It does not warn any more. It counts.',
+ bell:'The last ringer of the old Keepers, faceless, chained to a plain bronze Bell. He swings it like a maul. It counts.',
  penitent:'Rope-bound and barnacled, it climbs the Stair on its knees. It is very patient.',
  mender:'She mends whatever is nearest. It does not have to be alive.',
  heap:'It holds together by habit.',
  novice:'It rings twice a day. Nobody told it to stop.',
- tenant:'A Wrackfolk tenant who refused to leave. As the terrace sank he lifted what was left of his house onto his back, and walked. He is not cruel. He is home.',
+ tenant:'A tenant who refused to leave. As the terrace sank he lifted his house onto his back. He is not cruel. He is home.',
  matriarch:'Edda, last gardener of the terraces. She roots into the stone to hold it together, and faces the green moon in the cistern.'};
 export const TENANT_LINES={phase2:'The door splinters. He does not seem to notice.',defeat:'He sits down on what is left of the step, and does not get up.'};
+// Shown on the boss reward screen: what is left when the fight is over (Act 1 bosses only).
+export const BOSS_DEFEAT={
+ tenant:TENANT_LINES.defeat+' The house settles around him. Something is left on the step for you.',
+ bell:'The Bell goes quiet. For the first time in a long while, nothing is counting.',
+ matriarch:'The kelp lets go of the stone. The green moon in the water goes dark, and the beds are empty.'};
 export const BOSS_OPEN={
  bell:n=>bellOpening(n),
  tenant:()=>'"This is my house. You are standing in my doorway."',

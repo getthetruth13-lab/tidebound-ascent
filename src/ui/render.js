@@ -11,7 +11,7 @@ import {syncEnv,envFxSettingLabel} from './env.js';
 import {groundY,stageAtmosphereHTML,syncStage} from './stage.js';
 import {deathLine} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
-import {loadRunData,settings,saveSettings} from '../save.js';
+import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
 import {loadProfile,saveProfile} from '../progress.js';
 import {W} from '../core/state.js';
 import {cname,cost,desc,kwFor,needsTarget,isUp,baseCost} from '../engine/cards.js';
@@ -27,7 +27,7 @@ import {decorateKeywords} from './kwtip.js';
 import {decorateCardRefs} from './cardref.js';
 import {tileHTML,tilesRow,relicTile,potionTile,optionHTML,emblemHTML,splitLabel,esc as tesc} from './tiles.js';
 import {lampSummaryHTML,tasksHTML,lampBtnLabel} from './screens/lamp.js';
-import {relicFlavour,ferrymanLine,bellCount,wrenLine,WREN_SIDE,currentTier,ENEMY_FLAVOUR} from '../data/lore.js';
+import {relicFlavour,ferrymanLine,bellCount,wrenLine,WREN_SIDE,currentTier,ENEMY_FLAVOUR,BOSS_DEFEAT} from '../data/lore.js';
 export const TH={tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist',status:'',curse:'',colorless:''};
 const RARN={s:'Starter',c:'Common',u:'Uncommon',r:'Rare',x:'Special'};
 const esc=s=>String(s).replace(/"/g,'&quot;');
@@ -151,11 +151,11 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
 export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*.70),top:40,heroTop:40}}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
-function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min((role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:g.vh*.31),g.feet-(role==='hero'?g.heroTop:g.top+32)));
+function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min((role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*.31),g.feet-(role==='hero'?g.heroTop:g.top+32)));
  if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*sp.h/sp.w));
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
  const top=g.feet-H-hov,L=x-Math.round(W*ax),fx0=Math.round(W*ax);const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.max(96,Math.min(150,H*.62)));
- const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px" onerror="assetFail(this)">`:''}</div>`;
+ const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px${role!=='hero'&&sp.facing==='right'?';scale:-1 1':''}" onerror="assetFail(this)">`:''}</div>`;
  return `<div class="${cls}" ${attrs} style="left:${L}px;top:${top}px;width:${W}px;height:${H+hov}px;--bw:${bw}px;--ax:${fx0}px">
  <i class="shadow" style="left:${fx0}px;top:${H+hov}px;width:${Math.round(Math.min(W,H*.9)*.8)}px"></i>
  <div class="fig ${shake?'shake':''}" style="width:${W}px;height:${H}px;left:0;top:0;${shake||''}">${img}</div>
@@ -174,12 +174,24 @@ export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const sh
 export function tipHTML(){const cb=W.cb;
  if(cb.insp!=null&&cb.ens[cb.insp]&&cb.ens[cb.insp].hp>0){const e=cb.ens[cb.insp];return `<div class="tip" id="detail"><b>${e.e} ${e.n}</b> <span class="muted">${e.hp}/${e.max}</span><br>${intentText(e)}</div>`}
  return ''}
+// First-fight coach: one short line at a time, driven by what the player has done. Only on floor 1; closed with the X or Options > Hints.
+function coachHTML(){const cb=W.cb;if(settings.coach===false||cb.kind!=='fight'||W.run.floor!==1||cb.mode||cb.turn>2)return '';
+ const played=cb.energy<cb.maxE||cb.disc.length>0;let ico,t;
+ if(cb.turn<2&&!played){ico='⚔️';t='Drag an <b>Attack</b> onto the enemy.'}
+ else if(cb.turn<2&&cb.energy>0){ico='🛡️';t='<b>Guard</b> blocks the hit shown above the enemy. Spend your <b>Energy</b>.'}
+ else if(cb.turn<2){ico='⏳';t='Out of Energy? Press <b>End Turn</b>.'}
+ else{ico='✨';t='New turn: Energy and cards are back. Win the fight to earn a card.'}
+ return `<div class="coach" role="status"><span class="co-ico">${ico}</span><span>${t}</span><button class="co-x" aria-label="Hide hints" onclick="setCoach(false)">✕</button></div>`}
+const BEAT_MS={intro:3000,phase:2600};
+function bossBeatHTML(){const b=W.cb.beat;if(!b)return '';const age=Date.now()-b.t;if(age>=(BEAT_MS[b.kind]||2600))return '';
+ const epi=b.kind==='intro'?(ENEMY_FLAVOUR[W.cb.bossKey]||'').split('. ')[0].replace(/\.$/,'')+'.':'';
+ return `<div class="bossbeat bb-${b.kind}" aria-live="polite" style="animation-delay:-${age}ms"><i class="bb-rule"></i><h2>${b.title}</h2>${epi.length>2?`<div class="bb-epi">${epi}</div>`:''}<p>${b.sub}</p><i class="bb-rule"></i></div>`}
 function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<1300);return c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:''}
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
 export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}">`+topBar();
  h+=daisHTML();
- const g=sceneGeom();if(cb.mode&&['choice','slot','chart'].includes(cb.mode.k)){g.s*=.58;g.feet=Math.round(innerHeight*.29)}const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
- h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}`;
+ const g=sceneGeom();if(cb.mode&&['choice','slot','chart'].includes(cb.mode.k)){g.s*=.7;g.feet=Math.round(innerHeight*.4)}const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
+ h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,560);if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
@@ -193,24 +205,33 @@ export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W
   h+=`<div class="ov battle"><div class="box chartbox" id="chartbox"><h2>🗺️ Chart: set the order of your next draws</h2><div class="muted csub">Drag cards left or right. The leftmost card is drawn first. Drop one in the Bottom slot to send it under the pile.</div>
   <div class="chartrow" style="--n:${n}"><div class="cards" id="chartcards">${cards}</div><div class="cright"><div class="cbottom${m.moved?' used':''}" id="chartbottom"><span class="cbi">⤓</span><b>Bottom</b><i>${m.moved?'Card sent down':'Drop 1 card here'}</i></div><button class="btn pri" id="chartdone" onclick="modeAct('done')">Done</button></div></div></div></div>`}
  return h+'</div>'}
-export function tgt(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return;const e=cb.ens[i];if(!e||e.hp<=0)return;cb.tgt=i;
+function tgtImpl(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return;const e=cb.ens[i];if(!e||e.hp<=0)return;cb.tgt=i;
  cb.insp=cb.insp===i?null:i;cb.sel=null;render()}
 export function sceneTap(ev){if(!W.cb||drag)return;if(ev.target.closest('.en,.tip,.hero'))return;if(W.cb.sel!=null||W.cb.insp!=null){W.cb.sel=null;W.cb.insp=null;render()}}
 // Full framed cards at rest; one card rises above a scrubbing finger or cursor.
 export const HAND_REST_TOP=.67;
-export function layoutHand(){const hand=document.getElementById('hand');if(!hand)return;const cards=[...hand.querySelectorAll('.card')];const n=cards.length;if(!n)return;hand.classList.add('instant');
+const handLayouts=new WeakMap();
+export function layoutHand(){const hand=document.getElementById('hand');if(!hand)return;const cards=[...hand.querySelectorAll('.card')];const n=cards.length;if(!n)return;
  const land=matchMedia('(orientation:landscape)').matches;const vh=innerHeight;
+ const signature=[innerWidth,vh,hand.className,W.cb?.mode?.k,!!W.cb?.busy,
+  cards.map(c=>c.dataset.uid+':'+c.className+':'+c.style.width+':'+c.style.height).join('|'),
+  W.cb?.ens.filter(e=>e.hp>0&&!e.fled).map(e=>e.uid).join(',')].join('/');
+ // Enemy telegraphs and HP changes do not change the resting fan.
+ if(W.cb?.sel==null&&handLayouts.get(hand)===signature){if(land)clampPlates(hand);return}
+ hand.classList.add('instant');
  const Wd=hand.clientWidth,cw=cards[0].offsetWidth,ch=cards[0].offsetHeight;const hr=hand.getBoundingClientRect();const cx=hr.left+Wd/2;
  const step=n>1?Math.min(cw*.92,(Wd-cw)/(n-1)):0;const ang=land?1.6:n>6?2.5:4;
  const eL=Math.min(innerWidth,...[...document.querySelectorAll('.combat .en .fig')].map(f=>f.getBoundingClientRect().left));
  const zoom=land?0:(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--zoom'))||1.4);
+ // Read every bottom offset before writing transforms to avoid a layout flush per card.
+ const bottoms=land?cards.map(el=>parseFloat(getComputedStyle(el).bottom)||0):[];
  cards.forEach((el,i)=>{const off=i-(n-1)/2;const x=off*step,y=(Math.abs(off)*Math.abs(off)-Math.pow((n-1)/2,2))*cw*(land?.012:.018);
   const zl=land?1.55:zoom;
-  const ly=land?-Math.round(Math.max(0,-(parseFloat(getComputedStyle(el).bottom)||0))+6):-8;
+  const ly=land?-Math.round(Math.max(0,-bottoms[i])+6):-8;
   // a lifted card slides left of the enemy row when there is room, so it doesn't hide the target it's aimed at
   const zw=cw*zl;const lo=zw/2+4-cx;let hi=innerWidth-zw/2-4-cx;if(land&&eL<innerWidth&&eL-zw-10>0)hi=Math.min(hi,eL-zw/2-6-cx);const xs=Math.max(lo,Math.min(hi,x));
   el.style.setProperty('--x',x+'px');el.style.setProperty('--y',y+'px');el.style.setProperty('--r',off*ang+'deg');el.style.setProperty('--xs',xs+'px');
-  el.style.setProperty('--zl',zl.toFixed(3));el.style.setProperty('--ly',ly+'px');el.dataset.x=x;el.dataset.y=y;el.dataset.zl=zl.toFixed(3);el.dataset.ly=ly});void hand.offsetWidth;hand.classList.remove('instant');if(land)clampPlates(hand)}
+  el.style.setProperty('--zl',zl.toFixed(3));el.style.setProperty('--ly',ly+'px');el.dataset.x=x;el.dataset.y=y;el.dataset.zl=zl.toFixed(3);el.dataset.ly=ly});void hand.offsetWidth;hand.classList.remove('instant');handLayouts.set(hand,signature);if(land)clampPlates(hand)}
 // Name plates + HP bars (incl. extra lines such as the Matriarch's 'Rooted') always sit above the resting hand's top edge.
 function clampPlates(hand){const rest=[...hand.querySelectorAll('.card:not(.sel)')].map(c=>c.getBoundingClientRect().top);const lim=(rest.length?Math.min(...rest):innerHeight*HAND_REST_TOP)-3;
  const left=hand.getBoundingClientRect().left;
@@ -225,8 +246,12 @@ export function settingsHTML(){return `<div class="settings"><label><input type=
  <label>Music <input id="setmusic" aria-label="Music volume" type="range" min="0" max="1" step="0.01" value="${settings.musicVolume}" oninput="setAudioSetting('musicVolume',this.value)"></label>
  <label>SFX <input id="setsfx" aria-label="SFX volume" type="range" min="0" max="1" step="0.01" value="${settings.sfxVolume}" oninput="setAudioSetting('sfxVolume',this.value)"></label>
  <label><input id="setmute" type="checkbox" ${settings.audioMuted?'checked':''} onchange="setAudioSetting('audioMuted',this.checked)"> Mute audio</label>
+ <label><input id="sethints" type="checkbox" ${settings.coach!==false?'checked':''} onchange="setCoach(this.checked)"> First-fight hints</label>
+ <label><input id="setshake" type="checkbox" ${settings.screenShake!==false?'checked':''} onchange="setScreenShake(this.checked)"> Screen shake</label>
  <label><input id="setreduce" type="checkbox" ${settings.reduceMotion?'checked':''} onchange="setReduceMotion(this.checked)"> Reduced motion</label>
  </div>`}
+export function setCoach(on){settings.coach=!!on;saveSettings();render()}
+export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
 export function setEnvFx(v){settings.envFx=v;saveSettings();render()}
 // Act I title card (design-v2 §W.5, art/v2/bg/_src/tc-a1-spec.json): the painted plate (frame + emblem, 60% of the screen width, centred) fades in
@@ -250,6 +275,7 @@ function rowHTML(r,i,click){const done=!!r.done,c=done?'':`${click}(${i})`;
  if(r.k==='potion')return potionTile(r.id,{click:c,done,disabled:done});
  return tileHTML({id:'reward-cards',emoji:'🂠',name:r.took?`Took ${CARDS[r.took].n}`:r.skipped?'Skipped':'Choose a card',sum:r.took||r.skipped?'':`Add 1 of ${r.cards.length} to your deck.`,cls:'k-cards',click:c,done,disabled:done,tid:'row'+i,info:'Card reward: pick one card for your deck, or skip.'})}
 function rewardScr(){const S=W.S;let h=topBar()+`<h2>${S.title}</h2>`;
+ if(S.kind==='boss'&&S.boss&&EN[S.boss]&&S.cardsOpen==null&&S.swap==null)h+=`<div class="bossvic" style="${anim(S.t,2600)||''}"><i class="bv-rays"></i><b>${EN[S.boss].n}</b><q>${BOSS_DEFEAT[S.boss]||''}</q></div>`;
  if(S.cardsOpen!=null){const row=S.rows[S.cardsOpen];const boss=S.kind==='boss';
   h+=`<div class="sub">Choose a card to add to your deck <span class="muted">(hold a card to enlarge)</span></div><div class="grid rewgrid">${row.cards.map((id,j)=>`<div class="rcw">${cardHTML({id,uid:-1-j,up:false},{click:`rewCard(${j})`,isNew:isNewCard(id)})}${cardBackHTML()}</div>`).join('')}</div>
   <div class="actions"><button class="btn" onclick="rewCloseCards()">↩ Back</button><button class="btn" id="skipcard" onclick="rewSkipCards()">Skip card</button></div>`;return h}
@@ -319,7 +345,7 @@ function updateHTML(app,html,reset){const next=document.createElement('div');nex
 }
 
 // ---------------- render ----------------
-export function render(){if(W.previewing)return;if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;
+export function render(){if(W.previewing||W.replaying)return;if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;
  if(s==='title')h=titleScr();
  else if(s==='travel')h=travelScr();
  else if(s==='map')h=`<div class="page mappage">`+topBar()+mapHTML(true)+'</div>';
@@ -327,7 +353,7 @@ export function render(){if(W.previewing)return;if(drag||(W.chartDrag&&Date.now(
  else{const fit=['reward','shop','pick','chest','rest','event','potpick','msg'].includes(s);h=`<div class="page ${fit?'fit fit-'+s:''}">`;
   if(s==='reward')h+=rewardScr();else if(s==='chest')h+=chestScr();else if(s==='shop')h+=shopScr();else if(s==='rest')h+=restScr();else if(s==='event')h+=eventScr();
   else if(s==='pick')h+=pickScr();else if(s==='potpick')h+=potPickScr();
-  else if(s==='msg')h+=topBar()+`<div class="panel msgp"><h2>${W.S.title}</h2><p>${W.S.text}</p></div><div class="actions"><button class="btn pri" id="msgok" onclick="W.S.next()">Continue</button></div>`;
+  else if(s==='msg')h+=topBar()+`<div class="panel msgp"><h2>${W.S.title}</h2><p>${W.S.text}</p></div><div class="actions"><button class="btn pri" id="msgok" onclick="continueMessage()">Continue</button></div>`;
   else if(s==='end')h+=endScr();
   h+='</div>'}
  if(W.run&&s!=='title'&&s!=='end')h+=popHTML();
@@ -364,25 +390,29 @@ function measureCardBox(box){const style=getComputedStyle(box);
         rects.every(q=>q.width<=width*sx+.5&&q.height<=height*sy+.5&&q.top>=r.top+parseFloat(style.paddingTop)*sy-.5&&q.bottom<=r.bottom-parseFloat(style.paddingBottom)*sy+.5);
  };
 }
-export function fitCards(root=document){for(const c of root.querySelectorAll('.card')){
-  // A retained card needs no measurements if its content and viewport are unchanged.
+export function fitCards(root=document){const work=[];
+ for(const c of root.querySelectorAll('.card')){
   const content=[c.dataset.id,c.dataset.up,...['.name','.cost','.type','.text'].map(q=>c.querySelector(q)?.innerHTML),c.querySelector('.rline')?.dataset.full].join('|');
   const context=[];for(let p=c.parentElement;p&&p!==root;p=p.parentElement)context.push(p.className+'@'+(p.getAttribute('style')||''));
   const stamp=`${fitEpoch}|${innerWidth}|${innerHeight}|${devicePixelRatio}|${c.style.width}|${c.style.height}|${context.join('/')}|${content}`;
-  if(fittedCards.get(c)===stamp)continue;
-  if(!c.offsetWidth||!c.offsetHeight)continue;
-  const transform=c.style.transform,transition=c.style.transition;c.style.transition='none';c.style.transform='none';
-  const rect=c.getBoundingClientRect();
-  // Fractional placement affects browser glyph rounding at the fitter's boundary.
-  const key=[fitSignature(c),rect.width,rect.height,rect.left%1,rect.top%1,context.join('/')].join('|');
-  const cached=fitCache.get(key);
-  if(cached){for(const [q,style] of cached.panels){const box=c.querySelector(q);if(box){if(style===null)box.removeAttribute('style');else box.setAttribute('style',style)}}
-   const rl=c.querySelector('.rline');if(rl&&cached.line){rl.textContent=cached.line.text;rl.classList.toggle('nofit',cached.line.nofit)}
-   // Verify the cached answer once: inherited typography and browser rounding
-   // can differ even when a card has the same dimensions and source text.
-   const valid=['.name','.cost','.type','.text'].every(q=>{const box=c.querySelector(q);return !box||!box.clientHeight||measureCardBox(box)()});
-   if(valid){c.style.transform=transform;c.style.transition=transition;fittedCards.set(c,stamp);continue}
-  }
+  if(fittedCards.get(c)===stamp||!c.offsetWidth||!c.offsetHeight)continue;
+  work.push({c,context,stamp,transform:c.style.transform,transition:c.style.transition});
+ }
+ // Prepare the whole batch before measuring. Applying one cached card at a time
+ // otherwise forces a new layout for every card in a freshly drawn hand.
+ for(const {c} of work){c.style.transition='none';c.style.transform='none'}
+ for(const w of work){const rect=w.c.getBoundingClientRect();
+  w.key=[fitSignature(w.c),rect.width,rect.height,w.context.map(p=>p.split('@')[0]).join('/')].join('|');w.cached=fitCache.get(w.key);
+ }
+ for(const {c,cached} of work)if(cached){
+  for(const [q,style] of cached.panels){const box=c.querySelector(q);if(box){if(style===null)box.removeAttribute('style');else box.setAttribute('style',style)}}
+  const rl=c.querySelector('.rline');if(rl&&cached.line){rl.textContent=cached.line.text;rl.classList.toggle('nofit',cached.line.nofit)}
+ }
+ for(const w of work)if(w.cached){
+  // Validate inherited typography and fractional glyph rounding on every hit.
+  w.valid=['.name','.cost','.type','.text'].every(q=>{const box=w.c.querySelector(q);return !box||!box.clientHeight||measureCardBox(box)()});
+ }
+ for(const {c,key,valid} of work){if(valid)continue;
   c.classList.remove('grown');c.style.removeProperty('--tt');
   for(const selector of ['.name','.cost','.type','.text']){
     const box=c.querySelector(selector);if(!box||!box.clientHeight)continue;
@@ -394,16 +424,16 @@ export function fitCards(root=document){for(const c of root.querySelectorAll('.c
     const style=getComputedStyle(box),px=parseFloat(style.fontSize);
     const fits=measureCardBox(box);
     let lo=.5,hi=px;
-    if(!fits()){for(let i=0;i<14;i++){const mid=(lo+hi)/2;box.style.setProperty('font-size',mid+'px','important');if(fits())lo=mid;else hi=mid}
+    if(!fits()){for(let i=0;i<8;i++){const mid=(lo+hi)/2;box.style.setProperty('font-size',mid+'px','important');if(fits())lo=mid;else hi=mid}
       box.style.setProperty('font-size',lo+'px','important');}
   }
-  c.style.transform=transform;c.style.transition=transition;
   const rl=c.querySelector('.rline');if(rl&&rl.offsetWidth){rl.classList.remove('nofit','covered');rl.textContent=rl.dataset.full||'';
-    if(rl.scrollWidth>rl.clientWidth+1){rl.textContent=rl.dataset.first||'';if(rl.scrollWidth>rl.clientWidth+1){rl.classList.add('nofit')}}}
+    if(rl.scrollWidth>rl.clientWidth+1){rl.textContent=rl.dataset.first||'';if(rl.scrollWidth>rl.clientWidth+1)rl.classList.add('nofit')}}
   fitCache.set(key,{panels:['.name','.cost','.type','.text'].map(q=>[q,c.querySelector(q)?.getAttribute('style')??null]),line:rl?{text:rl.textContent,nofit:rl.classList.contains('nofit')}:null});
   if(fitCache.size>2048)fitCache.delete(fitCache.keys().next().value);
-  fittedCards.set(c,stamp);
-}}
+ }
+ for(const {c,transform,transition,stamp} of work){c.style.transform=transform;c.style.transition=transition;fittedCards.set(c,stamp)}
+}
 if(typeof document!=='undefined'&&document.fonts){
  const fontsChanged=()=>{fitEpoch++;fitCache.clear();fitCards(document);if(document.getElementById('hand'))layoutHand()};
  document.fonts.ready.then(fontsChanged);document.fonts.addEventListener('loadingdone',fontsChanged);
@@ -415,3 +445,5 @@ export function openInspect(ci){inspecting=ci;render()}
 export function closeInspect(){inspecting=null;render()}
 export function inspectHTML(){const ci=inspecting,d=CARDS[ci.id];if(!d)return'';
  return `<div class="ov inspect" id="inspect" onclick="closeInspect()"><div class="insp">${cardHTML(ci,{full:true})}<div class="ikw"><b>${cname(ci)}</b> <span class="muted">${TYPEN[d.t]} · ${RARN[d.r]||''}</span><div>${desc(ci)}</div><div class="kws">${kwFor(ci)}</div>${d.flavour?`<div class="flav">${d.flavour}</div>`:''}<div class="muted">Tap anywhere to close</div></div></div></div>`}
+
+export function tgt(...args){return savedAction('tgt',args,()=>tgtImpl(...args))}

@@ -1,3 +1,4 @@
+import {savedAction} from '../save.js';
 // engine/run.js — the run: seeded state, map, rooms (? / chests / merchant / camps / events), rewards, economy.
 // Numbers: design-v2 §1.1–§1.8. Every random roll uses a named seeded stream (core/state.js), so the same seed and the
 // same choices give the same maps, rewards and enemy rolls (§1.10).
@@ -81,12 +82,12 @@ export function eliteRange(rows){const mn=[],mx=[];for(let r=rows.length-1;r>=0;
 export function reachable(){const run=W.run;if(run.pos.r<0)return run.map[0].map((_,i)=>i);const row=run.map[run.pos.r];return row?row[run.pos.i].to:[]}
 // Tidewalker Boots: 3 times per run, move to ANY node on the next floor.
 export function bootsLeft(){const b=W.run.relics.find(r=>r.id==='boots');return b?b.n||0:0}
-export function goNode(r,i){const run=W.run;if(W.S.screen!=='map'||W.S.ov)return;if(r!==run.pos.r+1||!run.map[r]||!run.map[r][i])return;
+function goNodeImpl(r,i){const run=W.run;if(W.S.screen!=='map'||W.S.ov)return;if(r!==run.pos.r+1||!run.map[r]||!run.map[r][i])return;
  if(!reachable().includes(i)){if((run.cut||0)>0)run.cut--;else{if(bootsLeft()<=0)return;const b=run.relics.find(x=>x.id==='boots');b.n--;b.flashT=Date.now()}}
  const n=run.map[r][i];run.pos={r,i};run.vis[r+':'+i]=1;run.floor=r+1;run.stats.floors=run.floor;run.stats.path.push(n.t);
  if(n.t==='boss'){run.stats.relicsAtBoss=run.relics.length;run.stats.potionsAtBoss=run.potions.filter(Boolean).length}
  enterNode(n.t)}
-export function enterNode(t){const run=W.run;fire('enterRoom',{type:t});
+function enterNodeImpl(t){const run=W.run;fire('enterRoom',{type:t});
  if(t==='unknown')return resolveUnknown();
  if(t==='fight')return fight();
  if(t==='elite'){const e=pickEncounter('elite');return startCombat('elite',e)}
@@ -121,7 +122,7 @@ export function resolveUnknown(){const run=W.run,q=run.qOdds;const node=run.map[
 export function eventOK(ev){const run=W.run;if(ev.pool==='shrine'?run.shrinesThisAct[ev.id]:run.seenEvents[ev.id])return false;if(ev.act&&ev.act!==run.act)return false;return !ev.req||ev.req()}
 export function pickEvent(){const act=EVENTS.filter(e=>e.pool!=='shrine'&&eventOK(e)),sh=EVENTS.filter(e=>e.pool==='shrine'&&eventOK(e));
  let list=rnd('events')<.75?act:sh;if(!list.length)list=list===act?sh:act;return list.length?pick(list,'events'):null}
-export function evOpt(i){const S=W.S;if(S.screen!=='event')return;const o=S.ev.o[i];if(!o||(o.ok&&!o.ok()))return;o.f()}
+function evOptImpl(i){const S=W.S;if(S.screen!=='event')return;const o=S.ev.o[i];if(!o||(o.ok&&!o.ok()))return;o.f()}
 // ================= rewards (§1.1) =================
 // Act 1 rewards and the merchant are gated to the Act 1 card set (design/act1-complete.md §(a), data/act1.js); later acts use the full pool.
 // A locked id (Lamplight) never rolls in rewards, shops, events or potions: every pool below goes through isLocked.
@@ -168,23 +169,23 @@ export function combatRewards(kind,{allFled,opts={},cb}={}){const run=W.run;cons
   else if(run.rareNext){run.rareNext=false;cards=rollCards(rewardCardCount(),kind,{forceR:'r'})}
   else cards=rollCards(rewardCardCount(),kind==='elite'?'elite':'fight');
   remember('offerHist',cards);rows.push({k:'cards',cards})}
- W.S={screen:'reward',kind,rows,title:kind==='boss'?'🔔 Boss defeated!':kind==='elite'?'💀 Elite defeated!':allFled?'🐦 They fled with your gold…':'⚔️ Victory!',t:Date.now()};
- // Keep the previous map checkpoint until rewards are resolved. Loading restores the map,
- // so saving here would skip this room and discard its unclaimed rewards (including a boss win).
+ W.S={screen:'reward',kind,rows,boss:kind==='boss'?(cb&&cb.bossKey)||run.boss:null,title:kind==='boss'?'🔔 Boss defeated!':kind==='elite'?'💀 Elite defeated!':allFled?'🐦 They fled with your gold…':'⚔️ Victory!',t:Date.now()};
+ // Keep the map checkpoint; the save journal reconstructs this room and its
+ // claimed/unclaimed rewards when the player continues.
  render()}
-export function claimRow(i){const S=W.S;const row=S.rows&&S.rows[i];if(!row||row.done)return;
+function claimRowImpl(i){const S=W.S;const row=S.rows&&S.rows[i];if(!row||row.done)return;
  if(row.k==='gold'){gainGold(row.n);row.done=true}
  else if(row.k==='relic'){row.done=true;gainRelic(row.id);if(W.S!==S)return}
  else if(row.k==='potion'){if(addPotion(row.id))row.done=true;else{S.swap=i}}
  else if(row.k==='cards'){S.cardsOpen=i}
  render()}
-export function rewCard(j){const S=W.S;const row=S.rows[S.cardsOpen];if(!row)return;markCardsSeen(row.cards);gainCard(row.cards[j]);row.done=true;row.took=row.cards[j];S.cardsOpen=null;render()}
-export function rewCloseCards(){W.S.cardsOpen=null;render()}
-export function rewSkipCards(){const S=W.S;const row=S.rows[S.cardsOpen];if(row){markCardsSeen(row.cards);row.done=true;row.skipped=true}S.cardsOpen=null;
+function rewCardImpl(j){const S=W.S;const row=S.rows[S.cardsOpen];if(!row)return;markCardsSeen(row.cards);gainCard(row.cards[j]);row.done=true;row.took=row.cards[j];S.cardsOpen=null;render()}
+function rewCloseCardsImpl(){W.S.cardsOpen=null;render()}
+function rewSkipCardsImpl(){const S=W.S;const row=S.rows[S.cardsOpen];if(row){markCardsSeen(row.cards);row.done=true;row.skipped=true}S.cardsOpen=null;
  render()}
 // full potion slots: swap the new potion for one you hold, or discard it
-export function potionSwap(slot){const S=W.S;const row=S.rows&&S.rows[S.swap];if(!row)return;if(slot>=0){W.run.potions[slot]=row.id}row.done=true;S.swap=null;render()}
-export function rewDone(){const S=W.S;if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}
+function potionSwapImpl(slot){const S=W.S;const row=S.rows&&S.rows[S.swap];if(!row)return;if(slot>=0){W.run.potions[slot]=row.id}row.done=true;S.swap=null;render()}
+function rewDoneImpl(){const S=W.S;if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}
 // ================= relics =================
 export const campfireRelic=id=>!!(RELICS[id]&&RELICS[id].campfire);
 export function relicCandidates(tier){const run=W.run;const nCamp=run.relics.filter(r=>campfireRelic(r.id)).length;
@@ -207,12 +208,12 @@ export function loseRelic(id){const i=W.run.relics.findIndex(r=>r.id===id);if(i>
 // ================= potions =================
 export function addPotion(id){const i=W.run.potions.indexOf(null);if(i<0)return false;W.run.potions[i]=id;noteSeen('potion',id);toast(`${POTIONS[id].e} ${POTIONS[id].n}`,'potion');return true}
 export function addPotionSlot(){W.run.potions.push(null)}
-export function discardPotion(slot){W.run.potions[slot]=null;W.S.potion=null;render()}
+function discardPotionImpl(slot){W.run.potions[slot]=null;W.S.potion=null;render()}
 // Apothecary Chest: choose up to 3 of 5 random potions (as many as fit).
 export function pickPotions(n,title){const ids=[];let g=0;while(ids.length<n&&g++<50){const p=randomPotion('relics');if(!ids.includes(p))ids.push(p)}
  const back=W.S;W.S={screen:'potpick',title,ids,chosen:[],back};render()}
-export function potPickToggle(j){const S=W.S;const k=S.chosen.indexOf(j);if(k>=0)S.chosen.splice(k,1);else{const free=W.run.potions.filter(p=>!p).length;if(S.chosen.length<Math.min(3,free))S.chosen.push(j)}render()}
-export function potPickDone(){const S=W.S;S.chosen.forEach(j=>addPotion(S.ids[j]));W.S=S.back&&S.back.screen!=='potpick'?S.back:{screen:'map'};render()}
+function potPickToggleImpl(j){const S=W.S;const k=S.chosen.indexOf(j);if(k>=0)S.chosen.splice(k,1);else{const free=W.run.potions.filter(p=>!p).length;if(S.chosen.length<Math.min(3,free))S.chosen.push(j)}render()}
+function potPickDoneImpl(){const S=W.S;S.chosen.forEach(j=>addPotion(S.ids[j]));W.S=S.back&&S.back.screen!=='potpick'?S.back:{screen:'map'};render()}
 // ================= cards / curses / gold / HP =================
 export function gainCard(id,o={}){const d=CARDS[id];if(!d)return null;if(d.curse)return gainCurse(id);const ci=mk(id,o.up);W.run.deck.push(ci);fire('gainCard',{card:ci});return ci}
 export function gainCurse(id){const ctx=fire('gainCurse',{id});if(ctx.cancel){if(ctx.msg)toast(ctx.msg,'relic');return null}const ci=mk(id);W.run.deck.push(ci);toast(`${CARDS[id].e} Curse: ${CARDS[id].n}`,'curse');return ci}
@@ -232,7 +233,7 @@ export function pickable(mode,filter){return W.run.deck.filter(c=>{const d=CARDS
  if((mode==='remove'||mode==='transform'||mode==='offer')&&d.noRemove)return false;if(mode==='annotate'&&(c.open||d.open))return false;return !filter||filter(c)})}
 export function openPick(mode,title,then,cancel,filter,onPick){const list=pickable(mode,filter);if(!list.length){then?then(null):goMap();return}
  W.S={screen:'pick',mode,title,then:then||goMap,cancel,filter,onPick};render()}
-export function pickCard(uid){const S=W.S;if(S.screen!=='pick')return;const i=W.run.deck.findIndex(c=>c.uid===uid);if(i<0)return;const ci=W.run.deck[i];
+function pickCardImpl(uid){const S=W.S;if(S.screen!=='pick')return;const i=W.run.deck.findIndex(c=>c.uid===uid);if(i<0)return;const ci=W.run.deck[i];
  if(!pickable(S.mode,S.filter).includes(ci))return;
  if(S.mode==='upgrade')ci.up=true;
  else if(S.mode==='remove'){W.run.deck.splice(i,1)}
@@ -240,18 +241,18 @@ export function pickCard(uid){const S=W.S;if(S.screen!=='pick')return;const i=W.
  else if(S.mode==='duplicate'){W.run.deck.push(mk(ci.id,ci.up));toast('🪞 Duplicated '+cname(ci),'')}
  else if(S.mode==='annotate'){ci.open=true;toast('📘 '+cname(ci)+' gains Opening','')}
  if(S.onPick)S.onPick(ci);S.then(ci)}
-export function pickCancel(){const S=W.S;if(S.cancel)S.cancel();else S.then(null)}
+function pickCancelImpl(){const S=W.S;if(S.cancel)S.cancel();else S.then(null)}
 // ================= chests (§1.5) =================
-export function openChest(){const run=W.run;const c=wpick(ECON.chest.map(x=>[x,x.w]),'relics');const rows=[];
+function openChestImpl(){const run=W.run;const c=wpick(ECON.chest.map(x=>[x,x.w]),'relics');const rows=[];
  const id=randomRelic(c.rel);rows.push(id?{k:'relic',id}:{k:'gold',n:50,note:'(no relics left)'});
  if(rnd('relics')*100<c.gold[0])rows.push({k:'gold',n:rng(c.gold[1],c.gold[2],'relics')});
  W.S={screen:'chest',chest:c.k,name:c.n,rows,opened:false,t:Date.now()};render()}
-export function openChestLid(){if(W.S.screen!=='chest')return;W.S.opened=true;W.S.openT=Date.now();render()}
+function openChestLidImpl(){if(W.S.screen!=='chest')return;W.S.opened=true;W.S.openT=Date.now();render()}
 // ================= camps (§1.8) =================
 export function campOptions(){const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${Math.floor(W.run.max*mod('mendFrac',{},ECON.mend))} HP (30% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
  for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.camp)o.push({k:d.camp,l:{cook:'🍲 Cook',scour:'🪨 Scour',trawl:'⚓ Trawl',annotate:'📘 Annotate'}[d.camp],d:{cook:'Gain 4 Max HP (Galley Pot)',scour:'Remove a card (Pumice Stone)',trawl:'Gain a random Common or Uncommon relic (Grapnel Hook)',annotate:'Give a card Opening (Ship\'s Rutter)'}[d.camp],relic:r.id})}
  return mod('campOptions',{},o)}
-export function campDo(k){if(W.S.screen!=='rest')return;
+function campDoImpl(k){if(W.S.screen!=='rest')return;
  if(k==='mend'){heal(Math.floor(W.run.max*mod('mendFrac',{},ECON.mend)));return goMap()}
  if(k==='temper')return openPick('upgrade','⬆️ Temper: choose a card to upgrade',goMap,()=>{W.S={screen:'rest'};render()});
  if(k==='cook'){gainMaxHp(4);return msg('🍲 Cook','A hearty stew. +4 Max HP.')}
@@ -262,7 +263,7 @@ export const restHeal=()=>campDo('mend');
 // ================= merchant (§1.4) =================
 export const price=(v,kind)=>Math.max(0,Math.round(mod('price',{kind},v)));
 export function scrubPrice(){return Math.max(0,Math.round(mod('scrubPrice',{},ECON.price.scrub+ECON.price.scrubStep*W.run.removals)))}
-export function openShop(){const run=W.run,P=ECON.price;
+function openShopImpl(){const run=W.run,P=ECON.price;
  if(run.deck.some(c=>c.id==='doubloon')){const n=run.deck.filter(c=>c.id==='doubloon').length;for(let k=0;k<n;k++){const l=Math.min(15,run.gold);run.gold-=l;toast('🪙 Cursed Doubloon: −'+l+' gold','curse')}}
  const S={screen:'shop',cards:[],colorless:[],relics:[],potions:[],scrubbed:false,t:Date.now()};
  const types=run.cls==='carto'?['A','A','S','S','W']:['A','A','S','S','P'];const used=[];
@@ -277,16 +278,60 @@ export function openShop(){const run=W.run,P=ECON.price;
  for(const it of [...S.cards,...S.colorless,...S.relics,...S.potions])it.price=price(it.sale?it.base/2:it.base,'shop');
  W.S=S;render()}
 export function shopItems(){const S=W.S;return {cards:S.cards,colorless:S.colorless,relics:S.relics,potions:S.potions}}
-export function buy(shelf,i){const S=W.S;if(S.screen!=='shop')return;const it=S[shelf]&&S[shelf][i];if(!it||it.sold)return;if(W.run.gold<it.price){it.noT=Date.now();return render()}
+function buyImpl(shelf,i){const S=W.S;if(S.screen!=='shop')return;const it=S[shelf]&&S[shelf][i];if(!it||it.sold)return;if(W.run.gold<it.price){it.noT=Date.now();return render()}
  if(shelf==='potions'&&!W.run.potions.includes(null)){it.noT=Date.now();toast('Potion slots full','');return render()}
  W.run.gold-=it.price;it.sold=true;
  if(shelf==='cards'||shelf==='colorless')gainCard(it.id);else if(shelf==='relics'){gainRelic(it.id);if(W.S!==S)return}else if(shelf==='potions')addPotion(it.id);
  render()}
-export function shopRemove(){const S=W.S;if(S.screen!=='shop'||S.scrubbed||!pickable('remove').length)return;const p=scrubPrice();if(W.run.gold<p)return;
+function shopRemoveImpl(){const S=W.S;if(S.screen!=='shop'||S.scrubbed||!pickable('remove').length)return;const p=scrubPrice();if(W.run.gold<p)return;
  openPick('remove',`✂️ Scrub: remove a card (💰${p})`,()=>{W.run.gold-=p;W.run.removals++;S.scrubbed=true;W.S=S;render()},()=>{W.S=S;render()})}
 // ================= flow =================
-export function goMap(){W.cb=null;if(W.run&&W.run.hp<=0)return endRun(false);W.S={screen:'map'};fire('mapEnter',{});saveRun();render()}
+function goMapImpl(){W.cb=null;if(W.run&&W.run.hp<=0)return endRun(false);W.S={screen:'map'};fire('mapEnter',{});saveRun();render()}
 export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;clearRun();settleRun(run,won);W.S={screen:'end'};render()}
 // Event fights (Sunken Chest crab, Gull Nest gulls): normal fight rules + options.
 export function eventFight(enc,opts={}){return startCombat('fight',enc,opts)}
 export {cHeal};
+
+export function goNode(...args){return savedAction('goNode',args,()=>goNodeImpl(...args))}
+
+export function evOpt(...args){return savedAction('evOpt',args,()=>evOptImpl(...args))}
+
+export function claimRow(...args){return savedAction('claimRow',args,()=>claimRowImpl(...args))}
+
+export function rewCard(...args){return savedAction('rewCard',args,()=>rewCardImpl(...args))}
+
+export function rewCloseCards(...args){return savedAction('rewCloseCards',args,()=>rewCloseCardsImpl(...args))}
+
+export function rewSkipCards(...args){return savedAction('rewSkipCards',args,()=>rewSkipCardsImpl(...args))}
+
+export function potionSwap(...args){return savedAction('potionSwap',args,()=>potionSwapImpl(...args))}
+
+export function rewDone(...args){return savedAction('rewDone',args,()=>rewDoneImpl(...args))}
+
+export function discardPotion(...args){return savedAction('discardPotion',args,()=>discardPotionImpl(...args))}
+
+export function potPickToggle(...args){return savedAction('potPickToggle',args,()=>potPickToggleImpl(...args))}
+
+export function potPickDone(...args){return savedAction('potPickDone',args,()=>potPickDoneImpl(...args))}
+
+export function pickCard(...args){return savedAction('pickCard',args,()=>pickCardImpl(...args))}
+
+export function pickCancel(...args){return savedAction('pickCancel',args,()=>pickCancelImpl(...args))}
+
+export function openChestLid(...args){return savedAction('openChestLid',args,()=>openChestLidImpl(...args))}
+
+export function campDo(...args){return savedAction('campDo',args,()=>campDoImpl(...args))}
+
+export function buy(...args){return savedAction('buy',args,()=>buyImpl(...args))}
+
+export function shopRemove(...args){return savedAction('shopRemove',args,()=>shopRemoveImpl(...args))}
+
+export function goMap(...args){return savedAction('goMap',args,()=>goMapImpl(...args))}
+
+export function continueMessage(){return savedAction('continueMessage',[],()=>{if(W.S.screen==='msg')W.S.next()})}
+
+export function enterNode(...args){return savedAction('enterNode',args,()=>enterNodeImpl(...args))}
+
+export function openShop(...args){return savedAction('openShop',args,()=>openShopImpl(...args))}
+
+export function openChest(...args){return savedAction('openChest',args,()=>openChestImpl(...args))}

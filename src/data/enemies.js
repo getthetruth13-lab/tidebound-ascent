@@ -6,7 +6,7 @@ import {registerEnemies} from '../core/registry.js';
 import {W} from '../core/state.js';
 import {DATA} from './generated/data-v2.js';
 import {BELL_LINES,TENANT_LINES} from './lore.js';
-import {addSt,alive,countAlive,log,callout,spawn} from '../engine/combat.js';
+import {addSt,alive,countAlive,log,callout,spawn,bossBeat} from '../engine/combat.js';
 const V=DATA.v21.sim.enemies;
 const hp=k=>V[k].hp.slice();
 const tend=()=>alive().filter(x=>x.key==='tendril');
@@ -20,7 +20,7 @@ registerEnemies({
  leech:{n:'Tide Leech',e:'🪱',hp:[24,28],ai:e=>e.t%2?{a:3,brittle:1,lbl:'Latch'}:{a:5,heal:5,lbl:'Drink'}},
  lurker:{n:'Kelp Lurker',e:'🌿',hp:[34,38],ai:e=>{if(e.t===0)return{a:4,status:{id:'kelp',n:1,pile:'disc'},lbl:'Entangle'};const k=(e.t-1)%3;return k===0?{a:7,lbl:'Grab'}:k===1?{a:4,h:2,lbl:'Thrash'}:{a:7,status:{id:'kelp',n:1,pile:'disc'},lbl:'Entangle'}}},
  tendril:{n:'Kelp Tendril',e:'🌱',hp:[12,12],ai:e=>({a:3,lbl:'Lash'})},
- // ---- Act 1 roster additions (design/ACT1-ROSTER-ADDITIONS.md; numbers simmed in CODEX_TASK_20) ----
+ // ---- Act 1 roster additions (design/ACT1-ROSTER-ADDITIONS.md; numbers simmed in CODEX_TASK_20/21) ----
  penitent:{n:'Wrackfolk Penitent',e:'⛓️',hp:[40,44],b0:8,
   passive:{n:'Penance',text:'At the end of each of its turns, it gains 1 Might.',endTurn:e=>{addSt(e,'str',1)}},
   ai:e=>e.t===0?{s:2,lbl:'Kneel'}:{a:4,lbl:'Scourge'}},
@@ -51,13 +51,13 @@ registerEnemies({
   onSpawn:e=>{if(W.cb){spawn('tendril',{summoned:true});spawn('tendril',{summoned:true})}},
   ai:e=>{const k=(e.ci++)%3;return k===0?{a:12,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'}:k===1?{grow:1,fx:grow,lbl:'Grow'}:{a:6,h:2,lbl:'Crushing Embrace'}},
   onDamaged:e=>{if(!e.bloomed&&e.hp<=45){e.bloomed=true;spawn('tendril',{summoned:true});spawn('tendril',{summoned:true});addSt(e,'str',2);log('🌸 The Matriarch BLOOMS: 2 Tendrils, +2 Might');callout('BLOOM!','boss')}}},
- tenant:{n:'The Last Tenant',e:'🏚️',hp:[160,160],b0:24,boss:1,
-  passive:{n:'Home',text:'His Guard does not expire. Break all of it in one go and he is Breached: he loses his next action and takes 50% more damage, then rebuilds 20 Guard.',keepGuard:true},
-  ai:e=>{const k=(e.ci++)%3;return k===0?{a:e.ph===2?22:18,lbl:'Shoulder'}:k===1?{a:7,h:2,v:1,lbl:'Boathook'}:{b:10,lbl:'Board Up'}},
-  // Breached (Guard 30→0 in one hit sequence): the next action is skipped (Reeling), Exposed for that turn, 20 Guard back after it.
-  onGuardBroken:e=>{if(e.ph!==1||W.cb.acting===e)return;e.next={none:1,b:20,lbl:'Reeling'};addSt(e,'vuln',1);log('🏚️ The Last Tenant is BREACHED: he reels, Exposed');callout('BREACHED!','boss')},
-  onDamaged:e=>{if(e.ph===1&&e.hp<=60){e.ph=2;e.passive=null;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.next=EN.tenant.ai(e);if(W.cb.acting===e)e.keepNext=true;
-   log('🏚️ '+TENANT_LINES.phase2);callout('THE DOOR SPLINTERS!','boss')}},
+ tenant:{n:'The Last Tenant',e:'🏚️',hp:[180,180],b0:30,boss:1,
+  passive:{n:'Home',text:'His Guard does not expire. Break all of it in one go and he is Breached: he loses his next action and takes 50% more damage, then rebuilds 30 Guard.',keepGuard:true},
+  ai:e=>{const k=(e.ci++)%3;return k===0?{a:e.ph===2?22:18,lbl:'Shoulder'}:k===1?{a:7,h:2,v:1,lbl:'Boathook'}:{b:14,lbl:'Board Up'}},
+  // Breached (Guard >0→0 in one hit sequence): the next action is skipped (Reeling), Exposed for that turn, 30 Guard back after it.
+  onGuardBroken:e=>{if(e.ph!==1||W.cb.acting===e)return;e.next={none:1,b:30,lbl:'Reeling'};addSt(e,'vuln',1);log('🏚️ The Last Tenant is BREACHED: he reels, Exposed');callout('BREACHED!','boss')},
+  onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;e.passive=null;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.next=EN.tenant.ai(e);if(W.cb.acting===e)e.keepNext=true;
+   log('🏚️ '+TENANT_LINES.phase2);bossBeat('phase','The door splinters','He does not seem to notice. He hits harder now.',e)}},
   onDeath:e=>{log('🏚️ '+TENANT_LINES.defeat)}},
 });
 function grow(e){tend().forEach(t=>addSt(t,'str',1));if(tend().length<2)spawn('tendril',{summoned:true});log('🌿 Grow: Tendrils +1 Might')}

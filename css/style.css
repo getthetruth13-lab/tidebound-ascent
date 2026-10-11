@@ -1017,7 +1017,7 @@ body.combat-motion #endbtn:active{transform:translateY(3px) scale(.94);filter:br
  .combat .dais::before,.combat .dais::after,.combat .dais .dais-art{display:none}
  .combat .dais-hd span{display:none}
  .combat .dais *{text-shadow:0 1px 2px #000,0 0 5px #000}
- .combat .hand{left:calc(150px + env(safe-area-inset-left));right:calc(170px + env(safe-area-inset-right))}
+ .combat .hand{left:calc(150px + env(safe-area-inset-left));right:calc(172px + env(safe-area-inset-right))}
  .combat .ctl{position:fixed;inset:0;padding:0;display:block;pointer-events:none}
  .combat .ctl>div{display:contents}
  .combat .ctl .row2{display:contents}
@@ -1025,7 +1025,7 @@ body.combat-motion #endbtn:active{transform:translateY(3px) scale(.94);filter:br
  .combat #drawpile{position:absolute;left:calc(4px + env(safe-area-inset-left));bottom:4px;pointer-events:auto}
  .combat #discpile{position:absolute;right:calc(4px + env(safe-area-inset-right));bottom:4px;pointer-events:auto}
  .combat #exhpile{position:absolute;right:calc(4px + env(safe-area-inset-right));bottom:54px;pointer-events:auto}
- .combat #endbtn{position:absolute;right:calc(64px + env(safe-area-inset-right));bottom:72px;min-width:104px;min-height:48px;pointer-events:auto}
+ .combat #endbtn{position:absolute;right:calc(56px + env(safe-area-inset-right));bottom:8px;min-width:108px;min-height:52px;pointer-events:auto}
 }
 
 /* Choice headings use the frame budget rather than the general modal spacing. */
@@ -1038,3 +1038,35 @@ body.env-combat #env-front{display:none}
 .combat .drop-valid .fig{filter:drop-shadow(0 0 5px #65d6bb)}
 .combat .drop-over .fig{filter:drop-shadow(0 0 9px #ffe6a4)}
 .combat .drop-invalid{opacity:.55}
+
+/* ===== Task 27: boss moments (intro plate, phase change, victory plaque). Transform/opacity only; stilled by reduced motion. ===== */
+.bossbeat{position:absolute;left:0;right:0;top:20%;z-index:39;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6vw;pointer-events:none;text-align:center;
+ background:linear-gradient(90deg,transparent,#05070bcc 18%,#05070bcc 82%,transparent);opacity:0;animation:bbin 3s ease-out forwards}
+.bossbeat h2{margin:0;font:700 clamp(22px,4.4vw,38px)/1.05 var(--font-display);letter-spacing:.12em;text-transform:uppercase;color:#f1dcae;text-shadow:0 0 18px #a8322e,0 3px 6px #000}
+.bossbeat .bb-epi{font:italic 600 clamp(12px,2.2vw,17px)/1.2 var(--serif);color:#b9b4a6;letter-spacing:.03em}
+.bossbeat p{margin:0;font:italic 600 clamp(14px,2.8vw,22px)/1.25 var(--serif);color:#e9dcb8;max-width:70vw;text-shadow:0 2px 4px #000}
+.bossbeat .bb-rule{display:block;width:min(46vw,380px);height:2px;background:linear-gradient(90deg,transparent,var(--gold,#d9b46a),transparent)}
+.bossbeat.bb-phase{top:28%;animation-name:bbphase;animation-duration:2.6s;background:linear-gradient(90deg,transparent,#2a0806dd 15%,#2a0806dd 85%,transparent)}
+.bossbeat.bb-phase h2{color:#ffb0a0;text-shadow:0 0 22px #ff3a2a,0 3px 6px #000}
+@keyframes bbin{0%{opacity:0;transform:scale(1.12)}12%{opacity:1;transform:scale(1)}78%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+@keyframes bbphase{0%{opacity:0;transform:scale(1.5)}8%{opacity:1;transform:scale(1)}14%{transform:translateX(5px)}20%{transform:translateX(-4px)}26%{transform:none}82%{opacity:1}100%{opacity:0}}
+.bossvic{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;margin:0 auto 4px;max-width:min(640px,90vw);text-align:center;animation:bvin 2.6s ease-out backwards}
+.bossvic b{font:700 clamp(14px,2.6vw,20px)/1.1 var(--font-display);letter-spacing:.12em;text-transform:uppercase;color:#f1dcae;text-shadow:0 0 12px #d9b46a88}
+.bossvic q{font:italic 600 clamp(11px,1.9vw,15px)/1.25 var(--serif);color:#c9bf9e;quotes:none}
+.bossvic .bv-rays{position:absolute;left:50%;top:50%;width:min(520px,80vw);height:90px;transform:translate(-50%,-50%);z-index:-1;background:radial-gradient(closest-side,#d9b46a55,transparent);animation:bvpulse 3.2s ease-in-out infinite}
+.bossvic~.rewtiles .tile:not(.done){border-color:#d9b46a88;box-shadow:0 0 0 1px #05070b,0 0 16px #d9b46a44,0 6px 14px #000a;animation:bvtile .7s cubic-bezier(.2,1.3,.4,1) backwards}
+.bossvic~.rewtiles .tile:nth-child(2){animation-delay:.25s}.bossvic~.rewtiles .tile:nth-child(3){animation-delay:.5s}
+@keyframes bvin{0%{opacity:0;transform:translateY(-10px) scale(1.15)}30%{opacity:1;transform:none}}
+@keyframes bvpulse{50%{opacity:.55}}
+@keyframes bvtile{0%{opacity:0;transform:translateY(24px) scale(.9)}}
+@media (prefers-reduced-motion:reduce){.bossbeat,.bossbeat.bb-phase{animation:bbfade 3s linear forwards}.bossvic,.bossvic .bv-rays,.bossvic~.rewtiles .tile{animation:none!important}@keyframes bbfade{0%,85%{opacity:1}100%{opacity:0}}}
+body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbfade 3s linear forwards}body.reduce-motion .bossvic,body.reduce-motion .bossvic .bv-rays,body.reduce-motion .bossvic~.rewtiles .tile{animation:none}
+@keyframes bbfade{0%,85%{opacity:1}100%{opacity:0}}
+/* first-fight coach chip */
+.coach{position:absolute;left:50%;top:9%;transform:translateX(-50%);z-index:37;display:flex;align-items:center;gap:8px;max-width:min(78vw,520px);padding:6px 10px;border-radius:999px;background:#0d1016ee;border:1px solid #d9b46a99;box-shadow:0 4px 12px #000a;font:600 clamp(12px,2vw,16px)/1.2 var(--serif);color:#e9dcb8;animation:coachin .4s ease-out backwards}
+.coach b{color:#ffd9a0}.coach .co-ico{font-size:1.3em}
+.coach .co-x{background:none;border:0;color:#b9b4a6;font-size:14px;padding:2px 4px;cursor:pointer}
+@keyframes coachin{0%{opacity:0;transform:translate(-50%,-8px)}}
+@media (prefers-reduced-motion:reduce){.coach{animation:none}}
+.bossvic{margin-top:18px}
+.coach{pointer-events:none}.coach .co-x{pointer-events:auto}

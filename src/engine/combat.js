@@ -1,3 +1,4 @@
+import {savedAction} from '../save.js';
 // engine/combat.js — turn/card-play lifecycle, damage & Guard pipelines, class rules (v2.1), enemies.
 // Ordering contract: design/content-impl-plan.md §2 ("Turn / play ordering contract"). Rule numbers: DATA.v21.sim.core.
 import {CARDS,EN,POTIONS} from '../core/registry.js';
@@ -25,6 +26,8 @@ export function log(s){if(W.cb){W.cb.log.unshift(s);W.cb.log.length=Math.min(W.c
 // Floating combat text (damage/Guard numbers). Visual only; kept separate from the bus's turn-scoped W.cb.fx.
 export function floatText(who,txt,cls){if(!W.cb)return;const now=Date.now();W.cb.vfx=W.cb.vfx.filter(x=>now-x.t<2000);W.cb.vfx.push({who,txt,cls:cls||'',t:now,d:impactDelay(who)})}
 // Big combo call-outs ("CREST!", "FLOURISH ×3", "ECHO ×2"...): clear feedback when combos trigger. Never blocks input.
+// Boss moment (intro / phase change): a big title plate drawn over the scene (render.js bossBeatHTML) plus fx (anim.js listens to 'bossBeat').
+export function bossBeat(kind,title,sub,e){if(!W.cb)return;W.cb.beat={kind,title,sub:sub||'',t:Date.now()};fire('bossBeat',{kind,enemy:e})}
 export function callout(txt,cls){if(!W.cb)return;const now=Date.now();W.cb.callouts=(W.cb.callouts||[]).filter(x=>now-x.t<1400);W.cb.callouts.push({txt,cls:cls||'',t:now})}
 // Relic feedback: pulse the relic icon in the top bar.
 export function flash(r){if(r&&typeof r==='object'){r.flashT=Date.now()}}
@@ -46,7 +49,7 @@ export function spawn(key,o={}){const t=EN[key];const hp=rng(t.hp[0],t.hp[1],cs)
  W.cb.ens.push(e);e.next=t.ai(e);if(t.onSpawn)t.onSpawn(e);return e}
 export function countAlive(key){return alive().filter(x=>x.key===key).length}
 // ================= combat start =================
-export function startCombat(kind,enc,opts={}){
+function startCombatImpl(kind,enc,opts={}){
  W.run.deck.forEach(ci=>{ci.sus=0;ci.tmp0=false;ci.tmpUp=false;ci.rank=0});
  const cb=W.cb={kind,ens:[],tgt:0,p:{block:0,st:{}},energy:3,maxE:3,banner:null,insp:null,hand:[],draw:shuffle(W.run.deck.slice(),cs),disc:[],exh:[],log:[],vfx:[],callouts:[],fx:[],powers:[],
   stat:{playedTurn:0,playedCombat:0,attacksTurn:0,attacksCombat:0,tideturnsTurn:0,tideturnsCombat:0,crests:0,undertows:0,echoesTurn:0,echoesCombat:0,wpDestroyed:0,lastTideDir:0,lastEchoed:null,flourishes:0,advances:0},
@@ -58,7 +61,7 @@ export function startCombat(kind,enc,opts={}){
  // Opening cards go to the top of the draw pile (design §2.1).
  const open=cb.draw.filter(c=>c.open||CARDS[c.id].open);if(open.length){cb.draw=open.concat(cb.draw.filter(c=>!open.includes(c)))}
  enc.forEach(k=>spawn(k));cb.bossKey=(cb.ens.find(e=>e.boss)||{}).key||null;
- {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':cb.bossKey==='tenant'?'🏚️ ':'🪸 ')+t);callout(t,'lore')}} // lore: the boss speaks first (bible §16 items 7-9)
+ {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':cb.bossKey==='tenant'?'🏚️ ':'🪸 ')+t);const be=cb.ens.find(x=>x.boss);bossBeat('intro',EN[cb.bossKey].n,t,be)}} // lore: the boss speaks first (bible §16 items 7-9)
  const cls=W.run.cls;
  if(cls==='duel')cb.mom=DU.start_mom;
  if(cls==='carto'&&!hasRelic('trailboots')){
@@ -142,7 +145,7 @@ export function checkTide(cause){const cb=W.cb;
   gainBlock(u.guard);drawCards(u.draw);cb.tide=u.resetTo;if(TI.flip_after_reset)cb.tideDir=1;cb.stat.undertows++;if(cb.curF)cb.curF.causedUndertow=true;drenchTrigger('undertow');fire('undertow',{guard:u.guard,draw:u.draw,cause})}}
 // Bank the Crest (Power): Crests are held back instead of firing. Release them with the Tide meter button.
 export const bankOn=()=>!!(W.cb&&mod('bankCrest',{},false));
-export function releaseBank(){const cb=W.cb;if(!cb||cb.busy||cb.mode||!cb.banks)return;const n=cb.banks;cb.banks=0;const c=mod('crest',{cause:'bank'},{dmg:TI.crest_dmg,resetTo:5});
+function releaseBankImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode||!cb.banks)return;const n=cb.banks;cb.banks=0;const c=mod('crest',{cause:'bank'},{dmg:TI.crest_dmg,resetTo:5});
  if(cb.tide>=10){cb.tide=c.resetTo;if(TI.flip_after_reset)cb.tideDir=-1;cb.capped=false}fireCrest(c,'bank',n,1.5);after()}
 // Spend N Tide (Recede, counted as a Tideturn if it reverses the arrow). Returns the amount actually spent; 0 if there is not enough.
 export function spendTide(n){const cb=W.cb;n=Math.min(n,cb.tide);if(n<=0||cb.slack)return 0;tideShift(-n,'spend');return n}
@@ -174,7 +177,7 @@ export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=i
 export function expCount(){const cb=W.cb;return mod('expedition',{},cb.slots.length+cb.slots.filter(w=>(w.rank||0)>=CA.rank_max).length*(CA.landmark_extra||0))}
 export function trigWp(w){const d=CARDS[w.id];if(!d.wp)return;const r=w.rank||0;const f=F(w,{wp:true,rankDmg:CA.rank_dmg?CA.rank_dmg[Math.min(r,CA.rank_dmg.length-1)]:r*CA.per_rank}); // v2.2 Rank curve +2/+6/+11
  const gv=f.v;if(r&&CA.guard_per_rank&&d.wpGuard)f.v=(a,b)=>gv(a,b)+r*CA.guard_per_rank;d.wp(f);w.trigT=Date.now();fire('waypointTrigger',{wp:w,f})}
-export function advance(i){const cb=W.cb;if(!cb||cb.busy||cb.mode||W.run.cls!=='carto')return false;const w=cb.slots[i];const lim=mod('advances',{},1);
+function advanceImpl(i){const cb=W.cb;if(!cb||cb.busy||cb.mode||W.run.cls!=='carto')return false;const w=cb.slots[i];const lim=mod('advances',{},1);
  if(!w||cb.advUsed>=lim||(w.rank||0)>=CA.rank_max){render();return false}
  cb.advUsed++;w.rank=(w.rank||0)+1;cb.stat.advances++;w.advT=Date.now();
  log(`⛰️ Advance: ${cname(w)} → Rank ${w.rank}${w.rank>=CA.rank_max?' (LANDMARK)':''}`);callout(w.rank>=CA.rank_max?'LANDMARK!':'Advance → Rank '+w.rank,'adv');
@@ -191,7 +194,7 @@ export function placeWp(ci){const cb=W.cb;const put=()=>{if(cb.cairn){ci.rank=cb
 export function choose(title,opts){W.cb.mode={k:'choice',title,opts}}
 export function chart(n,then0){const cb=W.cb;const then=()=>{fire('chartDone',{n});then0&&then0()};refill(n);cb.mode={k:'chart',n:Math.min(n,cb.draw.length),then,moved:false};fire('chart',{n});if(!cb.mode||!cb.mode.n){if(cb.mode&&cb.mode.k==='chart')cb.mode=null;then&&then()}}
 export function pickSlot(title,then){W.cb.mode={k:'slot',title,then}}
-export function modeAct(a,i,j){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)return;
+function modeActImpl(a,i,j){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)return;
  const done=()=>{if(m.thenStart&&!cb.mode){if(W.cb===cb)return nextStart()}return after()};
  if(m.k==='choice'){cb.mode=null;m.opts[i].f();return done()}
  if(m.k==='slot'){cb.mode=null;m.then(i);return done()}
@@ -224,16 +227,16 @@ function drift(){const cb=W.cb;if(W.run.cls!=='tide'||cb.turn<2||!cb.tideDir)ret
  for(let k=0,t=mod('driftCount',{},1);k<t;k++){const n=mod('drift',{},TI.drift);const dir=cb.tideDir;if(!dir)break;
   cb.driftT=Date.now();log(`🌊 The Tide drifts ${dir>0?'up':'down'} ${n}`);tideShift(dir*n,'drift');fire('drift',{dir,n})}}
 // Tide Table / Helmsman's Wheel: free once-per-turn actions on the Tide meter (never block input).
-export function tideAct(a){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
+function tideActImpl(a){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  if((a==='up'||a==='down')&&hasRelic('tidetable')&&!cb.tideBtnUsed){cb.tideBtnUsed=true;flash(relic('tidetable'));tideShift(a==='up'?1:-1,'relic');return after()}
  if(a==='flip'&&hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir){cb.wheelUsed=true;cb.tideDir=-cb.tideDir;flash(relic('helmwheel'));log('☸️ Helmsman\'s Wheel: drift arrow flipped');return after()}}
 export function canPlay(ci){const cb=W.cb;const d=CARDS[ci.id];if(!d||cb.busy||cb.mode||d.unplay)return false;if(cost(ci)>cb.energy)return false;if(d.req&&!d.req(F(ci,{})))return false;return mod('canPlay',{card:ci},true)}
-export function tapCard(i){const cb=W.cb;if(cb.busy||cb.mode)return;cb.sel=i;cb.insp=null;render()}
+function tapCardImpl(i){const cb=W.cb;if(cb.busy||cb.mode)return;cb.sel=i;cb.insp=null;render()}
 // Retained for old debug callers; only the drag release UI commits a card.
 export function playSel(){}
 // UI toggles for the active class choices (applied to the next card you play)
-export function armFlourish(){const cb=W.cb;if(!cb||cb.busy)return;cb.armFlourish=!cb.armFlourish&&cb.mom>=flourishMin();render()}
-export function armMark(){const cb=W.cb;if(!cb||cb.busy||!canMark())return;cb.armMark=!cb.armMark;render()}
+function armFlourishImpl(){const cb=W.cb;if(!cb||cb.busy)return;cb.armFlourish=!cb.armFlourish&&cb.mom>=flourishMin();render()}
+function armMarkImpl(){const cb=W.cb;if(!cb||cb.busy||!canMark())return;cb.armMark=!cb.armMark;render()}
 export const flourishMin=()=>mod('flourishMin',{},DU.flourish_min);
 export const flourishMult=m=>Math.min(3.5,1+DU.flourish_per_mom*m);
 export const markBonus=(after)=>{const cb=W.cb;return Math.min(mod('markCap',{},EC.bonus_cap),mod('markPer',{},EC.bonus_per_card_after)*(after==null?cb.afterMark:after))};
@@ -241,9 +244,9 @@ export const markBonus=(after)=>{const cb=W.cb;return Math.min(mod('markCap',{},
 export const markLimit=()=>Math.min(2,mod('markSlots',{},1)+(W.cb?W.cb.extraMarks:0));
 export const canMark=()=>{const cb=W.cb;return !!cb&&(!cb.mark||(markLimit()>1&&!cb.mark2))};
 // playCard(i, opts): opts.flourish (Duelist) and opts.mark (Echo Mage) come from the UI; default = the armed toggles.
-export function playCard(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)return;if(!canPlay(ci)){cb.sel=i;return render()}const d=CARDS[ci.id];
+function playCardImpl(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)return;if(!canPlay(ci)){cb.sel=i;return render()}const d=CARDS[ci.id];
  if(opts.flourish==null)opts.flourish=cb.armFlourish;if(opts.mark==null)opts.mark=cb.armMark;
- if(!W.previewing)flyCard(ci,needsTarget(ci)?curTgt():null);
+ if(!W.previewing&&!W.replaying)flyCard(ci,needsTarget(ci)?curTgt():null);
  const c=cost(ci);const x=isX(ci)?cb.energy:0;cb.energy-=isX(ci)?x:c;cb.hand.splice(i,1);ci.tmp0=false;cb.sel=null;
  const tg=curTgt();const f=F(ci,{tgt:tg,x});cb.curF=f;
  // Flourish (Duelist, v2.1): optional, spends all Momentum, x(1 + 0.5 per Momentum), capped at x3.5.
@@ -301,7 +304,7 @@ export function doEcho(){const cb=W.cb;if(W.run.cls!=='echo')return;
  const n=Math.min(plan.repeats,4);if(n)callout(`ECHO${n>1?' ×'+n:''}${plan.bonus?' +'+plan.bonus:''}${plan.mult>1?' DOUBLED':''}`,'echo')}}
 // ================= end of turn / enemy phase =================
 // endTurn: onTurnEnd -> Echo -> onTurnEndInHand -> Fleeting sink / Moor keep / discard -> Momentum fade -> expire turn fx -> enemy phase
-export function endTurn(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
+function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  fire('turnEnd',{turn:cb.turn});if(!W.cb)return;
  const held=cb.hand.slice();cb.ending=true;doEcho();cb.ending=false;if(W.previewing)return;if(!W.cb)return;if(!alive().length)return win();
  for(const ci of held){const d=CARDS[ci.id];if(cb.hand.includes(ci)&&d.endInHand)d.endInHand(F(ci,{}),ci)}
@@ -368,10 +371,32 @@ export function escape(){const cb=W.cb;fire('combatEnd',{kind:cb.kind,won:false,
 export function potionNeedsTarget(id){return POTIONS[id]&&POTIONS[id].target==='enemy'}
 export function canDrink(id){const p=POTIONS[id];if(!p)return false;if(W.cb)return !W.cb.busy&&!W.cb.mode&&(!p.can||p.can());return !!p.outside}
 // drinkPotion(slot, enemyIndex?) uses the potion in that slot.  G.usePotion(id, enemyIndex?) drinks by id (debug/tests: works even if not owned).
-export function drinkPotion(slot,ti){const id=W.run.potions[slot];if(!id||!canDrink(id))return false;W.run.potions[slot]=null;applyPotion(id,ti);return true}
+function drinkPotionImpl(slot,ti){const id=W.run.potions[slot];if(!id||!canDrink(id))return false;W.run.potions[slot]=null;applyPotion(id,ti);return true}
 export function usePotion(id,ti){const s=W.run.potions.indexOf(id);if(s>=0)return drinkPotion(s,ti);if(!canDrink(id))return false;applyPotion(id,ti);return true}
 function applyPotion(id,ti){const p=POTIONS[id];if(W.run.stats)W.run.stats.potionsUsed=(W.run.stats.potionsUsed||0)+1;
  if(!W.cb){p.use({potion:true,heal,outside:true},null);if(W.run.hp>W.run.max)W.run.hp=W.run.max;return render()}
  const cb=W.cb;if(ti!=null&&cb.ens[ti]&&cb.ens[ti].hp>0)cb.tgt=ti;const tg=p.target==='enemy'?curTgt():null;
  const f=F({id,up:false,uid:-1},{def:Object.assign({t:'potion'},p),potion:true,tgt:tg});log('🧪 '+p.n);callout(p.n,'potion');
  p.use(f,tg);fire('potionUsed',{id});after()}
+
+export function playCard(...args){return savedAction('playCard',args,()=>playCardImpl(...args))}
+
+export function endTurn(...args){return savedAction('endTurn',args,()=>endTurnImpl(...args))}
+
+export function modeAct(...args){return savedAction('modeAct',args,()=>modeActImpl(...args))}
+
+export function advance(...args){return savedAction('advance',args,()=>advanceImpl(...args))}
+
+export function tideAct(...args){return savedAction('tideAct',args,()=>tideActImpl(...args))}
+
+export function releaseBank(...args){return savedAction('releaseBank',args,()=>releaseBankImpl(...args))}
+
+export function drinkPotion(...args){return savedAction('drinkPotion',args,()=>drinkPotionImpl(...args))}
+
+export function armFlourish(...args){return savedAction('armFlourish',args,()=>armFlourishImpl(...args))}
+
+export function armMark(...args){return savedAction('armMark',args,()=>armMarkImpl(...args))}
+
+export function tapCard(...args){return savedAction('tapCard',args,()=>tapCardImpl(...args))}
+
+export function startCombat(...args){return savedAction('startCombat',args,()=>startCombatImpl(...args))}

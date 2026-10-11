@@ -4,6 +4,7 @@
 import {W} from '../../core/state.js';
 import {settings,saveSettings} from '../../save.js';
 import {render} from '../render.js';
+import {dip} from '../dip.js';
 import {spriteImg} from './select.js';
 import {ORDER} from './heroes.js';
 const IMG=n=>`art/v2/intro/intro-${n===5?3:n}.webp`;
@@ -37,7 +38,7 @@ export function introStart(replay){W.S={screen:'title',view:'intro',scene:1,prev
 export function introNext(){if(W.S.screen!=='title'||W.S.view!=='intro')return;const n=W.S.scene;
  if(n>=SCENES.length)return introDone();W.S={...W.S,scene:n+1,prev:n};render()}
 function introDone(){clearTimeout(timer);const replay=W.S.replay;settings.introSeen=true;saveSettings();
- W.S=replay?{screen:'title',view:'learn',page:0}:{screen:'title',view:'select',page:0,hero:null};render()}
+ dip(()=>{W.S=replay?{screen:'title',view:'learn',page:0}:{screen:'title',view:'select',page:0,hero:null};render()})}
 export function introSkip(){introDone()}
 // Every New Game opens the cinematic; Continue and Load use their own paths.
 export function newGame(){introStart(false)}

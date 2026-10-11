@@ -43,6 +43,7 @@ window.G={get S(){return W.S},get run(){return W.run},get cb(){return W.cb},CARD
  playCard:combat.playCard,tapCard:combat.tapCard,endTurn:combat.endTurn,advance:combat.advance,tideAct:combat.tideAct,modeAct:combat.modeAct,
  TASKS:lampEngine.TASKS,progress,lampEngine,lampData,
  run$:runMod,combat$:combat,cards$:cards,debugEnv:env.debugEnv,envState:env.envState,quality:env.quality};
+save.registerSaveActions(runMod);save.registerSaveActions(combat);save.registerSaveActions({tgt:render.tgt});
 if(save.settings.fastAnim&&window.FAST==null)window.FAST=1;
 W.S={screen:'title',view:title.bootView()};
 assets.applyTextures();title.applyMotion();env.initEnv();

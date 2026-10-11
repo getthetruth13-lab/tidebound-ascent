@@ -4,6 +4,7 @@
 //      so an animation resumes instead of restarting or vanishing when something re-renders mid-flight.
 import {shakeLayers} from './stage.js';
 import {W} from '../core/state.js';
+import {settings} from '../save.js';
 import {CARDS} from '../core/registry.js';
 import {observeEvents} from '../core/bus.js';
 import {playSound} from '../audio.js';
@@ -96,6 +97,7 @@ function queue(rec){pending.push(rec)}
 observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
  if(event==='draw'&&!enabled()){const now=performance.now(),delay=Math.max(0,drawTimer-now);drawTimer=now+delay+62;const cb=W.cb;setTimeout(()=>{if(W.cb===cb&&!document.hidden)playSound('draw',.96+Math.random()*.08)},delay)}
  if(!fxOn())return;
+ if(event==='bossPhase'||event==='bossBeat'&&c.kind==='phase'){if(enabled()){shakeNow(10);slowmo(500,.4)}vignette('red',.7,900);const ce=centre(enemy(c.enemy));if(ce){ring(ce.x,ce.y,COL.rust,160,700);emit('burst',ce.x,ce.y,COL.rust,26)}return}
  if(event==='turnEnd')phaseSweep('Enemy Turn');
  if(event==='turnStart')phaseSweep('Your Turn');
  const cls=W.run.cls,target=enemy(c.target||c.enemy),hero='#hero',move=enabled();
@@ -158,7 +160,7 @@ function discardHand(){if(!enabled()||!W.cb)return;const pile=$('#discpile');if(
   g.animate([{transform:'none',opacity:1},{transform:`translate(${tx*.7}px,${ty*.7}px) scale(.55) rotate(-10deg)`,opacity:.8,offset:.7},{transform:`translate(${tx}px,${ty}px) scale(.25) rotate(-16deg)`,opacity:0}],{duration:250,delay,easing:'cubic-bezier(.5,0,.8,.5)',fill:'backwards'}).finished.then(()=>{g.remove()},()=>g.remove())}
  if(n)dest.pulse=pile.animate([{transform:'scale(1)'},{transform:'scale(1.16)',offset:.8},{transform:'scale(1)'}],{duration:260,delay:n*40+120})}
 // ---------- screen shake on #scene (transform only; reduced motion gets the vignette instead) ----------
-function shakeNow(amp){if(!enabled())return;entry(300,el=>play($('.scene'),shakeFrames(amp),300,el,0,'linear')).apply(0)}
+function shakeNow(amp){if(!enabled()||settings.screenShake===false)return;entry(300,el=>play($('.scene'),shakeFrames(amp),300,el,0,'linear')).apply(0)}
 // ---------- hp bars: delayed ghost chunk, flash on loss, heal motes ----------
 let hpMem={},blkMem={},lastEnergy=null,lastTide=null,lastTurn=0;
 function syncGuard(bar,who){const b=+bar.dataset.blk||0,prev=blkMem[who];blkMem[who]=b;if(prev==null||prev===b)return;
