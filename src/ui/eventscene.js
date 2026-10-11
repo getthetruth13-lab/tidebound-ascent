@@ -40,7 +40,8 @@ function optHTML(o,i,out){const dis=!!(o.ok&&!o.ok());let name,sum;
  return `<li><button ${cont?'id="msgok" ':''}class="evo${dis?' off':''}${rk!=null?' risky':''}${cont?' cont':''}" ${dis?'aria-disabled="true" ':`onclick="evOpt(${i})" `}${info?`data-info="${esc((name?name+': ':'')+info)}"`:''}>`+
   `${cont?'':`<span class="evnum">${i+1}.</span>`}<span class="evlab"><b class="evname">${hl(name)}</b>${sum?`<span class="evdash"> — </span><span class="es">${hl(sum)}</span>`:''}${risk}${why}</span></button></li>`}
 export function eventSceneHTML(e){const sc={...DEF,...(SCENES[e.id]||{})};const t=TILES['event-'+(e.id||'generic')]||TILES['event-generic'];
- const img=t&&t.ready?`<img src="${t.path}" alt="" draggable="false">`:'';const out=e.out;
+ const scenePath=SCENES[e.id]?`art/v2/ui/scenes/task36-event-${e.id}.webp`:t?.path;
+ const img=t&&t.ready?`<img src="${scenePath}" alt="" draggable="false">`:'';const out=e.out;
  const fresh=out&&Date.now()-(e.rt||0)<2500;
  return `<div class="evscene side-${sc.side}${out?' out out-'+out.tone:''}${fresh?' fresh':''}" data-ev="${e.id||''}" style="--sp:${U(1)};--fx:${sc.fx};--fy:${sc.fy*100}%;--z:${sc.z||1.2}">
  <div class="evbg">${img||`<b class="evph">${e.e||'◈'}</b>`}</div><div class="evfade"></div><div class="evflash"></div>

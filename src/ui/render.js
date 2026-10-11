@@ -39,11 +39,6 @@ const lbl=o=>typeof o.l==='function'?o.l():o.l;
 function cardArtHTML(id,d,full){if(assetEntry('cards',id))return slotHTML('cards',id,'art','');const P=CARD_ART[id];
  if(P)return `<div class="slot art has-img ph-art painted" data-asset="cardArt.${id}"><img src="${full?P.art:P.thumb}" alt="" draggable="false" decoding="async" onerror="this.remove()"></div>`;const k=d.curse?'curse':d.cls==='status'?'status':TH[d.cls]?d.cls:'colorless';
  const a=assetEntry('cardPH',k);return `<div class="slot art has-img ph-art" data-asset="cardPH.${k}"><img src="${a.src}" srcset="${a.srcset}" sizes="${a.sizes}" alt="" draggable="false" decoding="async" onerror="this.remove()"></div>`}
-// One short effect line over the resting hand art. The fitter uses full text when it fits,
-// otherwise the first sentence with ellipsis; the complete rules panel remains unchanged.
-const plain=h=>String(h).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
-function restLineHTML(ci,d){const t=plain(d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci));if(!t)return'';const first=(t.match(/^[^.]*\.?/)||[t])[0];
- return `<span class="rline" data-full="${esc(t)}" data-first="${esc(first)}">${esc(t)}</span>`}
 // Preferred title size; the measured fitter handles the final frame dimensions.
 const nameFit=n=>Math.max(11,Math.min(12.5,74/(Math.max(6,n.length)*.53))); // fitCards() shrinks longer names within the plate
 // Preferred rules size; fitCards() keeps the complete text inside the rules panel.
@@ -59,7 +54,7 @@ export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const ba
  const cls=['card','t'+d.t,'r-'+d.r,'theme-'+(TH[d.cls]||''),o.sel?'sel':'',o.can===false?'unp':'',d.curse?'curse':'',d.cls==='status'?'status':'',o.mark?'markable':'',o.flourish?'flourishable':'',ci.open?'opening':'',d.unplay?'nocost':''].filter(Boolean).join(' ');
  return `<div class="${cls}" ${o.click?`onclick="${o.click}"`:''} data-id="${ci.id}" data-uid="${ci.uid}" data-up="${up?1:0}"${o.i!=null?` data-i="${o.i}"`:''}>
  <i class="cfr"></i>${cardArtHTML(ci.id,d,!!(o.sel||o.full))}
- <span class="cost${c<base?' cheap':c>base?' dear':''}">${d.unplay?'':(d.c==='X'?'X':c)}</span><span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.r!=='s'&&d.r!=='x'?`<span class="rarity ${d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}<i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}${o.i!=null?restLineHTML(ci,d):''}</div>`}
+ <span class="cost${c<base?' cheap':c>base?' dear':''}">${d.unplay?'':(d.c==='X'?'X':c)}</span><span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.r!=='s'&&d.r!=='x'?`<span class="rarity ${d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}<i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}</div>`}
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
@@ -386,8 +381,7 @@ export function render(){if(W.previewing||W.replaying)return;if(drag||(W.chartDr
 // Fit text within the printed frame areas; never grow a panel into the illustration.
 const fittedCards=new WeakMap(),fitCache=new Map();let fitEpoch=0;
 function fitSignature(c){return [fitEpoch,innerWidth,innerHeight,devicePixelRatio,c.dataset.id,c.dataset.up,
- ...['.name','.cost','.type','.text'].map(q=>{const el=c.querySelector(q);return el?.innerHTML+'@'+el?.getAttribute('style')}),
- c.querySelector('.rline')?.dataset.full].join('|')}
+ ...['.name','.cost','.type','.text'].map(q=>{const el=c.querySelector(q);return el?.innerHTML+'@'+el?.getAttribute('style')})].join('|')}
 function measureCardBox(box){const style=getComputedStyle(box);
     const width=box.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
     const height=box.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
@@ -400,7 +394,7 @@ function measureCardBox(box){const style=getComputedStyle(box);
 }
 export function fitCards(root=document){const work=[];
  for(const c of root.querySelectorAll('.card')){
-  const content=[c.dataset.id,c.dataset.up,...['.name','.cost','.type','.text'].map(q=>c.querySelector(q)?.innerHTML),c.querySelector('.rline')?.dataset.full].join('|');
+  const content=[c.dataset.id,c.dataset.up,...['.name','.cost','.type','.text'].map(q=>c.querySelector(q)?.innerHTML)].join('|');
   const context=[];for(let p=c.parentElement;p&&p!==root;p=p.parentElement)context.push(p.className+'@'+(p.getAttribute('style')||''));
   const stamp=`${fitEpoch}|${innerWidth}|${innerHeight}|${devicePixelRatio}|${c.style.width}|${c.style.height}|${context.join('/')}|${content}`;
   if(fittedCards.get(c)===stamp||!c.offsetWidth||!c.offsetHeight)continue;
@@ -414,7 +408,7 @@ export function fitCards(root=document){const work=[];
  }
  for(const {c,cached} of work)if(cached){
   for(const [q,style] of cached.panels){const box=c.querySelector(q);if(box){if(style===null)box.removeAttribute('style');else box.setAttribute('style',style)}}
-  const rl=c.querySelector('.rline');if(rl&&cached.line){rl.textContent=cached.line.text;rl.classList.toggle('nofit',cached.line.nofit)}
+
  }
  for(const w of work)if(w.cached){
   // Validate inherited typography and fractional glyph rounding on every hit.
@@ -435,9 +429,7 @@ export function fitCards(root=document){const work=[];
     if(!fits()){for(let i=0;i<8;i++){const mid=(lo+hi)/2;box.style.setProperty('font-size',mid+'px','important');if(fits())lo=mid;else hi=mid}
       box.style.setProperty('font-size',lo+'px','important');}
   }
-  const rl=c.querySelector('.rline');if(rl&&rl.offsetWidth){rl.classList.remove('nofit','covered');rl.textContent=rl.dataset.full||'';
-    if(rl.scrollWidth>rl.clientWidth+1){rl.textContent=rl.dataset.first||'';if(rl.scrollWidth>rl.clientWidth+1)rl.classList.add('nofit')}}
-  fitCache.set(key,{panels:['.name','.cost','.type','.text'].map(q=>[q,c.querySelector(q)?.getAttribute('style')??null]),line:rl?{text:rl.textContent,nofit:rl.classList.contains('nofit')}:null});
+  fitCache.set(key,{panels:['.name','.cost','.type','.text'].map(q=>[q,c.querySelector(q)?.getAttribute('style')??null])});
   if(fitCache.size>2048)fitCache.delete(fitCache.keys().next().value);
  }
  for(const {c,transform,transition,stamp} of work){c.style.transform=transform;c.style.transition=transition;fittedCards.set(c,stamp)}

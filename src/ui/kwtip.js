@@ -40,12 +40,16 @@ function showCard(el){const id=el.dataset.card;if(!CARDS[id])return false;
  if(tip)tip.classList.remove('on');
  ctip.innerHTML=cardHTML({id,uid:-900,up:el.dataset.up==='1'},{full:true});ctip.classList.add('on');fitCards(ctip);anchor=el;shownAt=Date.now();
  const r=el.getBoundingClientRect(),tr=ctip.getBoundingClientRect();const sp=pickSpot(tr.width,tr.height,r,el);const x=sp.x,y=sp.y;
- ctip.style.left=x+'px';ctip.style.top=y+'px';clearTimeout(timer);timer=setTimeout(hideTip,6500);return true}
+ ctip.style.left=x+'px';ctip.style.top=y+'px';clearTimeout(timer);timer=el.closest('.dais')?0:setTimeout(hideTip,6500);return true}
 export function showTip(el){if(el.dataset.card)return showCard(el);if(ctip)ctip.classList.remove('on');const c=contentOf(el);if(!c||!c.text){return false}
  const t=ensure();const sl=el.matches('.relic,.potion,.shopicon')&&el.querySelector('.slot');const rl=el.dataset.relic&&RELICS[el.dataset.relic];
- t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b${c.kind?` class="${c.kind}"`:''}>${c.title}</b>`:''}<span>${c.text}</span>`;t.classList.toggle('item',!!sl);t.classList.toggle('stat',!!c.kind);if(c.kind)decorateKeywords(t);t.classList.add('on');anchor=el;shownAt=Date.now();
- t.style.maxWidth=el.closest('.dais')?'150px':'';const r=el.getBoundingClientRect(),tr=t.getBoundingClientRect();let x,y;if(document.querySelector('.combat')){const sp=pickSpot(tr.width,tr.height,r,el,!!c.kind);x=sp.x;y=sp.y}else{x=Math.max(6,Math.min(innerWidth-tr.width-6,r.left+r.width/2-tr.width/2));y=r.top-tr.height-8;if(y<6)y=Math.min(innerHeight-tr.height-6,r.bottom+8)}
- t.style.left=x+'px';t.style.top=y+'px';clearTimeout(timer);timer=setTimeout(hideTip,6500);return true}
+ t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b${c.kind?` class="${c.kind}"`:''}>${c.title}</b>`:''}<span>${c.text}</span>`;t.classList.toggle('meter-tip',!!el.closest('.dais'));t.classList.toggle('item',!!sl);t.classList.toggle('stat',!!c.kind);if(c.kind)decorateKeywords(t);t.classList.add('on');anchor=el;shownAt=Date.now();
+ const meter=!!el.closest('.dais');t.style.maxWidth=meter?'150px':'';const r=el.getBoundingClientRect();let x,y;
+ if(document.querySelector('.combat')){let best=null;
+  for(const width of meter?[150,130,170,200,230,260]:[null]){if(width)t.style.maxWidth=width+'px';const tr=t.getBoundingClientRect(),sp=pickSpot(tr.width,tr.height,r,el,!!c.kind||meter);if(!best||sp.s<best.s){best={...sp,width};if(sp.s===0)break}}
+  if(meter)t.style.maxWidth=best.width+'px';x=best.x;y=best.y;
+ }else{const tr=t.getBoundingClientRect();x=Math.max(6,Math.min(innerWidth-tr.width-6,r.left+r.width/2-tr.width/2));y=r.top-tr.height-8;if(y<6)y=Math.min(innerHeight-tr.height-6,r.bottom+8)}
+ t.style.left=x+'px';t.style.top=y+'px';clearTimeout(timer);timer=el.closest('.dais')?0:setTimeout(hideTip,6500);return true}
 // ---------------- input ----------------
 const LP=450;let lp=null,eat=false,holdEl=null; // holdEl: status icon being held; its tooltip closes on release
 const find=e=>e.target&&e.target.closest?e.target.closest('[data-kw],[data-card],[data-info]'):null;
@@ -53,6 +57,7 @@ const inHand=el=>!!el.closest('.hand .card'); // hand cards: a tap must lift/pla
 const inButton=el=>!!el.closest('button');
 document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.preventDefault();return}
  const el=find(e);const ref=el&&(el.dataset.kw||el.dataset.card);
+ if(el&&el.closest('.dais')&&!el.closest('button')){hideTip();e.stopPropagation();e.preventDefault();return}
  if(el&&el.matches('.tipi,.lp-node,.nmf,.wrenline,.dais [data-info]:not(button)')){if(anchor===el&&tip.classList.contains('on'))hideTip();else showTip(el);e.stopPropagation();e.preventDefault();return}
  if(!ref){const on=(tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on'));if(on&&!(e.target.closest&&e.target.closest('#kwtip,#cardtip')))hideTip();return}
  if(inHand(el)||inButton(el))return hideTip();
@@ -60,7 +65,7 @@ document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.pr
  e.stopPropagation();e.preventDefault()},true);
 document.addEventListener('pointerdown',e=>{if(lp){clearTimeout(lp.t);lp=null}if(e.pointerType==='mouse'&&e.button>0)return;
  const el=find(e);if(!el||inHand(el))return;const ok=el.matches('.bd,.hpblk')?e.pointerType!=='mouse':(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.evo,.rl,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
- lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el)){eat=true;if(el.matches('.bd,.hpblk'))holdEl=el}},LP)}},true);
+ lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el)){eat=true;if(el.matches('.bd,.hpblk')||el.closest('.dais'))holdEl=el}},LP)}},true);
 document.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){clearTimeout(lp.t);lp=null}},true);
 const release=()=>{if(holdEl){holdEl=null;hideTip()}};
 document.addEventListener('pointercancel',release,true);

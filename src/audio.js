@@ -3,7 +3,9 @@
 import {W} from './core/state.js';
 import {settings,saveSettings} from './save.js';
 import {observeEvents} from './core/bus.js';
-import {fxOn} from './ui/vfx.js';
+import {fxOn,cue,impactBase} from './ui/vfx.js';
+import {T} from './core/timing.js';
+import {deathSoundOf} from './ui/deathstyles.js';
 let ctx,master,unlocked=false,manifest={},context=null,current=null,lastScreen=null,initialized=false;
 const bags={},lastTrack={},voices=new Set(),recent={};
 const level=k=>settings.audioMuted?0:Math.max(0,Math.min(1,Number(settings[k])||0));
@@ -43,6 +45,9 @@ export function syncAudio(){syncUIState();syncBossPhases();const s=W.S.screen;
  if(next!==context){retire();context=next;startTrack()}
  if(s==='end'&&lastScreen!==s)playSound(W.run&&W.run.won?'victory':'defeat');lastScreen=s;
 }
+// Battle-won beat: the music dips for a moment, then recovers (the map track takes over right after).
+export function duckMusic(ms){const voice=current;if(!voice||document.hidden)return;ramp(voice,level('musicVolume')*.25,.12);
+ setTimeout(()=>{if(current===voice)ramp(voice,level('musicVolume'),.6)},ms)}
 export function setAudioSetting(key,value){if(!['musicVolume','sfxVolume','audioMuted'].includes(key))return;
  settings[key]=key==='audioMuted'?!!value:Math.max(0,Math.min(1,Number(value)||0));saveSettings();applyVolumes();
 }
@@ -50,36 +55,29 @@ function applyVolumes(){if(master)master.gain.setTargetAtTime(level('sfxVolume')
  for(const voice of voices)if(voice!==current&&settings.audioMuted)ramp(voice,0,.08,true);
  if(current)ramp(current,level('musicVolume'),.15);
 }
-// Soft filtered noise under falling sine tones gives impacts and card movement a watery voice.
-const tones={tap:[220,150,.07],lift:[270,410,.12],play:[340,170,.19],draw:[200,320,.09],shuffle:[130,250,.23],light:[150,65,.16],heavy:[95,38,.3],guard:[180,360,.26],debuff:[240,90,.24],death:[120,35,.45],hurt:[100,48,.23],reward:[330,495,.28],victory:[220,440,.7],defeat:[165,55,.75],endTurn:[220,110,.22]};
-// UI voices: [pitch start, pitch end, seconds, peak, noise mix, cutoff].
-Object.assign(tones,{
- endTurn:[110,82,.65,.15,.08,1800],crest:[90,38,.38,.14,.45,950],echo:[440,660,.3,.09,.04,1600],rank:[260,390,.24,.08,.08,1200],landmark:[196,392,.42,.12,.06,1600],flourish:[180,55,.32,.13,.35,1700],critical:[125,42,.28,.13,.3,1500],
- draw:[650,950,.085,.04,.5,3000],shuffle:[190,310,.3,.07,.8,2400],
- bossPhase:[73,49,.85,.13,.18,900],
- uiTap:[190,130,.065,.045,.12,750],select:[285,210,.09,.05,.1,950],
- menuOpen:[170,280,.14,.045,.35,800],menuClose:[240,150,.1,.04,.3,750],
- tab:[260,320,.075,.04,.22,850],confirm:[280,420,.16,.05,.08,1000],cancel:[210,135,.1,.04,.12,750],
- mapHover:[410,290,.07,.025,.04,800],mapTap:[300,190,.11,.045,.08,900],
- travel:[140,220,.22,.045,.5,650],room:[165,247,.28,.045,.04,850],
- pile:[180,290,.16,.04,.65,900],tooltip:[350,280,.065,.025,.06,750],
- enlarge:[210,350,.15,.045,.3,900],pickup:[200,310,.1,.04,.4,850],drop:[250,160,.1,.045,.3,750],
- sparkle:[1500,3000,.5,.06,.015,6000],evGood:[330,740,.62,.075,.03,1600],evBad:[210,70,.55,.1,.22,650],evRoll:[240,520,.28,.06,.1,1000],flip:[320,180,.12,.05,.1,900],levelUp:[220,440,.42,.065,.035,1000],taskComplete:[330,495,.32,.055,.035,1000]
-});
-export function playSound(name,pitch=1){if(W.replaying||!ctx||ctx.state!=='running'||!level('sfxVolume'))return;const now=ctx.currentTime;
- if(now-(recent[name]??-10)<.055)return;recent[name]=now;
- const [f,t,duration,peak=.12,noiseMix=.22,cutoff=1100]=tones[name]||tones.tap;
- const from=f*pitch,to=t*pitch;
- const gain=ctx.createGain(),filter=ctx.createBiquadFilter(),osc=ctx.createOscillator();
- filter.type='lowpass';filter.frequency.value=cutoff;gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(peak,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
- osc.type='sine';osc.frequency.setValueAtTime(from,now);osc.frequency.exponentialRampToValueAtTime(to,now+duration);
- const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),samples=buffer.getChannelData(0);
- for(let i=0;i<samples.length;i++)samples[i]=(Math.random()*2-1)*noiseMix;
- const noise=ctx.createBufferSource();noise.buffer=buffer;osc.connect(filter);noise.connect(filter);filter.connect(gain);gain.connect(master);
- osc.start(now);noise.start(now);osc.stop(now+duration);noise.stop(now+duration);osc.onended=()=>{osc.disconnect();noise.disconnect();filter.disconnect();gain.disconnect()};
- if(name==='endTurn'){for(const ratio of [2.76,4.07]){const bell=ctx.createOscillator();bell.frequency.value=from*ratio;bell.connect(gain);bell.start(now);bell.stop(now+duration);bell.onended=()=>bell.disconnect()}}
- if(name==='bossPhase'){for(const ratio of [2.76,4.07]){const bell=ctx.createOscillator(),partial=ctx.createGain();partial.gain.value=.3;bell.frequency.setValueAtTime(from*ratio,now);bell.frequency.exponentialRampToValueAtTime(to*ratio,now+duration);bell.connect(partial);partial.connect(gain);bell.start(now);bell.stop(now+duration);bell.onended=()=>{bell.disconnect();partial.disconnect()}}}
- if(name==='victory'||name==='reward'||name==='room'||name==='levelUp'||name==='taskComplete'||name==='sparkle'){const bell=ctx.createOscillator();bell.frequency.value=from*1.5;bell.connect(gain);bell.start(now+.08);bell.stop(now+duration);bell.onended=()=>bell.disconnect()}
+// Recorded Foley only; buffers are fetched once and decoded after a gesture.
+const sfxURL=new URL('../audio/sfx/index.json',import.meta.url);
+let sfxManifest={},sfxReady;
+const sfxBuffers=new Map(),sfxLoads=new Map(),activeSfx=new Set();
+sfxReady=fetch(sfxURL).then(r=>{if(!r.ok)throw Error('SFX index unavailable');return r.json()}).then(m=>{sfxManifest=m;return m}).catch(e=>{console.warn('SFX unavailable:',e.message);return {}});
+function loadSfx(file){if(sfxBuffers.has(file))return Promise.resolve(sfxBuffers.get(file));if(sfxLoads.has(file))return sfxLoads.get(file);
+ const request=fetch(new URL(file,sfxURL)).then(r=>{if(!r.ok)throw Error('Missing SFX '+file);return r.arrayBuffer()}).then(b=>ctx.decodeAudioData(b)).then(b=>{sfxBuffers.set(file,b);return b}).catch(e=>{console.warn(e.message);return null});
+ sfxLoads.set(file,request);return request;
+}
+let warming=false;
+function warmSfx(){if(!ctx||warming)return;warming=true;sfxReady.then(m=>Promise.all([...new Set(Object.values(m).map(v=>v.file))].map(loadSfx)))}
+export function playSound(name,pitch=1){if(W.replaying||document.hidden||!ctx||ctx.state!=='running'||!level('sfxVolume'))return;
+ const now=ctx.currentTime;if(now-(recent[name]??-10)<.075)return;recent[name]=now;
+ const config=sfxManifest[name];if(!config)return;
+ const started=performance.now();loadSfx(config.file).then(buffer=>{
+  // Drop stale first-load cues instead of playing them on an unrelated screen.
+  if(!buffer||performance.now()-started>250||document.hidden||W.replaying||ctx.state!=='running'||!level('sfxVolume'))return;
+  if(activeSfx.size>=16){const oldest=activeSfx.values().next().value;oldest.stop()}
+  const source=ctx.createBufferSource(),gain=ctx.createGain();source.buffer=buffer;
+  source.playbackRate.value=Math.max(.5,Math.min(1.5,(Number(pitch)||1)*config.pitch*(.97+Math.random()*.06)));
+  gain.gain.value=config.gain*(.92+Math.random()*.16);source.connect(gain);gain.connect(master);activeSfx.add(source);
+  source.onended=()=>{activeSfx.delete(source);source.disconnect();gain.disconnect()};source.start();
+ });
 }
 // Observe real state changes, so rerenders and rejected actions stay silent.
 let uiState=null,seenSummary=null,taskRun=null,doneTasks=new Set();
@@ -91,19 +89,25 @@ function syncProgress(){
  if(sum&&sum!==seenSummary){seenSummary=sum;if(sum.lampBar.to.lvl>sum.lampBar.from.lvl||sum.climbBar.to.lvl>sum.climbBar.from.lvl)playSound('levelUp')}
 }
 function syncUIState(){
- const next={screen:W.S.screen,view:W.S.view,ov:W.S.ov,tab:W.S.tab,potion:W.S.potion,relic:W.S.relicView};
+ const next={screen:W.S.screen,view:W.S.view,ov:W.S.ov,tab:W.S.tab,potion:W.S.potion,relic:W.S.relicView,chest:W.S.opened,hp:W.run?.hp,disc:W.cb?.disc.length||0,combat:W.cb};
  if(uiState){
   if(next.ov!==uiState.ov)playSound(next.ov?(['deck','draw','disc','exh'].includes(next.ov)?'pile':'menuOpen'):'menuClose');
   else if(next.view!==uiState.view&&next.screen==='title')playSound(next.view==='main'?'menuClose':'menuOpen');
   else if(next.tab!==uiState.tab&&next.screen===uiState.screen)playSound('tab');
   else if(next.potion!==uiState.potion||next.relic!==uiState.relic)playSound(next.potion!=null||next.relic?'menuOpen':'menuClose');
+  if(next.chest&&!uiState.chest&&next.screen==='chest')playSound('chest');
+  if(next.hp>uiState.hp)playSound('heal');
+  if(next.combat&&next.combat===uiState.combat&&next.disc>uiState.disc)playSound('discard');
   if(next.screen==='travel'&&uiState.screen!=='travel')playSound('travel');
  }
- uiState=next;syncProgress();
+ uiState=next;syncProgress();syncMeters();
 }
 function clickSound(el){
  if(el.dataset.sfx)return el.dataset.sfx;
  const action=el.getAttribute('onclick')||'',label=(el.getAttribute('aria-label')||el.textContent||'').trim();
+ if(/openChestLid/.test(action))return 'chest';
+ if(/buy|shopBuy/i.test(action))return 'shop';
+ if(/restHeal|restUpgrade|restDig|restTrain/.test(action))return 'camp';
  if(el.matches('.node'))return el.matches('.av')?'mapTap':null;
  if(el.matches('[data-tab],[role="tab"]')||/Tab\(/.test(action))return 'tab';
  if(/^(cancel|back|close|later|skip|✕|×)/i.test(label)||/close|Leave\(/.test(action))return 'cancel';
@@ -127,8 +131,8 @@ function observeUI(){
 }
 export function initAudio(){
  if(initialized)return;initialized=true;observeUI();
- const unlock=()=>{unlocked=true;try{if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(AC){ctx=new AC();master=ctx.createGain();master.gain.value=level('sfxVolume');master.connect(ctx.destination)}}if(ctx)ctx.resume().catch(()=>{})}catch(_){}
- syncAudio();startTrack();if(current&&(current.el.muted||current.blocked)){const voice=current;voice.el.muted=false;voice.blocked=false;voice.el.play().then(()=>{if(current===voice)ramp(voice,level('musicVolume'),.15)}).catch(()=>{voice.blocked=true})}};
+ const unlock=()=>{unlocked=true;try{if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(AC){ctx=new AC();master=ctx.createGain();master.gain.value=level('sfxVolume');const limiter=ctx.createDynamicsCompressor();limiter.threshold.value=-6;limiter.knee.value=0;limiter.ratio.value=20;limiter.attack.value=.003;limiter.release.value=.12;const ceiling=ctx.createWaveShaper(),curve=new Float32Array(2049);for(let i=0;i<curve.length;i++)curve[i]=.95*Math.tanh(i*2/(curve.length-1)-1);ceiling.curve=curve;ceiling.oversample='4x';master.connect(limiter);limiter.connect(ceiling);ceiling.connect(ctx.destination)}}if(ctx)ctx.resume().catch(()=>{})}catch(_){}
+ warmSfx();syncAudio();startTrack();if(current&&(current.el.muted||current.blocked)){const voice=current;voice.el.muted=false;voice.blocked=false;voice.el.play().then(()=>{if(current===voice)ramp(voice,level('musicVolume'),.15)}).catch(()=>{voice.blocked=true})}};
  let pendingDrag=null;
  document.addEventListener('pointerdown',e=>{unlock();if(e.button>0)return;
   const card=e.target.closest?.('.hand .card,#chartcards .card');
@@ -147,15 +151,46 @@ export function initAudio(){
  };
  document.addEventListener('pointerup',drop,true);document.addEventListener('pointercancel',drop,true);
  document.addEventListener('keydown',unlock,{once:true});
- document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const node=e.target.closest?.('.node');if(node&&!node.contains(e.relatedTarget))playSound('mapHover')});
- document.addEventListener('visibilitychange',()=>{if(document.hidden){retire();for(const voice of voices){if(voice.frame)cancelAnimationFrame(voice.frame);voice.el.pause();voice.el.removeAttribute('src');voice.el.load()}voices.clear();if(ctx)ctx.suspend().catch(()=>{})}else if(unlocked){if(ctx)ctx.resume().catch(()=>{});startTrack()}});
- observeEvents((event,c)=>{queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={cardPlayed:'play',shuffle:'shuffle',guardGained:'guard',enemyKilled:'death',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward',potionUsed:'confirm'};
+ document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const node=e.target.closest?.('.node');if(node&&!node.contains(e.relatedTarget))playSound('mapHover');else {const el=e.target.closest?.('button,.btn,.tile,.hand .card');if(el&&!el.contains(e.relatedTarget)&&!el.matches('[disabled],[aria-disabled="true"]'))playSound('hover')}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const source of activeSfx)source.stop();retire();for(const voice of voices){if(voice.frame)cancelAnimationFrame(voice.frame);voice.el.pause();voice.el.removeAttribute('src');voice.el.load()}voices.clear();if(ctx)ctx.suspend().catch(()=>{})}else if(unlocked){if(ctx)ctx.resume().catch(()=>{});startTrack()}});
+ observeEvents((event,c)=>{if(event==='parry'&&fxOn())playSound('parry');queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={shuffle:'shuffle',guardGained:'guard',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward',potionUsed:'potion'};
+ contextSound(event,c);
+ if(event==='enemyKilled'&&!document.hidden){const e=c.enemy,sound=deathSoundOf(e);if(fxOn())setTimeout(()=>{if(!document.hidden)playSound(sound)},T(impactBase()));else playSound(sound)}
+ if(event==='bossBeat'&&c.kind==='intro')playSound('bossIntro');
  if(event==='bossBeat'&&c.kind==='phase'){if(c.enemy)phaseHeard.add(c.enemy);if(!document.hidden)playSound('bossPhase')}
- if(!fxOn()&&!document.hidden){const combo={crest:'crest',undertow:'guard',echo:'echo',flourish:'flourish',parry:'guard',waypointPlaced:'rank',waypointTrigger:'rank',advance:(c.wp?.rank||0)>=3?'landmark':'rank'};if(combo[event])playSound(combo[event])}
+ if(!fxOn()&&!document.hidden){const combo={crest:'crest',undertow:'guard',echo:'echo',flourish:'flourish',parry:'parry',waypointPlaced:'rank',waypointTrigger:'rank',advance:(c.wp?.rank||0)>=3?'landmark':'rank'};if(combo[event])playSound(combo[event])}
  if(event==='playerHit'&&c.blocked>0&&!c.amount)playSound('guard');
  if(event==='damageDealt'&&c.amount>0)playSound(c.amount>=15?'heavy':'light');
- else if(event==='statusApplied'&&((c.n>0&&['weak','vuln','brittle','soaked','bleed','sink'].includes(c.key))||(c.n<0&&['str','dex'].includes(c.key))))playSound('debuff');
- else if(event==='combatEnd'&&!c.escaped)playSound(c.won?'victory':'defeat');else if(sounds[event])playSound(sounds[event]);
+ else if(event==='statusApplied'&&((c.n>0&&['weak','vuln','brittle','soaked','bleed','sink'].includes(c.key))||(c.n<0&&['str','dex'].includes(c.key))))playSound(({weak:'soaked',vuln:'exposed',brittle:'brittle',bleed:'bleed',sink:'sink'})[c.key]||'debuff');
+ else if(event==='combatEnd'&&!c.escaped){if(c.won&&cue.victoryAt>performance.now()){const wait=cue.victoryAt-performance.now();cue.victoryAt=0;setTimeout(()=>playSound('victory'),wait)}else playSound(c.won?'victory':'defeat')}else if(sounds[event])playSound(sounds[event]);
  });
  syncAudio();
 }
+
+let meterCombat=null,meterMom=0;
+function syncMeters(){const cb=W.cb;if(cb!==meterCombat){meterCombat=cb;meterMom=cb?.mom||0;return}if(cb&&cb.mom!==meterMom){meterMom=cb.mom;playSound('momentum')}}
+function contextSound(event,c){
+ if(event==='cardPlayed')playSound(({A:'attack',S:'skill',P:'power',W:'waypoint',C:'curse',T:'debuff'})[c.type]||'play');
+ if(event==='turnEndInHand'&&W.cb?.hand.length)playSound('discard');
+ if(event==='sink')playSound('sink');
+ if(event==='mapEnter')playSound('mapEnter');
+ if(event==='tideChange'&&c.delta)playSound(c.delta>0?'tideRise':'tideFall');
+ const names={tideTurn:'tideTurn',mark:'mark',chart:'shuffle',chartDone:'confirm',decamp:'decamp',gainCurse:'curse',potionUsed:'potion'};
+ if(names[event])playSound(names[event]);
+ if(event==='enterRoom'){const room={shop:'shop',rest:'camp',chest:'chest',treasure:'chest'}[c.type];if(room)playSound(room)}
+ if(event==='statusApplied'&&c.n>0){const sound={str:'might',dex:'poise',regen:'heal',drench:'drenched',reson:'resonating',shell:'shell',barbs:'barbs',ward:'rebuff',mending:'mending',mightTmp:'might',rooted:'entangle',parry:'guard'}[c.key];if(sound)playSound(sound)}
+ if(event==='combatStart'&&c.kind==='boss')playSound('bossIntro');
+ if(event==='enemyAct'){
+  const e=c.enemy,m=c.intent||{};
+  if(e.key==='bell'||e.key==='novice'||m.ring)playSound('knell');
+  else if(m.a)playSound(ENEMY_VOICES[e.key]||'heavy');
+  else if(m.heal||m.healAlly)playSound('heal');
+  else if(m.b)playSound('guard');
+  else if(m.s)playSound('might');
+  else if(m.summon||m.status)playSound('entangle');
+  else if(m.steal||m.stealPotion)playSound('shop');
+  else playSound(ENEMY_VOICES[e.key]||'debuff');
+ }
+}
+// Material voices apply to each foe's attacks and named special intents.
+const ENEMY_VOICES={slug:'water',gull:'cloth-open',knight:'steel',pod:'bubble',wisp:'gutter',crab:'metal',leech:'bubble',lurker:'rope',tendril:'rope',penitent:'steel',mender:'steel',heap:'heavy',limpet:'light',novice:'bell',captain:'steel',eel:'water',warden:'gutter',bell:'bell',matriarch:'rope',tenant:'heavy'};

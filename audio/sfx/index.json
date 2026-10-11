@@ -1,0 +1,482 @@
+{
+  "tap": {
+    "file": "cloth.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "lift": {
+    "file": "cloth.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "uiTap": {
+    "file": "cloth.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "select": {
+    "file": "cloth.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "tab": {
+    "file": "cloth.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "cancel": {
+    "file": "cloth.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "pickup": {
+    "file": "cloth.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "drop": {
+    "file": "cloth.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "hover": {
+    "file": "cloth.ogg",
+    "gain": 0.55,
+    "pitch": 1
+  },
+  "menuOpen": {
+    "file": "cloth-open.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "menuClose": {
+    "file": "cloth-open.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "enlarge": {
+    "file": "cloth-open.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "tooltip": {
+    "file": "cloth-open.ogg",
+    "gain": 0.55,
+    "pitch": 1
+  },
+  "pile": {
+    "file": "cloth-open.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "draw": {
+    "file": "draw.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "flip": {
+    "file": "draw.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "shuffle": {
+    "file": "shuffle.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "discard": {
+    "file": "discard.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "play": {
+    "file": "steel.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "attack": {
+    "file": "steel.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "flourish": {
+    "file": "steel.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "critical": {
+    "file": "steel.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "parry": {
+    "file": "parry.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "guard": {
+    "file": "guard.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "undertow": {
+    "file": "guard.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "light": {
+    "file": "light.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "hurt": {
+    "file": "light.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "heavy": {
+    "file": "heavy.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "confirm": {
+    "file": "buckle.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "shop": {
+    "file": "key.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "chest": {
+    "file": "key.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "rank": {
+    "file": "wood.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "landmark": {
+    "file": "wood.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "waypoint": {
+    "file": "wood.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "decamp": {
+    "file": "wood.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "mapTap": {
+    "file": "step.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "travel": {
+    "file": "step.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "room": {
+    "file": "step.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "mapEnter": {
+    "file": "step.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "mapHover": {
+    "file": "chime.ogg",
+    "gain": 0.55,
+    "pitch": 1
+  },
+  "reward": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "sparkle": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "evGood": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "levelUp": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "taskComplete": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "power": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "mark": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "echo": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "endTurn": {
+    "file": "bell.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "knell": {
+    "file": "bell.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "bossIntro": {
+    "file": "bell.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "deathBell": {
+    "file": "bell.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "bossPhase": {
+    "file": "gong.ogg",
+    "gain": 0.85,
+    "pitch": 0.8
+  },
+  "deathBoss": {
+    "file": "gong.ogg",
+    "gain": 0.85,
+    "pitch": 0.8
+  },
+  "splash": {
+    "file": "water.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "skill": {
+    "file": "water.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "tideRise": {
+    "file": "water.ogg",
+    "gain": 0.55,
+    "pitch": 1
+  },
+  "soaked": {
+    "file": "water.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "heal": {
+    "file": "water.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "potion": {
+    "file": "water.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "crest": {
+    "file": "wave.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "tideTurn": {
+    "file": "wave.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "debuff": {
+    "file": "bubble.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "tideFall": {
+    "file": "bubble.ogg",
+    "gain": 0.55,
+    "pitch": 1
+  },
+  "sink": {
+    "file": "bubble.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "camp": {
+    "file": "fire.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "deathGutter": {
+    "file": "gutter.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "brittle": {
+    "file": "scrape.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "bleed": {
+    "file": "scrape.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "might": {
+    "file": "metal.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "exposed": {
+    "file": "metal.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "momentum": {
+    "file": "metal.ogg",
+    "gain": 0.55,
+    "pitch": 1
+  },
+  "evRoll": {
+    "file": "glass.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "entangle": {
+    "file": "rope.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "deathSink": {
+    "file": "sink.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "death": {
+    "file": "dissolve.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "deathDissolve": {
+    "file": "dissolve.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "defeat": {
+    "file": "defeat.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "evBad": {
+    "file": "defeat.ogg",
+    "gain": 0.85,
+    "pitch": 0.8
+  },
+  "curse": {
+    "file": "defeat.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "victory": {
+    "file": "victory.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "cloth-open": {
+    "file": "cloth-open.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "steel": {
+    "file": "steel.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "bell": {
+    "file": "bell.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "bubble": {
+    "file": "bubble.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "rope": {
+    "file": "rope.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "metal": {
+    "file": "metal.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "gutter": {
+    "file": "gutter.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "water": {
+    "file": "water.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "drenched": {
+    "file": "water.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "resonating": {
+    "file": "chime.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "shell": {
+    "file": "guard.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "barbs": {
+    "file": "scrape.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "rebuff": {
+    "file": "guard.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "mending": {
+    "file": "water.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  },
+  "poise": {
+    "file": "metal.ogg",
+    "gain": 0.85,
+    "pitch": 1
+  }
+}

@@ -7,12 +7,13 @@ import {W} from '../core/state.js';
 import {settings} from '../save.js';
 import {CARDS} from '../core/registry.js';
 import {observeEvents} from '../core/bus.js';
-import {playSound} from '../audio.js';
+import {playSound,duckMusic} from '../audio.js';
+import {deathStyleOf,DEATH_STYLES,BOSS_VARIANT,FINALE} from './deathstyles.js';
 import {alive} from '../engine/combat.js';
 import {T,U} from '../core/timing.js';
 import {cardHTML} from './render.js';
 import {cloneCard,IMPACT_MS} from './fx.js';
-import {fxOn,motionOn,reducedMotion,fxQueue,emit,ring,vignette,shakeFrames,slowmo,freezeIdle,rectOf,setImpact,impactBase,crossfade,flyIcon,COL,CLASS_COL} from './vfx.js';
+import {fxOn,motionOn,reducedMotion,fxQueue,emit,ring,vignette,shakeFrames,slowmo,freezeIdle,rectOf,setImpact,impactBase,crossfade,xfadeEl,flyIcon,cue,COL,CLASS_COL} from './vfx.js';
 const enabled=()=>motionOn();
 export const motionEnabled=enabled;
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -42,7 +43,7 @@ function ringAt(sel,col,size,ms=0,ms2=360){later(ms,()=>{const c=centre(sel);if(
 // ---------- ghosts (persistent copies of a figure) ----------
 function ghost(selector,kind,opts={}){const source=selector&&$(selector);if(!source)return null;
  const fig=source.querySelector('.fig'),r=(fig||source).getBoundingClientRect();
- const el=document.createElement('div');el.className=`action-ghost ${kind}`;el.setAttribute('aria-hidden','true');
+ const el=document.createElement('div');el.className=opts.bare?kind:`action-ghost ${kind}`;el.setAttribute('aria-hidden','true');
  Object.assign(el.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
  if(fig){el.appendChild(fig.cloneNode(true));el.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));el.querySelectorAll('.fig').forEach(n=>{n.className='fig';n.style.animation='none'})}
  document.body.appendChild(el);const ms=opts.life||T(580);el.addEventListener('animationend',e=>{if(e.target===el&&!opts.keep)el.remove()});setTimeout(()=>el.remove(),ms);
@@ -52,27 +53,107 @@ function effect(selector,kind,col){const source=selector&&$(selector);if(!source
  Object.assign(el.style,{left:r.left+r.width/2+'px',top:r.top+r.height*.5+'px'});if(col)el.style.setProperty('--action-color',col);
  document.body.appendChild(el);setTimeout(()=>el.remove(),T(580));
 }
-// ---------- death (R10): flash, hit-stop, bottom-up dissolve + ash. Elites/bosses take longer. ----------
-let finalKillAt=0,finalKillBig=false;
+// ---------- death (Task 41): every foe has a lore style (ui/deathstyles.js). The last foe adds the battle-won finale. ----------
+//  dissolve = collapse into dark water, brine mist and salt · sink = topple, bubbles and a splash · gutter = flare, embers, smoke
+//  boss = slow-motion, shake, flash, then a long disintegrate (the Knell's bell drops and tolls)
+let finalEnd=0,finaleTimer=0,finaleEls=[],finaleOn=false;
+const keep=el=>{finaleEls.push(el);return el};
+const drop=el=>{el.remove();finaleEls=finaleEls.filter(x=>x!==el)};
+// Remove every finale element and release the held screen. Always safe to call (new fight, tap, hidden tab).
+export function finaleCleanup(){clearTimeout(finaleTimer);finaleTimer=0;finaleEls.forEach(el=>el.remove());finaleEls=[];finaleOn=false;finalEnd=0;
+ document.body.classList.remove('battle-finale','finale-hide')}
+function skipFinale(){if(!finaleOn)return;xfadeEl()?.getAnimations().forEach(a=>{try{a.finish()}catch(_){}});holdUntil=0;finaleCleanup()}
+document.addEventListener('pointerdown',()=>{if(finaleOn&&performance.now()-finaleStart>T(350))skipFinale()},true);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)finaleCleanup()});
+let finaleStart=0;
+function screenFlash(col,peak,ms){const el=keep(document.createElement('i'));el.className='finale-flash';el.style.background=col;document.body.appendChild(el);document.body.classList.add('battle-finale');
+ const done=()=>drop(el);if(!el.animate)return done();el.animate([{opacity:0},{opacity:peak,offset:.2},{opacity:0}],{duration:T(ms),easing:'ease-out'}).finished.then(done,done);setTimeout(done,T(ms)+200)}
+// particle recipes per style; (x,y) bottom-centre of the figure
+const PUFF={
+ dissolve:(x,y,w,h,k)=>{emit('mist',x,y,w,h,k?6:8);emit('salt',x,y,w,h,k?6:8);if(k)emit('splash',x,y,w*.8,6)},
+ sink:(x,y,w,h,k)=>{emit('bubbles',x,y,w,h,k?7:5);if(!k)emit('splash',x+w*.25,y,w*.9,12)},
+ gutter:(x,y,w,h,k)=>{emit('embers',x,y,w,h,k?7:10);emit('smoke',x,y,w,h,k?3:5)},
+ bell:(x,y,w,h,k)=>{emit('salt',x,y,w,h,10);emit('mist',x,y,w,h,6);emit('burst',x,y-h*.5,COL.gold,k?10:18)},
+ kelp:(x,y,w,h,k)=>{emit('spores',x,y,w,h,12);emit('mist',x,y,w,h,5,COL.kelp);emit('smoke',x,y,w,h,3)},
+ water:(x,y,w,h,k)=>{emit('mist',x,y,w,h,8);emit('splash',x,y,w,16);emit('bubbles',x,y,w,h*.6,6);emit('salt',x,y,w,h,6)}};
+// reduced motion: no movement or particles, just a short plain fade of the foe's figure (Task 42)
+function deathFade(e){const sel=enemy(e),el=sel&&$(sel);if(!el)return;const g=ghost(sel,'death-fade',{life:T(500),keep:true,bare:true});if(!g)return;
+ el.classList.add('gone');const done=()=>g.el.remove();
+ if(!g.el.animate)return done();g.el.animate([{opacity:1},{opacity:0}],{duration:T(350),easing:'ease-out',fill:'forwards'}).finished.then(done,done)}
 function death(e,lead){const sel=enemy(e);const el=sel&&$(sel);if(!el)return;
- const big=e.boss||e.elite;lead=T(lead);const hold=T(big?120:60),sink=T(big?800:430),total=lead+hold+sink;
- const g=ghost(sel,'death-sink',{life:total+120,keep:true});if(!g)return;
+ const style=deathStyleOf(e),def=DEATH_STYLES[style],boss=style==='boss',variant=boss?(BOSS_VARIANT[e.key]||'water'):style;
+ lead=T(lead);const D=T(def.ms),TT=lead+D;
+ const g=ghost(sel,'death-sink',{life:TT+240,keep:true});if(!g)return;
  el.classList.add('gone');
- const last=alive().length===0;if(last){finalKillAt=performance.now();finalKillBig=big}
- const fig=g.el.firstChild||g.el;
- const TT=lead+hold+sink,o=ms=>at(ms,TT),L=lead;
- const frames=[{filter:'none',transform:'none',clipPath:'inset(0 0 0% 0)',opacity:1,offset:0},
-  {filter:'none',transform:'none',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L)},
-  {filter:'brightness(3)',transform:'scale(1.07)',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L)+.0001},
-  {filter:'brightness(1.5)',transform:'scale(1.06)',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L+Math.min(T(55),hold*.8))},
-  {filter:'brightness(1.2)',transform:'scale(1.06)',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L+hold),easing:'ease-in'},
-  {filter:'brightness(.8)',transform:`translateY(${big?26:20}px) scale(.96,.9)`,clipPath:big?'inset(0 0 100% 0)':'inset(0 0 45% 0)',opacity:big?.9:0,offset:1}];
- g.el.animate(frames,{duration:TT,fill:'forwards'}).finished.then(()=>g.el.remove(),()=>g.el.remove());
- const {x,y,w,h}={x:g.r.left+g.r.width/2,y:g.r.top+g.r.height,w:g.r.width*.7,h:g.r.height*.8};
- const steps=big?5:2;for(let i=0;i<steps;i++)fxQueue.push(lead+hold+i*(sink/steps)*.8,()=>emit('death',x,y-(i/steps)*h*.4,w,h*(1-i/steps)*.6,big?9:7));
- if(last)fxQueue.push(lead+hold,()=>slowmo(400,.5));
+ const last=alive().length===0;
+ const fig=g.el;const o=ms=>Math.min(1,at(lead+ms*D,TT)),L=at(lead,TT);
+ const F=(k,props,easing)=>({offset:k,...props,...(easing?{easing}:{})});
+ const calm={filter:'none',opacity:1};
+ let frames;
+ const flash=(b,s)=>({filter:`brightness(${b})`,opacity:1,transform:`scale(${s})`});
+ if(style==='dissolve')frames=[F(0,{...calm,transform:'none'}),F(L,{...calm,transform:'none'}),F(L+.0001,flash(2.4,1.05)),F(o(.1),flash(1.3,1.02),'ease-in'),
+  F(o(.42),{filter:'brightness(.7) saturate(.5)',opacity:.95,transform:'translateY(10%) scale(1.05,.7)'},'ease-in'),
+  F(1,{filter:'brightness(.35) saturate(.3) blur(4px)',opacity:0,transform:'translateY(26%) scale(1.25,.12)'})];
+ else if(style==='sink')frames=[F(0,{...calm,transform:'none',translate:'0 0',rotate:'0deg'}),F(L,{...calm,transform:'none',translate:'0 0',rotate:'0deg'}),F(L+.0001,{...flash(1.9,1.04),translate:'0 0',rotate:'0deg'}),
+  F(o(.12),{filter:'brightness(1.1)',opacity:1,transform:'none',translate:'0 0',rotate:'-5deg'},'ease-in'),
+  F(o(.4),{filter:'brightness(.85)',opacity:1,transform:'none',translate:'4% 0',rotate:'84deg'},'ease-out'),
+  F(o(.52),{filter:'brightness(.85)',opacity:1,transform:'none',translate:'4% 0',rotate:'80deg'},'ease-in'),
+  F(1,{filter:'brightness(.4) saturate(.5) hue-rotate(-14deg)',opacity:0,transform:'none',translate:'10% 55%',rotate:'88deg'})];
+ else if(style==='gutter')frames=[F(0,{...calm,transform:'none'}),F(L,{...calm,transform:'none'}),F(L+.0001,flash(3.4,1.18)),F(o(.14),{filter:'brightness(2) saturate(1.5)',opacity:1,transform:'scale(1.1)'}),
+  F(o(.32),{filter:'brightness(.45)',opacity:.9,transform:'scale(.84,.95)'}),F(o(.46),{filter:'brightness(1.8) saturate(1.4)',opacity:1,transform:'scale(1.02)'}),
+  F(o(.7),{filter:'brightness(.3) blur(1px)',opacity:.7,transform:'translateY(-8%) scale(.6,.82)'}),
+  F(1,{filter:'brightness(.1) blur(3px)',opacity:0,transform:'translateY(-22%) scale(.25,.55)'})];
+ else{ // boss: flash, shudder, (bell: drop and thud), then a bottom-up disintegrate
+  const sh=[.12,.2,.28,.36,.44].map((k,i)=>F(o(k),{filter:`brightness(${i%2?1.1:1.9})`,opacity:1,transform:`translate(${i%2?5:-5}px,${i%2?-2:2}px) scale(1.03)`}));
+  const bell=variant==='bell';
+  frames=[F(0,{...calm,transform:'none'}),F(L,{...calm,transform:'none'}),F(L+.0001,{...flash(4,1.12),clipPath:'inset(0 0 0% 0)'}),F(o(.07),{filter:'brightness(1.4)',opacity:1,transform:'scale(1.05)',clipPath:'inset(0 0 0% 0)'}),
+   ...sh.map(f=>({...f,clipPath:'inset(0 0 0% 0)'})),
+   ...(bell?[F(o(.52),{filter:'brightness(1.1)',opacity:1,transform:'translateY(16%) rotate(-3deg)',clipPath:'inset(0 0 0% 0)'},'ease-in'),F(o(.57),{filter:'brightness(2)',opacity:1,transform:'translateY(14%) rotate(2deg) scale(1.04)',clipPath:'inset(0 0 0% 0)'})]:
+     [F(o(.54),{filter:variant==='kelp'?'brightness(.8) sepia(.7) hue-rotate(40deg)':'brightness(1.8) saturate(.3)',opacity:1,transform:'scale(1.06)',clipPath:'inset(0 0 0% 0)'})]),
+   F(1,{filter:'brightness(.5) blur(5px)',opacity:0,transform:`translateY(${bell?'30%':'12%'}) scale(${variant==='water'?'1.15,.7':'.95'})`,clipPath:'inset(0 0 100% 0)'},'ease-in')]}
+ frames.sort((a,b)=>a.offset-b.offset);
+ // clipPath must exist on every frame once used, and effect offsets must stay monotonic
+ fig.animate(frames,{duration:TT,fill:'forwards'}).finished.then(()=>fig.remove(),()=>fig.remove());
+ const x=g.r.left+g.r.width/2,y=g.r.top+g.r.height,w=g.r.width*.8,h=g.r.height*.85,puff=PUFF[variant];
+ const at2=(k,fn)=>fxQueue.push(lead+k*D,fn);
+ if(style==='dissolve'){at2(.08,()=>puff(x,y,w,h,0));at2(.4,()=>{puff(x,y-h*.1,w,h*.7,1);ring(x,y,COL.brine,w*1.1,500)});at2(.7,()=>puff(x,y,w,h*.5,1))}
+ else if(style==='sink'){at2(.38,()=>{puff(x+w*.25,y,w,h*.4,0);ring(x+w*.3,y,COL.teal,w*1.1,520);playSound('splash')});at2(.55,()=>puff(x+w*.2,y,w,h*.4,1));at2(.8,()=>puff(x+w*.2,y,w,h*.4,1))}
+ else if(style==='gutter'){at2(0,()=>{emit('flare',x,y-h*.5,COL.gold,16);ring(x,y-h*.5,COL.gold,w*1.4,420)});at2(.14,()=>puff(x,y,w,h,0));at2(.46,()=>{emit('flare',x,y-h*.5,COL.salt,8);puff(x,y,w,h,1)});at2(.75,()=>puff(x,y-h*.2,w,h*.6,1))}
+ else{ // boss
+  at2(0,()=>{shakeNow(12);vignette('gold',.8,520);screenFlash('#f4ecd0',.55,420);ring(x,y-h*.5,COL.gold,h*1.5,700)});
+  if(motionOn())at2(0,()=>slowmo(520,.4));
+  [.14,.26,.38,.5].forEach(k=>at2(k,()=>{emit('hit',x,y-h*.5,k>.3?-1:1);emit('death',x,y,w,h,10)}));
+  if(variant==='bell'){at2(.52,()=>{shakeNow(9);playSound('deathBell',.8);ring(x,y-h*.4,COL.gold,h*1.8,900);ring(x,y-h*.4,COL.salt,h*1.2,700)});at2(.64,()=>ring(x,y-h*.4,COL.gold,h*2.4,1000))}
+  else at2(.52,()=>{shakeNow(8);ring(x,y-h*.4,variant==='kelp'?COL.kelp:COL.brine,h*1.6,800)});
+  [.56,.64,.72,.8,.88].forEach((k,i)=>at2(k,()=>puff(x,y-h*(.8-i*.16),w,h*(.8-i*.12),i>2?1:0)));
+  at2(.84,()=>shakeNow(5))}
+ if(last){const t=performance.now();finaleStart=t;document.body.classList.add('battle-finale','finale-hide');
+  finalEnd=Math.max(finalEnd,t+TT+T(boss?FINALE.bossTotal+200:FINALE.total));
+  fxQueue.push(lead,()=>{duckMusic(1400);if(!boss)document.querySelectorAll('.scene .fig').forEach(f=>freezeIdle(f,FINALE.beat))});
+  scheduleFinale(TT-T(boss?0:160)+(boss?T(300):0),{boss,kind:W.cb?.kind,name:e.n,hero:ghost('#hero','hero-lantern',{life:TT+T(2600),keep:true})})}
 }
-export const deathHold=()=>performance.now()-finalKillAt<T(250)?T(finalKillBig?950:560):0;
+function scheduleFinale(delay,info){setTimeout(()=>document.body.classList.remove('finale-hide'),Math.max(0,finalEnd-performance.now()));
+ clearTimeout(finaleTimer);finaleOn=true;if(info.hero)keep(info.hero.el);
+ info.hero&&(info.hero.el.style.opacity=0);cue.victoryAt=performance.now()+delay;
+ finaleTimer=setTimeout(()=>runFinale(info),delay);
+ setTimeout(()=>{if(finalEnd&&performance.now()>finalEnd+T(900))finaleCleanup()},delay+T(1800));
+ setTimeout(()=>finaleOn&&performance.now()>finalEnd+T(500)&&finaleCleanup(),delay+T(2600))}
+// The battle-won moment: a sweep of light, the hero's lantern flares, then the centred banner. All body-level, so rerenders can't disturb it.
+function runFinale({boss,kind,name,hero}){if(!finaleOn||document.hidden)return;finaleTimer=0;
+ const part=(cls,html='')=>{const el=keep(document.createElement('div'));el.className=cls;el.setAttribute('aria-hidden','true');el.innerHTML=html;document.body.appendChild(el);return el};
+ const end=Math.max(T(400),finalEnd-performance.now()),life=end+T(450);
+ const anim=(el,frames,o)=>{if(!el.animate)return;const a=el.animate(frames,{fill:'both',...o});a.finished.then(()=>{},()=>{});return a};
+ vignette('gold',.4,Math.min(700,FINALE.total));
+ const sweep=part('finale-sweep');anim(sweep,[{transform:'translateX(-60%) skewX(-18deg)',opacity:0},{opacity:1,offset:.3},{transform:'translateX(160%) skewX(-18deg)',opacity:0}],{duration:T(FINALE.sweep),easing:'ease-in-out'});
+ if(hero){const r=hero.r,x=r.left+r.width/2,y=r.top+r.height*.45;
+  const glow=part('finale-glow');Object.assign(glow.style,{left:x+'px',top:y+'px',width:r.height*1.7+'px',height:r.height*1.7+'px'});
+  anim(glow,[{transform:'translate(-50%,-50%) scale(.2)',opacity:0},{transform:'translate(-50%,-50%) scale(1)',opacity:.9,offset:.35},{transform:'translate(-50%,-50%) scale(1.15)',opacity:.55}],{duration:Math.max(T(600),end*.8),easing:'ease-out'});
+  hero.el.style.opacity='';anim(hero.el,[{opacity:0,filter:'brightness(1)',transform:'none'},{opacity:1,filter:'brightness(1.7) drop-shadow(0 0 10px #f1c85a)',transform:'translateY(-5px) scale(1.04)',offset:.3},{opacity:1,filter:'brightness(1.25) drop-shadow(0 0 6px #f1c85a)',transform:'translateY(-3px) scale(1.02)'}],{duration:Math.max(T(600),end*.8),easing:'ease-out'});
+  emit('flare',x,y,COL.gold,18);emit('heal',x,y+r.height*.4,r.width);ring(x,y,COL.gold,r.height*1.6,600);ring(x,y,COL.salt,r.height,420)}
+ setTimeout(()=>{if(!finaleOn)return;const b=part('finale-banner',`<b>Victory</b>${kind==='boss'||kind==='elite'?`<small>${name} is silenced</small>`:''}`);
+  anim(b,[{opacity:0,transform:'translate(-50%,-50%) scale(.82)',letterSpacing:'14px'},{opacity:1,transform:'translate(-50%,-50%) scale(1)',letterSpacing:'6px',offset:.28},{opacity:1,transform:'translate(-50%,-50%) scale(1.03)',offset:.78},{opacity:0,transform:'translate(-50%,-50%) scale(1.06)'}],{duration:Math.max(T(500),end-T(boss?160:200)+T(120))})},T(boss?160:200));
+ setTimeout(()=>{if(finaleOn)finaleCleanup()},life+T(300))}
+export const deathHold=()=>Math.max(0,finalEnd-performance.now());
 // Combo beats are presentation only: never delay input or combat resolution.
 let lastBeat=0,phase=null,phaseTimer=null,drawTimer=0;
 function comboBeat(kind,size=1,delay=impactBase()){
@@ -140,7 +221,7 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
  if(event==='enemyTelegraph'){setImpact(0);queue({k:'telegraph',sel:enemy(c.enemy)})}
  if(event==='enemyAct'){setImpact(110);queue({k:'estrike',sel:enemy(c.enemy)})}
  if(event==='playerAttacked')setImpact(0);
- if(event==='enemyKilled'){const e=c.enemy;if(move){death(e,impactBase());queue({k:'shake',amp:(e.boss||e.elite)?7:3,delay:impactBase()})}}
+ if(event==='enemyKilled'){const e=c.enemy;if(move){death(e,impactBase());queue({k:'shake',amp:(e.boss||e.elite)?7:3,delay:impactBase()})}else if(reducedMotion()&&fxOn())deathFade(e)}
  if(event==='draw')queue({k:'draw',uid:c.card.uid});
  if(event==='shuffle')reshuffle();
  if(event==='turnEnd')discardHand();
@@ -337,7 +418,7 @@ function countUp(sel,from,to){if(from===to)return;const t0=performance.now(),dur
 // ---------- screen change: old screen lingers and fades (called by render()) ----------
 const quiet=new Set(['title']);
 export function screenChange(app,prev,next){if(!prev||prev===next||quiet.has(prev)||quiet.has(next))return;
- const hero=W.run&&W.run.hp<=0&&prev==='combat';const hold=Math.max(prev==='combat'?deathHold():0,holdReal(),hero?U(700):0);
+ if(next==='combat')finaleCleanup();const hero=W.run&&W.run.hp<=0&&prev==='combat';const hold=Math.max(prev==='combat'?deathHold():0,holdReal(),hero?U(700):0);
  if(hold)holdUntil=Math.max(holdUntil,performance.now()+hold);
  crossfade(app,{hold,ms:prev==='combat'?T(340):U(260),gray:hero})}
 matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',syncCombatAnimations);

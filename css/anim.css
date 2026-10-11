@@ -50,3 +50,22 @@
 body.reduce-motion .cardback,body.reduce-motion .travelmark,body.reduce-motion .flyicon{display:none}
 
 .hpbar>i.gh{background:linear-gradient(#f3d2c4,#d99a8a);opacity:.9}
+/* Task 41: death + battle-won finale (src/ui/anim.js). Body-level, pointer-events none, above the lingering combat snapshot (.xfade z 55). */
+body.battle-finale #fxlayer{z-index:60}
+body.battle-finale .action-ghost{z-index:58}
+.action-ghost.hero-lantern{z-index:61!important;animation:none}
+.finale-flash{position:fixed;inset:0;z-index:62;pointer-events:none;opacity:0}
+.finale-sweep{position:fixed;top:-10%;bottom:-10%;left:-30%;width:60%;z-index:62;pointer-events:none;opacity:0;mix-blend-mode:screen;background:linear-gradient(90deg,transparent,#f1d98a44 35%,#fff4cf99 50%,#f1d98a44 65%,transparent);will-change:transform,opacity}
+.finale-glow{position:fixed;z-index:60;pointer-events:none;border-radius:50%;opacity:0;mix-blend-mode:screen;background:radial-gradient(circle,#fff0b8cc 0,#f1c85a66 32%,transparent 68%);will-change:transform,opacity}
+.finale-banner{position:fixed;left:50%;top:44%;z-index:66;pointer-events:none;text-align:center;opacity:0;transform:translate(-50%,-50%);white-space:nowrap;color:#f6e7b8;text-shadow:0 2px 0 #1a1208,0 0 22px #d8a446cc,0 0 4px #000}
+.finale-banner b{display:block;font:700 clamp(30px,7vw,52px)/1 Cinzel,serif;letter-spacing:6px;text-transform:uppercase;padding:0 0 4px 6px}
+.finale-banner small{display:block;margin-top:6px;font:600 clamp(12px,2.4vw,17px) 'Crimson Pro',serif;letter-spacing:1.5px;color:#d9cba2}
+.finale-banner::before,.finale-banner::after{content:"";display:block;height:2px;width:70%;margin:0 auto;background:linear-gradient(90deg,transparent,#d8a446,transparent)}
+.finale-banner::before{margin-bottom:8px}.finale-banner::after{margin-top:8px}
+@media(prefers-reduced-motion:reduce){.finale-sweep,.finale-glow,.finale-flash{display:none!important}}
+/* the reward screen waits (hidden, not tappable) until the finale hands over; it then fades in under the dissolving snapshot */
+#app{transition:opacity calc(.3s*var(--ts,1)) ease-out}
+body.finale-hide #app{opacity:0;pointer-events:none;transition:none}
+/* reduced-motion death: a plain fade, shown even where other ghosts are hidden */
+.death-fade{position:fixed;pointer-events:none;z-index:34}
+.death-fade .fig,.death-fade .spr-slot{animation:none!important;transform:none!important}

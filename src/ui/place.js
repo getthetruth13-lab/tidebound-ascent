@@ -2,7 +2,7 @@
 // Rules: modal choices are centred over the empty middle of the battlefield (css .ov.battle); tooltips and detail
 // panels pick the candidate spot beside their anchor that covers the fewest combatants / HP + status plates / intents /
 // resting hand / End Turn / class display. Nothing is ever placed over those if any free spot exists.
-const OBST='.combat .fig>.slot>img.spr,.combat .fig>.sprph,.combat .plate,.combat .intentw,.combat .hand .card:not(.sel),.combat .ctl button,.combat .ctl .pile,.combat .topbar,.combat .dais';
+const OBST='.combat .fig img.spr,.combat .fig>.sprph,.combat .plate,.combat .intentw,.combat .hand .card:not(.sel),.combat .ctl button,.combat .ctl .pile,.combat .topbar,.combat .dais';
 const inter=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
 export function obstacles(skip){if(!document.querySelector('.combat'))return [];
  return [...document.querySelectorAll(OBST)].filter(e=>!(skip&&(e===skip||(e.classList.contains('dais')&&e.contains(skip))))).map(e=>e.getBoundingClientRect()).filter(r=>r.width>2&&r.height>2)}

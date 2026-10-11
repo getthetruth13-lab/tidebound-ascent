@@ -674,15 +674,7 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 .tcplate.noimg{background:linear-gradient(#0b1a20,#2c5a63);border:2px solid #6fb7b4;border-radius:12px}
 .tcboss{margin-top:10px;font-size:14px;animation:tcplate .8s ease-out 1.4s both}
 @keyframes tcplate{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
-/* B12 rest rules line (landscape hand only): one 10px line on the art window. If even the first sentence
-   will not fit, the line says "Tap to read". A tap adds .sel and lifts with no transition. */
-.card .rline{display:none}
-@media (orientation:landscape){
- .combat .hand .card:not(.sel):not(.drag) .rline:not(.covered){display:block;position:absolute;left:7%;right:7%;top:47.5%;height:12px;padding:0 3px;overflow:hidden;white-space:nowrap;text-overflow:clip;
-  font:600 10px/12px var(--font-body);color:#f1ece0;text-align:center;background:#0b0e14d6;border-radius:3px;text-shadow:0 1px 1px #000;pointer-events:none;z-index:3}
- .combat .hand .card:not(.sel):not(.drag) .rline.nofit{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
- .combat .hand .card.sel{transition:none}
-}
+@media (orientation:landscape){.combat .hand .card.sel{transition:none}}
 /* (d) type labels >= 10px everywhere */
 .card .type{font-size:max(10px,5.2cqw)!important}
 .intent .debn{display:inline-flex;align-items:center;gap:1px}
@@ -862,7 +854,6 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
  .combat .hand .card.sel,.combat .hand .card.peek{transform:translate(var(--xs,0),var(--ly,-58px)) scale(var(--zl,1.5));z-index:30;transition:transform 120ms ease-out,opacity 120ms ease-out}
  .combat .hand .card.peek::after{content:"";position:absolute;left:0;right:0;top:100%;height:54px;background:transparent}
  .combat .hand .card.peek-neighbour{transition:transform 120ms ease-out,opacity 120ms ease-out}
- .combat .hand .card .rline{pointer-events:none}
  .combat .intentw{height:27px}
  .combat .intentw .intent{min-height:24px;gap:4px}
  .combat .intentw .intent .intent-part,.combat .intentw .intent span{font-size:11px}

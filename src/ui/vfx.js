@@ -14,8 +14,10 @@ export const fxOn=()=>!window.FAST&&!document.hidden&&quality()!=='off';
 // effects that move things around (shake, lunges, flights)
 export const motionOn=()=>fxOn()&&!reducedMotion();
 // ---------- palette: drowned, painterly (salt, pale teal, rust, tarnished gold) ----------
-export const COL={salt:'#eef3f0',ash:'#b9b4a6',ashDark:'#7f796c',rust:'#a8322e',teal:'#7fd0c8',pale:'#bfe3ff',gold:'#d8a446',heal:'#a8d98a',tide:'#2fb8c4',echo:'#a07bff',carto:'#d8a446',duel:'#ec5f4a'};
+export const COL={salt:'#eef3f0',ash:'#b9b4a6',ashDark:'#7f796c',rust:'#a8322e',teal:'#7fd0c8',pale:'#bfe3ff',gold:'#d8a446',heal:'#a8d98a',tide:'#2fb8c4',echo:'#a07bff',carto:'#d8a446',duel:'#ec5f4a',brine:'#2b4d57',mist:'#6f9a9c',ember:'#ff9a3c',smoke:'#4d4943',kelp:'#6da35a'};
 export const CLASS_COL={tide:COL.tide,echo:COL.echo,carto:COL.carto,duel:COL.duel};
+// shared cue: anim.js sets when the victory fanfare should sound (real ms); audio.js reads it on combatEnd
+export const cue={victoryAt:0};
 // ---------- queue ----------
 const timers=new Set();
 export const fxQueue={
@@ -31,7 +33,7 @@ function ensure(){if(layer&&layer.isConnected)return layer;
 function size(){if(!cv)return;dpr=Math.min(window.devicePixelRatio||1,2);cv.width=Math.round(innerWidth*dpr);cv.height=Math.round(innerHeight*dpr)}
 addEventListener('resize',size);
 // ---------- particles ----------
-const POOL=60,P=[];
+const POOL=90,P=[];
 const cap=()=>quality()==='reduced'?POOL/2:POOL;
 function spawn(o){if(P.length>=cap())return;P.push(o)}
 const rnd=(a,b)=>a+Math.random()*(b-a);
@@ -42,6 +44,7 @@ function loop(t){const dt=Math.min(.05,(t-(lastT||t))/1000);lastT=t;
   p.vy+=p.g*dt;p.vx*=p.drag;p.x+=p.vx*dt;p.y+=p.vy*dt;const k=p.age/p.life;
   cx.globalAlpha=p.a*(k<.15?k/.15:1-(k-.15)/.85);cx.fillStyle=p.col;
   if(p.shape==='shard'){cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot+p.age*p.spin);cx.fillRect(-p.r,-p.r*.4,p.r*2,p.r*.8);cx.restore()}
+  else if(p.shape==='bubble'){cx.strokeStyle=p.col;cx.lineWidth=1.2;cx.beginPath();cx.arc(p.x,p.y,p.r,0,6.283);cx.stroke()}
   else if(p.shape==='drop'){cx.beginPath();cx.ellipse(p.x,p.y,p.r*.7,p.r*1.2,0,0,6.283);cx.fill()}
   else{cx.beginPath();cx.arc(p.x,p.y,p.r*(p.shrink?1-k*.6:1),0,6.283);cx.fill()}}
  cx.globalAlpha=1;requestAnimationFrame(loop)}
@@ -55,6 +58,15 @@ const PRE={
  guard(x,y){for(let i=0;i<7;i++)spawn(mk(x,y,rnd(0,6.28),[70,190],{spread:0,g:200,life:[300,460],r:[2,4],col:COL.pale,shape:'shard',drag:.96}))},
  heal(x,y,w=40){for(let i=0;i<7;i++)spawn(mk(x+rnd(-w/2,w/2),y+rnd(-8,14),-Math.PI/2,[30,80],{spread:.35,g:-30,life:[600,950],r:[1.4,2.6],col:i%2?COL.heal:COL.gold,drag:.985,shrink:1}))},
  death(x,y,w=60,h=80,n=14){for(let i=0;i<n;i++)spawn(mk(x+rnd(-w/2,w/2),y-rnd(0,h),Math.PI/2,[10,50],{spread:1.6,g:rnd(20,60),life:[650,1000],r:[1.4,3],col:i%3?COL.ash:COL.ashDark,a:.85,drag:.98,shrink:1}))},
+ // ---- Task 41 death emitters (x,y = bottom-centre of the figure, w/h = its size) ----
+ mist(x,y,w=60,h=80,n=10,col=COL.mist){for(let i=0;i<n;i++)spawn(mk(x+rnd(-w/2,w/2),y-rnd(0,h*.7),-Math.PI/2,[8,26],{spread:1.2,g:-6,life:[800,1250],r:[7,14],col:i%2?col:COL.brine,a:.32,drag:.97}))},
+ salt(x,y,w=60,h=80,n=10){for(let i=0;i<n;i++)spawn(mk(x+rnd(-w/2,w/2),y-rnd(0,h),Math.PI/2,[10,60],{spread:1.8,g:rnd(60,160),life:[600,1000],r:[1,2.2],col:COL.salt,a:.9,drag:.985,shape:i%2?'shard':'dot'}))},
+ bubbles(x,y,w=60,h=60,n=8){for(let i=0;i<n;i++)spawn(mk(x+rnd(-w/2,w/2),y-rnd(0,h*.4),-Math.PI/2,[30,80],{spread:.4,g:-40,life:[700,1100],r:[2,5],col:COL.pale,a:.8,drag:.985}))},
+ splash(x,y,w=60,n=12){for(let i=0;i<n;i++)spawn(mk(x+rnd(-w/2,w/2),y,-Math.PI/2,[110,260],{spread:.9,g:520,life:[380,620],r:[1.4,3],col:i%3?COL.teal:COL.salt,shape:i%2?'drop':'dot',shrink:1}))},
+ embers(x,y,w=60,h=80,n=12){for(let i=0;i<n;i++)spawn(mk(x+rnd(-w/2,w/2),y-rnd(0,h),-Math.PI/2,[30,110],{spread:.8,g:-50,life:[700,1200],r:[1.2,2.6],col:i%3?COL.ember:COL.gold,a:.95,drag:.98,shrink:1}))},
+ smoke(x,y,w=60,h=80,n=6){for(let i=0;i<n;i++)spawn(mk(x+rnd(-w/3,w/3),y-rnd(h*.2,h),-Math.PI/2,[12,34],{spread:.5,g:-14,life:[900,1400],r:[8,15],col:COL.smoke,a:.4,drag:.97}))},
+ flare(x,y,col=COL.gold,n=14){for(let i=0;i<n;i++)spawn(mk(x,y,rnd(0,6.28),[90,220],{spread:0,g:0,life:[220,420],r:[1.4,2.8],col:i%3?col:COL.salt,drag:.93,shrink:1}))},
+ spores(x,y,w=60,h=80,n=12){for(let i=0;i<n;i++)spawn(mk(x+rnd(-w/2,w/2),y-rnd(0,h),-Math.PI/2,[10,60],{spread:1.4,g:-20,life:[800,1300],r:[1.6,3.2],col:i%2?COL.kelp:COL.heal,a:.85,drag:.98,shrink:1}))},
  trail(x,y,col=COL.teal){spawn(mk(x,y,rnd(0,6.28),[0,18],{spread:0,life:[180,300],r:[1.6,3],col,a:.8,shrink:1}))},
  coin(x,y){for(let i=0;i<8;i++)spawn(mk(x,y,rnd(0,6.28),[40,150],{spread:0,g:320,life:[350,600],r:[1.5,2.6],col:i%2?COL.gold:COL.salt,shrink:1}))},
  burst(x,y,col=COL.gold,n=18){for(let i=0;i<n;i++)spawn(mk(x,y,rnd(0,6.28),[60,240],{spread:0,g:-30,life:[500,900],r:[1.6,3.2],col:i%3?col:COL.salt,drag:.97,shrink:1}))},

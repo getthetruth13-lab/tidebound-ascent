@@ -13,9 +13,8 @@ import {anim} from './fx.js';
 import {T} from '../core/timing.js';
 import {DAIS_ART,slotHTML} from '../assets.js';
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-const forecast=cb=>{let level=cb.tide,dir=cb.tideDir;
- if(!cb.holdDrift)for(let k=0;k<mod('driftCount',{},1);k++){if(!dir)break;level=Math.max(0,Math.min(10,level+dir*mod('drift',{},CORE.tide.drift)));if(level===10){level=mod('crest',{preview:true},{resetTo:5}).resetTo;if(CORE.tide.flip_after_reset)dir=-1}else if(level===0){level=mod('undertow',{preview:true},{resetTo:5}).resetTo;if(CORE.tide.flip_after_reset)dir=1}}
- return `<span class="meter-label tide-forecast">Next turn: ${level}</span>`};
+const tideInfo=cb=>{const t=CORE.tide,cr=mod('crest',{preview:true},{dmg:t.crest_dmg,resetTo:5}),un=mod('undertow',{preview:true},{guard:t.undertow_blk,draw:t.undertow_draw,resetTo:5});
+ return `Tide: ${cb.tide}/10. High: ${t.high}+; Low: ${t.low} or below: card bonuses. Surge ↑; Recede ↓. Crest: ${cr.dmg} to all at 10 → ${cr.resetTo}. Undertow: ${un.guard} Guard, draw ${un.draw} at 0 → ${un.resetTo}. Drift: ${cb.holdDrift?'held next turn':cb.tideDir?`${mod('drift',{},t.drift)} ${cb.tideDir>0?'up':'down'} at turn start (${mod('driftCount',{},1)} time(s))`:'none yet'}. ${t.flip_after_reset?'Reset reverses drift.':''}`};
 const plain=h=>String(h).replace(/<[^>]+>/g,'');
 // A PLAIN weathered verdigris bronze hand-bell: smooth flared body, one plain rim band, iron bracket and chain. No ridges, no jaw shapes.
 export const BELL=`<svg viewBox="0 0 64 84" class="bell-svg" aria-hidden="true"><defs><linearGradient id="bz-b" x1="0" x2="1"><stop offset="0" stop-color="#4f8f80"/><stop offset=".28" stop-color="#8a7a45"/><stop offset=".55" stop-color="#b08a4a"/><stop offset=".85" stop-color="#6d6a3c"/><stop offset="1" stop-color="#3d7a6c"/></linearGradient>
@@ -43,14 +42,11 @@ function tide(cb){if(DAIS_ART['dais-tide'])return tideArt(cb);const T=CORE.tide,
  if(hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir)b+=btn('tideflip','','',0,"tideAct('flip')","Helmsman's Wheel: flip the drift arrow.",'☸');
  if(cb.banks&&!cb.busy)b+=btn('relbank','rel','',0,'releaseBank()',`Release the Bank: ${cb.banks} Banked Crest${cb.banks>1?'s':''}, each 1½ × Crest damage to ALL.`,`×${cb.banks}`);else if(cb.banks)b+=`<span class="chip">×${cb.banks}</span>`;
  const hi=lvl>=T.high,lo=lvl<=T.low;
- return frame('tide','Tide',`<div class="tg2" data-lvl="${lvl}">
-  <div class="tg2-cap top${anim(cb.crestT,700)?' fire':''}" data-info="Crest: at 10 the Tide breaks: ${cr.dmg} damage to ALL enemies, then it settles to 5."><b>Crest</b><i>${cr.dmg} to ALL</i></div>
-  <div class="tg2-main"><div class="tg2-tube${anim(cb.crestT,700)?' crest':''}${anim(cb.undertowT,700)?' under':''} d-${dir[0]}${hi?' is-hi':''}${lo?' is-lo':''}" data-info="Tide ${lvl}/10: High ${T.high}+ and Low ${T.low}− change what your cards do. 10 = Crest, 0 = Undertow.">
+ return frame('tide','Tide',`<div class="tg2" data-lvl="${lvl}" data-info="${esc(tideInfo(cb))}">
+  <div class="tg2-main"><div class="tg2-tube${anim(cb.crestT,700)?' crest':''}${anim(cb.undertowT,700)?' under':''} d-${dir[0]}${hi?' is-hi':''}${lo?' is-lo':''}" data-info="${esc(tideInfo(cb))}">
     <i class="tg2-hi"></i><i class="tg2-lo"></i><i class="tg2-w" style="height:${lvl*10}%"></i><i class="tg2-pv"></i><s></s><s></s><s></s></div>
-   <div class="tg2-scale"><u class="tk hi${hi?' lit':''}" style="bottom:${T.high*10}%">High</u><u class="tk lo${lo?' lit':''}" style="bottom:${T.low*10}%">Low</u>
-    <b class="tg2-n" style="bottom:${lvl*10}%" data-info="${esc(dir[1])}">${lvl}<u class="drift d-${dir[0]}"></u></b><em class="tg2-pvn pvt"></em></div></div>
-  <div class="tg2-cap bot${anim(cb.undertowT,700)?' fire':''}" data-info="Undertow: at 0 the Tide drains: ${un.guard} Guard and draw ${un.draw}, then it settles to 5."><b>Undertow</b><i>${un.guard} Guard · draw ${un.draw}</i></div>
-  ${forecast(cb)}${b?`<div class="tg2-btns">${b}</div>`:''}</div>`)}
+   <div class="tg3-plate" data-info="${esc(tideInfo(cb))}"><b class="tg2-n">${lvl}</b><span class="tg3-st">${hi?'High':lo?'Low':'Calm'}</span><em class="tg2-pvn pvt"></em></div></div>
+  ${b?`<div class="tg2-btns">${b}</div>`:''}</div>`)}
 
 // Painted gauge variant: water animates from the previous level, engraved plate beside the tube, plaques at the tube ends.
 function tideArt(cb){const T=CORE.tide,lvl=cb.tide;
@@ -60,18 +56,16 @@ function tideArt(cb){const T=CORE.tide,lvl=cb.tide;
  if(hasRelic('tidetable')&&!cb.tideBtnUsed)b+=btn('tideup','','',0,"tideAct('up')",'Tide Table: Surge 1 (free, once per turn).','+1')+btn('tidedn','','',0,"tideAct('down')",'Tide Table: Recede 1 (free, once per turn).','−1');
  if(hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir)b+=btn('tideflip','','',0,"tideAct('flip')","Helmsman's Wheel: flip the drift arrow.",'☸');
  if(cb.banks&&!cb.busy)b+=btn('relbank','rel','',0,'releaseBank()',`Release the Bank: ${cb.banks} Banked Crest${cb.banks>1?'s':''}, each 1½ × Crest damage to ALL.`,`×${cb.banks}`);else if(cb.banks)b+=`<span class="chip">×${cb.banks}</span>`;
- const hi=lvl>=T.high,lo=lvl<=T.low,crest=anim(cb.crestT,900)||lvl>=10,under=anim(cb.undertowT,900)||lvl<=0;
+ const hi=lvl>=T.high,lo=lvl<=T.low,crest=anim(cb.crestT,900),under=anim(cb.undertowT,900);
  const prev=(tgCb===cb&&tgPrev!=null)?tgPrev:lvl,moved=prev!==lvl;tgPrev=lvl;tgCb=cb;
  if(moved)setTimeout(()=>{const w=document.querySelector('#dais .tg2-w');if(w){void w.offsetHeight;w.style.height=lvl*10+'%'}},30);
  const st=hi?'High':lo?'Low':'Calm';
- return frame('tide','Tide',`<div class="tg3" data-lvl="${lvl}">
-  <div class="tg2-cap top plq${crest?' fire':''}" data-info="Crest: at 10 the Tide breaks: ${cr.dmg} damage to ALL enemies, then it settles to 5."><b>Crest</b><i>${cr.dmg} to all</i></div>
-  <div class="tg2-main"><div class="tg2-tube${crest?' crest':''}${under?' under':''}${moved?' moved':''} d-${dir[0]}${hi?' is-hi':''}${lo?' is-lo':''}" style="--lv:${lvl*10}%" data-info="Tide ${lvl}/10: High ${T.high}+ and Low ${T.low}− change what your cards do. 10 = Crest, 0 = Undertow.">
+ return frame('tide','Tide',`<div class="tg3" data-lvl="${lvl}" data-info="${esc(tideInfo(cb))}">
+  <div class="tg2-main"><div class="tg2-tube${crest?' crest':''}${under?' under':''}${moved?' moved':''} d-${dir[0]}${hi?' is-hi':''}${lo?' is-lo':''}" style="--lv:${lvl*10}%" data-info="${esc(tideInfo(cb))}">
     <i class="tg2-w" style="height:${prev*10}%"><i class="tg3-foam"></i><i class="tg3-splash"></i></i><i class="tg3-swirl"></i><i class="tg2-pv"></i><s></s><s></s><s></s><s></s><s></s><i class="tg3-burst"></i></div>
    <i class="tg3-mk hi${hi?' lit':''}" style="bottom:${T.high*10}%"></i><i class="tg3-mk lo${lo?' lit':''}" style="bottom:${T.low*10}%"></i></div>
-  <div class="tg3-plate st-${st.toLowerCase()}" data-info="${esc(dir[1])}"><b class="tg2-n">${lvl}</b><span class="tg3-st">${st}<u class="drift d-${dir[0]}"></u></span><em class="tg2-pvn pvt"></em></div>
-  <div class="tg2-cap bot plq${under?' fire':''}" data-info="Undertow: at 0 the Tide drains: ${un.guard} Guard and draw ${un.draw}, then it settles to 5."><b>Undertow</b><i>${un.guard} Guard<br>draw ${un.draw}</i></div>
-  ${forecast(cb)}${b?`<div class="tg2-btns">${b}</div>`:''}</div>`)}
+  <div class="tg3-plate st-${st.toLowerCase()}" data-info="${esc(tideInfo(cb))}"><b class="tg2-n">${lvl}</b><span class="tg3-st">${st}<u class="drift d-${dir[0]}"></u></span><em class="tg2-pvn pvt"></em></div>
+  ${b?`<div class="tg2-btns">${b}</div>`:''}</div>`)}
 
 // ---------- Echo Mage: hanging hand-bell, ripple rings, the Marked card dangles beneath ----------
 function echo(cb){const cap=CORE.echo.bonus_cap;
@@ -81,10 +75,10 @@ function echo(cb){const cap=CORE.echo.bonus_cap;
   const tip=ci?`${cname(ci)} will Echo at the end of your turn${pv?': about '+pv.total+(pv.kind==='dmg'?' damage':' Guard')+' in total':''}. +1 per card played after it (max +${cap}).`
    :idx===1?'Tap the bell to Mark: the next card you play Echoes at the end of your turn (+1 per card played after it, max +'+cap+').':'A second bell: you can Mark a second card.';
   const tag=markable&&idx===(cb.mark?2:1)?'button':'div';const first=idx===1;
-  const a=`<${tag} class="bellbtn${ci?' ring':' empty'}${cb.armMark&&markable&&tag==='button'?' arm':''}" ${tag==='button'?`${first?'id="markbtn"':'id="markbtn2"'} onclick="armMark()"`:''} data-idx="${idx}" data-info="${esc(tip)}">
+  const a=`<${tag} class="bellbtn${ci?' ring':' empty'}${cb.armMark&&markable&&tag==='button'?' arm':''}" ${tag==='button'?`${first?'id="markbtn"':'id="markbtn2"'} onclick="armMark()"`:''} data-idx="${idx}" data-info="${esc(tip+` ${cb.armMark?'Armed: next card will be Marked.':''} Unmarked: last played card Echoes at ${CORE.echo.unmarked_fallback*100}% strength. Current bonus: +${ci?markBonus(after):0}.`)}">
    <span class="rings">${rings(ci?markBonus(after):0)}</span>${BELL}</${tag}>`;
   const ch=ci?`<div class="charm" data-info="${esc(tip)}">${mini(ci)}<b>${cname(ci)}</b></div><div class="ptot">${pv?`${pv.kind==='dmg'?'⚔':'🛡'} ${pv.n}${rep}${pl.mult>1?' ×2':''}`:''}<em class="pvt"></em></div>`:'';
-  return `<div class="bellcol${ci?' marked':''}">${a}<span class="meter-label">${ci?'End turn Echo':cb.armMark&&tag==='button'?'Armed: next card':tag==='button'?'Marks next card':'Echo'}</span>${ch}</div>`};
+  return `<div class="bellcol${ci?' marked':''}">${a}<b class="echo-read">${ci&&pv?pv.total:0}</b><span class="meter-label">${ci?'End turn Echo':cb.armMark&&tag==='button'?'Armed: next card':tag==='button'?'Marks next card':'Echo'}</span>${ch}</div>`};
  const plan=echoPlan(true);
  let h=bell(cb.mark,1,cb.afterMark,1);
  if(cb.mark2||(cb.mark&&markable))h+=bell(cb.mark2,2,cb.after2,2);
@@ -97,11 +91,11 @@ function carto(cb){const pk=cb.mode&&cb.mode.k==='slot',lim=mod('advances',{},1)
  for(let i=0;i<cb.nslots;i++){const w=cb.slots[i];
   if(!w){s+=`<div class="wp empty" style="--wi:${i}" data-i="${i}" data-info="Waypoint ${i+1}: empty. Cards with Waypoint place one here; each Waypoint triggers its effect for you."><i class="pinn"></i><span class="wpn">Unmarked</span></div>`;continue}
   const r=w.rank||0,adv=canAdv&&r<CORE.carto.rank_max,land=r>=CORE.carto.rank_max;
-  const tip=cname(w)+': '+plain(desc(w))+(adv?' — tap to Advance (+1 Rank; damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':'');
-  s+=`<button class="wp full${pk?' pick':''}${adv?' adv':''}${land?' land':''}${anim(w.trigT,T(900))?' trig':''}" style="--wi:${i};${anim(w.trigT,T(900))||''}" data-i="${i}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" data-info="${esc(tip)}">${CAIRN(r)}<span class="wpn cref" data-card="${w.id}">${cname(w)}</span><span class="map-rank">${'Rank '+r}${land?' ◆':''}</span><span class="map-act">${pk?'Replace':''}</span><span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span></button>`}
+  const tip='Rank '+r+' / '+CORE.carto.rank_max+'. '+cname(w)+': '+plain(desc(w))+(adv?' — tap to Advance (+1 Rank; damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':'');
+  s+=`<button class="wp full${pk?' pick':''}${adv?' adv':''}${land?' land':''}${anim(w.trigT,T(900))?' trig':''}" style="--wi:${i};${anim(w.trigT,T(900))||''}" data-i="${i}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" data-info="${esc(tip)}">${CAIRN(r)}<span class="wpn cref" data-card="${w.id}">${cname(w)}</span><span class="map-rank">${r}</span><span class="map-act">${pk?'Replace':''}</span><span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span></button>`}
  const nd=mod('drawCount',{},4);const nx=cb.draw.slice(0,3).map((ci,i)=>`<span class="nx cref ${i<nd?'next':''}" data-card="${ci.id}">${cname(ci)}</span>`).join('')||'<span class="muted">reshuffle</span>';
  const left=Math.max(0,lim-cb.advUsed);const hint=`${left} Advance${left===1?'':'s'} left`;
- return frame('carto','Chart',`<div class="chart" data-slots="${cb.nslots}"><svg class="map-ink" viewBox="0 0 672 312" aria-hidden="true"><path pathLength="1" d="M217 138 Q275 145 332 141 T453 139"/></svg><i class="stub"></i><svg class="rope" viewBox="0 0 20 100" preserveAspectRatio="none" aria-hidden="true"><path d="M10 2C2 14 18 22 10 34S2 54 10 66 18 86 10 98"/></svg><div class="wps">${s}</div></div>
+ return frame('carto','Chart',`<div class="chart" data-slots="${cb.nslots}" data-info="${esc(`Chart: ${left} Advances left. Tap Waypoint: +1 Rank. Rank ${CORE.carto.rank_max}: Landmark, counts twice for Expedition. Waypoint cards place effects. Next: ${cb.draw.slice(0,3).map(cname).join(', ')||'reshuffle'}. Draw pile: face up.`)}"><svg class="map-ink" viewBox="0 0 672 312" aria-hidden="true"><path pathLength="1" d="M217 138 Q275 145 332 141 T453 139"/></svg><i class="stub"></i><svg class="rope" viewBox="0 0 20 100" preserveAspectRatio="none" aria-hidden="true"><path d="M10 2C2 14 18 22 10 34S2 54 10 66 18 86 10 98"/></svg><div class="wps">${s}</div></div>
   <div class="nexts" data-info="Next cards in your draw pile (the first ${nd} are drawn next turn). The pile is face up."><b>Next</b>${nx}</div>${hint?`<div class="advhint">${hint}</div>`:''}`)}
 
 // ---------- Duelist: rapier planted in the step, wick flame on the tip = Momentum ----------
@@ -109,14 +103,14 @@ function duel(cb){const D=CORE.duel,max=mod('momMax',{},D.mom_max),fmin=flourish
  for(let i=max-1;i>=0;i--)n+=`<i class="${i<cb.mom?'on':''}${i+1===fmin?' mark':''}"></i>`;
  const can=cb.mom>=fmin&&!cb.busy,mult=flourishMult(cb.mom),fr=Math.max(0,cb.mom-D.decay);
  const st=cb.armFlourish?'armed':cb.mom>=fmin?'hot':cb.mom>0?'lit':'cold';
- const tip=can?`Flourish: tap the flame. Your next Attack spends all Momentum and deals ×${mult} (×(1 + ½ per Momentum)).`:`Momentum ${cb.mom}/${max}: each Attack feeds the flame. At ${fmin}+ it turns white-hot and you can tap it to Flourish.`;
+ const tip=`Momentum: ${cb.mom}/${max}. Attacks gain 1. Turn end: −${D.decay}${cb.keepMom?' (kept)':''}; unblocked hit: −${mod('momLoss',{},D.lose_on_unblocked)}. Flourish at ${fmin}+: tap flame; next Attack spends all for ×${mult}${cb.armFlourish?' (armed)':''}. Parry ${cb.parry}: first hit −${cb.parry}, reflect ${Math.floor(cb.parry*mod('parryReflect',{},D.parry_back_frac))}.`;
  return frame('duel','Rapier',`<div class="rap" style="--m:${cb.mom};--mx:${max};--fr:${fr}">
   <button class="wick st-${st}${cb.armFlourish?' on':''}" id="flourishbtn" ${can?'':'disabled'} onclick="armFlourish()" data-info="${esc(tip)}">${FLAME}</button><i class="wick-pv"></i>
-  <b class="rap-x${can?' can':''}">${can?'×'+mult:''}</b><em class="rap-pvn pvt"></em>
+  <b class="rap-x${can?' can':''}">${cb.armFlourish?'×'+mult:''}</b><em class="rap-pvn pvt"></em>
   <div class="rap-blade" data-info="Momentum ${cb.mom}/${max}: each Attack builds it. At ${fmin}+ you can Flourish. It fades by ${D.decay} each turn${cb.keepMom?' (kept this turn)':''}."><div class="notches">${n}</div><u class="fade"></u></div>
   <div class="rap-guard"></div><div class="rap-grip"></div>
   <span class="dag${cb.parry?' on':''}" data-info="Parry ${cb.parry}: reduce the first incoming hit by up to ${cb.parry} this turn and reflect damage. The parrying dagger is the off hand."><i></i><b>${cb.parry||''}</b></span>
-  <span class="mom-read"><span class="meter-label">Momentum</span><b>${cb.mom}</b><i>/${max}</i></span></div>`)}
+  <span class="mom-read"><b>${cb.mom}</b></span></div>`)}
 
 export function daisHTML(){const cb=W.cb,c=W.run.cls;return c==='tide'?tide(cb):c==='echo'?echo(cb):c==='carto'?carto(cb):c==='duel'?duel(cb):''}
 
@@ -129,7 +123,7 @@ export function showMeterPreview(res){const d=document.getElementById('dais'),cb
  if(c==='tide'){const t=m.tide;if(t!==cb.tide||m.crest||m.undertow){const tube=d.querySelector('.tg2-tube');tube.style.setProperty('--pv',t*10+'%');tube.classList.add('pvon');
    d.querySelector('.tg2-pvn').textContent='→ '+t;d.querySelector('.tg2-pvn').style.bottom=`calc(${t*10}% - 0px)`;
    d.querySelector('.tg2-n').classList.toggle('pvon',Math.abs(t-cb.tide)*tube.clientHeight/10<22);
-   if(m.crest)d.querySelector('.tg2-cap.top').classList.add('pvon');if(m.undertow)d.querySelector('.tg2-cap.bot').classList.add('pvon');on=true}}
+   if(m.crest||m.undertow)tube.classList.add('pvon');on=true}}
  else if(c==='echo'){const b1=d.querySelector('.bellcol:nth-child(1)');
   if(m.mark&&!cb.mark&&b1){b1.classList.add('pvon');const t=b1.querySelector('.bellbtn');if(t)t.classList.add('pvon');on=true}
   else if(m.mark2&&!cb.mark2){const b=d.querySelector('.bellcol:nth-child(2)');if(b){b.classList.add('pvon');on=true}}
