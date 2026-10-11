@@ -93,7 +93,7 @@ function syncUIState(){
  if(uiState){
   if(next.ov!==uiState.ov)playSound(next.ov?(['deck','draw','disc','exh'].includes(next.ov)?'pile':'menuOpen'):'menuClose');
   else if(next.view!==uiState.view&&next.screen==='title')playSound(next.view==='main'?'menuClose':'menuOpen');
-  else if(next.tab!==uiState.tab&&next.screen===uiState.screen)playSound('tab');
+  /* tab-change click silenced by Spencer */
   else if(next.potion!==uiState.potion||next.relic!==uiState.relic)playSound(next.potion!=null||next.relic?'menuOpen':'menuClose');
   if(next.chest&&!uiState.chest&&next.screen==='chest')playSound('chest');
   if(next.hp>uiState.hp)playSound('heal');
@@ -102,7 +102,10 @@ function syncUIState(){
  }
  uiState=next;syncProgress();syncMeters();
 }
-function clickSound(el){
+// Spencer silenced generic UI click/tap cues (2026-10-11). Do not restore.
+const SILENT_UI=new Set(['uiTap','confirm','cancel','select','tab','mapTap']);
+function clickSound(el){const s=pickClickSound(el);return s&&SILENT_UI.has(s)?null:s}
+function pickClickSound(el){
  if(el.dataset.sfx)return el.dataset.sfx;
  const action=el.getAttribute('onclick')||'',label=(el.getAttribute('aria-label')||el.textContent||'').trim();
  if(/openChestLid/.test(action))return 'chest';
