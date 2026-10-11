@@ -1,0 +1,8089 @@
+{
+ "version": "env-v1",
+ "units": "reference viewport 832x384 CSS px; speed px/s; size px; dir deg (0=right,90=down); a=opacity",
+ "acts": [
+  {
+   "act": 1,
+   "name": "The Drowned Stair",
+   "biome": "Tidepool ruins of a sunken tower, climbed from low-tide dawn into a rain-dark bell court",
+   "ties": "Brine Slug, Gull Thief, Coral Crab, Tide Leech, Kelp Lurker, Rust Knight, Spore Pod, Glimmer Wisp; bosses Leviathan Bell, Kelp Matriarch",
+   "arc": "Dawn → green gloom → rain. Light falls as the stair climbs."
+  },
+  {
+   "act": 2,
+   "name": "The Brine Bastion",
+   "biome": "A drowned fortress harbour: rusted quays, flooded barracks, storm-lashed ramparts",
+   "ties": "Harpoon Gunner, Shellback Guard, Bilge Rats, Siren Acolyte, Brine Hexer, Riveted Diver, Salt Wraith, Pressure Golem; bosses Tidewarden Colossus, Wreck Queen",
+   "arc": "Dusk rain → lantern-lit interiors → night storm on the walls."
+  },
+  {
+   "act": 3,
+   "name": "The Galecrown",
+   "biome": "A storm-wrapped summit above a sea of cloud: cliffs, lightning spires, hail-swept terraces",
+   "ties": "Gale Petrels, Thunderhead Jelly, Voltaic Ray, Gale Harpy, Cloudfin Shark, Static Polyp, Hail Golem, Cloud Serpent; bosses Maelstrom Engine, Thalassa the Undrowned",
+   "arc": "Wind → lightning → hail and the storm’s eye overhead."
+  },
+  {
+   "act": 4,
+   "name": "The Pale Lighthouse",
+   "biome": "Above the storm: a silent, lightless summit, a pale lighthouse, and a sun drowned beneath a glass-black sea",
+   "ties": "Breakwater Wardens (elite), The Drowned Sun (boss)",
+   "arc": "Total stillness → a black-gold dawn from below the horizon."
+  }
+ ],
+ "layers": {
+  "sky": {
+   "z": 0,
+   "factor": 0.05,
+   "drift": [
+    0,
+    0
+   ],
+   "note": "Static backdrop; cloud strip may scroll",
+   "export": {
+    "density": "@1x",
+    "px": [
+     1800,
+     720
+    ],
+    "alt": "@2x 3600x1440 if under budget",
+    "trim": false
+   }
+  },
+  "far": {
+   "z": 1,
+   "factor": 0.2,
+   "drift": [
+    0,
+    0
+   ],
+   "note": "Distant silhouettes, low contrast; static after slide-in",
+   "export": {
+    "density": "@1x",
+    "px": [
+     1800,
+     720
+    ],
+    "alt": "@2x 3600x1440 if under budget",
+    "trim": false
+   }
+  },
+  "mid": {
+   "z": 2,
+   "factor": 0.45,
+   "drift": [
+    3,
+    11
+   ],
+   "note": "Main architecture / landmark",
+   "export": {
+    "density": "@2x",
+    "px": [
+     3600,
+     1440
+    ],
+    "trim": true
+   }
+  },
+  "ground": {
+   "z": 3,
+   "factor": 0.8,
+   "drift": [
+    0,
+    0
+   ],
+   "note": "Floor figures stand on; ground line at 69% height (anchored to .scene bottom)",
+   "export": {
+    "density": "@2x",
+    "px": [
+     3600,
+     1440
+    ],
+    "trim": false
+   }
+  },
+  "fg": {
+   "z": 5,
+   "factor": 1.15,
+   "drift": [
+    4,
+    9
+   ],
+   "note": "Edge framing only (outer 18% each side of the 19.5:9 frame), drawn over figures, ≤35% opacity where it crosses them. Ships as two files, fg-l and fg-r, in one fg layer",
+   "export": {
+    "density": "@2x",
+    "px": [
+     802,
+     1440
+    ],
+    "trim": true,
+    "split": [
+     "l",
+     "r"
+    ],
+    "files": [
+     "<id-kebab>-fg-l@2x.webp",
+     "<id-kebab>-fg-r@2x.webp"
+    ],
+    "max_rect": {
+     "l": [
+      0,
+      0,
+      802,
+      1440
+     ],
+     "r": [
+      2798,
+      0,
+      802,
+      1440
+     ]
+    },
+    "note": "two files; each side spans at most the outer 18% of the 3120 frame plus 240 px overscan (802 px)"
+   }
+  }
+ },
+ "bands": [
+  {
+   "act": 1,
+   "floors": [
+    1,
+    5
+   ],
+   "band": "Entrance",
+   "env": "a1_shore"
+  },
+  {
+   "act": 1,
+   "floors": [
+    6,
+    10
+   ],
+   "band": "Deeper",
+   "env": "a1_cloister"
+  },
+  {
+   "act": 1,
+   "floors": [
+    11,
+    14
+   ],
+   "band": "Approach",
+   "env": "a1_bellcourt"
+  },
+  {
+   "act": 2,
+   "floors": [
+    1,
+    5
+   ],
+   "band": "Entrance",
+   "env": "a2_harbour"
+  },
+  {
+   "act": 2,
+   "floors": [
+    6,
+    10
+   ],
+   "band": "Deeper",
+   "env": "a2_halls"
+  },
+  {
+   "act": 2,
+   "floors": [
+    11,
+    14
+   ],
+   "band": "Approach",
+   "env": "a2_ramparts"
+  },
+  {
+   "act": 3,
+   "floors": [
+    1,
+    5
+   ],
+   "band": "Entrance",
+   "env": "a3_cliffs"
+  },
+  {
+   "act": 3,
+   "floors": [
+    6,
+    10
+   ],
+   "band": "Deeper",
+   "env": "a3_spires"
+  },
+  {
+   "act": 3,
+   "floors": [
+    11,
+    14
+   ],
+   "band": "Approach",
+   "env": "a3_terraces"
+  },
+  {
+   "act": 4,
+   "floors": [
+    1,
+    3
+   ],
+   "band": "Entrance",
+   "env": "f_stair"
+  }
+ ],
+ "boss_lair": {
+  "bell": "a1_lair_bell",
+  "matriarch": "a1_lair_kelp",
+  "colossus": "a2_lair_colossus",
+  "wreckqueen": "a2_lair_queen",
+  "maelstrom": "a3_lair_engine",
+  "thalassa": "a3_lair_thalassa",
+  "drownedsun": "f_lair_sun",
+  "tenant": "a1_lair_row"
+ },
+ "screen_scene": {
+  "event": {
+   "1": "ev_a1",
+   "2": "ev_a2",
+   "3": "ev_a3"
+  },
+  "shop": {
+   "1": "shop_a1",
+   "2": "shop_a2",
+   "3": "shop_a3",
+   "4": "shop_f"
+  },
+  "rest": {
+   "1": "camp_a1",
+   "2": "camp_a2",
+   "3": "camp_a3",
+   "4": "camp_f"
+  },
+  "treasure": {
+   "1": "chest_a1",
+   "2": "chest_a2",
+   "3": "chest_a3"
+  },
+  "map": {
+   "1": "map_a1",
+   "2": "map_a2",
+   "3": "map_a3",
+   "4": "map_f"
+  }
+ },
+ "grades": {
+  "normal": {
+   "tint_add": 0,
+   "vig_add": 0,
+   "extra": []
+  },
+  "elite": {
+   "tint_add": 0.06,
+   "vig_add": 0.12,
+   "extra": [
+    {
+     "t": "fog",
+     "n": 1,
+     "spd": 3,
+     "col": "#7a2e4a",
+     "a": 0.18,
+     "render": "css"
+    }
+   ]
+  },
+  "galecrowned": {
+   "tint_add": 0.08,
+   "vig_add": 0.15,
+   "extra": [
+    {
+     "t": "fog",
+     "n": 1,
+     "spd": 3,
+     "col": "#7b6cd9",
+     "a": 0.2,
+     "render": "css"
+    },
+    {
+     "t": "wind",
+     "n": 30,
+     "spd": 520,
+     "col": "#c6b8ff",
+     "a": 0.25,
+     "render": "canvas",
+     "size": 40,
+     "dir": 0
+    },
+    {
+     "t": "lightning",
+     "n": 1,
+     "spd": 0,
+     "col": "#c6b8ff",
+     "a": 0.2,
+     "render": "css",
+     "every_s": [
+      5,
+      8
+     ]
+    }
+   ]
+  },
+  "boss": {
+   "tint_add": 0,
+   "vig_add": 0.05,
+   "extra": []
+  }
+ },
+ "variant": {
+  "weather_mult": [
+   0.7,
+   1.0,
+   1.3
+  ],
+  "tint_shift_deg": [
+   -8,
+   0,
+   8
+  ],
+  "fg": [
+   "a",
+   "b"
+  ]
+ },
+ "transitions": [
+  {
+   "moment": "Map → battle",
+   "visual": "“Tide wipe”: a wave-edged mask sweeps left→right over the map in the band’s deep colour; env swaps at full cover; mask exits right",
+   "timing": "450 ms in · swap · 350 ms out; then camera settle 900 ms (layers slide in from +4% x)",
+   "reduced_motion": "200 ms crossfade, no pan"
+  },
+  {
+   "moment": "Battle → reward",
+   "visual": "No env change; scene dims to 55% behind the reward panel (no blur: too costly on mobile)",
+   "timing": "300 ms",
+   "reduced_motion": "Instant dim"
+  },
+  {
+   "moment": "Map → event / shop / camp / chest",
+   "visual": "Crossfade to the act’s room scene; scene dimmed behind panels (event 50%, shop 30%, camp 25%, chest 20%)",
+   "timing": "350 ms",
+   "reduced_motion": "200 ms crossfade"
+  },
+  {
+   "moment": "Room → map",
+   "visual": "Crossfade back; parchment slides up 24 px while fading in",
+   "timing": "350 ms",
+   "reduced_motion": "200 ms crossfade"
+  },
+  {
+   "moment": "Band change (on the map)",
+   "visual": "Toast banner “Entering the Kelp Colonnade” over the map; map backdrop crossfades to the new band",
+   "timing": "Banner 1.6 s; backdrop 600 ms",
+   "reduced_motion": "Banner static 1.6 s"
+  },
+  {
+   "moment": "Elite / Galecrowned battle",
+   "visual": "Same wipe, but the wave edge is crimson (elite) or violet (Galecrowned) and a 120 ms low thump flash",
+   "timing": "As map → battle",
+   "reduced_motion": "No flash"
+  },
+  {
+   "moment": "Boss battle",
+   "visual": "Iris close to black (circle), 400 ms hold on the boss name, iris open on the lair",
+   "timing": "450 ms close · 400 ms hold · 600 ms open",
+   "reduced_motion": "300 ms fade"
+  },
+  {
+   "moment": "Act transition / run start / final act",
+   "visual": "Fade to black → travel scene plays → title card fades in at 0.8 s for 2.2 s → fade to black → new act map",
+   "timing": "Fade 400 ms · travel 3–6 s (skippable after 1 s) · fade 400 ms",
+   "reduced_motion": "Static title card on the act’s map backdrop for 1.5 s, tap to continue"
+  },
+  {
+   "moment": "Victory / defeat",
+   "visual": "Victory: ending_lit (final) or crossfade to the current lair with a gold wash; defeat: current env desaturates to 15% over 1.2 s",
+   "timing": "1.2 s",
+   "reduced_motion": "Instant"
+  }
+ ],
+ "map_assets": {
+  "status": "approved",
+  "by": "Art Director",
+  "date": "2026-10-08",
+  "sheet_strip": {
+   "px": [
+    2100,
+    1440
+   ],
+   "density": "@2x",
+   "tile": "vertical"
+  },
+  "node": {
+   "px": [
+    180,
+    180
+   ],
+   "density": "@2x",
+   "css_px": 48
+  },
+  "boss_node": {
+   "px": [
+    240,
+    240
+   ],
+   "density": "@2x",
+   "css_px": 64
+  },
+  "map_blur": {
+   "px": [
+    900,
+    360
+   ],
+   "note": "pre-blurred quarter-size sky/far for map backdrops"
+  }
+ },
+ "world_notes": [
+  "The tower IS the Drowned Stair. Act 1 isn't a separate shore beside a tower: every Act 1 scene stands on the tower's drowned base.",
+  "`a1_shore` is the tidal shelf and lowest landings of the tower's outer stair. The tower's mass rises to the right and out of frame, and its upper spiral fades into mist.",
+  "The view of the tower from across the water appears only in `tr_start` (*Rowing to the Stair*).",
+  "Sea stacks carved with steps are toppled buttresses or broken stair sections of the tower, not natural rocks.",
+  "Gulls: ambient gulls are small, generic silhouette particles (the `birds` effect)."
+ ],
+ "file_naming": {
+  "master": "art/v2/bg/_src/<id-kebab>-<layer>.png",
+  "export": [
+   "art/v2/bg/<id-kebab>-<layer>@2x.webp",
+   "art/v2/bg/<id-kebab>-<layer>@1x.webp (sky, far only; optional half size)"
+  ],
+  "density_reference": "@1x/@2x relative to a 1560x720 reference layout; @2x = S24 native 3120x1440 or wider",
+  "master_size": [
+   3840,
+   1536
+  ],
+  "export_2x": [
+   3600,
+   1440
+  ],
+  "export_1x": [
+   1800,
+   720
+  ],
+  "map_blur": [
+   900,
+   360
+  ],
+  "fg_split": [
+   "art/v2/bg/<id-kebab>-fg-l@2x.webp",
+   "art/v2/bg/<id-kebab>-fg-r@2x.webp"
+  ],
+  "trim": {
+   "layers": [
+    "mid",
+    "fg"
+   ],
+   "rect_space": [
+    3600,
+    1440
+   ],
+   "rect_where": "envs.<id>.export.layers.<image>.rect (images: sky, far, mid, ground, fg_l, fg_r)"
+  }
+ },
+ "frame": {
+  "target": "Galaxy S24 Ultra landscape 3120x1440 (19.5:9), 832x384 CSS px",
+  "frames_in_export": {
+   "16:9_core": [
+    2560,
+    1440
+   ],
+   "19.5:9": [
+    3120,
+    1440
+   ],
+   "21:9": [
+    3360,
+    1440
+   ]
+  },
+  "frames_in_master": {
+   "16:9_core": [
+    2731,
+    1536
+   ],
+   "19.5:9": [
+    3328,
+    1536
+   ],
+   "21:9": [
+    3584,
+    1536
+   ]
+  },
+  "overscan_px_each_side": {
+   "19.5:9": 240,
+   "21:9": 120
+  },
+  "pan_pct": 3,
+  "zones_pct_height": {
+   "ui_top": [
+    0,
+    21
+   ],
+   "stage": [
+    21,
+    69
+   ],
+   "ground_line": 69,
+   "hand": [
+    69,
+    100
+   ]
+  },
+  "hud_quiet_zone": "upper-left corner under the HUD (top 21%): no bright features; light source at ~25-32% across, 28-34% down, mist-softened",
+  "edge_safe_pct": 4,
+  "fg_edge_pct": 18,
+  "map_node_css_px": 48,
+  "map_boss_css_px": 64
+ },
+ "budget": {
+  "target_fps": 60,
+  "max_particles": {
+   "full": 300,
+   "reduced": 150,
+   "off": 0
+  },
+  "canvas_dpr_cap": 2,
+  "canvas_redraw_hz_cap": 60,
+  "idle_sim_hz": 30,
+  "max_layers": 5,
+  "max_promoted_layers": 3,
+  "decoded_mb_per_scene": 80,
+  "decoded_mb_worst_untrimmed": 61.1,
+  "decoded_mb_worst_basis": "mid+ground 3600x1440, fg-l+fg-r 802x1440 each, sky+far 1800x720",
+  "decoded_main_lever": "trim mid and fg to content bounds",
+  "frame_ms": 2,
+  "adaptive": {
+   "down_reduced_ms": 14,
+   "down_off_ms": 16.7,
+   "up_ms": 9,
+   "up_after_s": 10
+  }
+ },
+ "envs": {
+  "a1_shore": {
+   "id": "a1_shore",
+   "name": "Shoreline Steps",
+   "act": 1,
+   "kind": "battle",
+   "band": "Entrance",
+   "floors": [
+    1,
+    5
+   ],
+   "used": "Act 1 fights & elites, floors 1–5",
+   "mood": "Hopeful, cold dawn; the climb begins",
+   "features": "The tidal shelf and lowest landings of the tower’s own outer stair (not a separate shore): wet stone steps rising to the right into the tower’s mass, which runs out of frame right; tidepools with starfish and anemones; stepped sea stacks that are toppled buttresses and broken stair sections; the tower’s upper spiral fading into mist; ambient gulls as small silhouette particles only (never painted)",
+   "palette": [
+    "#f2c99a",
+    "#6fb7b4",
+    "#2c5a63",
+    "#1a2b33",
+    "#e9efe8"
+   ],
+   "layers": {
+    "sky": "Peach dawn gradient, low sun at about 25–32% across and 28–34% down, in the sky or far layer, softened by mist with no hard glow (the hero zone stays low-contrast); it still reads as the upper-left key light. Thin cloud strip (scrolls 2 px/s)",
+    "far": "Stepped sea stacks (toppled buttresses and broken stair sections) in mist; the tower’s base rising out of frame right, its upper spiral fading into mist",
+    "mid": "Broken stair arch and a toppled pillar",
+    "ground": "Wet steps, tidepools, kelp strands",
+    "fg": "Barnacled rock (left), dripping kelp fronds (right)"
+   },
+   "tint": {
+    "col": "#ffcf9e",
+    "a": 0.12,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.35,
+    "col": "#0b1a20"
+   },
+   "effects": [
+    {
+     "t": "fog",
+     "n": 3,
+     "spd": 4,
+     "col": "#e9efe8",
+     "a": 0.22,
+     "render": "css"
+    },
+    {
+     "t": "spray",
+     "n": 40,
+     "spd": 90,
+     "col": "#e9efe8",
+     "a": 0.6,
+     "render": "canvas",
+     "size": 2,
+     "dir": -80,
+     "burst_every_s": 4
+    },
+    {
+     "t": "birds",
+     "n": 3,
+     "spd": 18,
+     "col": "#1a2b33",
+     "a": 0.8,
+     "render": "canvas",
+     "size": 10
+    },
+    {
+     "t": "motes",
+     "n": 30,
+     "spd": 5,
+     "col": "#f2c99a",
+     "a": 0.45,
+     "render": "canvas",
+     "size": 1.5
+    }
+   ],
+   "phase": 1,
+   "priority": 1,
+   "rim": "#f2c99a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "signed_off",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a1-shore-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "measured",
+      "bytes": 90040,
+      "note": "Signed off at @1x (1800x720), displayed x2 over the full 3600x1440 space"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a1-shore-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "measured",
+      "bytes": 81734,
+      "note": "Signed off at @1x (1800x720), displayed x2; top edge feathered into transparency"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a1-shore-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       1923,
+       1117
+      ],
+      "trim": true,
+      "rect": {
+       "x": 1677,
+       "y": 0,
+       "w": 1923,
+       "h": 1117
+      },
+      "rect_status": "measured",
+      "bytes": 81134
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a1-shore-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       912
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 528,
+       "w": 3600,
+       "h": 912
+      },
+      "rect_status": "measured",
+      "bytes": 157354,
+      "note": "Trimmed to content: 3600x912 placed at y=528 (feathered back edge); the empty top 528 px are not shipped"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a1-shore-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       706,
+       383
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 1057,
+       "w": 706,
+       "h": 383
+      },
+      "rect_status": "measured",
+      "bytes": 14316
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a1-shore-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       652,
+       386
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2948,
+       "y": 1054,
+       "w": 652,
+       "h": 386
+      },
+      "rect_status": "measured",
+      "bytes": 7472
+     }
+    },
+    "decoded_mb": 34.2,
+    "decoded_mb_basis": "actual shipped files",
+    "signed_off_by": "Art Director",
+    "signed_off_date": "2026-10-08",
+    "artist": "Environment Artist",
+    "rect_source": "art/v2/bg/_src/a1-shore-rects.json",
+    "readme": "art/v2/bg/README-a1-shore.md",
+    "composite": "art/v2/bg/a1-shore-composite@2x.webp",
+    "review": "art/v2/bg/a1-shore-review-3120x1440.jpg",
+    "note": "rect = [x, y, w, h] of the shipped WebP inside the full 3600x1440 layer (master 3840x1536 scaled to 1440 tall; 19.5:9 frame = centred 3120x1440). Images, rects, sizes and bytes are read from rect_source at build time; layers{} stays the text spec."
+   },
+   "layer_assets": {
+    "space": [
+     3600,
+     1440
+    ],
+    "note": "rect = [x, y, w, h] of the shipped WebP inside the full 3600x1440 layer (master 3840x1536 scaled to 1440 tall; 19.5:9 frame = centred 3120x1440). Images, rects, sizes and bytes are read from rect_source at build time; layers{} stays the text spec.",
+    "_alias_of": "export.layers (generated from tools/design/envs.py ART)",
+    "sky": {
+     "file": "art/v2/bg/a1-shore-sky@1x.webp",
+     "rect": [
+      0,
+      0,
+      3600,
+      1440
+     ]
+    },
+    "far": {
+     "file": "art/v2/bg/a1-shore-far@1x.webp",
+     "rect": [
+      0,
+      0,
+      3600,
+      1440
+     ]
+    },
+    "mid": {
+     "file": "art/v2/bg/a1-shore-mid@2x.webp",
+     "rect": [
+      1677,
+      0,
+      1923,
+      1117
+     ]
+    },
+    "ground": {
+     "file": "art/v2/bg/a1-shore-ground@2x.webp",
+     "rect": [
+      0,
+      528,
+      3600,
+      912
+     ]
+    },
+    "fg_l": {
+     "file": "art/v2/bg/a1-shore-fg-l@2x.webp",
+     "rect": [
+      0,
+      1057,
+      706,
+      383
+     ]
+    },
+    "fg_r": {
+     "file": "art/v2/bg/a1-shore-fg-r@2x.webp",
+     "rect": [
+      2948,
+      1054,
+      652,
+      386
+     ]
+    }
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e9efe840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1a2b33cc 69%, #1a2b33 100%), linear-gradient(180deg, #f2c99a 0%, #6fb7b4 33%, #2c5a63 66%)",
+   "particles_max": 103
+  },
+  "a1_cloister": {
+   "id": "a1_cloister",
+   "name": "Kelp Colonnade",
+   "act": 1,
+   "kind": "battle",
+   "band": "Deeper",
+   "floors": [
+    6,
+    10
+   ],
+   "used": "Act 1 fights & elites, floors 6–10",
+   "mood": "Hushed, green, claustrophobic",
+   "features": "Half-flooded colonnade; kelp ropes hanging through a broken roof; waist-deep water at the ground line; green light shafts; glowing spore clusters on pillars",
+   "palette": [
+    "#0f2e2a",
+    "#2f6b4f",
+    "#7fbf7a",
+    "#c9e6a3",
+    "#0a1716"
+   ],
+   "layers": {
+    "sky": "Broken vaulted roof with green daylight holes",
+    "far": "Receding colonnade in green haze",
+    "mid": "Columns wrapped in kelp, spore clusters",
+    "ground": "Flooded floor, ripples, sunken flagstones",
+    "fg": "Hanging kelp curtains left and right"
+   },
+   "tint": {
+    "col": "#2f6b4f",
+    "a": 0.1,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.45,
+    "col": "#06110f"
+   },
+   "effects": [
+    {
+     "t": "shafts",
+     "n": 4,
+     "spd": 0,
+     "col": "#c9e6a3",
+     "a": 0.18,
+     "render": "css",
+     "sway_deg": 3,
+     "period_s": 9
+    },
+    {
+     "t": "spores",
+     "n": 60,
+     "spd": 6,
+     "col": "#b6e07a",
+     "a": 0.6,
+     "render": "canvas",
+     "size": 2,
+     "dir": -90
+    },
+    {
+     "t": "drips",
+     "n": 20,
+     "spd": 160,
+     "col": "#c9e6a3",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": 90
+    },
+    {
+     "t": "caustics",
+     "n": 1,
+     "spd": 0,
+     "col": "#c9e6a3",
+     "a": 0.12,
+     "render": "css"
+    },
+    {
+     "t": "ripples",
+     "n": 8,
+     "spd": 0,
+     "col": "#c9e6a3",
+     "a": 0.3,
+     "render": "css"
+    }
+   ],
+   "phase": 1,
+   "priority": 4,
+   "rim": "#7fbf7a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a1-cloister-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a1-cloister-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a1-cloister-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a1-cloister-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a1-cloister-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a1-cloister-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #c9e6a340, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0a1716cc 69%, #0a1716 100%), linear-gradient(180deg, #7fbf7a 0%, #2f6b4f 33%, #0f2e2a 66%)",
+   "particles_max": 110
+  },
+  "a1_bellcourt": {
+   "id": "a1_bellcourt",
+   "name": "Bellwater Court",
+   "act": 1,
+   "kind": "battle",
+   "band": "Approach",
+   "floors": [
+    11,
+    14
+   ],
+   "used": "Act 1 fights & elites, floors 11–14",
+   "mood": "Ominous, overcast, a distant toll",
+   "features": "Open court at the top of the stair; rain on pooled water; the great bell frame high in the background; rust-streaked statues of drowned knights; storm clouds gathering",
+   "palette": [
+    "#3a4650",
+    "#6b7f86",
+    "#a9b8b5",
+    "#c78a4a",
+    "#141b21"
+   ],
+   "layers": {
+    "sky": "Low storm clouds, slow scroll (3 px/s)",
+    "far": "Bell frame and tower top, silhouetted",
+    "mid": "Drowned-knight statues, rust streaks",
+    "ground": "Flagstones with puddles",
+    "fg": "Broken balustrade (left), rusted chain (right)"
+   },
+   "tint": {
+    "col": "#6b7f86",
+    "a": 0.1,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#0a0f13"
+   },
+   "effects": [
+    {
+     "t": "drizzle",
+     "n": 120,
+     "spd": 420,
+     "col": "#a9b8b5",
+     "a": 0.35,
+     "render": "canvas",
+     "size": 1,
+     "dir": 100
+    },
+    {
+     "t": "fog",
+     "n": 2,
+     "spd": 6,
+     "col": "#a9b8b5",
+     "a": 0.18,
+     "render": "css"
+    },
+    {
+     "t": "ripples",
+     "n": 12,
+     "spd": 0,
+     "col": "#a9b8b5",
+     "a": 0.35,
+     "render": "css"
+    }
+   ],
+   "phase": 1,
+   "priority": 5,
+   "rim": "#c78a4a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a1-bellcourt-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a1-bellcourt-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a1-bellcourt-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a1-bellcourt-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a1-bellcourt-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a1-bellcourt-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #a9b8b540, transparent 70%), linear-gradient(180deg, transparent 0 65%, #141b21cc 69%, #141b21 100%), linear-gradient(180deg, #c78a4a 0%, #6b7f86 33%, #3a4650 66%)",
+   "particles_max": 150
+  },
+  "a1_lair_bell": {
+   "id": "a1_lair_bell",
+   "name": "Bell Gate Belfry",
+   "act": 1,
+   "kind": "lair",
+   "band": "Boss Lair",
+   "floors": [
+    15,
+    15
+   ],
+   "used": "Act 1 boss: Leviathan Bell (floor 15)",
+   "mood": "Vast, resonant, dread",
+   "features": "Cracked belfry open to the sea on one side; giant frayed bell rope; seawater sloshing across the floor; resonance cracks in the walls; the bell itself is the enemy sprite (keep centre-right clear)",
+   "palette": [
+    "#10171d",
+    "#2b3a45",
+    "#6aa8b0",
+    "#d9b46a",
+    "#e7eef0"
+   ],
+   "layers": {
+    "sky": "Storm sea through a broken wall",
+    "far": "Belfry beams and cracked masonry",
+    "mid": "Bell rope, bronze fittings",
+    "ground": "Wet belfry floor, sloshing water",
+    "fg": "Hanging bronze chain (left only)"
+   },
+   "tint": {
+    "col": "#d9b46a",
+    "a": 0.08,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.55,
+    "col": "#05080b"
+   },
+   "effects": [
+    {
+     "t": "rings",
+     "n": 2,
+     "spd": 0,
+     "col": "#6aa8b0",
+     "a": 0.2,
+     "render": "css",
+     "every_s": 3,
+     "on": "enemyAttack"
+    },
+    {
+     "t": "dust",
+     "n": 40,
+     "spd": 30,
+     "col": "#d9b46a",
+     "a": 0.4,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": 90
+    },
+    {
+     "t": "fog",
+     "n": 2,
+     "spd": 5,
+     "col": "#6aa8b0",
+     "a": 0.15,
+     "render": "css"
+    }
+   ],
+   "phase": 1,
+   "priority": 6,
+   "rim": "#d9b46a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a1-lair-bell-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a1-lair-bell-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a1-lair-bell-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a1-lair-bell-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a1-lair-bell-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a1-lair-bell-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e7eef040, transparent 70%), linear-gradient(180deg, transparent 0 65%, #10171dcc 69%, #10171d 100%), linear-gradient(180deg, #d9b46a 0%, #6aa8b0 33%, #2b3a45 66%)",
+   "particles_max": 40
+  },
+  "a1_lair_kelp": {
+   "id": "a1_lair_kelp",
+   "name": "Matriarch’s Cistern",
+   "act": 1,
+   "kind": "lair",
+   "band": "Boss Lair",
+   "floors": [
+    15,
+    15
+   ],
+   "used": "Act 1 boss: Kelp Matriarch (floor 15)",
+   "mood": "Alive, enveloping, bioluminescent",
+   "features": "A hollow of giant kelp at the stair’s summit pool; fronds as tall as towers; glowing seed-pods; a green moon seen through the canopy",
+   "palette": [
+    "#08221c",
+    "#1d5a3f",
+    "#3f8f5b",
+    "#9fd38a",
+    "#e6d27a"
+   ],
+   "layers": {
+    "sky": "Green moon through a kelp canopy",
+    "far": "Giant kelp trunks",
+    "mid": "Fronds with glowing seed-pods (slow sway)",
+    "ground": "Root-mat and pool edge",
+    "fg": "Kelp blades over both edges"
+   },
+   "tint": {
+    "col": "#1d5a3f",
+    "a": 0.12,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#03100c"
+   },
+   "effects": [
+    {
+     "t": "bubbles",
+     "n": 50,
+     "spd": 20,
+     "col": "#9fd38a",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 3,
+     "dir": -90
+    },
+    {
+     "t": "spores",
+     "n": 40,
+     "spd": 8,
+     "col": "#e6d27a",
+     "a": 0.6,
+     "render": "canvas",
+     "size": 2
+    },
+    {
+     "t": "shafts",
+     "n": 3,
+     "spd": 0,
+     "col": "#9fd38a",
+     "a": 0.15,
+     "render": "css",
+     "sway_deg": 4,
+     "period_s": 11
+    }
+   ],
+   "phase": 1,
+   "priority": 12,
+   "rim": "#e6d27a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a1-lair-kelp-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a1-lair-kelp-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a1-lair-kelp-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a1-lair-kelp-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a1-lair-kelp-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a1-lair-kelp-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e6d27a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #08221ccc 69%, #08221c 100%), linear-gradient(180deg, #9fd38a 0%, #3f8f5b 33%, #1d5a3f 66%)",
+   "particles_max": 90
+  },
+  "a2_harbour": {
+   "id": "a2_harbour",
+   "name": "Outer Harbour",
+   "act": 2,
+   "kind": "battle",
+   "band": "Entrance",
+   "floors": [
+    1,
+    5
+   ],
+   "used": "Act 2 fights & elites, floors 1–5",
+   "mood": "Grim arrival at dusk; rain on iron",
+   "features": "Broken quays; half-sunk wrecks still moored; harpoon-gun emplacements on the sea wall; a harbour chain across the mouth; the Bastion’s towers behind",
+   "palette": [
+    "#2b3540",
+    "#4e5d68",
+    "#8a5a3c",
+    "#c8b89a",
+    "#11161b"
+   ],
+   "layers": {
+    "sky": "Dusk rain clouds, last light on the horizon",
+    "far": "Bastion towers and harbour chain",
+    "mid": "Moored wrecks, harpoon gun on the wall",
+    "ground": "Wet quay planks and bollards",
+    "fg": "Mooring rope (left), rusted crane hook (right)"
+   },
+   "tint": {
+    "col": "#4e5d68",
+    "a": 0.12,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.45,
+    "col": "#080b0e"
+   },
+   "effects": [
+    {
+     "t": "rain",
+     "n": 160,
+     "spd": 520,
+     "col": "#c8b89a",
+     "a": 0.35,
+     "render": "canvas",
+     "size": 1,
+     "dir": 105
+    },
+    {
+     "t": "fog",
+     "n": 2,
+     "spd": 5,
+     "col": "#c8b89a",
+     "a": 0.18,
+     "render": "css"
+    },
+    {
+     "t": "birds",
+     "n": 2,
+     "spd": 22,
+     "col": "#11161b",
+     "a": 0.7,
+     "render": "canvas",
+     "size": 9
+    },
+    {
+     "t": "wavecrash",
+     "n": 1,
+     "spd": 0,
+     "col": "#c8b89a",
+     "a": 0.5,
+     "render": "css",
+     "every_s": 7
+    }
+   ],
+   "phase": 3,
+   "priority": 13,
+   "rim": "#c8b89a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a2-harbour-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a2-harbour-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a2-harbour-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a2-harbour-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a2-harbour-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a2-harbour-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #c8b89a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #11161bcc 69%, #11161b 100%), linear-gradient(180deg, #8a5a3c 0%, #4e5d68 33%, #2b3540 66%)",
+   "particles_max": 192
+  },
+  "a2_halls": {
+   "id": "a2_halls",
+   "name": "Flooded Barracks",
+   "act": 2,
+   "kind": "battle",
+   "band": "Deeper",
+   "floors": [
+    6,
+    10
+   ],
+   "used": "Act 2 fights & elites, floors 6–10",
+   "mood": "Close, dripping, lantern-lit",
+   "features": "Vaulted barracks interior; ankle-deep bilge water; swinging lanterns; armour racks; chains; rat eyes in the dark; a sickly murk haze (ties to Brine Hexer)",
+   "palette": [
+    "#1a1714",
+    "#3d3027",
+    "#7a5132",
+    "#e0a85a",
+    "#5a6b6a"
+   ],
+   "layers": {
+    "sky": "Vault ceiling with hanging lanterns (no sky)",
+    "far": "Dark archways receding",
+    "mid": "Armour racks, bunks, chains",
+    "ground": "Bilge water over flagstones",
+    "fg": "Lantern on a hook (right), barrel stack (left)"
+   },
+   "tint": {
+    "col": "#e0a85a",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.6,
+    "col": "#060504"
+   },
+   "effects": [
+    {
+     "t": "flicker",
+     "n": 3,
+     "spd": 0,
+     "col": "#e0a85a",
+     "a": 0.25,
+     "render": "css",
+     "hz": 0.7
+    },
+    {
+     "t": "drips",
+     "n": 30,
+     "spd": 160,
+     "col": "#5a6b6a",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": 90
+    },
+    {
+     "t": "dust",
+     "n": 40,
+     "spd": 6,
+     "col": "#e0a85a",
+     "a": 0.35,
+     "render": "canvas",
+     "size": 1.2
+    },
+    {
+     "t": "fog",
+     "n": 1,
+     "spd": 3,
+     "col": "#4c5b3e",
+     "a": 0.25,
+     "render": "css"
+    }
+   ],
+   "phase": 3,
+   "priority": 16,
+   "rim": "#e0a85a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a2-halls-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a2-halls-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a2-halls-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a2-halls-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a2-halls-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a2-halls-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e0a85a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1a1714cc 69%, #1a1714 100%), linear-gradient(180deg, #5a6b6a 0%, #7a5132 33%, #3d3027 66%)",
+   "particles_max": 100
+  },
+  "a2_ramparts": {
+   "id": "a2_ramparts",
+   "name": "Gale-Lashed Ramparts",
+   "act": 2,
+   "kind": "battle",
+   "band": "Approach",
+   "floors": [
+    11,
+    14
+   ],
+   "used": "Act 2 fights & elites, floors 11–14",
+   "mood": "Violent, exposed, night storm",
+   "features": "High crenellated walls; waves breaking over the battlements; cannons; torn red banners; distant lightning over the sea",
+   "palette": [
+    "#1d2630",
+    "#3c4b59",
+    "#9aa8b3",
+    "#d9e1e4",
+    "#7a2e2a"
+   ],
+   "layers": {
+    "sky": "Night storm clouds, fast scroll (6 px/s)",
+    "far": "Sea and breaking waves below the wall",
+    "mid": "Crenellations, cannons, torn banners",
+    "ground": "Wall-walk stones, pooled water",
+    "fg": "Banner pole (left), crenel (right)"
+   },
+   "tint": {
+    "col": "#3c4b59",
+    "a": 0.14,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.55,
+    "col": "#06090c"
+   },
+   "effects": [
+    {
+     "t": "rain",
+     "n": 200,
+     "spd": 640,
+     "col": "#d9e1e4",
+     "a": 0.4,
+     "render": "canvas",
+     "size": 1,
+     "dir": 115
+    },
+    {
+     "t": "wavecrash",
+     "n": 1,
+     "spd": 0,
+     "col": "#d9e1e4",
+     "a": 0.6,
+     "render": "css",
+     "every_s": 5,
+     "spray": 40
+    },
+    {
+     "t": "wind",
+     "n": 20,
+     "spd": 500,
+     "col": "#9aa8b3",
+     "a": 0.25,
+     "render": "canvas",
+     "size": 40,
+     "dir": 0
+    },
+    {
+     "t": "lightning",
+     "n": 1,
+     "spd": 0,
+     "col": "#d9e1e4",
+     "a": 0.2,
+     "render": "css",
+     "every_s": [
+      9,
+      14
+     ],
+     "distant": true
+    }
+   ],
+   "phase": 3,
+   "priority": 17,
+   "rim": "#9aa8b3",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a2-ramparts-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a2-ramparts-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a2-ramparts-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a2-ramparts-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a2-ramparts-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a2-ramparts-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #d9e1e440, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1d2630cc 69%, #1d2630 100%), linear-gradient(180deg, #9aa8b3 0%, #3c4b59 33%, #7a2e2a 66%)",
+   "particles_max": 290
+  },
+  "a2_lair_colossus": {
+   "id": "a2_lair_colossus",
+   "name": "The Sluice Gate",
+   "act": 2,
+   "kind": "lair",
+   "band": "Boss Lair",
+   "floors": [
+    15,
+    15
+   ],
+   "used": "Act 2 boss: Tidewarden Colossus",
+   "mood": "Mechanical, crushing, immense",
+   "features": "A colossal floodgate of riveted iron; gears and counterweights; water jetting through cracks; the Warden’s alcove (keep centre-right clear)",
+   "palette": [
+    "#20272b",
+    "#4a5a5f",
+    "#b07a3e",
+    "#e8d9b8",
+    "#2f8f8a"
+   ],
+   "layers": {
+    "sky": "Top of the gate disappearing into spray",
+    "far": "Gate plates and gears",
+    "mid": "Counterweights and chains (slow turn)",
+    "ground": "Grated walkway, puddles",
+    "fg": "Gear tooth (left)"
+   },
+   "tint": {
+    "col": "#2f8f8a",
+    "a": 0.08,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.55,
+    "col": "#060809"
+   },
+   "effects": [
+    {
+     "t": "spray",
+     "n": 80,
+     "spd": 140,
+     "col": "#e8d9b8",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 2,
+     "dir": 0,
+     "jets": 3
+    },
+    {
+     "t": "fog",
+     "n": 2,
+     "spd": 4,
+     "col": "#e8d9b8",
+     "a": 0.18,
+     "render": "css"
+    },
+    {
+     "t": "drips",
+     "n": 20,
+     "spd": 160,
+     "col": "#2f8f8a",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": 90
+    }
+   ],
+   "phase": 3,
+   "priority": 18,
+   "rim": "#b07a3e",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a2-lair-colossus-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a2-lair-colossus-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a2-lair-colossus-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a2-lair-colossus-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a2-lair-colossus-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a2-lair-colossus-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8d9b840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #20272bcc 69%, #20272b 100%), linear-gradient(180deg, #b07a3e 0%, #2f8f8a 33%, #4a5a5f 66%)",
+   "particles_max": 100
+  },
+  "a2_lair_queen": {
+   "id": "a2_lair_queen",
+   "name": "Wreck Queen’s Boneyard",
+   "act": 2,
+   "kind": "lair",
+   "band": "Boss Lair",
+   "floors": [
+    15,
+    15
+   ],
+   "used": "Act 2 boss: Wreck Queen",
+   "mood": "Ghostly, regal, rotting",
+   "features": "A basin choked with ghost galleons; masts lashed into a throne; green phosphor fog; lanterns in empty portholes; space at both sides for Ghost Cannons",
+   "palette": [
+    "#0b1412",
+    "#1f3a33",
+    "#4fd1a5",
+    "#a0e8c8",
+    "#3b2a22"
+   ],
+   "layers": {
+    "sky": "Black sky, green phosphor glow on clouds",
+    "far": "Ghost galleon hulls",
+    "mid": "Mast throne, rigging",
+    "ground": "Deck planks over black water",
+    "fg": "Broken rail and lantern (right)"
+   },
+   "tint": {
+    "col": "#4fd1a5",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.6,
+    "col": "#030806"
+   },
+   "effects": [
+    {
+     "t": "phosphor",
+     "n": 80,
+     "spd": 8,
+     "col": "#4fd1a5",
+     "a": 0.6,
+     "render": "canvas",
+     "size": 2
+    },
+    {
+     "t": "fog",
+     "n": 3,
+     "spd": 4,
+     "col": "#4fd1a5",
+     "a": 0.28,
+     "render": "css"
+    },
+    {
+     "t": "flicker",
+     "n": 2,
+     "spd": 0,
+     "col": "#a0e8c8",
+     "a": 0.2,
+     "render": "css",
+     "hz": 0.4
+    }
+   ],
+   "phase": 3,
+   "priority": 19,
+   "rim": "#4fd1a5",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a2-lair-queen-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a2-lair-queen-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a2-lair-queen-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a2-lair-queen-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a2-lair-queen-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a2-lair-queen-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #a0e8c840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0b1412cc 69%, #0b1412 100%), linear-gradient(180deg, #4fd1a5 0%, #1f3a33 33%, #3b2a22 66%)",
+   "particles_max": 80
+  },
+  "a3_cliffs": {
+   "id": "a3_cliffs",
+   "name": "Cloudbreak Cliffs",
+   "act": 3,
+   "kind": "battle",
+   "band": "Entrance",
+   "floors": [
+    1,
+    5
+   ],
+   "used": "Act 3 fights & elites, floors 1–5",
+   "mood": "Exhilarating, windswept, high",
+   "features": "Wind-torn cliffs above a sea of cloud; rope bridges; storm petrels; ribbons of rain in the distance; grey-violet light",
+   "palette": [
+    "#2a2440",
+    "#5b4f86",
+    "#a99fd0",
+    "#e8e4f5",
+    "#1a1626"
+   ],
+   "layers": {
+    "sky": "Violet sky, cloud sea scrolling (8 px/s)",
+    "far": "Distant summit spires",
+    "mid": "Cliff face, rope bridge",
+    "ground": "Rock ledge with wind-flattened grass",
+    "fg": "Rope post (left), crag (right)"
+   },
+   "tint": {
+    "col": "#a99fd0",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.4,
+    "col": "#0c0a14"
+   },
+   "effects": [
+    {
+     "t": "wind",
+     "n": 40,
+     "spd": 600,
+     "col": "#e8e4f5",
+     "a": 0.25,
+     "render": "canvas",
+     "size": 50,
+     "dir": 0
+    },
+    {
+     "t": "birds",
+     "n": 4,
+     "spd": 30,
+     "col": "#1a1626",
+     "a": 0.8,
+     "render": "canvas",
+     "size": 8
+    },
+    {
+     "t": "fog",
+     "n": 2,
+     "spd": 10,
+     "col": "#e8e4f5",
+     "a": 0.2,
+     "render": "css"
+    }
+   ],
+   "phase": 3,
+   "priority": 20,
+   "rim": "#e8e4f5",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a3-cliffs-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a3-cliffs-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a3-cliffs-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a3-cliffs-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a3-cliffs-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a3-cliffs-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8e4f540, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1a1626cc 69%, #1a1626 100%), linear-gradient(180deg, #a99fd0 0%, #5b4f86 33%, #2a2440 66%)",
+   "particles_max": 74
+  },
+  "a3_spires": {
+   "id": "a3_spires",
+   "name": "Thunder Spires",
+   "act": 3,
+   "kind": "battle",
+   "band": "Deeper",
+   "floors": [
+    6,
+    10
+   ],
+   "used": "Act 3 fights & elites, floors 6–10",
+   "mood": "Electric, eerie, charged",
+   "features": "Needle spires; sky-jellies drifting between them; static crawling on wet rock; lightning in the clouds below",
+   "palette": [
+    "#141128",
+    "#3a2f6b",
+    "#7b6cd9",
+    "#c6f0ff",
+    "#f2e9a0"
+   ],
+   "layers": {
+    "sky": "Dark violet with internal cloud flashes",
+    "far": "Needle spires",
+    "mid": "Spire base with glowing static veins",
+    "ground": "Slick rock shelf",
+    "fg": "Lightning-scarred spire edge (left)"
+   },
+   "tint": {
+    "col": "#7b6cd9",
+    "a": 0.12,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#06050f"
+   },
+   "effects": [
+    {
+     "t": "lightning",
+     "n": 1,
+     "spd": 0,
+     "col": "#c6f0ff",
+     "a": 0.25,
+     "render": "css",
+     "every_s": [
+      6,
+      10
+     ]
+    },
+    {
+     "t": "sparks",
+     "n": 50,
+     "spd": 60,
+     "col": "#c6f0ff",
+     "a": 0.7,
+     "render": "canvas",
+     "size": 1.5
+    },
+    {
+     "t": "motes",
+     "n": 30,
+     "spd": 6,
+     "col": "#f2e9a0",
+     "a": 0.4,
+     "render": "canvas",
+     "size": 1.5
+    }
+   ],
+   "phase": 3,
+   "priority": 22,
+   "rim": "#c6f0ff",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a3-spires-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a3-spires-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a3-spires-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a3-spires-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a3-spires-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a3-spires-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #c6f0ff40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #141128cc 69%, #141128 100%), linear-gradient(180deg, #f2e9a0 0%, #7b6cd9 33%, #3a2f6b 66%)",
+   "particles_max": 110
+  },
+  "a3_terraces": {
+   "id": "a3_terraces",
+   "name": "Crown Terraces",
+   "act": 3,
+   "kind": "battle",
+   "band": "Approach",
+   "floors": [
+    11,
+    14
+   ],
+   "used": "Act 3 fights & elites, floors 11–14",
+   "mood": "Majestic, punishing, cold",
+   "features": "White stone terraces; toppled storm-sentinel statues; hail; the eye of the gale open overhead (ties to Eye of the Gale elite)",
+   "palette": [
+    "#1b1e2c",
+    "#4b5675",
+    "#b9c4dc",
+    "#ffffff",
+    "#8a7bd1"
+   ],
+   "layers": {
+    "sky": "Storm eye overhead, rotating very slowly",
+    "far": "Upper terraces and the summit",
+    "mid": "Toppled statues, broken columns",
+    "ground": "Hail-strewn white flagstones",
+    "fg": "Statue hand (right)"
+   },
+   "tint": {
+    "col": "#b9c4dc",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#080a10"
+   },
+   "effects": [
+    {
+     "t": "hail",
+     "n": 120,
+     "spd": 500,
+     "col": "#ffffff",
+     "a": 0.6,
+     "render": "canvas",
+     "size": 2,
+     "dir": 100
+    },
+    {
+     "t": "wind",
+     "n": 20,
+     "spd": 550,
+     "col": "#b9c4dc",
+     "a": 0.2,
+     "render": "canvas",
+     "size": 40,
+     "dir": 0
+    },
+    {
+     "t": "lightning",
+     "n": 1,
+     "spd": 0,
+     "col": "#ffffff",
+     "a": 0.3,
+     "render": "css",
+     "every_s": [
+      8,
+      14
+     ]
+    }
+   ],
+   "phase": 3,
+   "priority": 23,
+   "rim": "#b9c4dc",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a3-terraces-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a3-terraces-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a3-terraces-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a3-terraces-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a3-terraces-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a3-terraces-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #ffffff40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1b1e2ccc 69%, #1b1e2c 100%), linear-gradient(180deg, #b9c4dc 0%, #8a7bd1 33%, #4b5675 66%)",
+   "particles_max": 170
+  },
+  "a3_lair_engine": {
+   "id": "a3_lair_engine",
+   "name": "Heart of the Maelstrom Engine",
+   "act": 3,
+   "kind": "lair",
+   "band": "Boss Lair",
+   "floors": [
+    15,
+    15
+   ],
+   "used": "Act 3 boss: Maelstrom Engine",
+   "mood": "Titanic, whirling, ancient",
+   "features": "A ring-machine of brass in the storm’s eye; a waterspout column through its core; rotating rings (separate layer)",
+   "palette": [
+    "#0f1020",
+    "#2d2c55",
+    "#c08b3e",
+    "#6fd3e8",
+    "#e8e2ff"
+   ],
+   "layers": {
+    "sky": "Storm wall circling",
+    "far": "Waterspout column",
+    "mid": "Brass rings (CSS rotate, 40 s/turn)",
+    "ground": "Riveted platform",
+    "fg": "Ring segment (top-left)"
+   },
+   "tint": {
+    "col": "#6fd3e8",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.55,
+    "col": "#05050c"
+   },
+   "effects": [
+    {
+     "t": "vortex",
+     "n": 120,
+     "spd": 40,
+     "col": "#6fd3e8",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 1.5
+    },
+    {
+     "t": "lightning",
+     "n": 1,
+     "spd": 0,
+     "col": "#e8e2ff",
+     "a": 0.3,
+     "render": "css",
+     "every_s": [
+      7,
+      11
+     ]
+    }
+   ],
+   "phase": 3,
+   "priority": 24,
+   "rim": "#c08b3e",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a3-lair-engine-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a3-lair-engine-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a3-lair-engine-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a3-lair-engine-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a3-lair-engine-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a3-lair-engine-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8e2ff40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0f1020cc 69%, #0f1020 100%), linear-gradient(180deg, #6fd3e8 0%, #c08b3e 33%, #2d2c55 66%)",
+   "particles_max": 120
+  },
+  "a3_lair_thalassa": {
+   "id": "a3_lair_thalassa",
+   "name": "The Upturned Sea",
+   "act": 3,
+   "kind": "lair",
+   "band": "Boss Lair",
+   "floors": [
+    15,
+    15
+   ],
+   "used": "Act 3 boss: Thalassa the Undrowned",
+   "mood": "Uncanny, regal, inverted",
+   "features": "A sea hanging in the sky above the summit; waterfalls falling upward; a coral-and-storm throne; light pouring down through the hanging water",
+   "palette": [
+    "#071824",
+    "#135a6e",
+    "#49b6c4",
+    "#c0f2ee",
+    "#7b6cd9"
+   ],
+   "layers": {
+    "sky": "The hanging sea’s underside with caustics",
+    "far": "Upward waterfalls",
+    "mid": "Coral throne",
+    "ground": "Wet summit stone",
+    "fg": "Coral spire (right)"
+   },
+   "tint": {
+    "col": "#49b6c4",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#030c12"
+   },
+   "effects": [
+    {
+     "t": "uprain",
+     "n": 140,
+     "spd": 300,
+     "col": "#c0f2ee",
+     "a": 0.4,
+     "render": "canvas",
+     "size": 1,
+     "dir": -90
+    },
+    {
+     "t": "bubbles",
+     "n": 40,
+     "spd": 20,
+     "col": "#c0f2ee",
+     "a": 0.4,
+     "render": "canvas",
+     "size": 3,
+     "dir": -90
+    },
+    {
+     "t": "shafts",
+     "n": 3,
+     "spd": 0,
+     "col": "#c0f2ee",
+     "a": 0.18,
+     "render": "css",
+     "sway_deg": 2,
+     "period_s": 12
+    },
+    {
+     "t": "caustics",
+     "n": 1,
+     "spd": 0,
+     "col": "#49b6c4",
+     "a": 0.12,
+     "render": "css"
+    }
+   ],
+   "phase": 3,
+   "priority": 25,
+   "rim": "#c0f2ee",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/a3-lair-thalassa-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/a3-lair-thalassa-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/a3-lair-thalassa-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/a3-lair-thalassa-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/a3-lair-thalassa-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/a3-lair-thalassa-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #c0f2ee40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #071824cc 69%, #071824 100%), linear-gradient(180deg, #49b6c4 0%, #7b6cd9 33%, #135a6e 66%)",
+   "particles_max": 180
+  },
+  "f_stair": {
+   "id": "f_stair",
+   "name": "Lighthouse Stair",
+   "act": 4,
+   "kind": "battle",
+   "band": "Entrance",
+   "floors": [
+    1,
+    3
+   ],
+   "used": "Final act: Camp, Bazaar backdrop and Breakwater Wardens elite (nodes 1–3)",
+   "mood": "Silent, sacred, unnerving stillness",
+   "features": "Spiral stair inside the pale lighthouse; tall windows onto a starless void; the lens glowing far above; no weather at all",
+   "palette": [
+    "#08090d",
+    "#1c2030",
+    "#e8e6dc",
+    "#f2d17a",
+    "#3a4a66"
+   ],
+   "layers": {
+    "sky": "Black void through windows",
+    "far": "Spiral stair winding upward",
+    "mid": "Pale stone wall and window frames",
+    "ground": "Landing flagstones",
+    "fg": "Stair rail (left)"
+   },
+   "tint": {
+    "col": "#f2d17a",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.6,
+    "col": "#020203"
+   },
+   "effects": [
+    {
+     "t": "dust",
+     "n": 40,
+     "spd": 4,
+     "col": "#e8e6dc",
+     "a": 0.35,
+     "render": "canvas",
+     "size": 1.2
+    },
+    {
+     "t": "sweep",
+     "n": 1,
+     "spd": 0,
+     "col": "#f2d17a",
+     "a": 0.18,
+     "render": "css",
+     "every_s": 7
+    }
+   ],
+   "phase": 4,
+   "priority": 37,
+   "rim": "#e8e6dc",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/f-stair-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/f-stair-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/f-stair-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/f-stair-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/f-stair-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/f-stair-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8e6dc40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #08090dcc 69%, #08090d 100%), linear-gradient(180deg, #f2d17a 0%, #3a4a66 33%, #1c2030 66%)",
+   "particles_max": 70
+  },
+  "f_lair_sun": {
+   "id": "f_lair_sun",
+   "name": "The Drowned Sun",
+   "act": 4,
+   "kind": "lair",
+   "band": "Boss Lair",
+   "floors": [
+    4,
+    4
+   ],
+   "used": "Final boss: The Drowned Sun (node 4)",
+   "mood": "Apocalyptic, awe, black-gold dawn",
+   "features": "The lantern gallery atop the lighthouse; a glass-black sea to the horizon; a black sun beneath the water with a gold corona refracting upward; reflections on the gallery glass",
+   "palette": [
+    "#030305",
+    "#1a1405",
+    "#b8862b",
+    "#ffe9a8",
+    "#0d2230"
+   ],
+   "layers": {
+    "sky": "Corona light from below the horizon",
+    "far": "Glass-black sea, refracted rays",
+    "mid": "Gallery railing and lens frame",
+    "ground": "Iron gallery floor",
+    "fg": "Broken lens shard (right)"
+   },
+   "tint": {
+    "col": "#b8862b",
+    "a": 0.12,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.65,
+    "col": "#000000"
+   },
+   "effects": [
+    {
+     "t": "corona",
+     "n": 6,
+     "spd": 0,
+     "col": "#ffe9a8",
+     "a": 0.2,
+     "render": "css",
+     "rotate_s": 90
+    },
+    {
+     "t": "embers",
+     "n": 80,
+     "spd": 18,
+     "col": "#ffe9a8",
+     "a": 0.6,
+     "render": "canvas",
+     "size": 1.8,
+     "dir": -90
+    }
+   ],
+   "phase": 4,
+   "priority": 38,
+   "rim": "#ffe9a8",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/f-lair-sun-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/f-lair-sun-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/f-lair-sun-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/f-lair-sun-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/f-lair-sun-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/f-lair-sun-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #ffe9a840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #030305cc 69%, #030305 100%), linear-gradient(180deg, #b8862b 0%, #0d2230 33%, #1a1405 66%)",
+   "particles_max": 80
+  },
+  "map_a1": {
+   "id": "map_a1",
+   "name": "Tidewater Chart",
+   "act": 1,
+   "kind": "map",
+   "band": null,
+   "floors": null,
+   "used": "Map screen, Act 1",
+   "mood": "Sun-faded, hopeful",
+   "features": "Sea-chart parchment with teal watercolour shallows; compass rose bottom-left; tower sketch at the top. Paths: sepia ink dashes (visited: oxblood solid). Nodes: round wax-stamp medallions, sand body with teal ink icons. Boss node: bell sigil on a red wax seal",
+   "palette": [
+    "#e8d6ae",
+    "#c9a46a",
+    "#3f7f80",
+    "#5a3a1e",
+    "#7c1f2c"
+   ],
+   "layers": {
+    "sky": "Pre-blurred a1 band backdrop (-blur export, no new painting)",
+    "far": "—",
+    "mid": "Parchment sheet strip 2100×1440 @2x, tileable vertically",
+    "ground": "—",
+    "fg": "Corner ornaments, compass rose"
+   },
+   "tint": {
+    "col": "#3f7f80",
+    "a": 0.05,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.3,
+    "col": "#5a3a1e"
+   },
+   "effects": [],
+   "phase": 1,
+   "priority": 3,
+   "rim": "#7c1f2c",
+   "subtitle": null,
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8d6ae40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #7c1f2ccc 69%, #7c1f2c 100%), linear-gradient(180deg, #c9a46a 0%, #3f7f80 33%, #5a3a1e 66%)",
+   "particles_max": 0
+  },
+  "map_a2": {
+   "id": "map_a2",
+   "name": "Admiralty Plate",
+   "act": 2,
+   "kind": "map",
+   "band": null,
+   "floors": null,
+   "used": "Map screen, Act 2",
+   "mood": "Military, cold, stained",
+   "features": "Slate-blue blueprint plate with chalk linework; riveted border; rust blooms. Paths: chain-link strokes (visited: brass). Nodes: brass tokens with stamped icons and a rust ring. Boss node: crowned-gate seal",
+   "palette": [
+    "#26313b",
+    "#e3ddcf",
+    "#9c7a3c",
+    "#8a5a3c",
+    "#121a20"
+   ],
+   "layers": {
+    "sky": "Pre-blurred a2 band backdrop",
+    "far": "—",
+    "mid": "Iron plate sheet (tileable vertically)",
+    "ground": "—",
+    "fg": "Rivets and corner brackets"
+   },
+   "tint": {
+    "col": "#26313b",
+    "a": 0.05,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.35,
+    "col": "#121a20"
+   },
+   "effects": [],
+   "phase": 3,
+   "priority": 14,
+   "rim": "#121a20",
+   "subtitle": null,
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e3ddcf40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #121a20cc 69%, #121a20 100%), linear-gradient(180deg, #9c7a3c 0%, #8a5a3c 33%, #26313b 66%)",
+   "particles_max": 0
+  },
+  "map_a3": {
+   "id": "map_a3",
+   "name": "Gale Vellum",
+   "act": 3,
+   "kind": "map",
+   "band": null,
+   "floors": null,
+   "used": "Map screen, Act 3",
+   "mood": "Windswept, arcane",
+   "features": "Violet-grey vellum with swirling isobar contours and silver leaf. Paths: silver dashes with small zigzags (visited: white glow). Nodes: engraved pewter medallions. Boss node: lightning sigil",
+   "palette": [
+    "#3b3552",
+    "#c9c2e0",
+    "#9aa3b5",
+    "#ffffff",
+    "#7b6cd9"
+   ],
+   "layers": {
+    "sky": "Pre-blurred a3 band backdrop",
+    "far": "—",
+    "mid": "Vellum sheet (tileable vertically)",
+    "ground": "—",
+    "fg": "Silver-leaf corner flourishes"
+   },
+   "tint": {
+    "col": "#7b6cd9",
+    "a": 0.05,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.35,
+    "col": "#1a1626"
+   },
+   "effects": [
+    {
+     "t": "wind",
+     "n": 10,
+     "spd": 200,
+     "col": "#c9c2e0",
+     "a": 0.12,
+     "render": "canvas",
+     "size": 30,
+     "dir": 0
+    }
+   ],
+   "phase": 3,
+   "priority": 21,
+   "rim": "#7b6cd9",
+   "subtitle": null,
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #ffffff40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #3b3552cc 69%, #3b3552 100%), linear-gradient(180deg, #c9c2e0 0%, #9aa3b5 33%, #7b6cd9 66%)",
+   "particles_max": 10
+  },
+  "map_f": {
+   "id": "map_f",
+   "name": "Star-Glass",
+   "act": 4,
+   "kind": "map",
+   "band": null,
+   "floors": null,
+   "used": "Map screen, final act",
+   "mood": "Hushed, celestial",
+   "features": "A slab of black glass with constellation lines. Paths: thin gold constellation lines. Nodes: white stars with small icons. Boss node: an eclipsed sun",
+   "palette": [
+    "#050608",
+    "#1b2233",
+    "#f2d17a",
+    "#e8e6dc"
+   ],
+   "layers": {
+    "sky": "Pre-blurred f_stair backdrop",
+    "far": "—",
+    "mid": "Black-glass sheet",
+    "ground": "—",
+    "fg": "Gold corner filigree"
+   },
+   "tint": {
+    "col": "#f2d17a",
+    "a": 0.04,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.45,
+    "col": "#000000"
+   },
+   "effects": [
+    {
+     "t": "motes",
+     "n": 20,
+     "spd": 3,
+     "col": "#f2d17a",
+     "a": 0.4,
+     "render": "canvas",
+     "size": 1
+    }
+   ],
+   "phase": 4,
+   "priority": 39,
+   "rim": "#e8e6dc",
+   "subtitle": null,
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8e6dc40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #050608cc 69%, #050608 100%), linear-gradient(180deg, #f2d17a 0%, #1b2233 50%)",
+   "particles_max": 20
+  },
+  "ev_a1": {
+   "id": "ev_a1",
+   "name": "Tidepool Grotto",
+   "act": 1,
+   "kind": "event",
+   "band": null,
+   "floors": null,
+   "used": "Act 1 event and shrine screens",
+   "mood": "Curious, quiet",
+   "features": "Sea cave mouth with tidepools; light from the opening; space at centre for the event panel (keep a calm, low-detail centre 50%)",
+   "palette": [
+    "#1c3a40",
+    "#5fa7a3",
+    "#e8d7b0",
+    "#0d1a1e"
+   ],
+   "layers": {
+    "sky": "Cave mouth glow",
+    "far": "Cave walls",
+    "mid": "Tidepools and rocks",
+    "ground": "Sand floor",
+    "fg": "Stalactites (top edge)"
+   },
+   "tint": {
+    "col": "#1c3a40",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "caustics",
+     "n": 1,
+     "spd": 0,
+     "col": "#5fa7a3",
+     "a": 0.12,
+     "render": "css"
+    },
+    {
+     "t": "drips",
+     "n": 12,
+     "spd": 150,
+     "col": "#e8d7b0",
+     "a": 0.4,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": 90
+    }
+   ],
+   "phase": 1,
+   "priority": 10,
+   "rim": "#0d1a1e",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/ev-a1-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/ev-a1-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/ev-a1-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/ev-a1-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/ev-a1-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/ev-a1-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8d7b040, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0d1a1ecc 69%, #0d1a1e 100%), linear-gradient(180deg, #5fa7a3 0%, #1c3a40 50%)",
+   "particles_max": 12
+  },
+  "shop_a1": {
+   "id": "shop_a1",
+   "name": "Driftwood Bazaar",
+   "act": 1,
+   "kind": "shop",
+   "band": null,
+   "floors": null,
+   "used": "Act 1 merchant",
+   "mood": "Warm, cluttered, welcoming",
+   "features": "Quartermaster Wren’s stall built from a beached hull; lanterns; hanging nets and floats; crates and jars. Leave the left-centre clear for a merchant figure",
+   "palette": [
+    "#3a2614",
+    "#a8743c",
+    "#f0c27a",
+    "#2c5a63",
+    "#120c07"
+   ],
+   "layers": {
+    "sky": "Dawn sea beyond the hull",
+    "far": "Hull ribs",
+    "mid": "Shelves, nets, lanterns",
+    "ground": "Planked counter area",
+    "fg": "Hanging net (top-right)"
+   },
+   "tint": {
+    "col": "#3a2614",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "flicker",
+     "n": 2,
+     "spd": 0,
+     "col": "#f0c27a",
+     "a": 0.2,
+     "render": "css",
+     "hz": 0.5
+    },
+    {
+     "t": "motes",
+     "n": 20,
+     "spd": 4,
+     "col": "#f0c27a",
+     "a": 0.35,
+     "render": "canvas",
+     "size": 1.2
+    }
+   ],
+   "phase": 1,
+   "priority": 9,
+   "rim": "#120c07",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/shop-a1-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/shop-a1-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/shop-a1-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/shop-a1-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/shop-a1-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/shop-a1-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #f0c27a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #120c07cc 69%, #120c07 100%), linear-gradient(180deg, #a8743c 0%, #2c5a63 33%, #3a2614 66%)",
+   "particles_max": 20
+  },
+  "camp_a1": {
+   "id": "camp_a1",
+   "name": "Stairwell Camp",
+   "act": 1,
+   "kind": "camp",
+   "band": null,
+   "floors": null,
+   "used": "Act 1 camp (rest) screen",
+   "mood": "Safe, tired, warm",
+   "features": "Small fire in a stair alcove; the sea through an arch; bedroll and kettle",
+   "palette": [
+    "#2a1a10",
+    "#d9733a",
+    "#ffc46b",
+    "#2c5a63",
+    "#0b0705"
+   ],
+   "layers": {
+    "sky": "Sea at dusk through the arch",
+    "far": "Stair walls",
+    "mid": "Alcove, bedroll",
+    "ground": "Stone step with the fire",
+    "fg": "Firelit pillar edge"
+   },
+   "tint": {
+    "col": "#2a1a10",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "embers",
+     "n": 40,
+     "spd": 25,
+     "col": "#ffc46b",
+     "a": 0.7,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": -90
+    },
+    {
+     "t": "flicker",
+     "n": 1,
+     "spd": 0,
+     "col": "#d9733a",
+     "a": 0.25,
+     "render": "css",
+     "hz": 1.2
+    }
+   ],
+   "phase": 1,
+   "priority": 7,
+   "rim": "#0b0705",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/camp-a1-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/camp-a1-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/camp-a1-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/camp-a1-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/camp-a1-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/camp-a1-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #ffc46b40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0b0705cc 69%, #0b0705 100%), linear-gradient(180deg, #d9733a 0%, #2c5a63 33%, #2a1a10 66%)",
+   "particles_max": 40
+  },
+  "chest_a1": {
+   "id": "chest_a1",
+   "name": "Wrack-Line Cache",
+   "act": 1,
+   "kind": "chest",
+   "band": null,
+   "floors": null,
+   "used": "Act 1 treasure (chest) screen",
+   "mood": "Lucky, glinting",
+   "features": "Chest half-buried in sand and kelp on a landing; sunbeam on the lid; gulls watching",
+   "palette": [
+    "#e6cf9a",
+    "#6fb7b4",
+    "#5a3a1e",
+    "#f7e3a1"
+   ],
+   "layers": {
+    "sky": "Bright morning",
+    "far": "Sea stacks",
+    "mid": "Kelp-draped rocks",
+    "ground": "Sand landing with the chest spot (centre)",
+    "fg": "Kelp (left)"
+   },
+   "tint": {
+    "col": "#e6cf9a",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "motes",
+     "n": 25,
+     "spd": 4,
+     "col": "#f7e3a1",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 1.5
+    },
+    {
+     "t": "birds",
+     "n": 2,
+     "spd": 15,
+     "col": "#1a2b33",
+     "a": 0.7,
+     "render": "canvas",
+     "size": 8
+    }
+   ],
+   "phase": 1,
+   "priority": 11,
+   "rim": "#f7e3a1",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/chest-a1-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/chest-a1-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/chest-a1-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/chest-a1-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/chest-a1-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/chest-a1-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #f7e3a140, transparent 70%), linear-gradient(180deg, transparent 0 65%, #5a3a1ecc 69%, #5a3a1e 100%), linear-gradient(180deg, #e6cf9a 0%, #6fb7b4 50%)",
+   "particles_max": 27
+  },
+  "ev_a2": {
+   "id": "ev_a2",
+   "name": "Drowned Archive",
+   "act": 2,
+   "kind": "event",
+   "band": null,
+   "floors": null,
+   "used": "Act 2 event and shrine screens",
+   "mood": "Secretive, scholarly",
+   "features": "Half-flooded fortress archive; floating pages; candle stubs; iron-bound shelves",
+   "palette": [
+    "#1c1a17",
+    "#5a4a36",
+    "#e0c48a",
+    "#3e5560"
+   ],
+   "layers": {
+    "sky": "Vaulted ceiling",
+    "far": "Shelves receding",
+    "mid": "Desks and floating pages",
+    "ground": "Water over tiles",
+    "fg": "Shelf edge"
+   },
+   "tint": {
+    "col": "#1c1a17",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "flicker",
+     "n": 2,
+     "spd": 0,
+     "col": "#e0c48a",
+     "a": 0.2,
+     "render": "css",
+     "hz": 0.6
+    },
+    {
+     "t": "dust",
+     "n": 30,
+     "spd": 4,
+     "col": "#e0c48a",
+     "a": 0.3,
+     "render": "canvas",
+     "size": 1.2
+    }
+   ],
+   "phase": 3,
+   "priority": 27,
+   "rim": "#3e5560",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/ev-a2-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/ev-a2-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/ev-a2-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/ev-a2-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/ev-a2-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/ev-a2-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e0c48a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1c1a17cc 69%, #1c1a17 100%), linear-gradient(180deg, #3e5560 0%, #5a4a36 50%)",
+   "particles_max": 30
+  },
+  "shop_a2": {
+   "id": "shop_a2",
+   "name": "Harbour Chandlery",
+   "act": 2,
+   "kind": "shop",
+   "band": null,
+   "floors": null,
+   "used": "Act 2 merchant",
+   "mood": "Wary, cosy, rain outside",
+   "features": "Wren’s stall under a quay arch in an upturned lifeboat; rain curtain at the arch mouth; brass instruments and potions",
+   "palette": [
+    "#24201c",
+    "#8a5a3c",
+    "#e0a85a",
+    "#4e5d68"
+   ],
+   "layers": {
+    "sky": "Rain beyond the arch",
+    "far": "Quay arch",
+    "mid": "Upturned lifeboat stall",
+    "ground": "Wet cobbles",
+    "fg": "Dripping arch edge"
+   },
+   "tint": {
+    "col": "#24201c",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "rain",
+     "n": 80,
+     "spd": 500,
+     "col": "#c8b89a",
+     "a": 0.25,
+     "render": "canvas",
+     "size": 1,
+     "dir": 100
+    },
+    {
+     "t": "flicker",
+     "n": 1,
+     "spd": 0,
+     "col": "#e0a85a",
+     "a": 0.2,
+     "render": "css",
+     "hz": 0.5
+    }
+   ],
+   "phase": 3,
+   "priority": 26,
+   "rim": "#4e5d68",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/shop-a2-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/shop-a2-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/shop-a2-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/shop-a2-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/shop-a2-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/shop-a2-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e0a85a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #24201ccc 69%, #24201c 100%), linear-gradient(180deg, #8a5a3c 0%, #4e5d68 50%)",
+   "particles_max": 80
+  },
+  "camp_a2": {
+   "id": "camp_a2",
+   "name": "Gun-Deck Camp",
+   "act": 2,
+   "kind": "camp",
+   "band": null,
+   "floors": null,
+   "used": "Act 2 camp (rest) screen",
+   "mood": "Hard-won rest",
+   "features": "Brazier on an abandoned gun deck; rain beyond portholes; cannon used as a backrest",
+   "palette": [
+    "#1d1a18",
+    "#c4612e",
+    "#ffb35c",
+    "#3c4b59"
+   ],
+   "layers": {
+    "sky": "Portholes with rain",
+    "far": "Deck beams",
+    "mid": "Cannon, crates",
+    "ground": "Deck with the brazier",
+    "fg": "Beam (top)"
+   },
+   "tint": {
+    "col": "#1d1a18",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "embers",
+     "n": 40,
+     "spd": 25,
+     "col": "#ffb35c",
+     "a": 0.7,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": -90
+    },
+    {
+     "t": "flicker",
+     "n": 1,
+     "spd": 0,
+     "col": "#c4612e",
+     "a": 0.25,
+     "render": "css",
+     "hz": 1.2
+    }
+   ],
+   "phase": 3,
+   "priority": 15,
+   "rim": "#3c4b59",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/camp-a2-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/camp-a2-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/camp-a2-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/camp-a2-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/camp-a2-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/camp-a2-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #ffb35c40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1d1a18cc 69%, #1d1a18 100%), linear-gradient(180deg, #c4612e 0%, #3c4b59 50%)",
+   "particles_max": 40
+  },
+  "chest_a2": {
+   "id": "chest_a2",
+   "name": "Armoury Strongbox",
+   "act": 2,
+   "kind": "chest",
+   "band": null,
+   "floors": null,
+   "used": "Act 2 treasure (chest) screen",
+   "mood": "Heavy, locked, promising",
+   "features": "Iron strongbox in a flooded armoury; weapon racks; a shaft of grey light",
+   "palette": [
+    "#20262b",
+    "#5a6b6a",
+    "#b07a3e",
+    "#e8d9b8"
+   ],
+   "layers": {
+    "sky": "Slit window light",
+    "far": "Weapon racks",
+    "mid": "Shields",
+    "ground": "Water over stone, chest spot",
+    "fg": "Spear rack edge"
+   },
+   "tint": {
+    "col": "#20262b",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "shafts",
+     "n": 1,
+     "spd": 0,
+     "col": "#e8d9b8",
+     "a": 0.15,
+     "render": "css"
+    },
+    {
+     "t": "drips",
+     "n": 15,
+     "spd": 160,
+     "col": "#5a6b6a",
+     "a": 0.4,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": 90
+    }
+   ],
+   "phase": 3,
+   "priority": 29,
+   "rim": "#e8d9b8",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/chest-a2-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/chest-a2-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/chest-a2-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/chest-a2-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/chest-a2-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/chest-a2-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8d9b840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #20262bcc 69%, #20262b 100%), linear-gradient(180deg, #b07a3e 0%, #5a6b6a 50%)",
+   "particles_max": 15
+  },
+  "ev_a3": {
+   "id": "ev_a3",
+   "name": "Windshrine Hollow",
+   "act": 3,
+   "kind": "event",
+   "band": null,
+   "floors": null,
+   "used": "Act 3 event and shrine screens",
+   "mood": "Reverent, wind-howling",
+   "features": "A shrine in a rock cleft; prayer ribbons whipping; votive bells; storm light",
+   "palette": [
+    "#231f36",
+    "#5b4f86",
+    "#e8e4f5",
+    "#c6a75a"
+   ],
+   "layers": {
+    "sky": "Storm through the cleft",
+    "far": "Rock walls",
+    "mid": "Shrine, ribbons",
+    "ground": "Worn steps",
+    "fg": "Ribbon tails"
+   },
+   "tint": {
+    "col": "#231f36",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "wind",
+     "n": 25,
+     "spd": 450,
+     "col": "#e8e4f5",
+     "a": 0.2,
+     "render": "canvas",
+     "size": 40,
+     "dir": 0
+    }
+   ],
+   "phase": 3,
+   "priority": 30,
+   "rim": "#c6a75a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/ev-a3-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/ev-a3-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/ev-a3-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/ev-a3-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/ev-a3-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/ev-a3-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8e4f540, transparent 70%), linear-gradient(180deg, transparent 0 65%, #231f36cc 69%, #231f36 100%), linear-gradient(180deg, #c6a75a 0%, #5b4f86 50%)",
+   "particles_max": 25
+  },
+  "shop_a3": {
+   "id": "shop_a3",
+   "name": "Stranded Hull Bazaar",
+   "act": 3,
+   "kind": "shop",
+   "band": null,
+   "floors": null,
+   "used": "Act 3 merchant",
+   "mood": "Absurd, cheerful defiance",
+   "features": "Wren’s stall in a ship stranded impossibly on the summit, lashed with ropes against the wind; lanterns swinging",
+   "palette": [
+    "#2a2238",
+    "#8a6a3c",
+    "#f0c27a",
+    "#a99fd0"
+   ],
+   "layers": {
+    "sky": "Violet storm sky",
+    "far": "Summit rocks",
+    "mid": "Stranded hull, ropes",
+    "ground": "Rock and planks",
+    "fg": "Rope (left)"
+   },
+   "tint": {
+    "col": "#2a2238",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "wind",
+     "n": 15,
+     "spd": 450,
+     "col": "#a99fd0",
+     "a": 0.2,
+     "render": "canvas",
+     "size": 40,
+     "dir": 0
+    },
+    {
+     "t": "flicker",
+     "n": 1,
+     "spd": 0,
+     "col": "#f0c27a",
+     "a": 0.2,
+     "render": "css",
+     "hz": 0.8
+    }
+   ],
+   "phase": 3,
+   "priority": 28,
+   "rim": "#a99fd0",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/shop-a3-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/shop-a3-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/shop-a3-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/shop-a3-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/shop-a3-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/shop-a3-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #f0c27a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #2a2238cc 69%, #2a2238 100%), linear-gradient(180deg, #a99fd0 0%, #8a6a3c 50%)",
+   "particles_max": 15
+  },
+  "camp_a3": {
+   "id": "camp_a3",
+   "name": "Lee-Side Camp",
+   "act": 3,
+   "kind": "camp",
+   "band": null,
+   "floors": null,
+   "used": "Act 3 camp (rest) screen",
+   "mood": "Fragile shelter under an aurora",
+   "features": "Fire behind a stone windbreak; aurora overhead; frost on the stones",
+   "palette": [
+    "#141428",
+    "#3f8f9a",
+    "#ff9f50",
+    "#d0d8ff"
+   ],
+   "layers": {
+    "sky": "Aurora (CSS hue drift)",
+    "far": "Peaks",
+    "mid": "Windbreak wall",
+    "ground": "Frosted ground with the fire",
+    "fg": "Stone edge"
+   },
+   "tint": {
+    "col": "#141428",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "aurora",
+     "n": 1,
+     "spd": 0,
+     "col": "#3f8f9a",
+     "a": 0.3,
+     "render": "css"
+    },
+    {
+     "t": "embers",
+     "n": 40,
+     "spd": 25,
+     "col": "#ff9f50",
+     "a": 0.7,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": -90
+    }
+   ],
+   "phase": 3,
+   "priority": 31,
+   "rim": "#d0d8ff",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/camp-a3-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/camp-a3-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/camp-a3-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/camp-a3-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/camp-a3-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/camp-a3-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #d0d8ff40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #141428cc 69%, #141428 100%), linear-gradient(180deg, #ff9f50 0%, #3f8f9a 50%)",
+   "particles_max": 40
+  },
+  "chest_a3": {
+   "id": "chest_a3",
+   "name": "Gale Reliquary",
+   "act": 3,
+   "kind": "chest",
+   "band": null,
+   "floors": null,
+   "used": "Act 3 treasure (chest) screen",
+   "mood": "Sacred, frost-bound",
+   "features": "Stone reliquary rimed with frost; storm light; scattered offerings",
+   "palette": [
+    "#1b1e2c",
+    "#8a7bd1",
+    "#d0d8ff",
+    "#c6a75a"
+   ],
+   "layers": {
+    "sky": "Storm eye light",
+    "far": "Terrace",
+    "mid": "Reliquary niche",
+    "ground": "Frosted stone, chest spot",
+    "fg": "Icicles (top)"
+   },
+   "tint": {
+    "col": "#1b1e2c",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "snowash",
+     "n": 40,
+     "spd": 30,
+     "col": "#d0d8ff",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": 100
+    }
+   ],
+   "phase": 3,
+   "priority": 32,
+   "rim": "#c6a75a",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/chest-a3-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/chest-a3-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/chest-a3-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/chest-a3-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/chest-a3-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/chest-a3-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #d0d8ff40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1b1e2ccc 69%, #1b1e2c 100%), linear-gradient(180deg, #c6a75a 0%, #8a7bd1 50%)",
+   "particles_max": 40
+  },
+  "camp_f": {
+   "id": "camp_f",
+   "name": "Lamp-Room Camp",
+   "act": 4,
+   "kind": "camp",
+   "band": null,
+   "floors": null,
+   "used": "Final act camp",
+   "mood": "Last quiet before the end",
+   "features": "Fire lit in the lighthouse’s old lamp brazier; the great lens dark above",
+   "palette": [
+    "#0b0b10",
+    "#c48a3a",
+    "#ffd98a",
+    "#3a4a66"
+   ],
+   "layers": {
+    "sky": "Dark lens overhead",
+    "far": "Lamp-room walls",
+    "mid": "Brazier",
+    "ground": "Iron floor",
+    "fg": "Lens frame edge"
+   },
+   "tint": {
+    "col": "#0b0b10",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "embers",
+     "n": 40,
+     "spd": 22,
+     "col": "#ffd98a",
+     "a": 0.7,
+     "render": "canvas",
+     "size": 1.5,
+     "dir": -90
+    }
+   ],
+   "phase": 4,
+   "priority": 40,
+   "rim": "#3a4a66",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/camp-f-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/camp-f-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/camp-f-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/camp-f-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/camp-f-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/camp-f-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #ffd98a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0b0b10cc 69%, #0b0b10 100%), linear-gradient(180deg, #c48a3a 0%, #3a4a66 50%)",
+   "particles_max": 40
+  },
+  "shop_f": {
+   "id": "shop_f",
+   "name": "The Last Bazaar",
+   "act": 4,
+   "kind": "shop",
+   "band": null,
+   "floors": null,
+   "used": "Final act merchant",
+   "mood": "Melancholy, final deals",
+   "features": "Wren’s stall set up in the lighthouse storeroom; oil drums, spare lenses, one candle",
+   "palette": [
+    "#0e0e12",
+    "#6e5a3a",
+    "#f2d17a",
+    "#3a4a66"
+   ],
+   "layers": {
+    "sky": "Window onto the void",
+    "far": "Storeroom shelves",
+    "mid": "Stall, spare lenses",
+    "ground": "Stone floor",
+    "fg": "Oil drum (left)"
+   },
+   "tint": {
+    "col": "#0e0e12",
+    "a": 0.06,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#05070b"
+   },
+   "effects": [
+    {
+     "t": "flicker",
+     "n": 1,
+     "spd": 0,
+     "col": "#f2d17a",
+     "a": 0.2,
+     "render": "css",
+     "hz": 0.5
+    },
+    {
+     "t": "dust",
+     "n": 20,
+     "spd": 3,
+     "col": "#e8e6dc",
+     "a": 0.3,
+     "render": "canvas",
+     "size": 1.2
+    }
+   ],
+   "phase": 4,
+   "priority": 41,
+   "rim": "#3a4a66",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/shop-f-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/shop-f-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/shop-f-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "ground": {
+      "layer": "ground",
+      "file": "art/v2/bg/shop-f-ground@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/shop-f-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/shop-f-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 61.1,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #f2d17a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0e0e12cc 69%, #0e0e12 100%), linear-gradient(180deg, #6e5a3a 0%, #3a4a66 50%)",
+   "particles_max": 20
+  },
+  "tc_a1": {
+   "id": "tc_a1",
+   "name": "Title card: Act I",
+   "act": 1,
+   "kind": "title",
+   "band": null,
+   "floors": null,
+   "used": "Run start (after class pick)",
+   "mood": "Ominous promise",
+   "features": "Framed plate: “Act I · The Wrack Terraces”, subtitle “The foot of the Drowned Stair.” Emblem: a stair spiral over a wave",
+   "palette": [
+    "#e9efe8",
+    "#6fb7b4",
+    "#2c5a63",
+    "#0b1a20"
+   ],
+   "layers": {
+    "sky": "—",
+    "far": "—",
+    "mid": "Frame and emblem (transparent PNG, centred, 60% width)",
+    "ground": "—",
+    "fg": "—"
+   },
+   "tint": {
+    "col": "#000000",
+    "a": 0,
+    "blend": "normal"
+   },
+   "vignette": {
+    "s": 0.6,
+    "col": "#000000"
+   },
+   "effects": [],
+   "phase": 1,
+   "priority": 2,
+   "rim": "#0b1a20",
+   "subtitle": "The foot of the Drowned Stair.",
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e9efe840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0b1a20cc 69%, #0b1a20 100%), linear-gradient(180deg, #6fb7b4 0%, #2c5a63 50%)",
+   "particles_max": 0
+  },
+  "tc_a2": {
+   "id": "tc_a2",
+   "name": "Title card: Act II",
+   "act": 2,
+   "kind": "title",
+   "band": null,
+   "floors": null,
+   "used": "Act 1 → 2 transition",
+   "mood": "Grim",
+   "features": "Framed plate: “Act II · The Brine Bastion”, subtitle “Its guns still face the sea.” Emblem: a gate between two cannons",
+   "palette": [
+    "#c8b89a",
+    "#8a5a3c",
+    "#2b3540",
+    "#11161b"
+   ],
+   "layers": {
+    "sky": "—",
+    "far": "—",
+    "mid": "Frame and emblem",
+    "ground": "—",
+    "fg": "—"
+   },
+   "tint": {
+    "col": "#000000",
+    "a": 0,
+    "blend": "normal"
+   },
+   "vignette": {
+    "s": 0.6,
+    "col": "#000000"
+   },
+   "effects": [],
+   "phase": 3,
+   "priority": 33,
+   "rim": "#11161b",
+   "subtitle": "Its guns still face the sea.",
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #c8b89a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #11161bcc 69%, #11161b 100%), linear-gradient(180deg, #8a5a3c 0%, #2b3540 50%)",
+   "particles_max": 0
+  },
+  "tc_a3": {
+   "id": "tc_a3",
+   "name": "Title card: Act III",
+   "act": 3,
+   "kind": "title",
+   "band": null,
+   "floors": null,
+   "used": "Act 2 → 3 transition",
+   "mood": "Awe",
+   "features": "Framed plate: “Act III · The Galecrown”, subtitle “Above the clouds, the storm keeps court.” Emblem: a crown of lightning",
+   "palette": [
+    "#e8e4f5",
+    "#7b6cd9",
+    "#2a2440",
+    "#0c0a14"
+   ],
+   "layers": {
+    "sky": "—",
+    "far": "—",
+    "mid": "Frame and emblem",
+    "ground": "—",
+    "fg": "—"
+   },
+   "tint": {
+    "col": "#000000",
+    "a": 0,
+    "blend": "normal"
+   },
+   "vignette": {
+    "s": 0.6,
+    "col": "#000000"
+   },
+   "effects": [],
+   "phase": 3,
+   "priority": 35,
+   "rim": "#0c0a14",
+   "subtitle": "Above the clouds, the storm keeps court.",
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8e4f540, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0c0a14cc 69%, #0c0a14 100%), linear-gradient(180deg, #7b6cd9 0%, #2a2440 50%)",
+   "particles_max": 0
+  },
+  "tc_f": {
+   "id": "tc_f",
+   "name": "Title card: The Pale Lighthouse",
+   "act": 4,
+   "kind": "title",
+   "band": null,
+   "floors": null,
+   "used": "Entering the final act",
+   "mood": "Hushed dread",
+   "features": "Framed plate: “The Pale Lighthouse”, subtitle “Light it, and the Drowned Sun will rise to meet you.” Emblem: three Shards around a lit lamp",
+   "palette": [
+    "#ffe9a8",
+    "#e8e6dc",
+    "#1c2030",
+    "#030305"
+   ],
+   "layers": {
+    "sky": "—",
+    "far": "—",
+    "mid": "Frame and emblem",
+    "ground": "—",
+    "fg": "—"
+   },
+   "tint": {
+    "col": "#000000",
+    "a": 0,
+    "blend": "normal"
+   },
+   "vignette": {
+    "s": 0.6,
+    "col": "#000000"
+   },
+   "effects": [],
+   "phase": 4,
+   "priority": 42,
+   "rim": "#030305",
+   "subtitle": "Light it, and the Drowned Sun will rise to meet you.",
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #ffe9a840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #030305cc 69%, #030305 100%), linear-gradient(180deg, #e8e6dc 0%, #1c2030 50%)",
+   "particles_max": 0
+  },
+  "tr_start": {
+   "id": "tr_start",
+   "name": "Travel: Rowing to the Stair",
+   "act": 1,
+   "kind": "travel",
+   "band": null,
+   "floors": null,
+   "used": "Run start (before Act 1 map)",
+   "mood": "Quiet resolve",
+   "features": "A small rowboat crosses dark water at dawn toward the half-sunk tower; gulls; the class’s silhouette at the oars (generic hooded rower; class colour on the lantern)",
+   "palette": [
+    "#f2c99a",
+    "#2c5a63",
+    "#0b1a20",
+    "#e9efe8"
+   ],
+   "layers": {
+    "sky": "Dawn sky (pans 0.1)",
+    "far": "Tower silhouette (0.25)",
+    "mid": "Swells (0.6, loops)",
+    "ground": "—",
+    "fg": "Rowboat actor sprite (separate file, moves L→R) + near wave (1.2)"
+   },
+   "tint": {
+    "col": "#ffcf9e",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#000000"
+   },
+   "effects": [
+    {
+     "t": "birds",
+     "n": 3,
+     "spd": 20,
+     "col": "#0b1a20",
+     "a": 0.8,
+     "render": "canvas",
+     "size": 10
+    },
+    {
+     "t": "fog",
+     "n": 2,
+     "spd": 8,
+     "col": "#e9efe8",
+     "a": 0.2,
+     "render": "css"
+    }
+   ],
+   "phase": 1,
+   "priority": 2,
+   "rim": "#e9efe8",
+   "subtitle": null,
+   "duration": 5,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/tr-start-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/tr-start-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/tr-start-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/tr-start-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/tr-start-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 40.3,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e9efe840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #0b1a20cc 69%, #0b1a20 100%), linear-gradient(180deg, #f2c99a 0%, #2c5a63 50%)",
+   "particles_max": 3
+  },
+  "tr_a1a2": {
+   "id": "tr_a1a2",
+   "name": "Travel: Through the Bell Gate",
+   "act": 2,
+   "kind": "travel",
+   "band": null,
+   "floors": null,
+   "used": "Act 1 → 2 transition",
+   "mood": "Determined",
+   "features": "Lampbearer passes the silenced bell and through rusted gates; the Bastion harbour opens below in dusk rain",
+   "palette": [
+    "#c78a4a",
+    "#4e5d68",
+    "#2b3540",
+    "#c8b89a"
+   ],
+   "layers": {
+    "sky": "Dusk rain sky",
+    "far": "Bastion towers",
+    "mid": "Gate (opens: two halves slide)",
+    "ground": "—",
+    "fg": "Lampbearer actor sprite + gate pillar"
+   },
+   "tint": {
+    "col": "#4e5d68",
+    "a": 0.1,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.5,
+    "col": "#000000"
+   },
+   "effects": [
+    {
+     "t": "rain",
+     "n": 100,
+     "spd": 520,
+     "col": "#c8b89a",
+     "a": 0.3,
+     "render": "canvas",
+     "size": 1,
+     "dir": 105
+    }
+   ],
+   "phase": 3,
+   "priority": 34,
+   "rim": "#c8b89a",
+   "subtitle": null,
+   "duration": 4,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/tr-a1a2-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/tr-a1a2-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/tr-a1a2-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/tr-a1a2-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/tr-a1a2-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 40.3,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #c8b89a40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #2b3540cc 69%, #2b3540 100%), linear-gradient(180deg, #c78a4a 0%, #4e5d68 50%)",
+   "particles_max": 100
+  },
+  "tr_a2a3": {
+   "id": "tr_a2a3",
+   "name": "Travel: The Updraft",
+   "act": 3,
+   "kind": "travel",
+   "band": null,
+   "floors": null,
+   "used": "Act 2 → 3 transition",
+   "mood": "Soaring",
+   "features": "A waterspout updraft lifts the Lampbearer from the ramparts through the cloud layer into violet light",
+   "palette": [
+    "#3c4b59",
+    "#a99fd0",
+    "#e8e4f5",
+    "#2a2440"
+   ],
+   "layers": {
+    "sky": "Gradient shifts slate → violet over the duration",
+    "far": "Cloud layer (scrolls down, 1.0)",
+    "mid": "Waterspout column",
+    "ground": "—",
+    "fg": "Lampbearer actor rising + spray"
+   },
+   "tint": {
+    "col": "#a99fd0",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.45,
+    "col": "#000000"
+   },
+   "effects": [
+    {
+     "t": "wind",
+     "n": 40,
+     "spd": 700,
+     "col": "#e8e4f5",
+     "a": 0.3,
+     "render": "canvas",
+     "size": 50,
+     "dir": -90
+    },
+    {
+     "t": "spray",
+     "n": 40,
+     "spd": 120,
+     "col": "#e8e4f5",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 2,
+     "dir": -90
+    }
+   ],
+   "phase": 3,
+   "priority": 36,
+   "rim": "#2a2440",
+   "subtitle": null,
+   "duration": 4,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/tr-a2a3-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/tr-a2a3-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/tr-a2a3-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/tr-a2a3-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/tr-a2a3-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 40.3,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8e4f540, transparent 70%), linear-gradient(180deg, transparent 0 65%, #2a2440cc 69%, #2a2440 100%), linear-gradient(180deg, #a99fd0 0%, #3c4b59 50%)",
+   "particles_max": 80
+  },
+  "tr_a3f": {
+   "id": "tr_a3f",
+   "name": "Travel: The Beacon Path",
+   "act": 4,
+   "kind": "travel",
+   "band": null,
+   "floors": null,
+   "used": "Entering the final act (Act 3 boss → Pale Lighthouse)",
+   "mood": "Hushed wonder",
+   "features": "The three Beacon Shards rise and resonate; a bridge of light forms from the Galecrown to the pale lighthouse above the storm",
+   "palette": [
+    "#7b6cd9",
+    "#e8e6dc",
+    "#f2d17a",
+    "#08090d"
+   ],
+   "layers": {
+    "sky": "Storm fades to a starless black",
+    "far": "Pale lighthouse",
+    "mid": "Light bridge (draws on L→R)",
+    "ground": "—",
+    "fg": "Lampbearer actor + three Shard sprites (violet, teal, black-pearl)"
+   },
+   "tint": {
+    "col": "#f2d17a",
+    "a": 0.08,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.55,
+    "col": "#000000"
+   },
+   "effects": [
+    {
+     "t": "motes",
+     "n": 60,
+     "spd": 10,
+     "col": "#f2d17a",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 1.5
+    }
+   ],
+   "phase": 4,
+   "priority": 43,
+   "rim": "#08090d",
+   "subtitle": null,
+   "duration": 5,
+   "export": {
+    "master_px": [
+     3840,
+     1536
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "spec",
+    "layers": {
+     "sky": {
+      "layer": "sky",
+      "file": "art/v2/bg/tr-a3f-sky@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "far": {
+      "layer": "far",
+      "file": "art/v2/bg/tr-a3f-far@1x.webp",
+      "density": "@1x",
+      "px": [
+       1800,
+       720
+      ],
+      "trim": false,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "full frame"
+     },
+     "mid": {
+      "layer": "mid",
+      "file": "art/v2/bg/tr-a3f-mid@2x.webp",
+      "density": "@2x",
+      "px": [
+       3600,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      },
+      "rect_status": "placeholder (full frame); export tool writes content bounds"
+     },
+     "fg_l": {
+      "layer": "fg",
+      "side": "l",
+      "file": "art/v2/bg/tr-a3f-fg-l@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     },
+     "fg_r": {
+      "layer": "fg",
+      "side": "r",
+      "file": "art/v2/bg/tr-a3f-fg-r@2x.webp",
+      "density": "@2x",
+      "px": [
+       802,
+       1440
+      ],
+      "trim": true,
+      "rect": {
+       "x": 2798,
+       "y": 0,
+       "w": 802,
+       "h": 1440
+      },
+      "rect_status": "placeholder (max edge zone); export tool writes content bounds"
+     }
+    },
+    "decoded_mb": 40.3,
+    "decoded_mb_basis": "spec maximum (untrimmed)"
+   },
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #e8e6dc40, transparent 70%), linear-gradient(180deg, transparent 0 65%, #08090dcc 69%, #08090d 100%), linear-gradient(180deg, #f2d17a 0%, #7b6cd9 50%)",
+   "particles_max": 60
+  },
+  "ending_lit": {
+   "id": "ending_lit",
+   "name": "The Lighthouse Lit",
+   "act": 4,
+   "kind": "ending",
+   "band": null,
+   "floors": null,
+   "used": "Victory screen after The Drowned Sun",
+   "mood": "Triumph, dawn",
+   "features": "The lighthouse beam sweeps a sea that has turned from black to dawn-gold; the storm below breaks apart",
+   "palette": [
+    "#ffe9a8",
+    "#f2c99a",
+    "#6fb7b4",
+    "#1c2030"
+   ],
+   "layers": {
+    "sky": "Real dawn",
+    "far": "Breaking storm below",
+    "mid": "Lighthouse and beam (sweeps)",
+    "ground": "—",
+    "fg": "Gallery rail"
+   },
+   "tint": {
+    "col": "#ffe9a8",
+    "a": 0.1,
+    "blend": "soft-light"
+   },
+   "vignette": {
+    "s": 0.35,
+    "col": "#000000"
+   },
+   "effects": [
+    {
+     "t": "sweep",
+     "n": 1,
+     "spd": 0,
+     "col": "#ffe9a8",
+     "a": 0.25,
+     "render": "css",
+     "every_s": 6
+    },
+    {
+     "t": "motes",
+     "n": 40,
+     "spd": 6,
+     "col": "#ffe9a8",
+     "a": 0.5,
+     "render": "canvas",
+     "size": 1.5
+    }
+   ],
+   "phase": 4,
+   "priority": 44,
+   "rim": "#1c2030",
+   "subtitle": null,
+   "duration": null,
+   "export": null,
+   "fallback_css": "radial-gradient(ellipse 50% 40% at 28% 31%, #ffe9a840, transparent 70%), linear-gradient(180deg, transparent 0 65%, #1c2030cc 69%, #1c2030 100%), linear-gradient(180deg, #f2c99a 0%, #6fb7b4 50%)",
+   "particles_max": 40
+  },
+  "a1_lair_row": {
+   "id": "a1_lair_row",
+   "name": "The Sunken Row",
+   "act": 1,
+   "kind": "lair",
+   "band": "Boss Lair",
+   "floors": [
+    15,
+    15
+   ],
+   "used": "Act 1 boss: The Last Tenant (floor 15)",
+   "mood": "An empty wet cobbled lane at the sunken end of a terrace row.",
+   "features": [
+    "Low garden-wall stumps and doorless frames on the left",
+    "Featureless mist-washed distant gables",
+    "Low grey-green sea at the right edge; open standing zones"
+   ],
+   "palette": [
+    "#10171d",
+    "#354f50",
+    "#647a7a",
+    "#afaa90"
+   ],
+   "layers": {
+    "sky": "Cold dawn glow over grey-green sea",
+    "far": "Mist-washed distant gables",
+    "mid": "Low wall stumps and empty door frames at left",
+    "ground": "Wet cobbled lane across both standing zones",
+    "fg": "Unlit lamp post at the far left"
+   },
+   "tint": {
+    "col": "#354f50",
+    "a": 0.06,
+    "blend": "multiply"
+   },
+   "vignette": {
+    "s": 0.4,
+    "col": "#10171d"
+   },
+   "effects": [],
+   "phase": 1,
+   "priority": 12,
+   "rim": "#90a6aa",
+   "subtitle": null,
+   "duration": null,
+   "export": {
+    "master_px": [
+     3600,
+     1440
+    ],
+    "export_px": [
+     3600,
+     1440
+    ],
+    "rect_space": [
+     3600,
+     1440
+    ],
+    "status": "shipped",
+    "layers": {
+     "sky": {
+      "file": "art/v2/bg/a1-lair-row-sky@1x.webp",
+      "layer": "sky",
+      "rect": {
+       "x": 0,
+       "y": 0,
+       "w": 3600,
+       "h": 1440
+      }
+     },
+     "far": {
+      "file": "art/v2/bg/a1-lair-row-far@1x.webp",
+      "layer": "far",
+      "rect": {
+       "x": 0,
+       "y": 186,
+       "w": 2386,
+       "h": 696
+      }
+     },
+     "mid": {
+      "file": "art/v2/bg/a1-lair-row-mid@2x.webp",
+      "layer": "mid",
+      "rect": {
+       "x": 0,
+       "y": 331,
+       "w": 1720,
+       "h": 584
+      }
+     },
+     "ground": {
+      "file": "art/v2/bg/a1-lair-row-ground@2x.webp",
+      "layer": "ground",
+      "rect": {
+       "x": 0,
+       "y": 799,
+       "w": 3600,
+       "h": 641
+      }
+     },
+     "fg_l": {
+      "file": "art/v2/bg/a1-lair-row-fg-l@2x.webp",
+      "layer": "fg",
+      "rect": {
+       "x": 137,
+       "y": 0,
+       "w": 258,
+       "h": 605
+      }
+     }
+    },
+    "decoded_mb": 19.76,
+    "decoded_mb_basis": "trimmed layer files; includes half-resolution sky and far"
+   },
+   "fallback_css": "linear-gradient(180deg,#354f50,#647a7a 55%,#10171d)",
+   "particles_max": 0
+  }
+ },
+ "shotlist": [
+  {
+   "priority": 1,
+   "id": "a1_shore",
+   "phase": 1,
+   "kind": "battle",
+   "name": "Shoreline Steps"
+  },
+  {
+   "priority": 2,
+   "id": "tc_a1",
+   "phase": 1,
+   "kind": "title",
+   "name": "Title card: Act I"
+  },
+  {
+   "priority": 3,
+   "id": "tr_start",
+   "phase": 1,
+   "kind": "travel",
+   "name": "Travel: Rowing to the Stair"
+  },
+  {
+   "priority": 4,
+   "id": "map_a1",
+   "phase": 1,
+   "kind": "map",
+   "name": "Tidewater Chart"
+  },
+  {
+   "priority": 5,
+   "id": "a1_cloister",
+   "phase": 1,
+   "kind": "battle",
+   "name": "Kelp Colonnade"
+  },
+  {
+   "priority": 6,
+   "id": "a1_bellcourt",
+   "phase": 1,
+   "kind": "battle",
+   "name": "Bellwater Court"
+  },
+  {
+   "priority": 7,
+   "id": "a1_lair_bell",
+   "phase": 1,
+   "kind": "lair",
+   "name": "Bell Gate Belfry"
+  },
+  {
+   "priority": 8,
+   "id": "camp_a1",
+   "phase": 1,
+   "kind": "camp",
+   "name": "Stairwell Camp"
+  },
+  {
+   "priority": 9,
+   "id": "shop_a1",
+   "phase": 1,
+   "kind": "shop",
+   "name": "Driftwood Bazaar"
+  },
+  {
+   "priority": 10,
+   "id": "ev_a1",
+   "phase": 1,
+   "kind": "event",
+   "name": "Tidepool Grotto"
+  },
+  {
+   "priority": 11,
+   "id": "chest_a1",
+   "phase": 1,
+   "kind": "chest",
+   "name": "Wrack-Line Cache"
+  },
+  {
+   "priority": 12,
+   "id": "a1_lair_kelp",
+   "phase": 1,
+   "kind": "lair",
+   "name": "Matriarch’s Cistern"
+  },
+  {
+   "priority": 13,
+   "id": "a2_harbour",
+   "phase": 3,
+   "kind": "battle",
+   "name": "Outer Harbour"
+  },
+  {
+   "priority": 14,
+   "id": "map_a2",
+   "phase": 3,
+   "kind": "map",
+   "name": "Admiralty Plate"
+  },
+  {
+   "priority": 15,
+   "id": "camp_a2",
+   "phase": 3,
+   "kind": "camp",
+   "name": "Gun-Deck Camp"
+  },
+  {
+   "priority": 16,
+   "id": "a2_halls",
+   "phase": 3,
+   "kind": "battle",
+   "name": "Flooded Barracks"
+  },
+  {
+   "priority": 17,
+   "id": "a2_ramparts",
+   "phase": 3,
+   "kind": "battle",
+   "name": "Gale-Lashed Ramparts"
+  },
+  {
+   "priority": 18,
+   "id": "a2_lair_colossus",
+   "phase": 3,
+   "kind": "lair",
+   "name": "The Sluice Gate"
+  },
+  {
+   "priority": 19,
+   "id": "a2_lair_queen",
+   "phase": 3,
+   "kind": "lair",
+   "name": "Wreck Queen’s Boneyard"
+  },
+  {
+   "priority": 20,
+   "id": "a3_cliffs",
+   "phase": 3,
+   "kind": "battle",
+   "name": "Cloudbreak Cliffs"
+  },
+  {
+   "priority": 21,
+   "id": "map_a3",
+   "phase": 3,
+   "kind": "map",
+   "name": "Gale Vellum"
+  },
+  {
+   "priority": 22,
+   "id": "a3_spires",
+   "phase": 3,
+   "kind": "battle",
+   "name": "Thunder Spires"
+  },
+  {
+   "priority": 23,
+   "id": "a3_terraces",
+   "phase": 3,
+   "kind": "battle",
+   "name": "Crown Terraces"
+  },
+  {
+   "priority": 24,
+   "id": "a3_lair_engine",
+   "phase": 3,
+   "kind": "lair",
+   "name": "Heart of the Maelstrom Engine"
+  },
+  {
+   "priority": 25,
+   "id": "a3_lair_thalassa",
+   "phase": 3,
+   "kind": "lair",
+   "name": "The Upturned Sea"
+  },
+  {
+   "priority": 26,
+   "id": "shop_a2",
+   "phase": 3,
+   "kind": "shop",
+   "name": "Harbour Chandlery"
+  },
+  {
+   "priority": 27,
+   "id": "ev_a2",
+   "phase": 3,
+   "kind": "event",
+   "name": "Drowned Archive"
+  },
+  {
+   "priority": 28,
+   "id": "shop_a3",
+   "phase": 3,
+   "kind": "shop",
+   "name": "Stranded Hull Bazaar"
+  },
+  {
+   "priority": 29,
+   "id": "chest_a2",
+   "phase": 3,
+   "kind": "chest",
+   "name": "Armoury Strongbox"
+  },
+  {
+   "priority": 30,
+   "id": "ev_a3",
+   "phase": 3,
+   "kind": "event",
+   "name": "Windshrine Hollow"
+  },
+  {
+   "priority": 31,
+   "id": "camp_a3",
+   "phase": 3,
+   "kind": "camp",
+   "name": "Lee-Side Camp"
+  },
+  {
+   "priority": 32,
+   "id": "chest_a3",
+   "phase": 3,
+   "kind": "chest",
+   "name": "Gale Reliquary"
+  },
+  {
+   "priority": 33,
+   "id": "tc_a2",
+   "phase": 3,
+   "kind": "title",
+   "name": "Title card: Act II"
+  },
+  {
+   "priority": 34,
+   "id": "tr_a1a2",
+   "phase": 3,
+   "kind": "travel",
+   "name": "Travel: Through the Bell Gate"
+  },
+  {
+   "priority": 35,
+   "id": "tc_a3",
+   "phase": 3,
+   "kind": "title",
+   "name": "Title card: Act III"
+  },
+  {
+   "priority": 36,
+   "id": "tr_a2a3",
+   "phase": 3,
+   "kind": "travel",
+   "name": "Travel: The Updraft"
+  },
+  {
+   "priority": 37,
+   "id": "f_stair",
+   "phase": 4,
+   "kind": "battle",
+   "name": "Lighthouse Stair"
+  },
+  {
+   "priority": 38,
+   "id": "f_lair_sun",
+   "phase": 4,
+   "kind": "lair",
+   "name": "The Drowned Sun"
+  },
+  {
+   "priority": 39,
+   "id": "map_f",
+   "phase": 4,
+   "kind": "map",
+   "name": "Star-Glass"
+  },
+  {
+   "priority": 40,
+   "id": "camp_f",
+   "phase": 4,
+   "kind": "camp",
+   "name": "Lamp-Room Camp"
+  },
+  {
+   "priority": 41,
+   "id": "shop_f",
+   "phase": 4,
+   "kind": "shop",
+   "name": "The Last Bazaar"
+  },
+  {
+   "priority": 42,
+   "id": "tc_f",
+   "phase": 4,
+   "kind": "title",
+   "name": "Title card: The Pale Lighthouse"
+  },
+  {
+   "priority": 43,
+   "id": "tr_a3f",
+   "phase": 4,
+   "kind": "travel",
+   "name": "Travel: The Beacon Path"
+  },
+  {
+   "priority": 44,
+   "id": "ending_lit",
+   "phase": 4,
+   "kind": "ending",
+   "name": "The Lighthouse Lit"
+  }
+ ]
+}

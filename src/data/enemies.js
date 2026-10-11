@@ -26,7 +26,7 @@ const AI=f=>e=>{if(e.queued){const m=e.queued;e.queued=null;(e.hist||(e.hist=[])
 const tend=()=>alive().filter(x=>x.key==='tendril');
 registerEnemies({
  slug:{n:'Brine Slug',e:'🐌',hp:hp('slug'),ai:AI(e=>{const lash={a:11,b:5,lbl:'Lash'},wd={b:12,lbl:'Withdraw'};
-  return pk(e,[{w:e.t?55+(playerLow()?20:0):100,m:lash,rep:2},{w:e.t?(hurt(e)>=10?70:35):0,m:wd,rep:1}])})},
+  return pk(e,[{w:e.t?40:100,m:lash,rep:2},{w:e.t?(hurt(e)>=10?70:35):0,m:wd,rep:1}])})},
  gull:{n:'Gull Thief',e:'🐦',hp:hp('gull'),ai:AI(e=>{const snatch={steal:10,lbl:'Snatch & flee'},peck={a:7,h:2,lbl:'Peck'};
   const gold=W.run.gold>0;return pk(e,[{w:e.t>=3&&gold?100:e.t>=2&&gold?50:0,m:snatch},{w:e.t>=3&&gold?0:60,m:peck,rep:3},{w:e.t&&e.t<3?25:0,m:{a:5,b:6,lbl:'Wheel & Peck'},rep:1}])})},
  knight:{n:'Wrack Knight',e:'🤖',hp:hp('knight'),ai:AI(e=>{const sh={s:2,b:8,lbl:'Sharpen'},cl={a:16,b:6,lbl:'Cleave'},br={b:14,lbl:'Brace'};const mt=e.st.str||0;
@@ -35,12 +35,12 @@ registerEnemies({
  pod:{n:'Brine Cyst',e:'🍄',hp:hp('pod'),ai:e=>e.t>=2?{a:V.pod.burst,boom:1,lbl:'BURST'}:{none:1,lbl:e.t===0?'Swelling…':'Ripening…'}},
  wisp:{n:'Glimmer Wisp',e:'🏮',hp:hp('wisp'),ai:AI(e=>{const dz={w:2,b:10,lbl:'Dazzle'},fl={a:13,b:5,lbl:'Flare'};const soaked=(W.cb&&W.cb.p.st.weak)||0;
   if(!e.t)return pk(e,[{w:1,m:dz}]);
-  return pk(e,[{w:soaked>=2?0:40,m:dz,rep:1},{w:60+(playerLow()?20:0),m:fl,rep:2}])})},
+  return pk(e,[{w:soaked>=2?0:40,m:dz,rep:1},{w:50,m:fl,rep:2}])})},
  crab:{n:'Coral Crab',e:'🦀',hp:hp('crab'),b0:6,ai:AI(e=>{const pn={a:9,b:4,lbl:'Pinch'},su={b:8,lbl:'Shell Up'};
-  if(!e.t)return pk(e,[{w:1,m:pn}]);
-  return pk(e,[{w:60,m:pn,rep:2},{w:e.block>=14?0:hurt(e)>=12?65:30,m:su,rep:1}])})},
+  if(!e.t)return pk(e,[{w:1,m:su}]);
+  return pk(e,[{w:50,m:pn,rep:2},{w:e.block>=14?0:hurt(e)>=12?65:38,m:su,rep:1}])})},
  leech:{n:'Tide Leech',e:'🪱',hp:[24,28],ai:AI(e=>{const miss=e.max-e.hp;
-  return pk(e,[{w:40,m:{a:3,brittle:1,lbl:'Latch'},rep:2},{w:e.t&&miss>=4?45:0,m:{a:5,heal:Math.min(5,miss),lbl:'Drink'},rep:1},{w:25,m:{a:6,lbl:'Gnaw'},rep:2}])})},
+  return pk(e,[{w:40,m:{a:3,brittle:1,lbl:'Latch'},rep:2},{w:e.t&&miss>=4?45:0,m:{a:5,heal:Math.min(5,miss),lbl:'Drink'},rep:1},{w:15,m:{a:6,lbl:'Gnaw'},rep:2}])})},
  lurker:{n:'Kelp Lurker',e:'🌿',hp:[34,38],ai:AI(e=>{const ent={a:4,status:{id:'kelp',n:1,pile:'disc'},lbl:'Entangle'};if(!e.t)return pk(e,[{w:1,m:ent}]);
   return pk(e,[{w:30,m:{a:7,lbl:'Grab'},rep:2},{w:35,m:{a:4,h:2,lbl:'Thrash'},rep:2},{w:35,m:{...ent,a:7},rep:1}])})},
  tendril:{n:'Kelp Tendril',e:'🌱',hp:[12,12],ai:e=>({a:3,lbl:'Lash'})},
@@ -61,22 +61,22 @@ registerEnemies({
  // ---- elites (v2.1) ----
  captain:{n:'Drowned Captain',e:'☠️',hp:hp('captain'),elite:1,ai:AI(e=>{const slugs=countAlive('slug');
   return pk(e,[{w:35,m:{a:16,lbl:'Cutlass'},rep:2},{w:30,m:{a:8,h:2,v:1,lbl:'Boarding'},rep:2},{w:e.t&&slugs<2?30:0,m:{summon:'slug',max:2,lbl:'Call the crew'},rep:1},
-   {w:canWind(e,2,4)?28:0,m:{lbl:'Raises the cutlass…'},wind:{a:26,lbl:'Death Stroke'}}])})},
+   {w:canWind(e,2,4)?28:0,m:{b:8,lbl:'Raises the cutlass…'},wind:{a:28,lbl:'Death Stroke'}}])})},
  // Tideglass Warden: mirrors the type of the last card you played THIS turn (resets each turn); an idle turn is punished.
  warden:{n:'Tideglass Warden',e:'🪞',hp:hp('warden'),elite:1,ai:e=>({mirror:1}),
   intent:e=>{const lt=W.cb&&W.cb.lastType,M=V.warden;return lt==='A'?{a:M.mirrorAtk,lbl:'Mirror: Attack',mirror:1}:lt==='S'?{b:M.mirrorBlk,lbl:'Mirror: Guard',mirror:1}:lt==='P'?{s:2,lbl:'Mirror: Empower',mirror:1}:{a:M.idleAtk,lbl:'Mirror: Punish idleness',mirror:1}}},
  eel:{n:'Twin Eel',e:'🐍',hp:hp('eel'),elite:1,ai:AI(e=>{
-  if(!e.t)return e.k%2?pk(e,[{w:1,m:{b:8,lbl:'Coil'},wind:{a:22,lbl:'Spring'}}]):pk(e,[{w:1,m:{a:12,lbl:'Strike'}}]); // the pair is staggered
-  return pk(e,[{w:50,m:{a:12,lbl:'Strike'},rep:2},{w:20,m:{a:7,h:2,lbl:'Snap'},rep:2},{w:canWind(e,1,3)?35:0,m:{b:8,lbl:'Coil'},wind:{a:22,lbl:'Spring'}}])}),
+  if(!e.t)return e.k%2?pk(e,[{w:1,m:{b:8,lbl:'Coil'},wind:{a:18,lbl:'Spring'}}]):pk(e,[{w:1,m:{a:12,lbl:'Strike'}}]); // the pair is staggered
+  return pk(e,[{w:35,m:{a:12,lbl:'Strike'},rep:2},{w:35,m:{b:10,lbl:'Slither'},rep:1},{w:canWind(e,1,3)?30:0,m:{b:8,lbl:'Coil'},wind:{a:18,lbl:'Spring'}}])}),
   onDeath:e=>{alive().filter(x=>x.key==='eel').forEach(x=>{addSt(x,'str',3);log('🐍 The other eel rages: +3 Might')})}},
  // ---- bosses (Act 1 pool: 1 of 3, chosen per run and shown on the map) ----
  bell:{n:'The Knell',e:'🔔',hp:hp('bell'),boss:1,randomSprite:1,
   ai:AI(e=>{const mt=e.st.str||0,tl={a:18,s:V.bell.toll_might,lbl:'Toll'};
    if(e.crackNext){e.crackNext=0;return pk(e,[{w:1,m:{a:22,lbl:'Crack'}}])}
-   if(e.ph===2)return pk(e,[{w:35,m:{a:22,lbl:'Crack'},rep:2},{w:25,m:{a:10,ring:2,lbl:'Shatter Wave'},rep:1},{w:mt>=6?0:20,m:tl,rep:1},{w:canWind(e,2,4)?30:0,m:{lbl:'The Bell tilts…'},wind:{a:30,ring:1,lbl:'Death Knell'}}]);
+   if(e.ph===2)return pk(e,[{w:35,m:{a:22,lbl:'Crack'},rep:2},{w:25,m:{a:10,ring:2,lbl:'Shatter Wave'},rep:1},{w:mt>=6?0:20,m:tl,rep:1},{w:canWind(e,2,4)?30:0,m:{b:10,lbl:'The Bell tilts…'},wind:{a:34,ring:1,lbl:'Death Knell'}}]);
    if(!e.t)return pk(e,[{w:1,m:tl}]);
    return pk(e,[{w:mt>=4?0:30,m:tl,rep:1},{w:35,m:{a:6,h:3,lbl:'Chain Sweep'},rep:2},{w:e.block>=15?0:hurt(e)>=25?55:25,m:{b:15,w:2,lbl:'Haul the Bell'},rep:1},
-    {w:canWind(e,2,4)?28:0,m:{lbl:'The Bell swings wide…'},wind:{a:26,ring:1,lbl:'Great Peal'}}])}),
+    {w:canWind(e,2,4)?30:0,m:{b:10,lbl:'The Bell swings wide…'},wind:{a:32,ring:1,lbl:'Great Peal'}}])}),
   // Phase 2 at <= 80 HP: clears debuffs, +2 Might, and starts on Crack — even when it cracks during its own turn (Parry; Playtester bug 2).
   onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.hist=[];e.queued=null;e.crackNext=1;e.next=EN_bell().ai(e);if(W.cb.acting===e)e.keepNext=true;
    log('🔔 The Knell\'s Bell CRACKS! Phase 2: +2 Might, debuffs cleared');log('🔔 '+BELL_LINES.crack);callout('THE BELL CRACKS!','boss')}}},
@@ -84,15 +84,15 @@ registerEnemies({
   passive:{n:'Rooted',text:'At the end of each of her turns, she gains 4 Guard per living Tendril.',endTurn:e=>{const n=tend().length;if(n){e.block+=4*n;e.blkT=Date.now()}}},
   onSpawn:e=>{if(W.cb){spawn('tendril',{summoned:true});spawn('tendril',{summoned:true})}},
   ai:AI(e=>{const n=tend().length,grown=n>=2&&tend().every(t=>(t.st.str||0)>=4);
-   if(!e.t)return pk(e,[{w:1,m:{a:12,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'}}]);
-   return pk(e,[{w:35,m:{a:12,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'},rep:1},{w:grown?0:30,m:{grow:1,fx:grow,lbl:'Grow'},rep:1},{w:40,m:{a:6,h:2,lbl:'Crushing Embrace'},rep:2},
-    {w:n&&canWind(e,2,4)?28:0,m:{lbl:'Roots tighten…'},wind:{a:22,status:{id:'kelp',n:1,pile:'drawRandom'},lbl:'Strangle'}}])}),
+   if(!e.t)return pk(e,[{w:1,m:{a:14,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'}}]);
+   return pk(e,[{w:35,m:{a:14,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'},rep:1},{w:grown?0:30,m:{grow:1,fx:grow,lbl:'Grow'},rep:1},{w:40,m:{a:7,h:2,lbl:'Crushing Embrace'},rep:2},
+    {w:n&&canWind(e,2,3)?30:0,m:{b:10,lbl:'Roots tighten…'},wind:{a:26,status:{id:'kelp',n:1,pile:'drawRandom'},lbl:'Strangle'}}])}),
   onDamaged:e=>{if(!e.bloomed&&e.hp<=45){e.bloomed=true;spawn('tendril',{summoned:true});spawn('tendril',{summoned:true});addSt(e,'str',2);log('🌸 The Matriarch BLOOMS: 2 Tendrils, +2 Might');callout('BLOOM!','boss')}}},
  tenant:{n:'The Last Tenant',e:'🏚️',hp:[180,180],b0:30,boss:1,
   passive:{n:'Home',text:'His Guard does not expire. Break all of it in one go and he is Breached: he loses his next action and takes 50% more damage, then rebuilds 30 Guard.',keepGuard:true},
-  ai:AI(e=>{const p2=e.ph===2;if(!e.t)return pk(e,[{w:1,m:{a:p2?22:18,lbl:'Shoulder'}}]);
-   return pk(e,[{w:40,m:{a:p2?22:18,lbl:'Shoulder'},rep:2},{w:30,m:{a:7,h:2,v:1,lbl:'Boathook'},rep:2},{w:e.block>=24?0:hurt(e)>=20?60:20,m:{b:14,lbl:'Board Up'},rep:1},
-    {w:canWind(e,2,4)?28:0,m:{lbl:'Hefts the door…'},wind:{a:p2?36:30,lbl:'Slam the Door'}}])}),
+  ai:AI(e=>{const p2=e.ph===2;if(!e.t)return pk(e,[{w:1,m:{a:p2?24:20,lbl:'Shoulder'}}]);
+   return pk(e,[{w:40,m:{a:p2?24:20,lbl:'Shoulder'},rep:2},{w:30,m:{a:7,h:2,v:1,lbl:'Boathook'},rep:2},{w:e.block>=24?0:hurt(e)>=20?60:30,m:{b:14,lbl:'Board Up'},rep:1},
+    {w:canWind(e,2,4)?28:0,m:{b:10,lbl:'Hefts the door…'},wind:{a:p2?42:36,lbl:'Slam the Door'}}])}),
   // Breached (Guard >0→0 in one hit sequence): the next action is skipped (Reeling), Exposed for that turn, 30 Guard back after it.
   onGuardBroken:e=>{if(e.ph!==1||W.cb.acting===e)return;e.queued=null;e.next={none:1,b:30,lbl:'Reeling'};addSt(e,'vuln',1);log('🏚️ The Last Tenant is BREACHED: he reels, Exposed');callout('BREACHED!','boss')},
   onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;e.passive=null;e.hist=[];e.queued=null;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.next=EN.tenant.ai(e);if(W.cb.acting===e)e.keepNext=true;

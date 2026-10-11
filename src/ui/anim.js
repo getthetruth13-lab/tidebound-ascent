@@ -297,6 +297,7 @@ function flipReveal(delay){const ws=$$('.rewgrid .rcw');ws.forEach((w,i)=>{const
 function syncScreens(){if(!motionOn())return;const S=W.S,s=S.screen;
  const key=(s==='reward'?'r'+(S.cardsOpen!=null?'c'+S.cardsOpen:S.swap!=null?'s':'rows'):s==='chest'?'x'+(S.opened?'o':'c'):(s==='title'&&S.view==='lamp'&&S.got)?'lamp':'');
  if(!key||(revealed===S&&revealKey===key))return;revealed=S;revealKey=key;const hold=holdReal();
+ if(key==='rrows')reveal('.reward-banner',[0,-8,'.82'],420,0,hold);
  if(key==='rrows'||key==='xo'){reveal('.rewtiles .tile',[0,26,'.9'],340,95,hold+40);
   if(key==='xo'){const c=$('.chestwrap');if(c){const r=rectOf(c);laterU(hold+10,()=>{emit('burst',r.x,r.y,COL.gold,22);ring(r.x,r.y,COL.gold,140,520);vignette('gold',.4,520)});
    c.animate([{filter:'brightness(3)',scale:'1.12'},{filter:'brightness(1.4)',scale:'1.04',offset:.4},{filter:'none',scale:'1'}],{duration:U(520),delay:U(hold),easing:'ease-out',fill:'backwards'})}}}

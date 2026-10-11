@@ -64,7 +64,7 @@ Object.assign(tones,{
  travel:[140,220,.22,.045,.5,650],room:[165,247,.28,.045,.04,850],
  pile:[180,290,.16,.04,.65,900],tooltip:[350,280,.065,.025,.06,750],
  enlarge:[210,350,.15,.045,.3,900],pickup:[200,310,.1,.04,.4,850],drop:[250,160,.1,.045,.3,750],
- sparkle:[1500,3000,.5,.06,.015,6000],flip:[320,180,.12,.05,.1,900],levelUp:[220,440,.42,.065,.035,1000],taskComplete:[330,495,.32,.055,.035,1000]
+ sparkle:[1500,3000,.5,.06,.015,6000],evGood:[330,740,.62,.075,.03,1600],evBad:[210,70,.55,.1,.22,650],evRoll:[240,520,.28,.06,.1,1000],flip:[320,180,.12,.05,.1,900],levelUp:[220,440,.42,.065,.035,1000],taskComplete:[330,495,.32,.055,.035,1000]
 });
 export function playSound(name,pitch=1){if(W.replaying||!ctx||ctx.state!=='running'||!level('sfxVolume'))return;const now=ctx.currentTime;
  if(now-(recent[name]??-10)<.055)return;recent[name]=now;

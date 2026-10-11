@@ -14,11 +14,11 @@ function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))r
 export const cancelLongPress=()=>{if(lp){clearTimeout(lp.t);lp=null}clearTimeout(hh);hh=0};
 let hh=0,holdTouch=false;
 function inspectNow(el,touch){clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el))}
-document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}const any=ev.target.closest&&ev.target.closest('.card');if(!any||any.closest('#inspect'))return;
+document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;closeInspect();return}const any=ev.target.closest&&ev.target.closest('.card');if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
- lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,ev.pointerType==='touch'||ev.pointerType==='pen')},LONGPRESS_MS)}},true);
+ lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,ev.pointerType!=='mouse'||!any.closest('.hand'))},LONGPRESS_MS)}},true);
 document.addEventListener('pointermove',ev=>{if(lp&&Math.hypot(ev.clientX-lp.x0,ev.clientY-lp.y0)>10){clearTimeout(lp.t);lp=null}},true);
-document.addEventListener('pointerup',()=>{if(lp){clearTimeout(lp.t);lp=null}if(holdTouch){holdTouch=false;closeInspect()}},true); // touch: releasing the finger closes the enlarged card
+document.addEventListener('pointerup',()=>{if(lp){clearTimeout(lp.t);lp=null}holdTouch=false},true); // Keep the inspector open; eatClick consumes the release click.
 document.addEventListener('pointercancel',()=>{cancelLongPress();if(holdTouch){holdTouch=false;closeInspect()}},true);
 // Desktop hover-hold: resting the mouse on a card (1.5 s in the hand, 0.9 s elsewhere) enlarges it, like right-click.
 document.addEventListener('pointerover',ev=>{if(ev.pointerType!=='mouse')return;clearTimeout(hh);hh=0;const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('#inspect,#cardtip,.cslot.lift')||ev.buttons)return;

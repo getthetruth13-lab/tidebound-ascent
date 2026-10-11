@@ -24,8 +24,11 @@ export const miniGauge=v=>`<span class="mg" aria-hidden="true"><i class="mg-tube
 // One illustrated tile. o: {id,emoji,art,name,sum,info,click,disabled,on,done,cls,tag,over}. art = ready-made inner HTML (relic / potion icons).
 // o.over = extra overlay HTML (mini gauge, sigil). Relic / potion art sits on a painted ledge (cls k-relic / k-potion).
 export function tileHTML(o){const info=o.info?esc(o.info):'';const cat=catOf(o.id,o.cls);
+ const itemKind=o.art&&/\bk-(relic|potion)\b/.exec(o.cls||'');
+ const ledge=itemKind&&TILES['tile-ledge']?.ready?TILES['tile-ledge']:null;
+ const art=itemKind?emblemHTML('reward-'+itemKind[1],'')+(ledge?`<img class="ledgeimg" src="${ledge.path}" alt="" draggable="false">`:'')+o.art:o.art||emblemHTML(o.id,o.emoji);
  return `<button ${o.eid?`id="${o.eid}" `:''}class="tile sp cat-${cat} ${o.cls||''}${o.on?' on':''}${o.done?' done':''}" ${o.click&&!o.disabled?`onclick="${o.click}"`:''} ${o.disabled?'disabled':''} ${info?`data-info="${info}"`:''}${o.tid?` data-tid="${esc(o.tid)}"`:''}>
- <span class="tart">${o.art||emblemHTML(o.id,o.emoji)}</span><i class="tglow"></i>${o.over||''}${o.tag?`<i class="ttag">${o.tag}</i>`:''}<span class="tname">${o.name}</span><span class="tsum">${o.sum||''}</span>${info?`<span class="tipi" data-info="${info}" aria-label="Details">i</span>`:''}${o.done?'<span class="tck">✔</span>':''}</button>`}
+ <span class="tart${ledge?' has-ledge':''}">${art}</span><i class="tglow"></i>${o.over||''}${o.tag?`<i class="ttag">${o.tag}</i>`:''}<span class="tname">${o.name}</span><span class="tsum">${o.sum||''}</span>${info?`<span class="tipi" data-info="${info}" aria-label="Details">i</span>`:''}${o.done?'<span class="tck">✔</span>':''}</button>`}
 export const tilesRow=(tiles,cls='')=>`<div class="tiles ${cls}${tiles.length>4?' many':''}" style="--n:${tiles.length}">${tiles.join('')}</div>`;
 // ---- label parsing for text options ("🎲 Spin the wheel (roll 1d6)", "🌙 Moon Shell: Tide 5") ----
 const EMO=/^((?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:️|‍\p{Extended_Pictographic}|\p{Emoji_Modifier})*)\s*/u;

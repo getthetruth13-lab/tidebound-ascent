@@ -1,4 +1,4 @@
-import {savedAction} from '../save.js';
+import {savedAction,settings,saveSettings} from '../save.js';
 // engine/run.js — the run: seeded state, map, rooms (? / chests / merchant / camps / events), rewards, economy.
 // Numbers: design-v2 §1.1–§1.8. Every random roll uses a named seeded stream (core/state.js), so the same seed and the
 // same choices give the same maps, rewards and enemy rolls (§1.10).
@@ -177,12 +177,21 @@ function claimRowImpl(i){const S=W.S;const row=S.rows&&S.rows[i];if(!row||row.do
  if(row.k==='gold'){gainGold(row.n);row.done=true}
  else if(row.k==='relic'){row.done=true;gainRelic(row.id);if(W.S!==S)return}
  else if(row.k==='potion'){if(addPotion(row.id))row.done=true;else{S.swap=i}}
- else if(row.k==='cards'){S.cardsOpen=i}
+ else if(row.k==='cards'){S.cardsOpen=i;S.cardSelected=null;S.skipConfirm=false}
  render()}
-function rewCardImpl(j){const S=W.S;const row=S.rows[S.cardsOpen];if(!row)return;markCardsSeen(row.cards);gainCard(row.cards[j]);row.done=true;row.took=row.cards[j];S.cardsOpen=null;render()}
-function rewCloseCardsImpl(){W.S.cardsOpen=null;render()}
-function rewSkipCardsImpl(){const S=W.S;const row=S.rows[S.cardsOpen];if(row){markCardsSeen(row.cards);row.done=true;row.skipped=true}S.cardsOpen=null;
- render()}
+function rewCardImpl(j){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done||!Number.isInteger(j)||!row.cards[j]||S.skipConfirm)return;
+ S.cardSelected=S.cardSelected===j?null:j;render()}
+function rewConfirmCardsImpl(confirm=settings.confirmCardSkip!==false){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done||S.skipConfirm)return;
+ const j=S.cardSelected;if(j==null)return rewSkipCardsImpl(confirm);if(!row.cards[j])return;
+ markCardsSeen(row.cards);gainCard(row.cards[j]);row.done=true;row.took=row.cards[j];S.cardsOpen=null;S.cardSelected=null;render()}
+function rewCloseCardsImpl(){W.S.cardsOpen=null;W.S.cardSelected=null;W.S.skipConfirm=false;render()}
+function rewSkipCardsImpl(confirm=settings.confirmCardSkip!==false){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done)return;
+ S.cardSelected=null;if(confirm){S.skipConfirm=true;render();return}finishSkipCards()}
+function finishSkipCards(){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done)return;
+ markCardsSeen(row.cards);row.done=true;row.skipped=true;S.cardsOpen=null;S.cardSelected=null;S.skipConfirm=false;render()}
+export function rewSkipAnswer(yes,dont=false){return savedAction('rewSkipAnswer',[yes,dont],()=>{if(!W.S.skipConfirm)return;
+ if(yes){if(dont&&!W.replaying){settings.confirmCardSkip=false;saveSettings()}finishSkipCards()}else{W.S.skipConfirm=false;render()}})}
+export function rewConfirmCards(confirm=settings.confirmCardSkip!==false){return savedAction('rewConfirmCards',[confirm],()=>rewConfirmCardsImpl(confirm))}
 // full potion slots: swap the new potion for one you hold, or discard it
 function potionSwapImpl(slot){const S=W.S;const row=S.rows&&S.rows[S.swap];if(!row)return;if(slot>=0){W.run.potions[slot]=row.id}row.done=true;S.swap=null;render()}
 function rewDoneImpl(){const S=W.S;if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}
@@ -302,7 +311,7 @@ export function rewCard(...args){return savedAction('rewCard',args,()=>rewCardIm
 
 export function rewCloseCards(...args){return savedAction('rewCloseCards',args,()=>rewCloseCardsImpl(...args))}
 
-export function rewSkipCards(...args){return savedAction('rewSkipCards',args,()=>rewSkipCardsImpl(...args))}
+export function rewSkipCards(confirm=settings.confirmCardSkip!==false){return savedAction('rewSkipCards',[confirm],()=>rewSkipCardsImpl(confirm))}
 
 export function potionSwap(...args){return savedAction('potionSwap',args,()=>potionSwapImpl(...args))}
 

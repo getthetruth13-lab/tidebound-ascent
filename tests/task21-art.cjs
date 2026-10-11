@@ -1,0 +1,15 @@
+// Verify approved delivery paths, alpha budgets, real scene rendering, and S24 screenshots.
+const {chromium}=require('playwright'),{start,DEVICES}=require('./util.js'),assert=require('assert'),fs=require('fs');
+(async()=>{const srv=await start(0),b=await chromium.launch();try{const p=await b.newPage(DEVICES.s24Landscape),errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(srv.url);await p.waitForFunction(()=>window.G);await p.addScriptTag({path:__dirname+'/p1/checks.js'});
+ fs.mkdirSync('screenshots/task21',{recursive:true});
+ for(const [label,enemies,kind] of [['tenant',['tenant'],'boss'],['support',['knight','mender'],'fight'],['racer',['penitent','slug'],'fight'],['heap',['heap'],'fight'],['novice',['novice','leech'],'fight'],['limpet',['limpet'],'fight']]){
+  const info=await p.evaluate(async({enemies,kind})=>{P1.fr('tide',enemies,[],{kind});const A=await import('/src/assets.js'),E=await import('/src/ui/env.js');G.run.floor=kind==='boss'?15:enemies.includes('novice')?12:6;G.render();return {env:E.envKeyFor().id,sprites:enemies.map(e=>A.spriteFor('enemies',e)),bodyScroll:document.documentElement.scrollWidth>innerWidth}}, {enemies,kind});
+  assert(info.sprites.every((s,i)=>s&&s.id===({knight:'rust-knight',slug:'brine-slug',leech:'tide-leech'}[enemies[i]]||enemies[i])&&s.facing==='left'));assert(!info.bodyScroll);if(kind==='boss')assert.equal(info.env,'a1_lair_row');
+  await p.waitForFunction(()=>[...document.querySelectorAll('.scene img')].every(i=>i.complete&&i.naturalWidth>0));await p.waitForTimeout(100);await p.screenshot({path:`screenshots/task21/${label}.png`});
+ }
+ await p.evaluate(()=>{P1.fr('tide',['slug','heap']);const e=G.cb.ens.find(e=>e.key==='heap');e.block=0;G.combat$.dmgEnemy(e,Math.ceil(e.max/2));G.render()});
+ assert.equal(await p.evaluate(()=>G.cb.ens.filter(e=>e.key==='limpet'&&e.hp>0).length),2);assert(await p.evaluate(()=>[...document.querySelectorAll('[data-key=limpet] .fig')].every(e=>e.getBoundingClientRect().height<=innerHeight*.24+1)));await p.waitForTimeout(150);await p.screenshot({path:'screenshots/task21/heap-spall.png'});
+ for(const id of ['anvil','tidepool','sunkenchest']){await p.evaluate(id=>{G.newRun('tide',{seed:3,skipTravel:true});W.S={screen:'event',ev:G.EVENTS.find(e=>e.id===id),t:0};G.render()},id);await p.waitForFunction(id=>{const im=document.querySelector(`[data-tile="event-${id}"] img`);return im&&im.complete&&im.naturalWidth===512},id);await p.screenshot({path:`screenshots/task21/event-${id}.png`})}
+ const t=await p.evaluate(async()=>{const {TILES,loadTiles}=await import('/src/ui/tiles.js');await loadTiles();return Object.fromEntries(Object.entries(TILES).filter(([k])=>k.startsWith('event-')).map(([k,t])=>[k,t.ready]))});
+ assert(t['event-anvil']&&t['event-tidepool']&&t['event-sunkenchest']);assert.deepEqual(errors,[]);console.log('Task21 art: six delivered sprite ids, Tenant lair, approved event manifest, S24 rendering and screenshots PASS');
+}finally{await b.close();srv.close()}})().catch(e=>{console.error(e);process.exitCode=1});

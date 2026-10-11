@@ -1,0 +1,739 @@
+READ-ONLY: do not modify any files; output markdown only. Round 2 of a design brainstorm for the game Tidebound Ascent. Below are the shared brief and five Round 1 proposals (Claude, Codex/ChatGPT, Gemini, Grok Build, Grok Bot). Critique each briefly (strengths, weaknesses), pick the strongest elements, and propose ONE merged direction: act names, the journey and why the map branches, per-act floor bands, the background rule, and an Act 1 NOW checklist (names/text, map, each of the 10 backgrounds keep/retouch/redo, events/enemies, cinematic, code) vs LATER. Take a clear position on the key disagreement: keep Act 1 named 'The Drowned Stair' vs rename it (e.g. Claude's 'The Drowned Shallows'). 900-1500 words.
+
+=== BRIEF ===
+# Tidebound Ascent: World-Structure Brainstorm Brief (shared context for every model)
+
+## The game
+Tidebound Ascent is a dark, painterly drowned-world deck-building roguelike in the style of Slay the Spire (original names only, no StS/MTG terms). Target: Samsung S24 Ultra, landscape. Owner: Spencer (no game-dev background). Priorities: 1 fun, 2 visual impressiveness and environments ("each act and floor band should feel like a place you travel through"), 3 cohesion (one style, palette family, voice), 4 polish. Map is randomly generated every run. Naming voice: concrete and weathered (salt, rust, kelp, brass, tallow, rope, bone); Act 1 names from tidepool/kelp/old stone, Act 2 iron/rivets/harbour/garrison, Act 3 gale/cloud/static/hail, Final pale stone/lamp/gold. No high-fantasy boilerplate.
+
+## The problem to solve (Spencer's words, paraphrased)
+Act 1 is called "The Drowned Stair", but its backgrounds (a shore, a kelp cloister, a bell court, a sea cave for events, etc.) do not look like climbing stairs, and a branching map does not make sense on a staircase. It would make sense once we reach the tower and climb it in Acts 2 and 3. He wants a direction for Acts 1, 2 and 3 (and the Final) where map, backgrounds, enemies, events, names, story and cinematic all match the lore, so the player feels fully immersed at all times. Fix it now, before building more (only Act 1 is built and arted; Acts 2–3 are designed on paper only).
+
+## Current lore (premise)
+The sun did not set one evening. It sank beneath the Pale Sea and became the **Drowned Sun**; every year since, its pull has dragged the tide higher up the coasts. Then the sea drew back further than anyone living had seen, and the **Drowned Stair** rose out of the shallows: a sunken tower whose summit is the **Pale Lighthouse**. Relight its lamp and the sun will be called back up, so the old keepers swore. You climb because the tide is coming for everyone else. Old faction: the **Tidewardens** built the Bastion and the Maelstrom Engine to pull the tide down. Recurring NPCs: Quartermaster Wren (merchant, appears in every act), the Ferryman. Collectibles: three **Beacon Shards** (Tide Shard from a chest, Gale Shard from Galecrowned elites, etc.) unlock the Final act.
+
+## Classes (why they climb)
+- **Tidecaller** (crowned barnacled trident warden, teal): moon-sworn keeper of the tides; the sea answers them and they mean to make it obey again.
+- **Echo Mage** (masked porcelain bell-mage, violet): heard the Leviathan Bell's last note from 40 leagues inland and follows the echo.
+- **Cartographer** (stocky hat, spyglass, lantern, amber): wants to chart the one coast nobody has mapped and sell the only copy.
+- **Duelist** (lean fencer, crimson scarf): swore an oath to the last lighthouse keeper to carry her blade to the lamp and light it.
+
+## Intro cinematic (approved, 5 scenes, already built)
+1. "It did not set. It sank. / Down beneath the Pale Sea, dragging the world's light into the deep."
+2. "Each year, the water rose higher, devouring the shores."
+3. "But now, the ocean draws back. / The ancient stair has risen."
+4. "At the summit lies the lamp that can call the Drowned Sun back. / But the climb is a vertical grave."
+5. "Four souls stand upon the salt-slick stone, ready to brave the ascent. / Choose your climber." (built from scene 3: zoom into the base of the stair, four hero silhouettes on the lowest steps).
+Run start travel scene `tr_start` "Rowing to the Stair": rowboat at dawn toward a half-sunk tower. Title card: "Act I · The Drowned Stair · Where the tide gave the tower back."
+
+## Lamplight (meta-progression lore, built)
+Every climber carries a lantern. When the tide takes you, your lantern does not go out; it burns on the step where you fell, and the stair remembers. That flame is Lamplight. Death screen: "The tide took you on the Cairn Landing. Your lantern burns on: 143 Lamplight." Each class has a **Class Lamp**, its own landing on the Drowned Stair where past climbers' lanterns gather (Tidecaller flooded vestibule, Echo Mage bell loft, Cartographer survey chamber, Duelist fencing hall). Shared track "Stair Climb". Logbook = "the Keeper's Ledger". Difficulty ladder = Tidemark 1–20.
+
+## Map structure (all acts)
+15 rows, 3–4 nodes wide, each node links to 1–2 above. Row 1 fights, row 8 Treasure, row 14 Camp, row 15 Boss. Other nodes: Fight, Unknown (?) -> event/fight/shop/treasure, Camp, Elite (row 5+), Merchant (row 3+). Floor bands: Entrance 1–5, Deeper 6–10, Approach 11–14, Lair 15. Final act: 4 nodes (Lighthouse Stair: camp, bazaar, wardens, then the Drowned Sun).
+Map skins: Act 1 "Tidewater Chart" (sea-chart parchment, teal shallows, compass rose, tower sketch at top; wax-seal nodes), Act 2 "Admiralty Plate" (slate blueprint, rivets, chain paths), Act 3 "Gale Vellum" (violet vellum, isobar contours), Final "Star-Glass".
+
+## Acts as currently designed
+| Act | Name | In-world |
+|---|---|---|
+| 1 | The Drowned Stair | The tower's drowned base, laid bare by the lowest tide in a generation. Tidepools, kelp-choked cloisters, the court of the Leviathan Bell. The Kelp Matriarch is rooted in the summit pool. |
+| 2 | The Brine Bastion | Fortress the Tidewardens built to hold back the sea; drowned with its garrison at their posts. Rusted guns face the water. Bosses: Tidewarden Colossus (sluice gate), Wreck Queen (dead fleet in the harbour basin). |
+| 3 | The Galecrown | Above the clouds the storm keeps court; the Upturned Sea hangs over the summit. Bosses: Thalassa the Undrowned, Maelstrom Engine. |
+| Final | The Pale Lighthouse | Silent, lightless; carry three Beacon Shards up the stair and light the lamp; the Drowned Sun rises beneath glass-black water. |
+Note: there is a geography tension: the docs say "the tower IS the Drowned Stair" and all of Act 1 stands on the tower's drowned base, yet Act 2 is a fortress harbour (horizontal), Act 3 is cliffs above clouds, and the transition from Act 2 to 3 is a waterspout updraft.
+
+## Environment bands (current)
+Act 1 (built and painted, 10 backgrounds):
+- `a1_shore` Shoreline Steps (floors 1–5, signed off): dark misty tidal shelf, wet rock, a dark tower mass on the right with faint steps, sea stacks/mountains left. Reads as "shore", steps barely visible.
+- `a1_cloister` Kelp Cloister (6–10): half-flooded green colonnade, kelp hanging from a broken roof, green light. Reads as a flat interior hall.
+- `a1_bellcourt` Bellwater Court (11–14): misty open plaza with drowned-knight statues, a distant lit spire/bell frame, chains. Reads as a flat courtyard.
+- `a1_lair_bell` Belfry of the Leviathan Bell: arched stone hall open to a stormy sea.
+- `a1_lair_kelp` Matriarch's Kelp Hollow: tunnel of giant kelp with glowing pods, green moon.
+- `ev_a1` Tidepool Grotto (all Act 1 events): sea cave mouth with tidepools, light from the opening.
+- `shop_a1` Driftwood Bazaar: Wren's stall inside a beached ship hull, lanterns, shelves.
+- `camp_a1` Stairwell Camp: fire in a stone alcove, sea through an arch.
+- `chest_a1` Wrack-Line Cache: chest on a sandy beach among rocks.
+- `tr_start` Rowing to the Stair: sunrise over the sea, a jagged tower-rock rising from water.
+Also: map parchment `map_a1`, title card `tc_a1`, 5 intro images, title screen. Battle backgrounds are layered (sky/far/mid/ground/foreground) for parallax. Lighting arc for Act 1: dawn -> green gloom -> rain.
+Act 2 planned: Outer Harbour (1–5), Flooded Barracks (6–10), Gale-Lashed Ramparts (11–14); events in a Drowned Archive; shop Harbour Chandlery; camp Gun-Deck Camp; chest Armoury Strongbox.
+Act 3 planned: Cloudbreak Cliffs (1–5), Thunder Spires (6–10), Crown Terraces (11–14); events Windshrine Hollow; shop Stranded Hull Bazaar; camp Lee-Side Camp; chest Gale Reliquary.
+Final: Lighthouse Stair (spiral inside the pale lighthouse), lair = lantern gallery atop the lighthouse over a glass-black sea.
+Transitions: Act1->2 "Through the Bell Gate" (past the silenced bell, through rusted gates, Bastion harbour opens below in dusk rain); Act2->3 "The Updraft" (waterspout lifts climber through cloud); Act3->Final "The Beacon Path" (shards form a bridge of light to the lighthouse above the storm). Victory: "The Lighthouse Lit".
+
+## Enemies (motif per act)
+Act 1 "Tidewrack" (barnacles, kelp, verdigris, drowned stone): Brine Slug, Gull Thief, Rust Knight, Spore Pod, Glimmer Wisp, Coral Crab, Tide Leech (coiled around a broken stair-stone), Kelp Lurker; elites Drowned Captain, Tideglass Warden (stone sentinel with mirror face), Twin Eels; bosses Leviathan Bell, Kelp Matriarch (+Kelp Tendril).
+Act 2 "Rust & Rivet": Harpoon Gunner, Shellback Guard, Bilge Rat, Siren Acolyte, Brine Hexer, Riveted Diver, Salt Wraith, Pressure Golem; elites Abyssal Siege Crab, Drowned Choir Singer, Harbormaster Grell; bosses Tidewarden Colossus, Wreck Queen.
+Act 3 "Stormglass": Gale Petrel, Thunderhead Jelly, Voltaic Ray, Gale Harpy, Cloudfin Shark, Static Polyp, Hail Golem, Cloud Serpent; elites Galecaller Magus, Twin Squalls, Eye of the Gale; bosses Maelstrom Engine, Thalassa the Undrowned.
+Final "Pale & Gilt": Bulwark Warden, Harpoon Warden; boss The Drowned Sun.
+
+## Act 1 events (all staged in the one cave scene today)
+Tidepool Shrine, Wandering Cartomancer, Sunken Chest (crab-guarded), Campfire Stranger (driftwood fire on the stair), Crab Market, Gull Nest (sea-stack ledges), Ink Grotto, Shipwrecked Sailor, Tideglass Mirror, Saltwife's Loom. Any-act shrines: Tidal Wheel, Barnacle Anvil, Cleansing Spring, Changeling Pool, Offering Tide, Wishing Undertow.
+
+## Grok Bot's initial ideas (one input among many)
+1. The Stair is a terraced sunken city climbing a mountain/tower toward the Pale Lighthouse; map branches are alternate routes up (broken stairways, flooded streets, rooftops, collapsed galleries). Each floor is a terrace.
+2. Every background shows the climb: steps in the foreground, the lighthouse closer/higher each band, the sea dropping further below.
+3. The tide floods and collapses sections, forcing detours through side passages, chapels, caves (fits "the tide is coming").
+4. Optionally rename Act 1 (e.g. "The Drowned Shore"/"Sunken Terraces") so the Stair/tower comes later.
+
+## Constraints
+- Act 1 is built; prefer retouching existing art (Grok Imagine image edits using the existing image as reference keep style) over full redos; Spencer is cost-conscious. a1_shore is signed off.
+- Code ids must stay unchanged (display renames only).
+- Gameplay map rules (15 rows, branching, row 8 treasure, row 14 camp) should stay.
+- Everything must stay original and in voice.
+
+=== ROUND 1: claude ===
+# Claude's proposal: one tower, climbed from the sea to the sky
+
+## The core fix
+
+The tower is the whole world. The structure is a single vertical climb, and each act is a different part of the tower or its works. Act 1 is the **foot** of the tower, the drowned city that grew around it. That is why the map can branch: **a city has many streets, and a stair has one line.** Branching only makes sense where the climber chooses between routes. The map is a choice of routes up the **slopes**.
+
+I would stop saying "the Drowned Stair" is the tower and keep it only as the name of the **spiral staircase inside**, the one line the climber is trying to reach. The **Pale Lighthouse** is the tower's top. The "Stair" becomes the Final's name and the goal of the whole game.
+
+| | Place | Shape of travel |
+|---|---|---|
+| Act 1 | **The Drowned Shallows** (the Tower's foot) | Horizontal into vertical: wade, then climb terraces |
+| Act 2 | **The Brine Bastion** (the Tidewardens' works built *into the tower's flank*) | Up through a fortress, harbour to ramparts |
+| Act 3 | **The Galecrown** (the tower's upper shaft above the clouds) | Outside, on ledges and spires |
+| Final | **The Pale Lighthouse** | The one true spiral: no branching, 4 nodes |
+
+## Why the map branches
+
+In every act the climber is choosing **routes through a broken place**: a collapsed gallery here, a flooded street there. A **story line in the map frame** (Act 1 chart: "the tide has broken the stair; find a way around") explains it. Short version for the UI: *"The Stair is broken here. Every road up is a gamble."*
+
+The branches also link to **tide mechanics**: low tide opens one route, so the chart can mark flooded segments in teal (cosmetic first, mechanical later).
+
+## Act 1: The Drowned Shallows (display rename; code id unchanged)
+
+The act is about **leaving the water and finding the first step**. The Stair rises only at the end.
+
+- **Floors 1–5, Wrack Shelf** (`a1_shore`, keep): the lowest tide in a generation. The tower stands far off, at the edge of the shelf, as a dark mass. *The climber is far away and low.*
+- **Floors 6–10, Kelp Cloister → rename "The Sunken Terraces"** (`a1_cloister`): the drowned town built on the tower's lower slope, **terraced streets going up**. The foreground already has colonnades. Re-stage it as *one terrace of a flooded town seen from a higher step*, with the shallows visible **below** through arches.
+- **Floors 11–14, Bellwater Court → "The Bell Stair Court"** (`a1_bellcourt`): the top terrace. The tower wall now **fills the right half**, and the first true stair (the entrance flight) rises into it.
+- **Lair:** Belfry of the Leviathan Bell and Matriarch's Kelp Hollow stay. The bell hangs in the **gate-tower** that guards the entrance (Act 2 begins "Through the Bell Gate"). The Matriarch's pool is the **last flooded cistern** under the gate.
+
+**Progress cue:** the sea level **drops** and the tower **grows** from band to band. This is the one rule every background follows (see below).
+
+**Act 1 name:** I suggest **"The Drowned Shallows"** over "Sunken Terraces". It keeps the voice (salt, kelp) and promises the Stair as a payoff rather than a lie. The title card becomes *"Act I · The Drowned Shallows · Where the tide gave the tower back."* The line already works.
+
+## Act 2: The Brine Bastion
+
+The Tidewardens carved the Bastion **into the tower's flank** to hold back the sea. It is a fortress that is also a staircase, with levels linked by lifts, chains and gun-decks.
+
+- **1–5 Outer Harbour:** the tower's foot is now the harbour wall; wrecks at anchor, sea at the climber's back.
+- **6–10 Flooded Barracks:** inside the wall, the garrison still at their posts, water at knee level.
+- **11–14 Gale-Lashed Ramparts:** the top of the works, open to the weather. The first real wind and the first clouds *below* the horizon.
+- **Bosses:** Tidewarden Colossus (sluice gate) and Wreck Queen (the harbour basin). The basin should be **seen from above** in the Rampart band, so the climber looks down on the harbour they crossed.
+- **Rooms:** events in the **Drowned Archive** (the Wardens' records); shop is the **Chandlery**, Wren's second stall (keep); camp on a gun deck; chest is an armoury strongbox.
+
+Act 2's transition becomes less magical: instead of a waterspout, the climber takes a **rope-and-chain lift** the Wardens built, which snaps halfway, and the climber is flung into cloud. The waterspout can stay as the villain's force, not the vehicle.
+
+## Act 3: The Galecrown
+
+The shaft of the tower above the clouds, wind-scoured, hung with the wrecks of ships the storm lifted.
+
+- **1–5 Cloudbreak Cliffs → "Cloudbreak Ledges"** (the tower's own outer ledges, not natural cliffs).
+- **6–10 Thunder Spires:** broken pinnacles and lightning rods.
+- **11–14 Crown Terraces:** the **Upturned Sea** hangs overhead; water falling *upward* in sheets.
+- **Rooms:** events at the Windshrine; shop is the stranded hull (Wren arrives by sky-barge); camp lee-side; chest a Gale Reliquary.
+- **Bosses:** Thalassa the Undrowned and the Maelstrom Engine, where the Engine is the Wardens' last machine, bridging Act 2's story.
+
+## Final: The Pale Lighthouse
+
+The **only literal stair**, a spiral inside the white shaft. Four nodes: camp, bazaar, wardens, then the Drowned Sun. The Drowned Sun is **seen through the lantern glass from the first node**, a dim glow far below on the sea floor, brighter each step. It reads as the payoff of the "sun sank" premise: you have climbed so high that you can finally **look down on it**.
+
+## The rule for every background (one-sentence art brief)
+
+> Every scene contains **three readable elements**: the **tower** (size grows by band), the **sea level** (drops by band), and **a visible way up** (steps, ramp, chain, ladder).
+
+Act 1 bands: tower tiny and distant → tower half the frame → tower fills the right with steps entering it. Sea: wide below → narrow strip → only glimpsed through arches.
+
+## The cinematic and Lamplight
+
+- **Scenes 1–4: keep verbatim.** They are about the sun and the sea and need no change.
+- **Scene 5:** "Four souls stand upon the salt-slick stone" now reads as the base of the tower. Change to *"Four souls stand at the tower's foot, ready to brave the ascent."* Keep "Choose your climber."
+- **Scene 3** ("The ancient stair has risen"): change to *"The ancient tower has risen."* The Stair is the inside; players should hear that word later.
+- **Lamplight:** the death line "tide took you on the Cairn Landing" stays. Each **Class Lamp** is a landing *inside the tower the climber finds at the end of Act 1*. Reveal that in the Act 1 → 2 transition: the Bell Gate opens onto the first interior stair, and the lanterns of past climbers line it. That is the emotional hook that connects the meta-progression to the tower.
+
+## Concrete changes NOW (Act 1)
+
+**Names (display only):**
+- Act 1: "The Drowned Stair" → **"The Drowned Shallows"** (title card, map header, death text, any "Act I" label).
+- Floor bands: Shoreline Steps → **Wrack Shelf**; Kelp Cloister → **The Sunken Terraces**; Bellwater Court → **Bell Stair Court**. Map: "Tidewater Chart" stays.
+- Run-start `tr_start`: keep "Rowing to the Stair"; change to **"Rowing to the Tower."**
+- Tidecaller's Class Lamp "flooded vestibule" etc. stay (they are inside the tower, found later).
+
+**Backgrounds (10):**
+
+| id | Verdict | Action |
+|---|---|---|
+| `a1_shore` | **Keep** | Signed off; the tower mass on the right is the right cue. |
+| `a1_cloister` | **Retouch** | Image edit: add tall steps rising at the left edge and show sea through the arches far below. |
+| `a1_bellcourt` | **Retouch** | Edit: enlarge the tower wall on the right and add a wide flight of steps entering a dark gate. |
+| `a1_lair_bell` | **Keep** | Already open to the sea; fine as gate-tower belfry. |
+| `a1_lair_kelp` | **Keep** | Reads as the last cistern. |
+| `ev_a1` | **Keep + vary** | Cave of tidepools works as "shelf" events; later add 2–3 variants. |
+| `shop_a1` | **Keep** | The beached hull fits the shelf. |
+| `camp_a1` | **Retouch** | Make the arch show a **tall step flight**, not just sea. |
+| `chest_a1` | **Keep** | Beach fits the shallows. |
+| `tr_start` | **Keep** | Matches the new name. |
+
+Only three retouches; **no full redos**.
+
+**Map art:** `map_a1` keeps the sea-chart look. Edit the top sketch to a **large tower with a gate**, and the bottom to **shallows with a rowboat**, so the chart itself shows a rising path. No new files.
+
+**Events and enemies:** no renames except one: **Campfire Stranger** stages best at `camp_a1`, so use that background and no change of name. Enemies are already tidewrack-themed; **Tide Leech "coiled around a broken stair-stone"** is a good detail, so keep it.
+
+**Cinematic text:** the scene 3 and 5 tweaks above, and the title card.
+
+**Code:** display-string changes only; no ids change. Add a `bandName` lookup if it does not exist, so band names live in one place, ready for Acts 2–3.
+
+## LATER
+
+- Act 2 and 3 backgrounds, built with the **same three-element rule** from the start.
+- Tide-flooded segments as a map cosmetic, then a mechanic.
+- Event background variants.
+- The Act 2 → 3 chain-lift transition art.
+- The Final's dim sun seen from step one.
+
+## Risks
+
+- "Drowned Stair" is already in many strings: grep before the rename.
+- The Class Lamp lore only works if the Act 1 → 2 transition shows the lanterns. Without it, move the Class Lamps to the Final.
+
+=== ROUND 1: codex ===
+**Make the Drowned Stair the name of the entire ascent: a stepped coastal citadel built around one immense stone spine, with the Pale Lighthouse at its summit.** It has terraces, streets, harbour works, galleries and stairs. From the sea, its overlapping structures resemble a single ruined tower. Within it, several routes climb toward the same gates.
+
+Keep Act 1 named **The Drowned Stair**. Its identity is the newly exposed lower precinct of that larger structure. This preserves the approved cinematic, Lamplight and most existing art while giving the branching map a physical explanation.
+
+The key visual rule is **show elevation through relationships**: the waterline drops, retaining walls become taller, familiar landmarks appear below, and the lighthouse becomes clearer. Steps help, but adding steps to every foreground would not make the world convincing.
+
+**The physical journey and branching map**
+
+The citadel occupies a steep island ridge. Its builders cut terraces into the rock and extended them with massive stone foundations. The Tidewardens later fortified its middle levels and installed machinery in its crown.
+
+The player climbs through four connected places:
+
+- Exposed tidal terraces at the foot of the ridge.
+- A fortified harbour and garrison built into its middle.
+- Storm-battered maintenance works around its upper spine.
+- The lighthouse’s final stair and lantern gallery.
+
+Each map row represents a stage of ascent, not one literal storey. Nodes are places reached along alternative routes: a quay, passage, garden, guardroom or sheltered landing. Connections are traversable streets, stairs, bridges and galleries. Routes split around collapsed structures and converge at surviving crossings.
+
+Keep the existing random map rules. The geography explains their shape; it does not require movement puzzles, tide timers or a second navigation system.
+
+**Act I — The Drowned Stair**
+
+*Floors 1–5: Wrack Steps.* The retreating sea exposes the arrival quay, tidal shelves and lowest retaining walls. Dawn catches wet stone; kelp hangs above the current waterline. The player starts close enough to the sea to hear loose boats scraping rock.
+
+Keep the shoreline’s openness. Its architectural purpose becomes clearer through a visible landing, a rising route toward the tower mass, and masonry partly buried beneath wrack.
+
+*Floors 6–10: Kelp Cloister.* These are the lower keepers’ quarters, built around stepped gardens and covered walks. Floodwater remains trapped in their basins. Broken roofs admit green light through hanging kelp. The player crosses upper galleries while looking into flooded courts below.
+
+The cloister can contain flat rooms. A journey uphill naturally passes through rooms between flights of stairs.
+
+*Floors 11–14: Bellwater Court.* The routes converge on a raised ceremonial terrace beneath the Bell Gate. Rain replaces dawn. The arrival shore is now visible far below through breaches in the parapet. The lighthouse remains dark above the Bastion.
+
+*Lair: Leviathan Belfry or Matriarch’s Cistern.* Both occupy the gate terrace. The Leviathan Bell hangs in the gatehouse; the Kelp Matriarch has rooted in an adjacent keeper’s cistern and spread across the passage.
+
+Both bosses lead to the same exit. If the Matriarch is fought, the bell remains an ominous landmark rather than an implied second compulsory boss.
+
+Enemy themes remain barnacles, scavengers, kelp and drowned masonry. Stone sentinels and ruined guards belong here alongside shore creatures: this was an inhabited precinct reclaimed by the sea.
+
+Events occur in recesses, terraces and surviving rooms. Wren shelters in a wrecked boat lodged against a quay wall. Camps occupy dry keeper’s alcoves. The row-eight chest sits on an old storage landing above the exposed shore. These places support repeated discoveries without suggesting that every room contains the same cave.
+
+**Act II — The Brine Bastion**
+
+The Bastion is the citadel’s fortified middle, built by the Tidewardens around a **high harbour basin connected to the sea by monumental locks**. Ships entered through successive chambers before the machinery failed. The stranded fleet now explains the Wreck Queen without placing a normal sea-level harbour halfway up the ascent.
+
+*Floors 1–5: Lockside Harbour.* The Bell Gate opens onto the basin’s lower service quay. Rusted lock doors tower overhead. Ship hulls lean against masonry; chain lifts and gun platforms connect the routes. Through an open spillway, the lower terraces lie beneath the player.
+
+*Floors 6–10: Flooded Barracks.* Routes climb through garrison blocks, pump rooms and covered bridges. The flooding comes from trapped basin water and leaking conduits. Outside windows, the harbour appears progressively lower.
+
+*Floors 11–14: Gale-Lashed Ramparts.* The player reaches the upper defensive ring. Guns face the pale horizon. Rain blows sideways through embrasures; the storm crown dominates the skyline.
+
+*Lair: Main Sluice or Fleet Basin.* The Tidewarden Colossus guards the upper sluice crossing. The Wreck Queen occupies the elevated fleet basin beside it. Either route opens onto the same maintenance ascent.
+
+Enemies express a garrison that continued working after death: divers, gunners, guards, machinery and salt-haunted crews. Events belong in the Drowned Archive and abandoned duty rooms. Wren’s Harbour Chandlery sells salvaged stores. Camps use sheltered gun decks; chests are armoury strongboxes.
+
+Revise “Through the Bell Gate” so the harbour **opens ahead**, with the drowned terraces below. It should not suggest a descent into a separate coastal town.
+
+**Act III — The Galecrown**
+
+The Galecrown is the exposed upper spine and the Tidewardens’ failed weather works. The Maelstrom Engine was installed here to draw water through the citadel’s conduits and force the tide down. Its failure helped gather the **Upturned Sea**, a suspended mass of seawater turning above the ridge.
+
+*Floors 1–5: Cloudbreak Ledges.* Narrow exterior paths and maintenance bridges rise from the Bastion. Clouds interrupt views of the roofs below. Stone is scoured clean; vegetation survives only in sheltered cracks.
+
+*Floors 6–10: Thunder Spires.* Lightning rods, broken conductors and pump towers stand among the natural stone teeth. Storm creatures swim through airborne spray. Branches follow different service bridges around damaged installations.
+
+*Floors 11–14: Crown Terraces.* The player reaches the engine’s upper platforms. The Upturned Sea occupies much of the sky, its underside streaked with foam and drifting wreckage. The Pale Lighthouse is finally visible across a broken crown bridge.
+
+*Lair: Engine Crown or Suspended Basin.* The Maelstrom Engine is encountered at its exposed heart. Thalassa the Undrowned inhabits the adjacent basin beneath the hanging water. Both guard access to the lighthouse crossing.
+
+Use gale, hail, static and storm-tossed sea life as the enemy vocabulary. Events occur in wind shelters and abandoned maintenance stations. Wren has lashed a small wrecked hull to a service platform; the shop’s arrival is credible because the storm lifts wreckage here. Camps occupy the lee of stone buttresses; chests are sealed instrument reliquaries.
+
+Keep “The Updraft” as a cinematic traversal through a broken lift shaft: the climber catches the waterspout’s rising current and lands on a visible maintenance ledge. It bridges a specific gap in the same structure.
+
+**Final — The Pale Lighthouse**
+
+The lighthouse was the original summit structure. The later fortifications and machinery were built beneath it.
+
+The three Beacon Shards are **Tide, Brass and Gale**: surviving pieces of the lamp’s focusing assembly, recovered from the three precincts. Keep the Tide chest and Gale elite sources; establish the Brass source in Act II later. Present them as guaranteed discoveries along successful progression, so the ending does not depend on unexplained luck.
+
+The shards restore the broken beacon crossing for “The Beacon Path.” Inside, the four-node sequence has clear physical locations: a sheltered keeper’s landing, Wren’s last supply table, the wardens at the lantern door, and the gallery.
+
+The lamp calls the Drowned Sun upward. Its presence rises through the glass-black water surrounding the crown, filling the gallery’s windows with submerged gold. **Lighting the lamp begins the final confrontation.** The climber must hold the beacon against the Sun’s pull long enough for it to rise.
+
+Victory reveals the same coast shown at the beginning, illuminated from above. Water begins draining from the terraces. The payoff is immediately legible: the journey restored light to the world the player crossed.
+
+**Intro cinematic and Lamplight**
+
+Preserve the five scenes and their composition. Make three small text changes:
+
+- Scene 3: “But now, the ocean draws back. / The drowned terraces lie bare.”
+- Scene 4: “At the summit, the Pale Lighthouse waits. / Its lamp can call the Drowned Sun back.”
+- Scene 5: “Four souls stand upon the lowest steps. / Choose your climber.”
+
+Scene 3’s image should read as a stepped citadel around the existing tower silhouette. Scene 5’s lowest steps remain literal.
+
+Keep Lamplight, the Keeper’s Ledger, Class Lamps and “Stair Climb.” Lanterns gather on landings throughout the citadel. Their flame survives where the tide took the climber; the Stair remembers those lights. Class Lamp rooms are surviving keeper spaces within the larger ascent. This lore now fits outdoor terraces as naturally as interior stairs.
+
+**Concrete Act 1 work now**
+
+Keep every code ID. Use these display names and art decisions:
+
+| Existing background | Decision | Specific treatment |
+|---|---|---|
+| `a1_shore` | **Keep** | Preserve the signed-off painting. Display name: **Wrack Steps**. Establish its landing and route through the map and transition framing. |
+| `a1_cloister` | **Retouch** | Add a broken ascending gallery and a view down into a flooded court; retain the green colonnade and kelp. |
+| `a1_bellcourt` | **Retouch** | Add a breached parapet overlooking the distant arrival shore; make the bell structure dark and place the lighthouse higher behind it. |
+| `a1_lair_bell` | **Retouch** | Show the hall as a raised gatehouse, with lower terraces visible beyond its sea-facing arches. |
+| `a1_lair_kelp` | **Retouch** | Make the kelp tunnel a roof-broken stone cistern with a raised maintenance ledge; remove the apparent green moon. |
+| `ev_a1` | **Retouch** | Recessed tidepool vault beneath a retaining wall, with worn steps climbing past its opening. |
+| `shop_a1` | **Retouch** | Preserve Wren’s hull and lanterns; establish the boat as wedged against a masonry quay beneath rising terraces. |
+| `camp_a1` | **Keep** | Existing alcove and sea-facing arch fit. Rename **Keeper’s Alcove**. |
+| `chest_a1` | **Retouch** | Replace the beach under the chest with a salt-coated storage landing; keep sand, wrack and rocks at its edges. |
+| `tr_start` | **Retouch** | Preserve boat, dawn and tower silhouette; reveal stepped foundations and the arrival quay around the base. |
+
+**No full background redos are needed now.** Preserve combat staging and existing parallax boundaries during edits.
+
+Retouch `map_a1` into a chart of the exposed lower terraces: shallow water at the bottom, rising retaining-wall contours, several routes around ruined blocks, Bell Gate at the top, and the lighthouse beyond. Draw generated connections as traversable routes across that geography. Update `tc_a1` to:
+
+> **Act I · The Drowned Stair**  
+> **Where the tide laid the lower terraces bare.**
+
+Rename “Matriarch’s Kelp Hollow” to **Matriarch’s Cistern** and “Wrack-Line Cache” to **Wrack Landing Cache**.
+
+Use a small, targeted naming pass: **Rust Knight → Wrack Knight**, reserving the strongest iron vocabulary for Act II; **Spore Pod → Kelp Pod**; **Glimmer Wisp → Tideglimmer**. Keep the remaining Act I enemy names.
+
+Rename **Wandering Cartomancer → Stray Chartmaker**, **Sunken Chest → Wrackbound Chest**, **Campfire Stranger → Landing Stranger**, and **Shipwrecked Sailor → Castaway**. Keep the other event names. Amend their opening sentences to locate them in the precinct: the gull nest on a broken parapet, the loom in a keeper’s recess, the mirror in a flooded chamber. Use the shared event painting as a discovery backdrop; illustrations and text establish the particular site.
+
+Code changes now should cover display strings, revised cinematic text, art references where necessary, map presentation, and floor-band location labels. Ensure both Act I bosses use a geographically neutral Bell Gate departure. Keep map generation, encounters, rewards and balance unchanged.
+
+**Later**
+
+Build the high locks, stranded fleet, upper weather works and lighthouse crossing into Act II–Final art from their first sketches. Implement the Brass Shard and complete shard progression then. Create distinct event illustrations as those acts enter production.
+
+The immediate success criterion is simple: after Act I, a player should be able to point to the shore below, the Bell Gate ahead and the lighthouse above—and understand why several routes can take them there.
+=== ROUND 1: gemini ===
+# Tidebound Ascent: World-Structure Proposal (Round 1)
+
+---
+
+## 1. Executive Summary & Core Solution
+
+### Spencer’s Problem
+Act 1 is called **"The Drowned Stair"**, yet its backgrounds read as flat shores, interior halls, and open courtyards. A branching map feels unnatural on a single narrow staircase. Furthermore, the transitions between Act 1 (flooded stair), Act 2 (horizontal harbour fortress), and Act 3 (cliffside clouds via a waterspout updraft) create geographical disconnect.
+
+### The Unified Solution: The Monolithic Spire-Mountain
+The "Drowned Stair" is **not a narrow interior flight of steps** in a slim tower. It is a **colossal, ancient monolithic spire-mountain** sculpted by precursor keepers into thousands of monumental terraced steps, causeways, and landings leading up to the **Pale Lighthouse**. 
+
+Because each tier of the Stair is hundreds of yards wide—consisting of outer seawall ledges, flooded colonnades, drainage grottos, and inner stair-wells—a **branching 15-row map makes total sense**. The climber isn't picking which stair tread to step on; they are selecting which **causeway, gallery, or breach-passage** to scale to reach the next terrace level.
+
+```
+       [ FINAL ACT ] ------ The Pale Lighthouse (Summit / Lamp Gallery)
+            ^
+       [  ACT 3   ] ------ The Galecrown (Upper Terraces & Sky Viaducts)
+            ^
+       [  ACT 2   ] ------ The Brine Bastion (Garrison Terraces & Sluice Gates)
+            ^
+       [  ACT 1   ] ------ The Drowned Stair (Submerged Basal Terraces)
+```
+
+By defining the entire physical world as one continuous, upward-scaling structure, we preserve every existing asset and code ID, fix the branching logic instantly, and give each act a clear place in a single vertical climb.
+
+---
+
+## 2. World Structure & Physical Journey (Acts 1, 2, 3 & Final)
+
+### ACT 1: The Drowned Stair (Floors 1–15)
+*   **Act Name:** The Drowned Stair
+*   **In-World Setting:** The basal terraces of the monolithic spire, exposed for the first time in generations as the sea recedes. Monumental stone steps (shoulder-high to giant proportions), carved tidepools, and kelp-draped archways at the ocean's edge.
+*   **Why the Map Branches:** The receding tide leaves multiple paths up the basal terrace: outer causeways exposed to the surf, flooded interior colonnades, or kelp-choked stair-ramps.
+*   **Sub-Zones (Floor Ranges):**
+    *   **Floors 1–5 (Sub-Zone 1): *Terrace I · Low-Water Mark*** — Barnacled step-bases and tidepools at sea level.
+    *   **Floors 6–10 (Sub-Zone 2): *Terrace I · Kelp Cloister Steps*** — Flooded stone archways and stair-ramps filled with hanging kelp and emerald light.
+    *   **Floors 11–14 (Sub-Zone 3): *Terrace I · Bellwater Landing*** — High stone terrace before the Bastion gates, wet with draining water, flanked by keeper statues and giant bronze chains.
+    *   **Lair (Floor 15):**
+        *   *Option A:* **Belfry of the Leviathan Bell** — Arched stone terrace with steps spiraling up around the suspended bell.
+        *   *Option B:* **Matriarch's Kelp Hollow** — A flooded stairwell shaft overgrown with giant kelp pods.
+*   **Background Concepts & Progress:** Steps/ramps lead upward from bottom-left to top-right in every background. As you move from Floors 1 to 14, the sea horizon drops lower in the background while the towering black wall of the Brine Bastion grows larger above.
+*   **Room Logic:**
+    *   *Events (`ev_a1`):* Tidepool Grottoes carved into the stone risers of the steps.
+    *   *Shop (`shop_a1`):* Driftwood Bazaar wedged on a wide stair landing inside a beached hulk.
+    *   *Camp (`camp_a1`):* Stairwell Camp tucked inside a dry stone masonry alcove.
+    *   *Chest (`chest_a1`):* Wrack-Line Cache wedged between massive step flagstones.
+*   **Enemies & Bosses:**
+    *   *Enemies:* Brine Slug, Gull Thief, Rust Knight, Spore Pod, Glimmer Wisp, Coral Crab, Tide Leech, Kelp Lurker.
+    *   *Elites:* Drowned Captain, Tideglass Warden, Twin Eels.
+    *   *Bosses:* Leviathan Bell, Kelp Matriarch.
+
+---
+
+### ACT 2: The Brine Bastion (Floors 16–30)
+*   **Act Name:** The Brine Bastion
+*   **In-World Setting:** A massive iron-and-stone fortress built directly onto the middle terraces of the Stair by the ancient Tidewardens to hold back the sea and power their sluice machinery. Rust, rivets, heavy oak, brass pipework, and floodgates.
+*   **Why the Map Branches:** The Bastion’s lower gates are sealed. Climbers choose between scaling the outer gantry catwalks, crawling through flooded sluice galleries, or forcing through the gun-deck stairwells.
+*   **Sub-Zones (Floor Ranges):**
+    *   **Floors 1–5 (16–20): *Terrace II · Outer Harbour Gantries*** — Catwalks and iron ladders clinging to the lower fortress wall above the surf.
+    *   **Floors 6–10 (21–25): *Terrace II · Flooded Barracks & Sluice Runways*** — Interior stone corridors with surging sea currents, iron grates, and turning brass valves.
+    *   **Floors 11–14 (26–29): *Terrace II · Gale-Lashed Ramparts*** — High fortress battlements swept by spray, open to dark clouds, featuring massive iron harpoon batteries.
+    *   **Lair (Floor 30):**
+        *   *Option A:* **The Sluice Gate Basin** — Iron floodgate chamber with roaring water currents (*Tidewarden Colossus*).
+        *   *Option B:* **The Drowned Citadel Harbour** — Internal sea-basin filled with smashed warden warships (*Wreck Queen*).
+*   **Background Concepts & Progress:** Interior/exterior iron staircases and riveted gantries. Looking back down shows the distant sea and Act 1's terraces far below. Looking up reveals storm clouds swirling around the spire's summit.
+*   **Room Logic:**
+    *   *Events:* Drowned Archive / Sentry Nook.
+    *   *Shop:* Harbour Chandlery (Wren's brass lantern shop set on a gantry landing).
+    *   *Camp:* Gun-Deck Camp (sheltered behind a heavy iron culverin).
+    *   *Chest:* Armoury Strongbox (riveted iron safe on a landing).
+*   **Enemies & Bosses:**
+    *   *Enemies:* Harpoon Gunner, Shellback Guard, Bilge Rat, Siren Acolyte, Brine Hexer, Riveted Diver, Salt Wraith, Pressure Golem.
+    *   *Elites:* Abyssal Siege Crab, Drowned Choir Singer, Harbormaster Grell.
+    *   *Bosses:* Tidewarden Colossus, Wreck Queen.
+
+---
+
+### ACT 3: The Galecrown (Floors 31–45)
+*   **Act Name:** The Galecrown
+*   **In-World Setting:** The upper monolithic steps piercing the cloud layer. Exposed sky-viaducts, wind-scoured pale stone, crackling static, and lightning arches wrapping around the spire peak.
+*   **Why the Map Branches:** Broken flying buttresses and shattered step-arches force the climber to pick between exposed sky-bridges, wind-sheltered interior galleries, or lightning-conduit ramps.
+*   **Sub-Zones (Floor Ranges):**
+    *   **Floors 1–5 (31–35): *Terrace III · Cloudbreak Step-Ledges*** — Shattered stone staircases emerging above a blanket of white storm clouds.
+    *   **Floors 6–10 (36–40): *Terrace III · Thunder Spires & Arcades*** — Glazed stone bridges wrapped in crackling static, surrounded by wind-harps and resonance pillars.
+    *   **Floors 11–14 (41–44): *Terrace III · Crown Terraces*** — Open-air stair landings directly beneath the Pale Lighthouse glass gallery; the sea hangs inverted in the sky above in a giant vortex.
+    *   **Lair (Floor 45):**
+        *   *Option A:* **The Maelstrom Engine Core** — A massive brass-and-stormglass machine spinning on the peak terrace.
+        *   *Option B:* **The Undrowned Sanctum** — The storm-slick roof terrace where Thalassa stands over the light gap.
+*   **Background Concepts & Progress:** Clouds below, crackling purple/gold lightning above. The glass lens dome of the Pale Lighthouse dominates the background, growing larger with each node.
+*   **Room Logic:**
+    *   *Events:* Windshrine Hollow.
+    *   *Shop:* Stranded Hull Bazaar (sky-wrecked vessel lodged in a cliff gap).
+    *   *Camp:* Lee-Side Camp (sheltered windbreak alcove in pale stone).
+    *   *Chest:* Gale Reliquary (brass and stormglass casket).
+*   **Enemies & Bosses:**
+    *   *Enemies:* Gale Petrel, Thunderhead Jelly, Voltaic Ray, Gale Harpy, Cloudfin Shark, Static Polyp, Hail Golem, Cloud Serpent.
+    *   *Elites:* Galecaller Magus, Twin Squalls, Eye of the Gale.
+    *   *Bosses:* Maelstrom Engine, Thalassa the Undrowned.
+
+---
+
+### FINAL ACT: The Pale Lighthouse (Floors 46–49)
+*   **Act Name:** The Pale Lighthouse
+*   **In-World Setting:** The interior glass-and-gilt spire at the very apex of the world. A central spiral stair made of brass and pale stone surrounded by continuous glass windows.
+*   **Node Sequence (4 Linear Nodes):**
+    1. **Node 1 (Camp):** *The Lighthouse Stair* — Final rest and lantern tuning at the foot of the brass spiral stair.
+    2. **Node 2 (Shop):** *Bazaar of the Last Keeper* — Wren’s final shop beside an ancient brass ledger.
+    3. **Node 3 (Elite/Event):** *The Beacon Wardens* — Final martial test before entering the lens gallery.
+    4. **Node 4 (Boss):** *The Lamp Gallery* — **The Drowned Sun**.
+*   **Payoff & Narrative Conclusion:**
+    *   Inserting the three **Beacon Shards** into the central brass hearth ignites the dormant lamp.
+    *   The lens fires a beam through the glass floor down into the sea depth.
+    *   **Ending Cinematic:** The Drowned Sun rises slowly back out of the black water, breaking the surface and restoring the dawn.
+
+---
+
+## 3. Cinematic & Narrative Integration
+
+### Intro Cinematic Alignment
+*   **Scene 3 ("The ancient stair has risen"):** Visual shows the receding sea exposing the colossal, multi-tiered stone mountain-spire (Terraces I, II, III).
+*   **Scene 5 ("Choose your climber"):** Camera zooms to the lowest step blocks at water level (Terrace I). Four heroes stand beside their rowboat on the lowest stone tread.
+*   **Run Start (`tr_start`):** "Rowing to the Stair" — Rowboat approaches the colossal step-base of the spire rising from the shallows. Title Card: *"Act I · The Drowned Stair · The Submerged Terraces"*.
+
+### Lamplight & Meta-Progression
+*   When a climber dies, their death location is explicitly tied to a stair landing:
+    *   *Death Screen:* `"The tide took you on the 8th Step of the Kelp Cloister. Your lantern burns on: 143 Lamplight."`
+*   **Class Lamps:** Each class's sanctuary sits at a specific landing level along the Stair:
+    *   *Tidecaller:* Submerged Vestibule (Terrace I base).
+    *   *Echo Mage:* Bell Loft (Terrace I upper).
+    *   *Cartographer:* Survey Chamber (Terrace II gantry).
+    *   *Duelist:* Fencing Hall (Terrace II rampart).
+
+---
+
+## 4. Concrete Action Plan: Act 1 Changes
+
+To maintain budget efficiency, **no assets or code IDs will be deleted or re-coded**. Instead, existing Act 1 assets will receive targeted image-retouches or text adjustments.
+
+```
++------------------+----------------------------------+------------------------------------+
+| ASSET TYPE       | CODE ID                          | ACTION / DIRECTION                 |
++------------------+----------------------------------+------------------------------------+
+| Map Parchment    | map_a1                           | RETOUCH: Add terrace stair lines   |
+| Title Card       | tc_a1                            | TEXT EDIT: Add "Submerged Terraces"|
+| Background       | a1_shore                         | KEEP AS IS (Signed Off)            |
+| Background       | a1_cloister                      | RETOUCH: Add stone stair treads    |
+| Background       | a1_bellcourt                     | RETOUCH: Add midground grand stair |
+| Background       | a1_lair_bell                     | RETOUCH: Enhance stair archway     |
+| Background       | a1_lair_kelp                     | RETOUCH: Add stair steps in rock   |
+| Background       | ev_a1                            | RETOUCH: Add stone steps in pool   |
+| Background       | shop_a1                          | RETOUCH: Wedged ship across steps  |
+| Background       | camp_a1                          | RETOUCH: Explicit stair turret     |
+| Background       | chest_a1                         | RETOUCH: Chest on stair landing    |
+| Transition       | tr_start                         | KEEP AS IS                         |
++------------------+----------------------------------+------------------------------------+
+```
+
+### Immediate Changes (Act 1 - NOW)
+
+#### 1. Map Parchment (`map_a1`)
+*   **Action:** **Retouch (Image Edit)**.
+*   **Edit Prompt:** *Keep existing sea-chart parchment and layout, but overlay faint brass-ink contour lines depicting spiraling monumental staircase terraces ascending a mountain-spire from bottom to top. Add terrace labels: "Terrace I: Low Water", "Terrace II: Bastion Gate".*
+
+#### 2. Background Retouches (10 Backgrounds)
+*   `a1_shore` (Shoreline Steps): **KEEP AS IS**. (Already shows tidal shelf with tower/steps on right; perfectly establishes Terrace I).
+*   `a1_cloister` (Kelp Cloister): **RETOUCH**. *Instruction: Add clear stone stair treads climbing steeply upward along the right wall through the drowned colonnade, showing water cascading down the steps.*
+*   `a1_bellcourt` (Bellwater Court): **RETOUCH**. *Instruction: Add a massive grand stone staircase spanning the midground leading up toward the dark Bastion iron gate in the background.*
+*   `a1_lair_bell` (Belfry of the Leviathan Bell): **RETOUCH**. *Instruction: Emphasize broad curved stair steps leading up around the suspended bell platform.*
+*   `a1_lair_kelp` (Matriarch's Kelp Hollow): **RETOUCH**. *Instruction: Show broken stone stair carvings along the rock shaft walls overgrown with kelp.*
+*   `ev_a1` (Tidepool Grotto): **RETOUCH**. *Instruction: Add visible carved stone stair steps leading into and out of the grotto pool on the left edge.*
+*   `shop_a1` (Driftwood Bazaar): **RETOUCH**. *Instruction: Show the grounded ship hull resting wedged across two broad stone stair terraces.*
+*   `camp_a1` (Stairwell Camp): **RETOUCH**. *Instruction: Ensure the alcove is explicitly inside a stone stair turret, with steps leading up into the darkness.*
+*   `chest_a1` (Wrack-Line Cache): **RETOUCH**. *Instruction: Place the chest on a landing between two broad tidepool stair treads instead of flat open sand.*
+*   `tr_start` (Rowing to the Stair): **KEEP AS IS**.
+
+#### 3. Display Text & Naming Adjustments
+*   **Title Card (`tc_a1`):** Change display text to: `"Act I · The Drowned Stair · The Submerged Terraces"`.
+*   **Sub-Zone Headers (Display only):**
+    *   Floors 1–5: `Terrace I · Low-Water Mark`
+    *   Floors 6–10: `Terrace I · Kelp Cloister Steps`
+    *   Floors 11–14: `Terrace I · Bellwater Landing`
+*   **Event Names (Display text only):**
+    *   `Tidepool Shrine` -> `Step-Shrine of the Tide`
+    *   `Campfire Stranger` -> `Stairwell Stranger`
+
+#### 4. Code & Technical Notes
+*   All string changes occur strictly in localized display text tables (`ui_strings.json`).
+*   Asset IDs (`a1_shore`, `a1_cloister`, `ev_a1`, `shop_a1`, `camp_a1`, `chest_a1`, `map_a1`, `tc_a1`) remain untouched to avoid breaking logic or save files.
+
+---
+
+### Deferred Work (Acts 2, 3 & Final - LATER)
+
+1. **Act 2 Production:**
+   * Paint map skin `map_a2` ("Admiralty Plate").
+   * Paint Act 2 backgrounds (`a2_gantry`, `a2_barracks`, `a2_ramparts`, `ev_a2`, `shop_a2`, `camp_a2`, `chest_a2`, `a2_lair_colossus`, `a2_lair_wreckqueen`).
+   * Implement Act 2 enemy models, animations, and encounter pools.
+2. **Act 3 Production:**
+   * Paint map skin `map_a3` ("Gale Vellum").
+   * Paint Act 3 backgrounds (`a3_cloudbreak`, `a3_thunderspires`, `a3_crown`, `ev_a3`, `shop_a3`, `camp_a3`, `chest_a3`, `a3_lair_engine`, `a3_lair_thalassa`).
+   * Implement Act 3 enemy models, animations, and encounter pools.
+3. **Final Act Production:**
+   * Paint map skin `map_a4` ("Star-Glass").
+   * Paint Final Act backgrounds (`a4_stair`, `a4_gallery`).
+   * Implement *The Drowned Sun* boss mechanics and ending cinematic sequences.
+
+=== ROUND 1: grok ===
+I'll start by reading the brief and related world-structure files so the proposal matches the existing design.I’ll pull the design docs and other round-1 proposals so the structure stays consistent with existing lore and art.I’ll check current names, map copy, and a couple of existing round-1 takes so the proposal stays specific.I have the lore, the Act 1 art list, and the geography tension. Proposal below.
+
+# Tidebound Ascent: World Structure (Acts 1–3 + Final)
+
+## The mountain is the Stair
+
+The **Drowned Stair** is the whole climb: a drowned coastal mountain carved by the old keepers into stacked **terrace-rings**, streets, cloisters, and walls, crowned by the **Pale Lighthouse**. The tide has just given the lowest rings back. You climb because it is coming for everyone else.
+
+A terrace is hundreds of yards across. Each run’s “floor” is one ring. The Pale Lighthouse is visible from the first landing as a pale needle in mist, and it grows closer and higher in every band. The sea drops away in the same shots. That is how the player feels the ascent on a landscape phone.
+
+**Act names**
+
+| Act | Name | Place |
+|---|---|---|
+| 1 | **The Wrack Terraces** | Lowest rings of the drowned city, bared by the lowest tide in a generation |
+| 2 | **The Brine Bastion** | Tidewarden ring-fort and harbour basin cut into the mountain’s waist |
+| 3 | **The Galecrown** | Storm cliffs and hail terraces above the cloud |
+| Final | **The Pale Lighthouse** | Silent lamp-tower; the only true narrow stair |
+
+“The Drowned Stair” stays the world’s name: Lamplight, the Keeper’s Ledger, the Stair Climb track, death copy. Act 1’s title no longer claims a single staircase.
+
+## Why the map branches
+
+The keepers’ main flight is broken. The returning tide floods a different set of stairs each run. A node is a dry way across a ring: outer seawall, flooded street, colonnade, collapsed gallery, rooftop, grotto. Links to 1–2 nodes above are the still-passable up-flights. Unknown nodes are detours the tide forced — caves, shrines, wrecks under the terrace. Gameplay stays 15 rows, 3–4 wide, treasure on 8, camp on 14, boss on 15.
+
+---
+
+### Act 1 — The Wrack Terraces
+**Voice:** salt, kelp, old stone, barnacle, tallow. **Light:** dawn → green gloom → rain. **Motif:** Tidewrack.
+
+The drowned city’s lowest belts. Streets of wet stone, kelp in the roofs, a bell court at the Bell Gate. Enemies are what the sea left in the houses: slugs, gulls, verdigris knights, kelp that grew in the cisterns.
+
+| Band | Zone | What you see |
+|---|---|---|
+| 1–5 | **Shoreline Steps** | Tidal shelf, wet rock, tidepools. Sea at your elbow. Tower-mass right. Lighthouse a pinprick in dawn mist. |
+| 6–10 | **Kelp Colonnade** | Half-flooded columned street. Kelp through a broken roof. Through the arches: terraces stepping **down** to the sea. Through the roof: the lamp **higher**. |
+| 11–14 | **Bellwater Court** | High terrace plaza, drowned-knight statues, rain. Bell frame on this ring. Sea far below. Rusted Bastion gates at the back. |
+| Lair | **Bell Gate Belfry** / **Matriarch’s Cistern** | Belfry is the gatehouse into the Bastion, storm through a broken wall, iron on the far side. The Matriarch is rooted in the city’s summit pool — a cistern, giant kelp, green moon. |
+
+**Rooms.** Events in side-hollows under the ring (`ev_a1` Tidepool Grotto: you ducked off the landing). Shop: Wren’s stall in a hull **wedged against a terrace wall**, sea below through the ribs. Camp: fire in a stone alcove, sea through an arch **below**. Chest: iron-bound cache on a **stone landing** among broken steps (the wrack-line of this ring). Row 8 is a known cache terrace; row 14 is the last dry alcove before the Bell Gate.
+
+**Bosses.** Leviathan Bell: the city’s warning bell, last note the Echo Mage followed. Kelp Matriarch: what grew in the cisterns while the sea covered the town.
+
+**Title card:** “Act I · The Wrack Terraces · Where the tide gave the landings back.” Travel: *Rowing to the Stair* — rowboat at dawn toward a **terraced mountain** with a pale needle on top.
+
+---
+
+### Act 2 — The Brine Bastion
+**Voice:** iron, rivets, harbour, garrison, brass, rope. **Light:** dusk rain → lantern interiors → night storm on the walls. **Motif:** Rust & Rivet.
+
+You pass the silenced bell and the rusted gates. The Tidewardens girdled the mountain and cut a harbour basin into the mid-terrace. The fleet drowned at its moorings. Guns still face the water.
+
+| Band | Zone | What you see |
+|---|---|---|
+| 1–5 | **Outer Harbour** | Drowned quay at dusk. Dead hulls. Basin to one side, fortress wall climbing the other. Lamp above the wall. |
+| 6–10 | **Flooded Barracks** | Dripping bunks, rivets, lanterns. Windows show the harbour **below**. |
+| 11–14 | **Gale-Lashed Ramparts** | Fighting top, night storm, cloud at eye level. Galecrown cliffs ahead. Lamp close and dark. |
+| Lair | **The Sluice Gate** / **Wreck Queen’s Boneyard** | Colossus holds the engine’s lower mouth. Wreck Queen rules the flagship in the basin. |
+
+**Rooms.** Events in the Drowned Archive (flooded chart room). Shop: Harbour Chandlery. Camp: Gun-Deck Camp in a casemate. Chest: Armoury Strongbox. Enemies: drowned garrison, siege crabs, siren cult, Harbormaster Grell.
+
+**Transition in:** *Through the Bell Gate.* **Transition out:** *The Updraft* — the Maelstrom Engine’s sluice still vents a waterspout through the cloud. That is the only way onto the sheer upper mountain. The Colossus fight is at that mouth; the updraft is earned.
+
+---
+
+### Act 3 — The Galecrown
+**Voice:** gale, cloud, static, hail. **Light:** wind → lightning → hail, storm-eye overhead. **Motif:** Stormglass.
+
+The mountain’s head above the cloud. The Upturned Sea hangs over the summit: the Drowned Sun’s weather. The engine’s upper works still spin.
+
+| Band | Zone | What you see |
+|---|---|---|
+| 1–5 | **Cloudbreak Cliffs** | Wet black rock over a sea of cloud. Bastion a dark ring in the cloud **below**. Lamp fills the upper third. |
+| 6–10 | **Thunder Spires** | Lightning pylons, the engine’s ribs, static. Lamp beside you, unlit. |
+| 11–14 | **Crown Terraces** | Hail-swept pale stone rings. The lighthouse door is the destination. |
+| Lair | **Heart of the Maelstrom Engine** / **The Upturned Sea** | Titanic brass in a cliff hollow. Thalassa the Undrowned: the sea that refused to drown, fought under an inverted ocean. |
+
+**Rooms.** Windshrine Hollow; Stranded Hull Bazaar (a ship the engine blew up here — Wren followed); Lee-Side Camp; Gale Reliquary. Galecrowned elites carry the Gale Shard.
+
+**Transition out:** *The Beacon Path* — three shards braid a bridge of light from the Crown Terraces across the storm’s eye to the lighthouse door.
+
+---
+
+### Final — The Pale Lighthouse
+**Voice:** pale stone, lamp, gold. **Light:** stillness, then black-gold dawn from below.
+
+This is the only narrow stair. The map is four nodes on purpose: the branching city is over.
+
+1. **Camp** — keeper’s alcove; lanterns of the fallen (Lamplight made visible).  
+2. **Bazaar** — Wren’s last stall, gilt and pale.  
+3. **Wardens** — Bulwark Warden, Harpoon Warden, last Tidewardens who reached the lamp.  
+4. **Lantern gallery** — glass-black sea around the tower; you seat the shards and light the lamp.
+
+**Boss:** The Drowned Sun rises **in** the water under the glass, then is called up. Victory: *The Lighthouse Lit.*
+
+---
+
+## Intro cinematic and Lamplight
+
+Keep the five approved scenes. Scene 3’s second line becomes: “The ancient stair has risen. / A city of landings, given back by the tide.” Scene 5 already places four silhouettes on the lowest steps of that first terrace. *Rowing to the Stair* still names the mountain.
+
+Every climber carries a lantern. Death leaves it burning on the **landing** where they fell; the mountain remembers. Class Lamps are named landings: Tidecaller’s flooded vestibule (a cistern on the Wrack Terraces), Echo Mage’s bell loft (Bell Gate), Cartographer’s survey chamber (a terrace with a view of the lamp), Duelist’s fencing hall (a Bastion salle). Shared track **Stair Climb**. Ledger = the lighthouse log, written all the way down.
+
+## Pale Lighthouse and Drowned Sun payoff
+
+The lamp is in the far plane from floor 1. Each band enlarges it and drops the sea. Act 2 wraps iron around the mountain that holds it. Act 3 puts you in its weather. The shards are the three belts answering: Tide Shard from an Act 1 cache, a Bastion shard from Act 2, Gale Shard from Galecrowned elites. Seated in the gallery they call the sun **up through the water** — the same water that sank it in intro scene 1. The climb you have been seeing in every background is the sentence; lighting the lamp is the last word.
+
+---
+
+## Act 1 changes NOW vs LATER
+
+### NOW (display and targeted retouch; ids unchanged)
+
+**Names (copy only)**  
+Act 1: **The Wrack Terraces**. Subtitle: **Where the tide gave the landings back.** Map header, title screen kicker/foot, Learn to Play (“Climb 15 floors of the Wrack Terraces along the Tidewater Chart”), `TC_A1_DEFAULT` in `render.js`. World name “Drowned Stair” stays on Lamplight, Ledger, death, Stair Climb. Bands: Shoreline Steps keep; Kelp Cloister display **Kelp Colonnade**; Bellwater Court keep; lairs display **Bell Gate Belfry** / **Matriarch’s Cistern**.
+
+**Map**  
+Retouch `map_a1` Tidewater Chart: terrace rings as the field, lighthouse pin at the top, wax-seal nodes on landings. Compass rose stays.
+
+**Ten backgrounds**
+
+| Id | Now | Action |
+|---|---|---|
+| `a1_shore` | Shoreline Steps | **Keep** (signed off). |
+| `a1_cloister` | Kelp Cloister | **Retouch:** seaward arches showing lower terraces and sea below; roof-gap showing the lamp higher; a terrace edge in the ground. Keep kelp and columns. |
+| `a1_bellcourt` | Bellwater Court | **Retouch:** sea far below a terrace drop; Bastion iron gates in the back; lamp closer above the bell frame. Keep statues, rain, bell. |
+| `a1_lair_bell` | Belfry | **Retouch:** rusted gate/iron on one side (Bell Gate). Keep storm sea through the broken wall. |
+| `a1_lair_kelp` | Kelp Hollow | **Keep.** Optional later: stone cistern rim in the ground. |
+| `ev_a1` | Tidepool Grotto | **Keep.** Copy: a hollow under the landing. |
+| `shop_a1` | Driftwood Bazaar | **Retouch:** hull wedged against a terrace wall; sea **below** through the ribs. Keep Wren’s lanterns and shelves. |
+| `camp_a1` | Stairwell Camp | **Keep.** Copy: sea through the arch is below. |
+| `chest_a1` | Wrack-Line Cache | **Retouch:** chest on a **stone landing**, broken steps, kelp. Lose the sandy beach. |
+| `tr_start` | Rowing to the Stair | **Retouch:** terraced mountain, pale lighthouse needle at the summit. Keep dawn, rowboat path, peach sun. |
+
+Zero redos. `tc_a1` plate: **keep art**, swap HTML title/sub.
+
+**Events / enemies**  
+Keep all names. Flavour only: Tidepool Shrine on the lowest ring; Campfire Stranger on a landing; Gull Nest on a broken stair-stack; Sunken Chest on a landing. Enemies unchanged (Tide Leech already coils a stair-stone).
+
+**Cinematic**  
+Scene 3 line 2 as above. Scenes 1, 2, 4, 5 untouched.
+
+**Code**  
+Display strings in `map.js`, `title.js`, `learn.js`, `render.js` (`TC_A1_DEFAULT`), Learn copy, band display names in env tables. Asset ids (`a1_shore`, `ev_a1`, …) stay. Map rules stay.
+
+### LATER
+Act 2–3–Final art and titles as above. Travel scenes *Through the Bell Gate*, *The Updraft*, *The Beacon Path*, victory *The Lighthouse Lit*. Optional `a1_shore` far-layer lighthouse pin. Class Lamp interiors. Per-event scenes (skip while `ev_a1` holds). Beacon Path and lantern-gallery payoff. Admiralty Plate / Gale Vellum / Star-Glass map skins drawn as the same mountain, belt by belt.
+
+=== ROUND 1: grokbot ===
+# Round 1 — Grok Bot (facilitator) proposal
+
+## Core idea: the Drowned Stair is a mountain, not a staircase
+The Drowned Stair is a colossal sea-mount carved into a terraced holy city by the old keepers: thousands of stairways, landings, cloisters, bridges and tunnels winding up one mountain-tower to the Pale Lighthouse at its peak. "The Stair" is what sailors call the whole thing, the way people call a city "the Hill". The map branches because there are many ways up: a broad processional stair, a collapsed side gallery, a flooded street, a rope-bridge between terraces. Each map row is one **landing** (a level of the city); each path is a **route**. The tide drains and refloods daily, so routes open and close: that is why the map is different every run.
+
+## Act structure (all three acts are on the same mountain, rising)
+| Act | Name | Height | Setting |
+|---|---|---|---|
+| 1 | **The Drowned Stair** (keep) — subtitle "The Low Tiers" | Sea level to the old high-water mark | The lowest tiers, underwater for centuries, just uncovered. Kelp, barnacles, tidepools on every step. |
+| 2 | **The Brine Bastion** | Mid-mountain | The Tidewardens' fortress-ring built around the mountain's waist at the highest tide line, with a terraced harbour basin cut into the rock (ships moored when the sea stood that high). Drowned when the tide outgrew it. |
+| 3 | **The Galecrown** | Above the clouds | The upper spire: crown terraces wrapped in the storm the Drowned Sun's pull whips up; the Upturned Sea is seawater the Maelstrom Engine hurled up and the storm holds aloft. |
+| Final | **The Pale Lighthouse** | Peak | The lighthouse itself, silent above the storm. |
+
+## Every background shows height
+Rule for all battle art: (a) a stair, ramp or terrace edge in the mid/foreground, (b) the Pale Lighthouse visible somewhere in the sky (tiny in Act 1, large in Act 3) except in interiors, where a window or shaft shows it, (c) the sea visibly lower each band.
+
+## Act 1 bands
+- 1–5 **Shoreline Steps**: the lowest landings at the waterline. Keep (signed off); retouch so the tower's steps are clearer and add a faint lighthouse glint at the top.
+- 6–10 **Kelp Cloister**: a flooded cloister gallery cut into the mountain, its colonnade stepping upward; through the broken roof, the terraces above. Retouch: add steps rising between columns toward the back, a stair landing in the foreground.
+- 11–14 **Bellwater Court**: a high terrace plaza looking DOWN over the lower tiers and the sea far below; the belfry tower above. Retouch: add a balustrade edge, the sea and lower terraces visible far below, broad stairs up to the bell frame.
+- Lairs: Belfry (keep; add view down), Kelp Hollow = the summit pool of the low tiers (keep).
+- Events `ev_a1`: rename **Tidepool Grotto** to a cave cut INTO the stair (keep art; one cave is fine as "side passages"). Later: 2–3 event scene variants.
+- Shop: Wren's stall in a hull that the tide left wedged on a landing — retouch to show stairs outside the hull opening.
+- Camp: keep (already a stair alcove). Chest `chest_a1`: redo — chest on a kelp-strewn landing at the foot of a broken stairway (the current flat beach reads wrong).
+- `tr_start`: keep.
+
+## Map
+Redraw `map_a1` "Tidewater Chart" as a **side-on elevation chart**: the mountain's lower tiers sketched faintly on parchment, nodes on landings, the lighthouse inked at the top edge, a tide line drawn at the bottom. Rows read as height. Code: add a faint tier/height scale and "Landing N" labels.
+
+## Rooms logic
+? rooms = side passages (caves, chapels, flooded houses of the old stair-city). Shop = Wren hauls her hull up with the climbers. Camp = alcoves on the stair. Chests = what the tide stranded on landings.
+
+## Lamplight fits perfectly
+Lanterns burn "on the landing where you fell": landings now literally exist. Death text uses landing names ("the Kelp Cloister, Landing 7").
+
+## Cinematic tweaks
+Scene 3: "The ancient stair has risen" → keep, but scene 4: "At the summit of the Drowned Stair lies the lamp..." and the image should show the mountain city, not a lone tower (retouch intro-3 to show terraces). Title card subtitle stays.
+
+## Payoff
+Each act the lighthouse gets bigger; the Final is inside it; the Drowned Sun is seen from the gallery — the sea you climbed out of, now far below and black.
+
+## Now vs later
+NOW: lore text (mountain-city), map elevation skin, retouch cloister/bellcourt/shore/shop, redo chest, rename event scene, cinematic scene 4 wording, death text with landings. LATER: event scene variants, Act 2/3 art painted to the height rule.

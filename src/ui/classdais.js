@@ -13,6 +13,9 @@ import {anim} from './fx.js';
 import {T} from '../core/timing.js';
 import {DAIS_ART,slotHTML} from '../assets.js';
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const forecast=cb=>{let level=cb.tide,dir=cb.tideDir;
+ if(!cb.holdDrift)for(let k=0;k<mod('driftCount',{},1);k++){if(!dir)break;level=Math.max(0,Math.min(10,level+dir*mod('drift',{},CORE.tide.drift)));if(level===10){level=mod('crest',{preview:true},{resetTo:5}).resetTo;if(CORE.tide.flip_after_reset)dir=-1}else if(level===0){level=mod('undertow',{preview:true},{resetTo:5}).resetTo;if(CORE.tide.flip_after_reset)dir=1}}
+ return `<span class="meter-label tide-forecast">Next turn: ${level}</span>`};
 const plain=h=>String(h).replace(/<[^>]+>/g,'');
 // A PLAIN weathered verdigris bronze hand-bell: smooth flared body, one plain rim band, iron bracket and chain. No ridges, no jaw shapes.
 export const BELL=`<svg viewBox="0 0 64 84" class="bell-svg" aria-hidden="true"><defs><linearGradient id="bz-b" x1="0" x2="1"><stop offset="0" stop-color="#4f8f80"/><stop offset=".28" stop-color="#8a7a45"/><stop offset=".55" stop-color="#b08a4a"/><stop offset=".85" stop-color="#6d6a3c"/><stop offset="1" stop-color="#3d7a6c"/></linearGradient>
@@ -47,7 +50,7 @@ function tide(cb){if(DAIS_ART['dais-tide'])return tideArt(cb);const T=CORE.tide,
    <div class="tg2-scale"><u class="tk hi${hi?' lit':''}" style="bottom:${T.high*10}%">High</u><u class="tk lo${lo?' lit':''}" style="bottom:${T.low*10}%">Low</u>
     <b class="tg2-n" style="bottom:${lvl*10}%" data-info="${esc(dir[1])}">${lvl}<u class="drift d-${dir[0]}"></u></b><em class="tg2-pvn pvt"></em></div></div>
   <div class="tg2-cap bot${anim(cb.undertowT,700)?' fire':''}" data-info="Undertow: at 0 the Tide drains: ${un.guard} Guard and draw ${un.draw}, then it settles to 5."><b>Undertow</b><i>${un.guard} Guard · draw ${un.draw}</i></div>
-  ${b?`<div class="tg2-btns">${b}</div>`:''}</div>`)}
+  ${forecast(cb)}${b?`<div class="tg2-btns">${b}</div>`:''}</div>`)}
 
 // Painted gauge variant: water animates from the previous level, engraved plate beside the tube, plaques at the tube ends.
 function tideArt(cb){const T=CORE.tide,lvl=cb.tide;
@@ -68,7 +71,7 @@ function tideArt(cb){const T=CORE.tide,lvl=cb.tide;
    <i class="tg3-mk hi${hi?' lit':''}" style="bottom:${T.high*10}%"></i><i class="tg3-mk lo${lo?' lit':''}" style="bottom:${T.low*10}%"></i></div>
   <div class="tg3-plate st-${st.toLowerCase()}" data-info="${esc(dir[1])}"><b class="tg2-n">${lvl}</b><span class="tg3-st">${st}<u class="drift d-${dir[0]}"></u></span><em class="tg2-pvn pvt"></em></div>
   <div class="tg2-cap bot plq${under?' fire':''}" data-info="Undertow: at 0 the Tide drains: ${un.guard} Guard and draw ${un.draw}, then it settles to 5."><b>Undertow</b><i>${un.guard} Guard<br>draw ${un.draw}</i></div>
-  ${b?`<div class="tg2-btns">${b}</div>`:''}</div>`)}
+  ${forecast(cb)}${b?`<div class="tg2-btns">${b}</div>`:''}</div>`)}
 
 // ---------- Echo Mage: hanging hand-bell, ripple rings, the Marked card dangles beneath ----------
 function echo(cb){const cap=CORE.echo.bonus_cap;
@@ -81,7 +84,7 @@ function echo(cb){const cap=CORE.echo.bonus_cap;
   const a=`<${tag} class="bellbtn${ci?' ring':' empty'}${cb.armMark&&markable&&tag==='button'?' arm':''}" ${tag==='button'?`${first?'id="markbtn"':'id="markbtn2"'} onclick="armMark()"`:''} data-idx="${idx}" data-info="${esc(tip)}">
    <span class="rings">${rings(ci?markBonus(after):0)}</span>${BELL}</${tag}>`;
   const ch=ci?`<div class="charm" data-info="${esc(tip)}">${mini(ci)}<b>${cname(ci)}</b></div><div class="ptot">${pv?`${pv.kind==='dmg'?'⚔':'🛡'} ${pv.n}${rep}${pl.mult>1?' ×2':''}`:''}<em class="pvt"></em></div>`:'';
-  return `<div class="bellcol${ci?' marked':''}">${a}${ch}</div>`};
+  return `<div class="bellcol${ci?' marked':''}">${a}<span class="meter-label">${ci?'End turn Echo':cb.armMark&&tag==='button'?'Armed: next card':tag==='button'?'Marks next card':'Echo'}</span>${ch}</div>`};
  const plan=echoPlan(true);
  let h=bell(cb.mark,1,cb.afterMark,1);
  if(cb.mark2||(cb.mark&&markable))h+=bell(cb.mark2,2,cb.after2,2);
@@ -95,9 +98,9 @@ function carto(cb){const pk=cb.mode&&cb.mode.k==='slot',lim=mod('advances',{},1)
   if(!w){s+=`<div class="wp empty" style="--wi:${i}" data-i="${i}" data-info="Waypoint ${i+1}: empty. Cards with Waypoint place one here; each Waypoint triggers its effect for you."><i class="pinn"></i><span class="wpn">Unmarked</span></div>`;continue}
   const r=w.rank||0,adv=canAdv&&r<CORE.carto.rank_max,land=r>=CORE.carto.rank_max;
   const tip=cname(w)+': '+plain(desc(w))+(adv?' — tap to Advance (+1 Rank; damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':'');
-  s+=`<button class="wp full${pk?' pick':''}${adv?' adv':''}${land?' land':''}${anim(w.trigT,T(900))?' trig':''}" style="--wi:${i};${anim(w.trigT,T(900))||''}" data-i="${i}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" data-info="${esc(tip)}">${CAIRN(r)}<span class="wpn cref" data-card="${w.id}">${cname(w)}</span><span class="map-rank">${'R'+r}${land?' ◆':''}</span><span class="map-act">${pk?'Replace':adv?'Advance +1':''}</span><span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span></button>`}
+  s+=`<button class="wp full${pk?' pick':''}${adv?' adv':''}${land?' land':''}${anim(w.trigT,T(900))?' trig':''}" style="--wi:${i};${anim(w.trigT,T(900))||''}" data-i="${i}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" data-info="${esc(tip)}">${CAIRN(r)}<span class="wpn cref" data-card="${w.id}">${cname(w)}</span><span class="map-rank">${'Rank '+r}${land?' ◆':''}</span><span class="map-act">${pk?'Replace':''}</span><span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span></button>`}
  const nd=mod('drawCount',{},4);const nx=cb.draw.slice(0,3).map((ci,i)=>`<span class="nx cref ${i<nd?'next':''}" data-card="${ci.id}">${cname(ci)}</span>`).join('')||'<span class="muted">reshuffle</span>';
- const hint=canAdv&&cb.slots.length?'Tap a cairn to Advance':cb.advUsed?'Advanced':'';
+ const left=Math.max(0,lim-cb.advUsed);const hint=`${left} Advance${left===1?'':'s'} left`;
  return frame('carto','Chart',`<div class="chart" data-slots="${cb.nslots}"><svg class="map-ink" viewBox="0 0 672 312" aria-hidden="true"><path pathLength="1" d="M217 138 Q275 145 332 141 T453 139"/></svg><i class="stub"></i><svg class="rope" viewBox="0 0 20 100" preserveAspectRatio="none" aria-hidden="true"><path d="M10 2C2 14 18 22 10 34S2 54 10 66 18 86 10 98"/></svg><div class="wps">${s}</div></div>
   <div class="nexts" data-info="Next cards in your draw pile (the first ${nd} are drawn next turn). The pile is face up."><b>Next</b>${nx}</div>${hint?`<div class="advhint">${hint}</div>`:''}`)}
 
@@ -113,7 +116,7 @@ function duel(cb){const D=CORE.duel,max=mod('momMax',{},D.mom_max),fmin=flourish
   <div class="rap-blade" data-info="Momentum ${cb.mom}/${max}: each Attack builds it. At ${fmin}+ you can Flourish. It fades by ${D.decay} each turn${cb.keepMom?' (kept this turn)':''}."><div class="notches">${n}</div><u class="fade"></u></div>
   <div class="rap-guard"></div><div class="rap-grip"></div>
   <span class="dag${cb.parry?' on':''}" data-info="Parry ${cb.parry}: reduce the first incoming hit by up to ${cb.parry} this turn and reflect damage. The parrying dagger is the off hand."><i></i><b>${cb.parry||''}</b></span>
-  <span class="mom-read"><b>${cb.mom}</b><i>/${max}</i></span></div>`)}
+  <span class="mom-read"><span class="meter-label">Momentum</span><b>${cb.mom}</b><i>/${max}</i></span></div>`)}
 
 export function daisHTML(){const cb=W.cb,c=W.run.cls;return c==='tide'?tide(cb):c==='echo'?echo(cb):c==='carto'?carto(cb):c==='duel'?duel(cb):''}
 

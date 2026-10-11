@@ -152,7 +152,7 @@
     384
    ],
    "desc": "Camp action: a small campfire with a warm bedroll",
-   "ready": false
+   "ready": true
   },
   "camp-temper": {
    "path": "art/v2/ui/tiles/camp-temper.webp",
@@ -161,7 +161,7 @@
     384
    ],
    "desc": "Camp action: a hammer and anvil by the fire",
-   "ready": false
+   "ready": true
   },
   "camp-cook": {
    "path": "art/v2/ui/tiles/camp-cook.webp",
@@ -170,7 +170,7 @@
     384
    ],
    "desc": "Camp action: a pot over the flames",
-   "ready": false
+   "ready": true
   },
   "camp-scour": {
    "path": "art/v2/ui/tiles/camp-scour.webp",
@@ -179,7 +179,7 @@
     384
    ],
    "desc": "Camp action: a pumice stone scrubbing a card",
-   "ready": false
+   "ready": true
   },
   "camp-trawl": {
    "path": "art/v2/ui/tiles/camp-trawl.webp",
@@ -188,7 +188,7 @@
     384
    ],
    "desc": "Camp action: a grapnel hook hauling up a net",
-   "ready": false
+   "ready": true
   },
   "camp-annotate": {
    "path": "art/v2/ui/tiles/camp-annotate.webp",
@@ -197,7 +197,7 @@
     384
    ],
    "desc": "Camp action: an open logbook with ink",
-   "ready": false
+   "ready": true
   },
   "reward-gold": {
    "path": "art/v2/ui/tiles/reward-gold.webp",
@@ -206,7 +206,7 @@
     384
    ],
    "desc": "Reward tile: a pile of gold coins and salt crystals",
-   "ready": false
+   "ready": true
   },
   "reward-cards": {
    "path": "art/v2/ui/tiles/reward-cards.webp",
@@ -215,7 +215,7 @@
     384
    ],
    "desc": "Reward tile: three fanned cards",
-   "ready": false
+   "ready": true
   },
   "reward-relic": {
    "path": "art/v2/ui/tiles/reward-relic.webp",
@@ -224,7 +224,7 @@
     384
    ],
    "desc": "Reward tile fallback: a relic on a cloth",
-   "ready": false
+   "ready": true
   },
   "reward-potion": {
    "path": "art/v2/ui/tiles/reward-potion.webp",
@@ -233,7 +233,7 @@
     384
    ],
    "desc": "Reward tile fallback: a potion on a shelf",
-   "ready": false
+   "ready": true
   },
   "chest-closed": {
    "path": "art/v2/ui/tiles/chest-closed.webp",
@@ -242,7 +242,7 @@
     384
    ],
    "desc": "Closed sunken chest, barnacled, dark teal",
-   "ready": false
+   "ready": true
   },
   "chest-open": {
    "path": "art/v2/ui/tiles/chest-open.webp",
@@ -251,7 +251,7 @@
     384
    ],
    "desc": "Open chest with light spilling out",
-   "ready": false
+   "ready": true
   },
   "choice-tide-low": {
    "path": "art/v2/ui/tiles/choice-tide-low.webp",
@@ -827,7 +827,7 @@
     200
    ],
    "desc": "Painted stone ledge / tide-pool shelf strip that relic and potion art stands on in reward tiles (cutout bottom third of a tile)",
-   "ready": false
+   "ready": true
   },
   "select-stair": {
    "path": "art/v2/ui/tiles/select-stair.webp",

@@ -89,3 +89,14 @@
 /* burst flash for rares */
 .rarebeam{position:fixed;pointer-events:none;z-index:90;width:160px;height:160px;margin:-80px 0 0 -80px;border-radius:50%;background:radial-gradient(circle,#fff8d0cc,#f2c14e66 35%,transparent 70%)}
 @media (prefers-reduced-motion:reduce){.card>.foil{animation:none!important}}
+
+/* Task 35: concise effect stays within the painted art at the resting hand height. */
+@media (orientation:landscape){.combat .hand .card:not(.sel):not(.drag) .rline:not(.covered){top:43%;height:14px;line-height:14px;left:7.2%;right:7.2%;background:#090e16ed}}
+.guard-preview{position:static!important;font:700 11px var(--font-body);white-space:nowrap;color:#ffe2a0}
+.new-guard{position:absolute!important;left:0;top:-18px}
+.hpblk:has(.guard-preview)>b{visibility:hidden}
+.hpblk .guard-preview{position:absolute!important;left:50%;top:50%;translate:-50% -50%;padding:2px;background:#101923e8;border-radius:3px}
+/* Larger shelf art uses the available tile width without changing shop flow. */
+.shelf .shopicon .slot{width:42px;height:42px;flex-shrink:0}
+@media(max-height:500px){.fit-shop .shelf .shopicon .slot{width:36px;height:36px}}
+.outcome-label:empty{display:none}

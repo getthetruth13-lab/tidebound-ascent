@@ -1,0 +1,468 @@
+[
+ {
+  "kind": "icon",
+  "id": "might",
+  "group": "buff",
+  "replaces": "💪 Might (str)",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/might.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a tarnished antique-gold rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a clenched gauntleted fist raised upward. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: hot amber light along the knuckles. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "poise",
+  "group": "buff",
+  "replaces": "🪨 Poise (dex)",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/poise.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a tarnished antique-gold rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a single balanced standing stone on a small cairn. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: pale gold glow at the stone's edges. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "shell",
+  "group": "buff",
+  "replaces": "🐚 Shell",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/shell.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a tarnished antique-gold rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a spiral conch shell seen from the side. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: pearly teal glow inside the shell opening. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "barbs",
+  "group": "buff",
+  "replaces": "🌵 Barbs",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/barbs.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a tarnished antique-gold rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a cluster of sharp outward-pointing urchin spines. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: cold teal glints on the spine tips. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "rebuff",
+  "group": "buff",
+  "replaces": "🛡️ Rebuff (ward)",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/rebuff.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a tarnished antique-gold rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: an upright kite shield with a downward arrow deflecting off it. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: white-teal flare where the arrow glances off. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "mending",
+  "group": "buff",
+  "replaces": "💚 Mending (also intent heal)",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/mending.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a tarnished antique-gold rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a heart-shaped knot of green kelp stitched closed. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: soft sea-green glow in the knot. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "soaked",
+  "group": "debuff",
+  "replaces": "💧 Soaked (weak)",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/soaked.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a single large heavy water droplet dripping from a lowered sword point. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: cold blue-teal glow inside the droplet. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "exposed",
+  "group": "debuff",
+  "replaces": "💔 Exposed (vuln)",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/exposed.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a cracked breastplate split down the middle. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: ember-red light leaking through the crack. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "brittle",
+  "group": "debuff",
+  "replaces": "🧊 Brittle",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/brittle.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a shattering shield breaking into sharp shards. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: icy pale-blue glow on the fracture lines. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "bleed",
+  "group": "debuff",
+  "replaces": "🩸 Bleed",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/bleed.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: three long drops of blood falling from a blade nick. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: deep crimson glow in the drops. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "guard",
+  "group": "resource",
+  "replaces": "🛡️ Guard / block badge, +N🛡 floaters",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/guard.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a verdigris-green bronze rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a heavy round iron buckler with a barnacled boss. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: cool steel-teal sheen on the shield rim. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "energy",
+  "group": "resource",
+  "replaces": "⚡ energy cost, Static, drain floaters",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/energy.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a verdigris-green bronze rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a jagged lightning bolt inside a small sphere of seawater. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: electric teal-white core of the bolt. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "hp",
+  "group": "resource",
+  "replaces": "❤️ HP, heal floaters",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/hp.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a verdigris-green bronze rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: an anatomical heart wrapped in a thin silver chain. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: deep red glow pulsing in the heart. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "gold",
+  "group": "resource",
+  "replaces": "💰 gold, steal intent",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/gold.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a verdigris-green bronze rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a small stack of three old tarnished coins with an anchor stamp. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: warm gold glint on the top coin. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "tide",
+  "group": "keyword",
+  "replaces": "🌊 Tide meter, Crest log",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/tide.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a single curling ocean wave. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: moon-teal glow in the curl. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "crest",
+  "group": "keyword",
+  "replaces": "🌊 CREST callout",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/crest.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a towering wave crashing down with white foam. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: bright teal-white foam at the crest. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "undertow",
+  "group": "keyword",
+  "replaces": "🌀 UNDERTOW callout",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/undertow.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a downward spiralling whirlpool. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: deep teal glow at the whirlpool's eye. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "drift",
+  "group": "keyword",
+  "replaces": "⬆/⬇ drift arrow, ☸️ Helmsman's Wheel",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/drift.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a ship's helm wheel with one curved arrow around it. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: pale teal glow on the arrowhead. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "mark",
+  "group": "keyword",
+  "replaces": "🔔 Mark / Ringing",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/mark.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a small bronze bell with a single ring-shaped sound wave. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: violet glow inside the bell mouth. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "echo",
+  "group": "keyword",
+  "replaces": "🔊 Echo plan, 🎼 Resound",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/echo.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: three concentric rings of sound expanding from a tuning fork. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: violet light on the rings. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "momentum",
+  "group": "keyword",
+  "replaces": "Momentum pips, 🏃 keeps",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/momentum.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a rapier blade with three speed streaks behind it. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: hot crimson streaks. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "flourish",
+  "group": "keyword",
+  "replaces": "🔥 FLOURISH",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/flourish.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a rapier tip tracing a bright looping arc. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: white-hot crimson arc of light. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "parry",
+  "group": "keyword",
+  "replaces": "🤺 Parry chip, ⚔️ Parry log",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/parry.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: two crossed blades meeting with a spark at the contact point. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: bright spark where the blades cross. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "waypoint",
+  "group": "keyword",
+  "replaces": "📍 Waypoint placed",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/waypoint.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a brass map pin standing in a small mound of parchment. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: amber glow on the pin head. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "advance",
+  "group": "keyword",
+  "replaces": "⛰️ Advance / Rank",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/advance.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a mountain peak with a small flag on the summit. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: amber light on the flag. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "landmark",
+  "group": "keyword",
+  "replaces": "LANDMARK callout",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/landmark.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a stone lighthouse tower. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: warm amber beam from the lantern room. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "chart",
+  "group": "keyword",
+  "replaces": "🗺️ Chart, 🧭 starting Waypoint",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/chart.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a brass compass rose with a long north needle. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: amber glow on the needle tip. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "sink",
+  "group": "keyword",
+  "replaces": "Sink (exhaust) pile, 🗑️",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/sink.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a card-shaped stone tablet sinking into dark water with bubbles. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: faint teal bubbles. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "fleeting",
+  "group": "keyword",
+  "replaces": "Fleeting",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/fleeting.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a wisp of sea mist dissolving into the air. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: pale ghostly teal glow. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "moor",
+  "group": "keyword",
+  "replaces": "⛓️ Moor / Anchor Chain",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/moor.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a heavy iron anchor. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: cold teal glint on the anchor fluke. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "unplayable",
+  "group": "keyword",
+  "replaces": "Unplayable",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/unplayable.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a padlock wrapped in barnacles. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: dull red glow in the keyhole. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "faint",
+  "group": "keyword",
+  "replaces": "Faint",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/faint.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a bell muffled by a wrapped cloth. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: very dim violet glow. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "sustain",
+  "group": "keyword",
+  "replaces": "Sustain X",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/sustain.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a dark pewter rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a bell with a rising arrow made of sound rings. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: violet glow on the arrow. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "intent-status",
+  "group": "debuff",
+  "replaces": "🌿 adds status cards",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/intent-status.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a tangle of slimy kelp wrapping around a playing card. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: sickly green glow in the kelp. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "intent-summon",
+  "group": "debuff",
+  "replaces": "📯 summon",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/intent-summon.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a curved conch horn blowing a gust. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: teal glow from the horn mouth. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "intent-steal",
+  "group": "debuff",
+  "replaces": "💰🏃 steal and flee",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/intent-steal.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a gull's talon clutching a coin. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: warm gold glint on the coin. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "intent-steal-potion",
+  "group": "debuff",
+  "replaces": "🧪 steals a potion",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/intent-steal-potion.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a grasping tentacle wrapped around a small glass vial. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: teal liquid glowing in the vial. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "intent-drain",
+  "group": "debuff",
+  "replaces": "⚡− drains energy",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/intent-drain.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a lightning bolt broken in two. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: fading teal-white glow at the break. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ },
+ {
+  "kind": "icon",
+  "id": "intent-ring",
+  "group": "debuff",
+  "replaces": "🔔 adds Ringing",
+  "out": "/workspace/game/art/v2/_src/hosted/icons/intent-ring.jpg",
+  "aspect_ratio": "1:1",
+  "reference_image_paths": [
+   "/workspace/game/art/v2/_src/hosted/icons/might.jpg"
+  ],
+  "prompt": "Game icon: a single round medallion seen straight on, centred, filling the middle 60% of the image height, with plenty of empty space around it, on a plain flat mid-grey background (#7f7f7f), no scenery, no shadow. The medallion is a thick weathered metal ring (a rust-red oxidised iron rim) around a dark recessed slate-black disc. Inside the disc ONE large, bold, simple emblem: a large cracked iron bell. The emblem fills most of the disc, a clean high-contrast silhouette with a bright core and dark outline, readable when shrunk to 32 pixels; no small details, no secondary objects. Key light from the upper left, subtle cool teal rim on the lower right of the ring. Glowing accent: deep teal glow from the crack. Dark fantasy oil painting, painterly brushwork, coastal gothic, muted desaturated palette, one glowing accent, no text, no letters, no numbers, no watermark, no border, no frame."
+ }
+]

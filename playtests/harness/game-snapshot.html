@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0f1117">
+<title>Tidebound Ascent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#0f1117;color:#e7e9ee;font:14px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#app{max-width:560px;margin:0 auto;padding:8px 8px 24px;min-height:100vh}
+button{font:inherit;color:inherit}
+.btn{background:#262d40;border:1px solid #3b4662;border-radius:10px;padding:10px 14px;font-size:15px;cursor:pointer}
+.btn.pri{background:#3a63e0;border-color:#5b84ff;font-weight:600}
+.btn.gold{background:#7a5a10;border-color:#c99a2a}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.full{width:100%;margin-top:8px}
+.mini{background:#262d40;border:1px solid #3b4662;border-radius:8px;padding:2px 8px;font-size:12px;cursor:pointer}
+.topbar{display:flex;gap:6px;justify-content:space-between;align-items:center;font-size:13px;background:#171b25;border:1px solid #232a3a;border-radius:10px;padding:6px 8px;margin-bottom:8px}
+.panel{background:#171b25;border:1px solid #262d3d;border-radius:12px;padding:10px;margin-bottom:8px}
+h1{font-size:30px;text-align:center;margin:18px 0 2px;letter-spacing:1px;background:linear-gradient(90deg,#5fd3ff,#b993ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:20px;margin:6px 0 8px;text-align:center}
+.sub{text-align:center;color:#9aa3b8;margin-bottom:14px;font-size:13px}
+.muted{color:#8b93a7;font-size:12px}
+.cls{display:flex;gap:10px;align-items:flex-start;background:#171b25;border:1px solid #2a3248;border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer;width:100%;text-align:left}
+.cls:hover{border-color:#5b84ff}
+.cls .big{font-size:34px;line-height:1}
+.cls b{font-size:16px}
+.bar{height:9px;background:#2a2f3c;border-radius:6px;overflow:hidden;margin:3px 0}.bar>i{display:block;height:100%;transition:width .25s}
+/* cards */
+.hand{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;padding:12px 0 6px;min-height:150px}
+.card{position:relative;width:calc((100% - 24px)/5);max-width:104px;min-height:138px;background:linear-gradient(#232a40,#1b2133);border:2px solid #3a4560;border-radius:10px;padding:14px 4px 5px;text-align:center;cursor:pointer;transition:transform .12s,box-shadow .12s;user-select:none}
+.card.tA{border-color:#c0624f}.card.tS{border-color:#4f8fc0}.card.tP{border-color:#a07bd6}.card.tW{border-color:#58b36b}.card.tX{border-color:#666;background:#1b1b22}
+.card.sel{transform:translateY(-10px) scale(1.05);box-shadow:0 0 0 3px #ffd65a;z-index:2}
+.card.unp{opacity:.45}
+.card .cost{position:absolute;top:-9px;left:-7px;width:24px;height:24px;border-radius:50%;background:#e8b830;color:#111;font-weight:800;line-height:24px;font-size:13px;box-shadow:0 1px 3px #000}
+.card .cost.cheap{background:#6fe08a}
+.card .ce{font-size:22px;line-height:1.1}
+.card .cn{font-weight:700;font-size:11px;margin:2px 0 1px;line-height:1.15}
+.card .ct{font-size:9px;color:#8b93a7;text-transform:uppercase;letter-spacing:.5px}
+.card .cd{font-size:10px;color:#cdd3e0;margin-top:3px;line-height:1.25}
+.card .rar{position:absolute;top:3px;right:4px;font-size:9px;color:#8b93a7}
+.upv{color:#7dff9a;font-weight:700}
+.grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding-top:10px}
+.grid .card{width:31%;max-width:150px;min-height:160px}
+.grid .card .cd{font-size:11px}
+.grid>div>.card{width:100%;max-width:none}
+@media(hover:hover){.hand .card:hover{transform:translateY(-6px)}}
+/* combat */
+.ens{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:6px}
+.en{flex:1 1 0;max-width:180px;min-width:98px;background:#171b25;border:2px solid #262d3d;border-radius:12px;padding:6px;text-align:center;cursor:pointer;position:relative}
+.en.tg{border-color:#ff6b6b}
+.en .emo{font-size:40px;line-height:1.1}
+.en.boss .emo{font-size:56px}
+.en .nm{font-size:12px;font-weight:700}
+.intent{font-size:13px;background:#2a1f26;border:1px solid #5a3040;border-radius:8px;padding:2px 4px;margin-bottom:3px;min-height:22px}
+.intent small{color:#d9a0b5}
+.st{font-size:11px;min-height:15px}
+.shake{animation:sh .35s}
+@keyframes sh{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.fl{position:absolute;left:50%;top:30%;transform:translateX(-50%);font-weight:800;font-size:20px;color:#ff6b6b;pointer-events:none;animation:fl .8s forwards;text-shadow:0 2px 3px #000}
+.fl.b{color:#7cc4ff}
+@keyframes fl{to{top:-10%;opacity:0}}
+.me{display:flex;align-items:center;gap:8px;position:relative}
+.me .hp{flex:1}
+.energy{width:42px;height:42px;border-radius:50%;background:radial-gradient(#ffe27a,#d98e00);color:#221;font-weight:900;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px #d98e0088}
+.detail{background:#141824;border:1px solid #2a3248;border-radius:10px;padding:8px 10px;min-height:64px;font-size:13px}
+.detail .kw{font-size:11px;color:#9aa3b8;margin-top:4px}
+.ctrl{display:flex;gap:6px;align-items:center}
+.ctrl .btn.pri{margin-left:auto;min-width:120px}
+.log{font-size:11px;color:#8b93a7;margin-top:6px;min-height:30px}
+.cp{font-size:12px}
+.gauge{display:flex;gap:2px;margin:4px 0}
+.gauge i{flex:1;height:14px;border-radius:3px;background:#242a38;position:relative}
+.gauge i.on{background:#3b7bd6}.gauge i.on.hi{background:#21c4c4}.gauge i.on.lo{background:#3048a8}
+.gauge i.cur{outline:2px solid #fff}
+.chip{display:inline-block;background:#262d40;border:1px solid #3b4662;border-radius:8px;padding:2px 6px;margin:2px;font-size:11px}
+.chip.next{border-color:#ffd65a}
+.slots{display:flex;gap:5px;margin:4px 0}
+.slot{flex:1;min-height:44px;border:1px dashed #3d4a66;border-radius:8px;padding:4px;font-size:11px;text-align:center;background:#141824}
+.slot.full{border-style:solid;border-color:#58b36b;background:#16241b}
+.slot.pick{border-color:#ffd65a;box-shadow:0 0 0 2px #ffd65a55;cursor:pointer}
+.pips{display:inline-flex;gap:4px;vertical-align:middle}.pips i{width:16px;height:16px;border-radius:50%;background:#2a2f3c;border:1px solid #444}.pips i.on{background:#ff8a3d;border-color:#ffb27a}
+/* overlay */
+.ov{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:50;padding:12px}
+.ov .box{background:#171b25;border:1px solid #3b4662;border-radius:14px;padding:14px;max-width:520px;width:100%;max-height:88vh;overflow:auto}
+.row{display:flex;gap:6px;align-items:center;padding:6px;border-bottom:1px solid #232a3a}
+.row .nm{flex:1}
+/* map */
+.mapwrap{position:relative;margin:0 auto;max-width:420px}
+.mapwrap svg{position:absolute;left:0;top:0}
+.node{position:absolute;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:#1d2232;border:2px solid #343d55;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:default}
+.node.av{border-color:#ffd65a;box-shadow:0 0 0 4px #ffd65a33;cursor:pointer;animation:pulse 1.2s infinite}
+.node.vis{background:#2f3d5c;border-color:#7d9bdc}
+.node.cur{border-color:#fff}
+.node.dim{opacity:.45}
+.node.boss{width:56px;height:56px;font-size:30px}
+@keyframes pulse{50%{box-shadow:0 0 0 8px #ffd65a22}}
+.legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-size:11px;color:#9aa3b8;margin-bottom:6px}
+.opt{display:block;width:100%;text-align:left;margin-top:8px}
+.price{display:block;text-align:center;font-size:12px;margin-top:3px}
+.end{text-align:center;padding-top:40px}
+.end .big{font-size:80px}
+</style></head><body><div id="app"></div>
+<script>
+"use strict";
+// ================= utilities =================
+const R=n=>Math.floor(Math.random()*n), pick=a=>a[R(a.length)], rng=(a,b)=>a+R(b-a+1);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=R(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+let S={screen:'title'}, run=null, cb=null, UID=1;
+const CARDS={};
+function C(cls,id,o){o.id=id;o.cls=cls;CARDS[id]=o}
+const TYPEN={A:'Attack',S:'Skill',P:'Power',W:'Waypoint',X:'Status'};
+const RARN={s:'',c:'C',u:'U',r:'R'};
+
+// ================= TIDECALLER =================
+C('tide','splash',{n:'Splash',c:1,t:'A',r:'s',e:'💦',d:'Deal {6|9}. Surge 1.',p:f=>{f.dmg(f.v(6,9));f.surge(1)}});
+C('tide','brace',{n:'Brace',c:1,t:'S',r:'s',e:'🪨',d:'Gain {5|8} Block. Recede 1.',p:f=>{f.blk(f.v(5,8));f.recede(1)}});
+C('tide','riptide',{n:'Riptide',c:1,t:'A',r:'s',e:'🌀',d:'Deal {4|6}. <b>Low Tide:</b> deal {8|11} instead. Surge 2.',p:f=>{f.dmg(f.low?f.v(8,11):f.v(4,6));f.surge(2)}});
+C('tide','still',{n:'Still Water',c:1,t:'S',r:'s',e:'🪷',d:'Gain {4|6} Block. <b>High Tide:</b> gain {9|12} instead. Recede 2.',p:f=>{f.blk(f.high?f.v(9,12):f.v(4,6));f.recede(2)}});
+C('tide','swell',{n:'Swell',c:0,t:'S',r:'c',e:'🌊',d:'Surge {2|3}. Draw 1.',p:f=>{f.surge(f.v(2,3));f.draw(1)}});
+C('tide','ebb',{n:'Ebb',c:0,t:'S',r:'c',e:'🏖️',d:'Gain {3|5} Block. Recede 2.',p:f=>{f.blk(f.v(3,5));f.recede(2)}});
+C('tide','breaker',{n:'Breaker',c:1,t:'A',r:'c',e:'🌊',d:'Deal {7|9}. <b>High Tide:</b> deal {7|9} again. Recede 1.',p:f=>{f.dmg(f.v(7,9),f.high?2:1);f.recede(1)}});
+C('tide','shoal',{n:'Shoal Guard',c:1,t:'S',r:'c',e:'🐚',d:'Gain {7|9} Block. <b>Low Tide:</b> draw 1. Surge 1.',p:f=>{f.blk(f.v(7,9));if(f.low)f.draw(1);f.surge(1)}});
+C('tide','spray',{n:'Spray',c:1,t:'A',r:'c',e:'💧',d:'Deal {4|5} to ALL. Surge 1.',p:f=>{f.all(f.v(4,5));f.surge(1)}});
+C('tide','undercur',{n:'Undercurrent',c:1,t:'S',r:'c',e:'🫧',d:'Apply {2|3} Weak. <b>Low Tide:</b> also apply 2 Vulnerable. Surge 1.',p:f=>{f.weak(f.v(2,3));if(f.low)f.vuln(2);f.surge(1)}});
+C('tide','lash',{n:'Tidal Lash',c:2,t:'A',r:'u',e:'🐋',d:'Deal {12|15}. Surge 3.',p:f=>{f.dmg(f.v(12,15));f.surge(3)}});
+C('tide','sinking',{n:'Sinking Pull',c:1,t:'A',r:'u',e:'⚓',d:'Deal {5|8}. Recede 3. If now at <b>Low Tide</b>: draw 2.',p:f=>{f.dmg(f.v(5,8));f.recede(3);if(cb.tide<=3)f.draw(2)}});
+C('tide','moonpull',{n:'Moonpull',c:1,cu:0,t:'S',r:'u',e:'🌙',x:1,d:'Set the Tide to 9 or 1 (your choice).',p:f=>{choose('Moonpull: set the Tide',[{l:'🌕 Set Tide to 9',f:()=>{cb.tide=9}},{l:'🌑 Set Tide to 1',f:()=>{cb.tide=1}}])}});
+C('tide','pressure',{n:'Pressure Front',c:2,t:'S',r:'u',e:'⛈️',d:'Gain {12|15} Block. <b>High Tide:</b> gain 2 Strength. Recede 2.',p:f=>{f.blk(f.v(12,15));if(f.high){cb.pstr+=2;log('💪 +2 Strength')}f.recede(2)}});
+C('tide','slack',{n:'Slack Water',c:1,t:'S',r:'u',e:'🛶',d:'This turn, your cards don\'t change the Tide. Draw {2|3}.',p:f=>{cb.slack=true;f.draw(f.v(2,3))}});
+C('tide','whirl',{n:'Whirlpool',c:2,t:'A',r:'u',e:'🌪️',d:'Deal {3|4} to ALL, 3 times. Surge 1 per volley.',p:f=>{for(let i=0;i<3;i++){f.all(f.v(3,4));f.surge(1)}}});
+C('tide','spring',{n:'Spring Tide',c:1,cu:0,t:'P',r:'r',e:'🌕',d:'Power. Crest deals 16 instead of 8.',p:f=>{cb.pw.spring=1}});
+C('tide','neap',{n:'Neap Ward',c:1,cu:0,t:'P',r:'r',e:'🌑',d:'Power. Undertow grants 16 Block and draws 2.',p:f=>{cb.pw.neap=1}});
+C('tide','tsunami',{n:'Tsunami',c:3,t:'A',r:'r',e:'🌊',d:'Deal {4|5}× current Tide to ALL. Set the Tide to 0.',p:f=>{f.all(f.v(4,5)*cb.tide);setTide(0)}});
+
+// ================= ECHO MAGE =================
+C('echo','arc',{n:'Arc Bolt',c:1,t:'A',r:'s',e:'⚡',d:'Deal {6|9}.',p:f=>f.dmg(f.v(6,9))});
+C('echo','shimmer',{n:'Shimmer Ward',c:1,t:'S',r:'s',e:'🔷',d:'Gain {5|8} Block.',p:f=>f.blk(f.v(5,8))});
+C('echo','reverb',{n:'Reverb',c:1,t:'A',r:'s',e:'📣',d:'Deal {4|6}. <b>Resound:</b> deal {10|14} instead.',p:f=>f.dmg(f.echo?f.v(10,14):f.v(4,6))});
+C('echo','hum',{n:'Hum',c:0,t:'S',r:'s',e:'🎶',faint:1,d:'Draw {1|2}.',p:f=>f.draw(f.v(1,2))});
+C('echo','ping',{n:'Ping',c:0,t:'A',r:'c',e:'🔹',d:'Deal {3|5}.',p:f=>f.dmg(f.v(3,5))});
+C('echo','mirror',{n:'Mirror Step',c:1,t:'S',r:'c',e:'🪞',d:'Gain {6|8} Block. <b>Resound:</b> also draw 1.',p:f=>{f.blk(f.v(6,8));if(f.echo)f.draw(1)}});
+C('echo','afterimg',{n:'Afterimage',c:1,t:'A',r:'c',e:'👥',d:'Deal {5|7}. Apply 1 Weak.',p:f=>{f.dmg(f.v(5,7));f.weak(1)}});
+C('echo','lownote',{n:'Low Note',c:1,t:'S',r:'c',e:'🎵',faint:1,d:'Gain {4|6} Block. The next card you play this turn costs 1 less.',p:f=>{f.blk(f.v(4,6));cb.discount=1}});
+C('echo','crackle',{n:'Crackle',c:1,t:'A',r:'c',e:'✨',d:'Deal {3|4} to ALL. <b>Resound:</b> apply 1 Vulnerable to ALL.',p:f=>{f.all(f.v(3,4));if(f.echo)alive().forEach(e=>f.vuln(1,e))}});
+C('echo','prism',{n:'Prism Shard',c:2,t:'A',r:'c',e:'💎',d:'Deal {11|14}.',p:f=>f.dmg(f.v(11,14))});
+C('echo','cascade',{n:'Cascade',c:1,t:'A',r:'u',e:'🌠',faint:1,d:'Deal {4|5} × cards played this turn (counting this).',p:f=>f.dmg(f.v(4,5)*cb.played)});
+C('echo','feedback',{n:'Feedback',c:1,t:'A',r:'u',e:'🔊',d:'Deal {8|10}. <b>Resound:</b> deal {16|20} instead.',p:f=>f.dmg(f.echo?f.v(16,20):f.v(8,10))});
+C('echo','delay',{n:'Delay Line',c:1,t:'S',r:'u',e:'⏳',d:'Gain {7|9} Block. <b>Resound:</b> gain {14|18} instead.',p:f=>f.blk(f.echo?f.v(14,18):f.v(7,9))});
+C('echo','overtone',{n:'Overtone',c:2,cu:1,t:'S',r:'u',e:'🎼',faint:1,d:'This turn, your Echo happens twice.',p:f=>{cb.overtone=true}});
+C('echo','recall',{n:'Recall',c:0,t:'S',r:'u',e:'↩️',faint:1,x:1,xu:0,d:'Return the last card you played to your hand. It costs 0 this turn.',p:f=>{const l=cb.last;if(!l){log('Nothing to recall');return}const i=cb.disc.indexOf(l);if(i>=0){cb.disc.splice(i,1);l.tmp0=true;cb.hand.push(l);log('↩️ Recalled '+cname(l))}else log('Can\'t recall that card')}});
+C('echo','amplify',{n:'Amplify',c:1,cu:0,t:'S',r:'u',e:'📢',faint:1,d:'Your next Echo this turn has its numbers doubled.',p:f=>{cb.amp=true}});
+C('echo','standing',{n:'Standing Wave',c:2,cu:1,t:'P',r:'r',e:'〰️',d:'Power. Your first Echo each turn happens one extra time.',p:f=>{cb.pw.standing=1}});
+C('echo','silence',{n:'Silence',c:1,cu:0,t:'S',r:'r',e:'🤫',d:'Remove all Block from target. Apply 2 Vulnerable. <b>Resound:</b> apply 2 Weak too.',p:f=>{const t=f.tg;if(!t)return;t.block=0;f.vuln(2);if(f.echo)f.weak(2)}});
+C('echo','crescendo',{n:'Crescendo',c:3,t:'A',r:'r',e:'🎺',d:'Deal {10|14}. Each time this Echoes, it permanently deals +5 this combat.',p:f=>{f.dmg(f.v(10,14)+(f.ci.cres||0));if(f.echo){f.ci.cres=(f.ci.cres||0)+5;log('🎺 Crescendo grows +5')}}});
+
+// ================= CARTOGRAPHER =================
+C('carto','cstrike',{n:'Compass Strike',c:1,t:'A',r:'s',e:'🧭',d:'Deal {6|9}.',p:f=>f.dmg(f.v(6,9))});
+C('carto','tent',{n:'Field Tent',c:1,t:'S',r:'s',e:'⛺',d:'Gain {5|8} Block.',p:f=>f.blk(f.v(5,8))});
+C('carto','survey',{n:'Survey',c:0,t:'S',r:'s',e:'🔭',d:'Chart {3|4}. Draw 1.',p:f=>chart(f.v(3,4),()=>drawCards(1))});
+C('carto','signal',{n:'Signal Fire',c:1,t:'W',r:'s',e:'🔥',d:'Waypoint: at start of turn, deal {3|5} to a random enemy.',wp:f=>{const t=randAlive();if(t)hit(t,f.v(3,5),null,true)}});
+C('carto','plot',{n:'Plot Course',c:0,t:'S',r:'c',e:'🗺️',d:'Chart {4|5}.{| Draw 1.}',p:f=>chart(f.v(4,5),()=>{if(f.u)drawCards(1)})});
+C('carto','trail',{n:'Trailblaze',c:1,t:'A',r:'c',e:'🥾',d:'Deal 5 + {2|3} per Waypoint. <b>Expedition.</b>',p:f=>f.dmg(5+f.v(2,3)*cb.slots.length)});
+C('carto','bivouac',{n:'Bivouac',c:1,t:'S',r:'c',e:'🏕️',d:'Gain 5 + {2|3} Block per Waypoint. <b>Expedition.</b>',p:f=>f.blk(5+f.v(2,3)*cb.slots.length)});
+C('carto','cache',{n:'Supply Cache',c:1,t:'W',r:'c',e:'📦',d:'Waypoint: at start of turn, gain {3|4} Block.',wp:f=>gainBlock(f.v(3,4))});
+C('carto','lookout',{n:'Lookout Post',c:1,t:'W',r:'c',e:'🗼',d:'Waypoint: at start of turn, Chart {2|3}.{| Also apply 1 Weak to the strongest enemy.}',wp:f=>{cb.chartQ=Math.max(cb.chartQ||0,f.v(2,3));if(f.u){const t=strongest();if(t)addSt(t,'weak',1)}}});
+C('carto','shortcut',{n:'Shortcut',c:1,t:'S',r:'c',e:'🪜',d:'Draw the card at position {3|3 or 4} of your draw pile. It costs 0 this turn.',p:f=>{const take=k=>{refill(k+1);if(cb.draw.length>k){const c=cb.draw.splice(k,1)[0];c.tmp0=true;cb.hand.push(c);log('🪜 Shortcut to '+cname(c))}};
+  refill(4);if(f.u&&cb.draw.length>3)choose('Shortcut: which card?',[{l:'#3 '+cname(cb.draw[2]),f:()=>take(2)},{l:'#4 '+cname(cb.draw[3]),f:()=>take(3)}]);else take(2)}});
+C('carto','landslide',{n:'Landslide',c:2,t:'A',r:'u',e:'⛰️',d:'Deal {8|10} + 2 per Waypoint to ALL. <b>Expedition.</b>',p:f=>f.all(f.v(8,10)+2*cb.slots.length)});
+C('carto','watch',{n:'Watchtower',c:1,cu:0,t:'W',r:'u',e:'🏯',d:'Waypoint: at start of turn, apply 1 Vulnerable to a random enemy.',wp:f=>{const t=randAlive();if(t)addSt(t,'vuln',1)}});
+C('carto','waystation',{n:'Waystation',c:1,cu:0,t:'W',r:'u',e:'🚉',d:'Waypoint: at start of turn, draw 1.',wp:f=>{cb.wpDraw=(cb.wpDraw||0)+1}});
+C('carto','triang',{n:'Triangulate',c:1,cu:2,t:'S',r:'u',e:'📐',x:1,xu:0,d:'Trigger all your Waypoints now.',p:f=>{cb.chartQ=0;cb.wpDraw=0;cb.slots.forEach(trigWp);const d=cb.wpDraw;cb.wpDraw=0;if(d)drawCards(d);if(cb.chartQ){const n=cb.chartQ;cb.chartQ=0;chart(n)}}});
+C('carto','camp',{n:'Fortified Camp',c:2,t:'W',r:'u',e:'🏰',d:'Waypoint: at start of turn, gain {6|8} Block.',wp:f=>gainBlock(f.v(6,8))});
+C('carto','foreknow',{n:'Foreknowledge',c:0,t:'S',r:'u',e:'🔮',d:'If the top card of your draw pile is an Attack, deal {6|9}; if a Skill, gain {6|9} Block. Then draw it.',p:f=>{refill(1);const t=cb.draw[0];if(!t)return;const ty=CARDS[t.id].t;if(ty==='A')f.dmg(f.v(6,9));else if(ty==='S')f.blk(f.v(6,9));drawCards(1)}});
+C('carto','grand',{n:'Grand Survey',c:1,t:'P',r:'r',e:'🌐',d:'Power. You have 4 Waypoint slots.{| Chart 3.}',p:f=>{cb.nslots=4;if(f.u)chart(3)}});
+C('carto','known',{n:'Known World',c:2,cu:1,t:'P',r:'r',e:'🗾',d:'Power. Draw 1 extra card each turn (5 instead of 4).',p:f=>{cb.pw.known=1}});
+C('carto','finaldest',{n:'Final Destination',c:3,t:'A',r:'r',e:'🏁',d:'Deal {6|8} per Waypoint. Then destroy one of your Waypoints and deal 6 more. <b>Expedition.</b>',p:f=>{const n=cb.slots.length;if(n)f.dmg(f.v(6,8)*n);if(n)pickSlot('Destroy which Waypoint?',i=>{const w=cb.slots.splice(i,1)[0];if(!w.temp)cb.disc.push(w);log('🏁 '+cname(w)+' destroyed');f.dmg(6)})}});
+
+// ================= DUELIST =================
+C('duel','thrust',{n:'Thrust',c:1,t:'A',r:'s',e:'🗡️',d:'Deal {5|8}.',p:f=>f.dmg(f.v(5,8))});
+C('duel','parry',{n:'Parry',c:1,t:'S',r:'s',e:'🛡️',d:'Parry {5|8}.',p:f=>f.parry(f.v(5,8))});
+C('duel','lunge',{n:'Lunge',c:2,t:'A',r:'s',e:'🤺',d:'Deal {10|14}.',p:f=>f.dmg(f.v(10,14))});
+C('duel','footwork',{n:'Footwork',c:0,t:'S',r:'s',e:'👣',d:'Gain 1 Momentum. Draw {1|2}.',p:f=>{gainMom(1);f.draw(f.v(1,2))}});
+C('duel','jab',{n:'Jab',c:0,t:'A',r:'c',e:'👊',d:'Deal {3|4}.',p:f=>f.dmg(f.v(3,4))});
+C('duel','feint',{n:'Feint',c:0,t:'S',r:'c',e:'🎭',d:'Gain 1 Momentum. Apply 1 Weak.{| Draw 1.}',p:f=>{gainMom(1);f.weak(1);if(f.u)f.draw(1)}});
+C('duel','slash',{n:'Slash',c:1,t:'A',r:'c',e:'⚔️',d:'Deal {8|11}.',p:f=>f.dmg(f.v(8,11))});
+C('duel','sweep',{n:'Sweep',c:1,t:'A',r:'c',e:'🌙',d:'Deal {5|7} to ALL (one Attack).',p:f=>f.all(f.v(5,7))});
+C('duel','counter',{n:'Counterstance',c:1,t:'S',r:'c',e:'🧱',d:'Parry {8|11}.',p:f=>f.parry(f.v(8,11))});
+C('duel','bind',{n:'Bind',c:1,t:'A',r:'c',e:'🪢',d:'Deal 4. Apply {2|3} Vulnerable.',p:f=>{f.dmg(4);f.vuln(f.v(2,3))}});
+C('duel','flurry',{n:'Flurry',c:1,t:'A',r:'u',e:'💨',d:'Deal {3|4} three times (one Attack).',p:f=>f.dmg(f.v(3,4),3)});
+C('duel','riposte',{n:'Riposte',c:1,t:'S',r:'u',e:'↪️',d:'Parry {6|8}. With 2+ Momentum: Parry {12|14} instead.',p:f=>f.parry(cb.mom>=2?f.v(12,14):f.v(6,8))});
+C('duel','press',{n:'Press the Advantage',c:1,t:'A',r:'u',e:'🏃',d:'Deal {7|10}. Momentum doesn\'t reset at the end of this turn.',p:f=>{f.dmg(f.v(7,10));cb.press=true}});
+C('duel','secondwind',{n:'Second Wind',c:1,t:'S',r:'u',e:'🌬️',d:'Gain {4|5} Block per Momentum. Doesn\'t spend it.',p:f=>f.blk(f.v(4,5)*cb.mom)});
+C('duel','disarm',{n:'Disarm',c:1,t:'S',r:'u',e:'🫳',x:1,d:'Target loses {2|3} Strength.',p:f=>{const t=f.tg;if(t){t.st.str=(t.st.str||0)-f.v(2,3);log('🫳 Disarmed '+t.n)}}});
+C('duel','coup',{n:'Coup de Grâce',c:2,t:'A',r:'u',e:'💀',d:'Deal {12|15}. If this is a <b>Flourish</b> and kills: gain 1 energy and draw 2.',p:f=>{const t=f.tg;f.dmg(f.v(12,15));if(f.flourish&&t&&t.hp<=0){cb.energy++;drawCards(2);log('💀 Coup! +1 energy, draw 2')}}});
+C('duel','engarde',{n:'En Garde',c:1,cu:0,t:'P',r:'r',e:'🎌',d:'Power. Start each turn with 1 Momentum.',p:f=>{cb.pw.engarde=1}});
+C('duel','perfect',{n:'Perfect Parry',c:1,t:'S',r:'r',e:'✨',d:'Parry {10|14}. If it triggers, gain 2 Momentum next turn.',p:f=>{f.parry(f.v(10,14));cb.perfect=true}});
+C('duel','cuts',{n:'Thousand Cuts',c:2,t:'A',r:'r',e:'🩸',x:1,d:'Deal {2|3} for each Attack played this combat (max 30).',p:f=>{const n=Math.min(30,cb.atkCount);if(n)f.dmg(f.v(2,3),n);else log('No attacks yet!')}});
+
+// status
+C('status','ringing',{n:'Ringing',c:1,t:'X',r:'s',e:'🔔',x:1,d:'No effect.',p:f=>{}});
+
+const CLASSES={
+ tide:{n:'Tidecaller',e:'🌊',hp:78,col:'#21c4c4',starter:['splash','splash','splash','splash','brace','brace','brace','brace','riptide','still'],
+  rule:'Steer a <b>Tide gauge</b> (0–10, starts at 5). Cards Surge it up or Recede it down. <b>High Tide</b> (7+) and <b>Low Tide</b> (3−) unlock bonuses. Hit 10 to <b>Crest</b> (8 dmg to ALL); hit 0 for <b>Undertow</b> (8 Block, draw 1).'},
+ echo:{n:'Echo Mage',e:'🔮',hp:66,col:'#b993ff',starter:['arc','arc','arc','arc','shimmer','shimmer','shimmer','shimmer','reverb','hum'],
+  rule:'At the end of your turn, the <b>last card you played Echoes</b>: its effect happens again for free. <b>Resound</b> cards get a bonus only on the Echo; <b>Faint</b> cards do nothing when Echoed. Order is everything.'},
+ carto:{n:'Cartographer',e:'🧭',hp:72,col:'#58b36b',starter:['cstrike','cstrike','cstrike','cstrike','tent','tent','tent','tent','survey','signal'],
+  rule:'Your draw pile is <b>face up</b>: you always see what\'s next. Draw 4, not 5, but build <b>Waypoints</b> (3 slots) that fire every turn. <b>Chart</b> reorders upcoming cards; <b>Expedition</b> cards scale with Waypoints.'},
+ duel:{n:'Duelist',e:'🤺',hp:70,col:'#ff8a3d',starter:['thrust','thrust','thrust','thrust','parry','parry','parry','parry','lunge','footwork'],
+  rule:'Each Attack builds <b>Momentum</b> (max 3). At 3, your next Attack is a <b>Flourish</b> for double damage. <b>Parry</b> gives Block that strikes back if an enemy attack hits it. Attacks deal +2 to the highest-HP enemy.'}
+};
+const KW={'Surge':'Raise the Tide by X (after the effect).','Recede':'Lower the Tide by X (after the effect).','High Tide':'Tide 7 or more, checked when played.','Low Tide':'Tide 3 or less, checked when played.','Crest':'Tide hits 10: deal 8 to ALL, Tide resets to 5.','Undertow':'Tide hits 0: gain 8 Block, draw 1, Tide resets to 5.',
+ 'Resound':'Bonus that only happens when this card Echoes.','Faint':'Does nothing when Echoed.','Echo':'End of turn: your last played card\'s effect repeats for free.',
+ 'Waypoint':'Goes into a Waypoint slot and triggers at the start of every turn this combat.','Chart':'Look at the top X cards of your draw pile and reorder them (one may go to the bottom).','Expedition':'Gets stronger per Waypoint you have.',
+ 'Parry':'Gain X Block. If an enemy attack hits that Block, deal X back to it once.','Momentum':'+1 per Attack (max 3). Resets at end of turn.','Flourish':'Your Attack at 3 Momentum deals double damage and spends all Momentum.',
+ 'Weak':'Deals 25% less attack damage.','Vulnerable':'Takes 50% more attack damage.','Strength':'+1 attack damage per hit.','Exhaust':'Removed for the rest of combat.'};
+
+// ================= ENEMIES =================
+const EN={
+ slug:{n:'Brine Slug',e:'🐌',hp:[14,18],ai:e=>e.t%2?{b:5}:{a:6}},
+ gull:{n:'Gull Thief',e:'🐦',hp:[10,12],ai:e=>e.t>=2?{steal:10,lbl:'Snatch & flee'}:{a:4,h:2}},
+ knight:{n:'Rust Knight',e:'🤖',hp:[30,34],ai:e=>e.t===0?{s:2,lbl:'Sharpen'}:{a:9}},
+ pod:{n:'Spore Pod',e:'🍄',hp:[20,20],ai:e=>e.t>=2?{a:18,boom:1,lbl:'BURST'}:{none:1,lbl:e.t===0?'Swelling…':'Ripening…'}},
+ wisp:{n:'Lantern Wisp',e:'🏮',hp:[16,20],ai:e=>e.t%2?{a:7}:{w:2,lbl:'Dazzle'}},
+ crab:{n:'Coral Crab',e:'🦀',hp:[24,28],b0:6,ai:e=>e.t%2?{a:5,b:4}:{b:8}},
+ captain:{n:'Drowned Captain',e:'☠️',hp:[70,70],elite:1,ai:e=>{const k=e.t%3;if(k===0)return{a:12,lbl:'Cutlass'};if(k===1)return{a:6,h:2,v:1,lbl:'Boarding'};return cb.ens.filter(x=>x.key==='slug'&&x.hp>0).length<2?{summon:'slug',lbl:'Call the crew'}:{a:12,lbl:'Cutlass'}}},
+ warden:{n:'Mirror Warden',e:'🪞',hp:[56,56],elite:1,ai:e=>({mirror:1})},
+ eel:{n:'Twin Eel',e:'🐍',hp:[32,32],elite:1,ai:e=>(e.t+e.k)%2?{b:8,lbl:'Coil'}:{a:8,lbl:'Strike'}},
+ bell:{n:'The Leviathan Bell',e:'🔔',hp:[160,160],boss:1,ai:e=>{const P=e.ph===2?[{a:20,lbl:'Crack'},{a:8,ring:2,lbl:'Shatter Wave'},{a:14,lbl:'Toll'}]:[{a:14,lbl:'Toll'},{a:5,h:3,lbl:'Reverberate'},{b:15,w:2,lbl:'Deep Hum'}];return P[(e.ci++)%3]}}
+};
+const ENC_EASY=[['slug'],['gull','gull'],['wisp']];
+const ENC_HARD=[['knight'],['crab','slug'],['pod','pod','pod'],['wisp','gull'],['crab','crab']];
+const ENC_ELITE=[['captain'],['warden'],['eel','eel']];
+
+// ================= card helpers =================
+function mk(id,up){return {id,uid:UID++,up:!!up}}
+function cost(ci){const d=CARDS[ci.id];let c=(ci.up&&d.cu!=null)?d.cu:d.c;if(cb){if(ci.tmp0)c=0;if(cb.discount&&c>0)c=Math.max(0,c-cb.discount)}return c}
+function isEx(ci){const d=CARDS[ci.id];return (ci.up&&d.xu!=null)?!!d.xu:!!d.x}
+function fmt(s,u){return s.replace(/\{([^|}]*)\|([^}]*)\}/g,(m,a,b)=>u?(b?`<span class="upv">${b}</span>`:''):a)}
+function cname(ci){return CARDS[ci.id].n+(ci.up?'+':'')}
+function desc(ci){const d=CARDS[ci.id];let s=fmt(d.d,ci.up);if(isEx(ci))s+=' <i>Exhaust.</i>';if(d.faint)s+=' <i>Faint.</i>';if(d.t==='W'&&!s.startsWith('Waypoint'))s='Waypoint. '+s;return s}
+function kwFor(ci){const t=desc(ci).replace(/<[^>]+>/g,'');return Object.keys(KW).filter(k=>t.includes(k)||(k==='Waypoint'&&CARDS[ci.id].t==='W')).map(k=>`<b>${k}:</b> ${KW[k]}`).join('<br>')}
+function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const base=(ci.up&&d.cu!=null)?d.cu:d.c;
+ return `<div class="card t${d.t}${o.sel?' sel':''}${o.can===false?' unp':''}" ${o.click?`onclick="${o.click}"`:''} onmouseenter="hov(${ci.uid})" data-id="${ci.id}" data-uid="${ci.uid}">
+ <div class="cost${c<base?' cheap':''}">${c}</div><div class="rar">${RARN[d.r]}</div><div class="ce">${d.e}</div><div class="cn">${cname(ci)}</div><div class="ct">${TYPEN[d.t]}</div><div class="cd">${desc(ci)}</div>${o.extra||''}</div>`}
+
+// ================= run setup =================
+function newRun(cls){const K=CLASSES[cls];
+ run={cls,hp:K.hp,max:K.hp,gold:99,deck:K.starter.map(id=>mk(id)),floor:0,map:genMap(),pos:{r:-1,i:-1},vis:{},won:false,kills:0};
+ S={screen:'map'};render()}
+function genMap(){let m;for(let t=0;t<300;t++){m=tryMap();const r=eliteRange(m);if(r[0]<=1&&r[1]>=3)return m}return m}
+function nodeType(f){if(f===1)return'fight';if(f===8)return'treasure';if(f===14)return'rest';
+ const w=[['fight',45],['event',20]];if(f>=5)w.push(['elite',12]);if(f!==13)w.push(['rest',12]);if(f>=3)w.push(['shop',11]);
+ let tot=w.reduce((s,x)=>s+x[1],0),x=Math.random()*tot;for(const [k,v] of w){if((x-=v)<0)return k}return'fight'}
+function tryMap(){const rows=[];
+ for(let r=0;r<14;r++){const cnt=r===0?3:3+R(2);const cols=shuffle([0,1,2,3]).slice(0,cnt).sort((a,b)=>a-b);rows.push(cols.map(c=>({c,t:nodeType(r+1),to:[]})))}
+ rows.push([{c:1.5,t:'boss',to:[]}]);
+ for(let r=0;r<14;r++){const nx=rows[r+1],cur=rows[r];
+  cur.forEach(n=>{let b=0;nx.forEach((m,j)=>{if(Math.abs(m.c-n.c)<Math.abs(nx[b].c-n.c))b=j});n.to.push(b);
+   nx.forEach((m,j)=>{if(j!==b&&n.to.length<2&&Math.abs(m.c-n.c)<=1&&Math.random()<.45)n.to.push(j)})});
+  nx.forEach((m,j)=>{if(!cur.some(n=>n.to.includes(j))){let b=0;cur.forEach((n,i)=>{if(Math.abs(n.c-m.c)<Math.abs(cur[b].c-m.c))b=i});cur[b].to.push(j)}})}
+ return rows}
+function eliteRange(rows){const mn=[],mx=[];for(let r=rows.length-1;r>=0;r--){mn[r]=[];mx[r]=[];rows[r].forEach((n,i)=>{const e=n.t==='elite'?1:0;if(!n.to.length){mn[r][i]=e;mx[r][i]=e}else{mn[r][i]=e+Math.min(...n.to.map(j=>mn[r+1][j]));mx[r][i]=e+Math.max(...n.to.map(j=>mx[r+1][j]))}})}
+ return [Math.min(...mn[0]),Math.max(...mx[0])]}
+function goNode(r,i){const n=run.map[r][i];run.pos={r,i};run.vis[r+':'+i]=1;run.floor=r+1;enterNode(n.t)}
+function enterNode(t){
+ if(t==='fight')return startCombat('fight',pick(run.floor<=3?ENC_EASY:ENC_HARD));
+ if(t==='elite')return startCombat('elite',pick(ENC_ELITE));
+ if(t==='boss')return startCombat('boss',['bell']);
+ if(t==='rest'){S={screen:'rest'};return render()}
+ if(t==='shop')return openShop();
+ if(t==='event'){S={screen:'event',ev:pick(EVENTS)};return render()}
+ if(t==='treasure'){const g=rng(50,80);run.gold+=g;return openPick('upgrade',`💎 Treasure! +${g} gold. Choose a card to upgrade:`,goMap)}}
+function goMap(){S={screen:'map'};render()}
+function heal(n){run.hp=Math.min(run.max,run.hp+n)}
+function msg(title,text,next){S={screen:'msg',title,text,next:next||goMap};render()}
+function poolOf(r){return Object.values(CARDS).filter(c=>c.cls===run.cls&&c.r!=='s'&&(!r||c.r===r))}
+function rollRar(el){const x=Math.random()*100;return el?(x<25?'r':x<57?'u':'c'):(x<8?'r':x<40?'u':'c')}
+function choices(n,el,forceR){const out=[];let g=0;while(out.length<n&&g++<200){const id=pick(poolOf(forceR||rollRar(el))).id;if(!out.includes(id))out.push(id)}return out}
+
+// ================= combat =================
+function alive(){return cb?cb.ens.filter(e=>e.hp>0&&!e.fled):[]}
+function randAlive(){const a=alive();return a.length?pick(a):null}
+function strongest(){return alive().sort((a,b)=>b.hp-a.hp)[0]}
+function curTgt(){let t=cb.ens[cb.tgt];if(!t||t.hp<=0||t.fled){t=alive()[0];cb.tgt=cb.ens.indexOf(t)}return t}
+function log(s){if(cb){cb.log.unshift(s);cb.log.length=Math.min(cb.log.length,4)}}
+function addSt(e,k,n){n=Math.floor(n);if(n<=0)return;e.st[k]=(e.st[k]||0)+n}
+function tick(st){['weak','vuln'].forEach(k=>{if(st[k]){st[k]--;if(!st[k])delete st[k]}})}
+function fx(who,txt,cls){cb.fx.push({who,txt,cls:cls||'',t:Date.now()})}
+function spawn(key){const t=EN[key];const hp=rng(t.hp[0],t.hp[1]);const e={key,n:t.n,e:t.e,hp,max:hp,block:t.b0||0,st:{},t:0,ci:0,ph:1,uid:UID++,elite:t.elite,boss:t.boss};
+ e.k=cb.ens.filter(x=>x.key===key).length;e.next=t.ai(e);cb.ens.push(e);return e}
+function startCombat(kind,enc){
+ run.deck.forEach(ci=>{ci.cres=0;ci.tmp0=false});
+ cb={kind,ens:[],tgt:0,p:{block:0,st:{}},pstr:0,energy:3,hand:[],draw:shuffle(run.deck.slice()),disc:[],exh:[],pw:{},log:[],fx:[],turn:0,played:0,lastType:null,mode:null,busy:false,sel:null,
+  tide:5,slack:false,last:null,lastTgt:null,amp:false,overtone:false,discount:0,slots:[],nslots:3,chartQ:0,mom:0,press:false,parry:0,perfect:false,perfNext:0,atkCount:0};
+ enc.forEach(spawn);
+ if(run.cls==='carto'){const id=pick(['signal','cache','lookout']);cb.slots.push({id,uid:UID++,up:false,temp:true});log('🧭 Starting Waypoint: '+CARDS[id].n)}
+ S={screen:'combat'};startTurn()}
+function gainBlock(n){n=Math.floor(n);if(n<=0)return;cb.p.block+=n;fx('p','+'+n+'🛡','b')}
+function gainMom(n){cb.mom=Math.min(3,cb.mom+n)}
+function refill(k){if(cb.draw.length<k&&cb.disc.length){cb.draw=cb.draw.concat(shuffle(cb.disc));cb.disc=[]}}
+function drawCards(n){for(let i=0;i<n;i++){if(cb.hand.length>=10)break;refill(1);if(!cb.draw.length)break;cb.hand.push(cb.draw.shift())}}
+function hit(e,base,f,raw){if(!e||e.hp<=0||e.fled)return;let d=base;
+ if(!raw){d+=cb.pstr;if(run.cls==='duel'){const top=Math.max(...alive().map(x=>x.hp));if(e.hp===top)d+=2;if(f&&f.flourish)d*=2}if(cb.p.st.weak)d=Math.floor(d*.75)}
+ if(e.st.vuln)d=Math.floor(d*1.5);dmgEnemy(e,Math.max(0,d))}
+function dmgEnemy(e,d){if(e.hp<=0)return;const b=Math.min(e.block,d);e.block-=b;d-=b;e.hp-=d;fx(e.uid,d>0?'-'+d:(b?'🛡'+b:'0'));e.shake=Date.now();
+ if(e.key==='bell'&&e.ph===1&&e.hp<=80&&e.hp>0){e.ph=2;delete e.st.weak;delete e.st.vuln;e.st.str=(e.st.str||0)+2;e.ci=0;e.next=EN.bell.ai(e);log('🔔 The Bell CRACKS! Phase 2: +2 Strength, debuffs cleared')}
+ if(e.hp<=0){e.hp=0;run.kills++;log('💥 '+e.n+' defeated');if(e.key==='eel'){alive().filter(x=>x.key==='eel').forEach(x=>{x.st.str=(x.st.str||0)+3;log('🐍 The other eel rages: +3 Strength')})}}}
+function setTide(v){cb.tide=Math.max(0,Math.min(10,v));checkTide()}
+function tideShift(n){if(cb.slack){return}setTide(cb.tide+n)}
+function checkTide(){if(cb.tide>=10){const d=cb.pw.spring?16:8;log(`🌊 CREST! ${d} damage to ALL`);alive().forEach(e=>dmgEnemy(e,d));cb.tide=5}
+ else if(cb.tide<=0){const n=cb.pw.neap;log(`🌀 UNDERTOW! +${n?16:8} Block, draw ${n?2:1}`);gainBlock(n?16:8);drawCards(n?2:1);cb.tide=5}}
+function F(ci,o){const u=!!ci.up,m=o.mult||1;
+ const f={u,ci,m,echo:!!o.echo,v:(a,b)=>u?b:a,
+  get tg(){let t=o.tgt;if(!t||t.hp<=0||t.fled)t=o.echo?randAlive():curTgt();return t},
+  dmg(n,h=1){for(let i=0;i<h;i++){const t=f.tg;if(!t)return;hit(t,n*m,f)}},
+  all(n,h=1){for(let i=0;i<h;i++)alive().forEach(e=>hit(e,n*m,f))},
+  blk(n){gainBlock(n*m)},draw(n){drawCards(n)},
+  weak(n,t){t=t||f.tg;if(t)addSt(t,'weak',n*m)},vuln(n,t){t=t||f.tg;if(t)addSt(t,'vuln',n*m)},
+  surge(n){tideShift(n)},recede(n){tideShift(-n)},
+  parry(n){gainBlock(n*m);cb.parry+=Math.floor(n*m)}};
+ f.low=cb.tide<=3;f.high=cb.tide>=7;return f}
+function trigWp(w){const d=CARDS[w.id];d.wp(F(w,{}))}
+function choose(title,opts){cb.mode={k:'choice',title,opts}}
+function chart(n,then){refill(n);cb.mode={k:'chart',n:Math.min(n,cb.draw.length),then,moved:false};if(!cb.mode.n){cb.mode=null;then&&then()}}
+function pickSlot(title,then){cb.mode={k:'slot',title,then}}
+function modeAct(a,i){const m=cb.mode;if(!m)return;
+ if(m.k==='choice'){cb.mode=null;m.opts[i].f();return after()}
+ if(m.k==='slot'){cb.mode=null;m.then(i);return after()}
+ if(m.k==='chart'){const d=cb.draw;
+  if(a==='up'&&i>0)[d[i-1],d[i]]=[d[i],d[i-1]];
+  if(a==='dn'&&i<m.n-1)[d[i+1],d[i]]=[d[i],d[i+1]];
+  if(a==='bot'&&!m.moved){d.push(d.splice(i,1)[0]);m.moved=true;m.n--}
+  if(a==='done'){cb.mode=null;log('🗺️ Charted');m.then&&m.then();return after()}
+  render()}}
+function startTurn(){cb.turn++;cb.p.block=0;cb.parry=0;cb.perfect=false;cb.energy=3;cb.played=0;cb.overtone=false;cb.amp=false;cb.slack=false;cb.discount=0;cb.last=null;cb.sel=null;
+ if(cb.pw.engarde)gainMom(1);if(cb.perfNext){gainMom(cb.perfNext);cb.perfNext=0}
+ cb.chartQ=0;cb.wpDraw=0;
+ if(run.cls==='carto')cb.slots.forEach(trigWp);
+ const n=(run.cls==='carto'?(cb.pw.known?5:4):5)+(cb.wpDraw||0);cb.wpDraw=0;
+ if(!alive().length)return after();
+ if(cb.chartQ){const q=cb.chartQ;cb.chartQ=0;chart(q,()=>drawCards(n));render()}else{drawCards(n);after()}}
+function canPlay(ci){const d=CARDS[ci.id];return !cb.busy&&!cb.mode&&cost(ci)<=cb.energy&&!d.unplay}
+function tapCard(i){if(cb.busy||cb.mode)return;if(cb.sel===i)return playCard(i);cb.sel=i;render()}
+function playSel(){if(cb.sel!=null)playCard(cb.sel)}
+function playCard(i){const ci=cb.hand[i];if(!ci||!canPlay(ci))return;const d=CARDS[ci.id];
+ cb.energy-=cost(ci);cb.discount=0;cb.hand.splice(i,1);cb.played++;ci.tmp0=false;cb.sel=null;
+ const tg=curTgt();const f=F(ci,{tgt:tg});
+ if(run.cls==='duel'&&d.t==='A')f.flourish=cb.mom>=3;
+ if(d.t==='W')placeWp(ci);else if(d.t==='P'||isEx(ci))cb.exh.push(ci);else cb.disc.push(ci);
+ if(d.p)d.p(f);
+ if(f.flourish)log('🔥 FLOURISH! '+cname(ci)+' dealt double');
+ if(run.cls==='duel'&&d.t==='A'){cb.mom=f.flourish?0:Math.min(3,cb.mom+1);cb.atkCount++}
+ cb.lastType=d.t==='A'?'A':d.t==='P'?'P':'S';
+ if(run.cls==='echo'){cb.last=d.t==='P'?null:ci;cb.lastTgt=tg}
+ after()}
+function placeWp(ci){if(cb.slots.length<cb.nslots){cb.slots.push(ci);log('📍 Waypoint placed: '+cname(ci))}
+ else pickSlot('Slots full: replace which Waypoint?',i=>{const old=cb.slots[i];cb.slots[i]=ci;if(!old.temp)cb.disc.push(old);log('📍 '+cname(ci)+' replaces '+cname(old))})}
+function after(){if(!cb)return;if(run.hp<=0)return lose();if(!alive().length&&!cb.mode)return win();render()}
+function doEcho(){if(run.cls!=='echo'||!cb.last)return;const ci=cb.last,d=CARDS[ci.id];
+ if(d.faint){log('🔇 '+cname(ci)+' is Faint: no Echo');return}
+ let times=(cb.overtone?2:1)+(cb.pw.standing?1:0);
+ for(let k=0;k<times;k++){if(!alive().length)break;const mult=cb.amp?2:1;cb.amp=false;const f=F(ci,{echo:true,mult,tgt:cb.lastTgt});d.p(f);log(`🔊 Echo: ${cname(ci)}${mult>1?' (doubled!)':''}`)}}
+function endTurn(){if(!cb||cb.busy||cb.mode)return;
+ doEcho();if(!alive().length)return win();
+ cb.hand.forEach(ci=>{ci.tmp0=false;cb.disc.push(ci)});cb.hand=[];cb.sel=null;
+ if(!cb.press)cb.mom=0;cb.press=false;tick(cb.p.st);
+ cb.busy=true;render();setTimeout(enemyPhase,window.FAST?0:550)}
+function eAtk(e,a){let d=a+(e.st.str||0);if(e.st.weak)d=Math.floor(d*.75);if(cb.p.st.vuln)d=Math.floor(d*1.5);return Math.max(0,d)}
+function intentOf(e){const m=e.next;if(m&&m.mirror){return cb.lastType==='A'?{a:10,lbl:'Mirror: Attack'}:cb.lastType==='S'?{b:12,lbl:'Mirror: Guard'}:cb.lastType==='P'?{s:2,lbl:'Mirror: Empower'}:{q:1,lbl:'Watching…'}}return m}
+function enemyHitPlayer(e,d){const b=Math.min(cb.p.block,d);cb.p.block-=b;const rest=d-b;run.hp-=rest;fx('p',rest>0?'-'+rest:'🛡'+b);cb.pshake=Date.now();
+ if(b>=1&&cb.parry>0&&!e.parried){e.parried=true;log(`⚔️ Parry! ${cb.parry} back to ${e.n}`);dmgEnemy(e,cb.parry);if(cb.perfect){cb.perfNext=2;cb.perfect=false}}}
+function act(e){const m=intentOf(e);if(m.lbl)log(`${e.e} ${e.n}: ${m.lbl}`);
+ if(m.b)e.block+=m.b;if(m.s)e.st.str=(e.st.str||0)+m.s;
+ if(m.a){for(let h=0;h<(m.h||1);h++){if(run.hp<=0||e.hp<=0)break;enemyHitPlayer(e,eAtk(e,m.a))}}
+ if(m.w)addSt(cb.p,'weak',m.w);if(m.v)addSt(cb.p,'vuln',m.v);
+ if(m.boom&&e.hp>0){e.hp=0;log('🍄 The Spore Pod bursts and dies')}
+ if(m.summon){spawn(m.summon);log('📯 A Brine Slug joins the fight')}
+ if(m.steal){const g=Math.min(m.steal,run.gold);run.gold-=g;e.fled=true;log(`🐦 Gull Thief stole ${g} gold and flew off!`)}
+ if(m.ring){for(let i=0;i<m.ring;i++)cb.disc.push(mk('ringing'));log('🔔 2 Ringing cards added to your discard')}}
+function enemyPhase(){if(!cb)return;
+ for(const e of cb.ens.slice()){if(e.hp<=0||e.fled)continue;e.block=0;act(e);e.t++;tick(e.st);if(e.hp>0&&!e.fled)e.next=EN[e.key].ai(e);if(run.hp<=0)return lose()}
+ cb.ens.forEach(e=>e.parried=false);cb.busy=false;if(!alive().length)return win();startTurn()}
+function win(){const k=cb.kind;cb=null;
+ if(k==='boss'){run.won=true;S={screen:'end'};return render()}
+ const g=k==='elite'?rng(25,35):rng(10,20);run.gold+=g;
+ S={screen:'reward',rew:{gold:g,cards:choices(3,k==='elite'),upg:k==='elite',title:k==='elite'?'Elite defeated!':'Victory!'}};render()}
+function lose(){cb=null;run.won=false;run.hp=0;S={screen:'end'};render()}
+function tgt(i){if(!cb||cb.busy)return;if(cb.mode&&cb.mode.k!=='none')return;cb.tgt=i;cb.insp=i;cb.sel=null;render()}
+function hov(uid){if(!cb||cb.sel!=null||S.screen!=='combat')return;const ci=cb.hand.find(c=>c.uid===uid);if(!ci)return;const el=document.getElementById('detail');if(el)el.innerHTML=cardDetail(ci,false)}
+
+// ================= events / shop / rest / pick =================
+const EVENTS=[
+ {n:'Tidepool Shrine',e:'⛩️',t:'A shrine half-sunk in a glowing tidepool. The water asks for blood.',o:[
+  {l:'🩸 Offer 8 HP: gain a random Uncommon card',ok:()=>run.hp>8,f:()=>{run.hp-=8;const c=pick(poolOf('u'));run.deck.push(mk(c.id));msg('Tidepool Shrine',`The water takes its due. You gain <b>${c.n}</b>.`)}},
+  {l:'🚶 Leave',f:()=>goMap()}]},
+ {n:'Wandering Cartomancer',e:'🃏',t:'A cloaked figure shuffles a deck that seems to shuffle back.',o:[
+  {l:'💰 Pay 50 gold: remove a card from your deck',ok:()=>run.gold>=50,f:()=>{run.gold-=50;openPick('remove','Choose a card to remove',goMap)}},
+  {l:'🔁 Free: transform a card into a random class card',f:()=>openPick('transform','Choose a card to transform',goMap)}]},
+ {n:'Sunken Chest',e:'🧰',t:'A barnacled chest rests between the rocks. Something with claws is guarding it.',o:[
+  {l:'💰 Take 40 gold and fight a Coral Crab',f:()=>{run.gold+=40;startCombat('fight',['crab'])}},
+  {l:'🚶 Leave it',f:()=>goMap()}]},
+ {n:'Campfire Stranger',e:'🔥',t:'A stranger by a small fire waves you over. "Sit. Rest. Or let me sharpen something."',o:[
+  {l:'❤️ Heal 15 HP',f:()=>{heal(15);msg('Campfire Stranger','You rest and feel restored. +15 HP')}},
+  {l:'⬆️ Upgrade a random card',f:()=>{const c=run.deck.filter(x=>!x.up);if(c.length){const x=pick(c);x.up=true;msg('Campfire Stranger',`The stranger improves <b>${cname(x)}</b>.`)}else msg('Campfire Stranger','Nothing left to improve.')}}]}
+];
+function evOpt(i){const o=S.ev.o[i];if(o.ok&&!o.ok())return;o.f()}
+function openShop(){const items=[];const used=[];for(let i=0;i<5;i++){let c,g=0;do{c=pick(poolOf(rollRar(false)))}while(used.includes(c.id)&&g++<50);used.push(c.id);items.push({ci:mk(c.id),price:{c:50,u:75,r:150}[c.r]})}
+ S={screen:'shop',items,removed:false};render()}
+function buy(i){const it=S.items[i];if(it.sold||run.gold<it.price)return;run.gold-=it.price;it.sold=true;run.deck.push(it.ci);render()}
+function shopRemove(){if(S.removed||run.gold<75)return;const back=S;openPick('remove','Remove a card (75 gold)',()=>{run.gold-=75;back.removed=true;S=back;render()},()=>{S=back;render()})}
+function openPick(mode,title,then,cancel){const list=run.deck.filter(c=>mode!=='upgrade'||!c.up);if(!list.length){then();return}S={screen:'pick',mode,title,then,cancel};render()}
+function pickCard(uid){const i=run.deck.findIndex(c=>c.uid===uid);if(i<0)return;const ci=run.deck[i];
+ if(S.mode==='upgrade')ci.up=true;else if(S.mode==='remove')run.deck.splice(i,1);else if(S.mode==='transform'){const n=pick(poolOf().filter(c=>c.id!==ci.id));run.deck[i]=mk(n.id)}
+ S.then()}
+function restHeal(){heal(Math.floor(run.max*.3));goMap()}
+function rewPick(i){run.deck.push(mk(S.rew.cards[i]));rewDone()}
+function rewDone(){if(S.rew.upg)openPick('upgrade','Elite bonus: choose a card to upgrade',goMap);else goMap()}
+
+// ================= render =================
+function topBar(){const K=CLASSES[run.cls];return `<div class="topbar"><span style="color:${K.col}">${K.e} <b>${K.n}</b></span><span>❤️ ${Math.max(0,run.hp)}/${run.max}</span><span>💰 ${run.gold}</span><span>🏔️ ${run.floor}/15</span><button class="mini" onclick="S.ov='deck';render()">🂠 ${run.deck.length}</button></div>`}
+function hpbar(h,m,c){return `<div class="bar"><i style="width:${Math.max(0,h/m*100)}%;background:${c}"></i></div>`}
+function stHTML(st,str){const p=[];if(str)p.push(`💪${str}`);if(st.str)p.push(`💪${st.str}`);if(st.weak)p.push(`🥀Weak ${st.weak}`);if(st.vuln)p.push(`💔Vuln ${st.vuln}`);return p.join(' ')}
+function fxHTML(who){const now=Date.now();return cb.fx.filter(x=>x.who===who&&now-x.t<800).map(x=>`<div class="fl ${x.cls}">${x.txt}</div>`).join('')}
+function intentHTML(e){const m=intentOf(e);const p=[];if(m.q)p.push('❓');if(m.none)p.push('💤');
+ if(m.a)p.push(`⚔️${eAtk(e,m.a)}${m.h>1?'×'+m.h:''}`);if(m.b)p.push('🛡️'+m.b);if(m.s)p.push('💪+'+m.s);if(m.w||m.v)p.push('🌀');if(m.summon)p.push('📯');if(m.steal)p.push('💰🏃');if(m.ring)p.push('🔔+2');
+ return (m.lbl?`<small>${m.lbl}</small> `:'')+p.join(' ')}
+function intentText(e){const m=intentOf(e);const p=[];if(m.q)p.push('Will copy the type of the last card you play (Attack→attack 10, Skill→12 Block, Power→+2 Strength)');if(m.none)p.push('Does nothing');
+ if(m.a)p.push(`Attack for ${eAtk(e,m.a)}${m.h>1?' × '+m.h:''}`+(m.boom?' then dies':''));if(m.b)p.push(`Gain ${m.b} Block`);if(m.s)p.push(`Gain ${m.s} Strength`);if(m.w)p.push(`Apply ${m.w} Weak`);if(m.v)p.push(`Apply ${m.v} Vulnerable`);
+ if(m.summon)p.push('Summon a Brine Slug');if(m.steal)p.push(`Steal ${m.steal} gold and flee`);if(m.ring)p.push('Add 2 Ringing to your discard');return p.join(', ')}
+function cardDetail(ci,withPlay){const d=CARDS[ci.id];return `<div><b>${d.e} ${cname(ci)}</b> · ${cost(ci)}⚡ · ${TYPEN[d.t]}${d.r!=='s'?' · '+{c:'Common',u:'Uncommon',r:'Rare'}[d.r]:''}</div><div>${desc(ci)}</div><div class="kw">${kwFor(ci)}</div>`+
+ (withPlay?`<button class="btn pri full" id="playbtn" onclick="playSel()" ${canPlay(ci)?'':'disabled'}>${canPlay(ci)?'▶ Play '+cname(ci):'Not enough energy'}</button>`:'')}
+function classPanel(){const c=run.cls;
+ if(c==='tide'){let g='';for(let i=0;i<=10;i++)g+=`<i class="${i<=cb.tide?'on':''} ${i>=7?'hi':i<=3?'lo':''} ${i===cb.tide?'cur':''}"></i>`;
+  const st=cb.tide>=7?'🔺 <b style="color:#21c4c4">HIGH TIDE</b>':cb.tide<=3?'🔻 <b style="color:#6f8cff">LOW TIDE</b>':'〰️ <b>Mid Tide</b>';
+  return `<div class="panel cp">${st} · Tide <b>${cb.tide}</b>/10 ${cb.slack?'· 🛶 Slack (frozen)':''}<div class="gauge">${g}</div><span class="muted">10 = Crest (${cb.pw.spring?16:8} to ALL) · 0 = Undertow (${cb.pw.neap?16:8} Block)</span></div>`}
+ if(c==='echo'){const l=cb.last;let t='<span class="muted">Play a card. The last one you play Echoes at end of turn.</span>';
+  if(l){const d=CARDS[l.id];const times=(cb.overtone?2:1)+(cb.pw.standing?1:0);t=d.faint?`🔇 Last card <b>${cname(l)}</b> is Faint: no Echo`:`🔊 Will Echo: <span class="chip next">${d.e} ${cname(l)}</span>${times>1?' ×'+times:''}${cb.amp?' <b style="color:#ffd65a">(doubled)</b>':''}`}
+  return `<div class="panel cp">${t}${cb.discount?' · 🎵 next card -1⚡':''}</div>`}
+ if(c==='carto'){let s='';const pick=cb.mode&&cb.mode.k==='slot';for(let i=0;i<cb.nslots;i++){const w=cb.slots[i];s+=w?`<div class="slot full ${pick?'pick':''}" ${pick?`onclick="modeAct('slot',${i})"`:''}>${CARDS[w.id].e} ${cname(w)}</div>`:`<div class="slot">empty</div>`}
+  const nx=cb.draw.slice(0,6).map((ci,i)=>`<span class="chip ${i<(cb.pw.known?5:4)?'next':''}">${CARDS[ci.id].e} ${cname(ci)}</span>`).join('')||'<span class="muted">empty (discard reshuffles)</span>';
+  return `<div class="panel cp">📍 Waypoints (${cb.slots.length}/${cb.nslots})<div class="slots">${s}</div>🗺️ Open Map, next up: ${nx}</div>`}
+ if(c==='duel'){let p='';for(let i=0;i<3;i++)p+=`<i class="${i<cb.mom?'on':''}"></i>`;
+  return `<div class="panel cp">Momentum <span class="pips">${p}</span> ${cb.mom>=3?'<b style="color:#ff8a3d">🔥 Next Attack is a FLOURISH (×2)</b>':''} ${cb.parry?` · ⚔️ Parry ${cb.parry}`:''}${cb.press?' · 🏃 keeps Momentum':''}</div>`}}
+function enemyHTML(e,i){const many=alive().length>1;return `<div class="en ${e.boss?'boss':''} ${many&&cb.tgt===i?'tg':''} ${Date.now()-(e.shake||0)<400?'shake':''}" onclick="tgt(${i})" data-en="${i}">
+ <div class="intent">${intentHTML(e)}</div><div class="emo">${e.e}</div><div class="nm">${e.n}${e.elite?' ⭐':''}${e.boss?(' · Phase '+e.ph):''}</div>${hpbar(e.hp,e.max,'#d9534f')}
+ <div class="st">❤️${e.hp}/${e.max} ${e.block?'🛡️'+e.block:''} ${stHTML(e.st)}</div>${fxHTML(e.uid)}</div>`}
+function detailHTML(){if(cb.sel!=null&&cb.hand[cb.sel])return cardDetail(cb.hand[cb.sel],true);
+ if(cb.insp!=null&&cb.ens[cb.insp]&&cb.ens[cb.insp].hp>0){const e=cb.ens[cb.insp];return `<b>${e.e} ${e.n}</b> (targeted)<br>Intent: ${intentText(e)}`}
+ return '<span class="muted">Tap a card to inspect it, tap again (or ▶ Play) to play. Tap an enemy to target it and see its intent.</span>'}
+function combatScr(){const K=CLASSES[run.cls];let h=topBar();
+ h+=`<div class="ens">${cb.ens.map((e,i)=>e.hp>0&&!e.fled?enemyHTML(e,i):'').join('')}</div>`;
+ h+=classPanel();
+ h+=`<div class="panel me ${Date.now()-(cb.pshake||0)<400?'shake':''}"><div class="energy" title="Energy">${cb.energy}</div><div class="hp"><b>${K.e} You</b> ${cb.p.block?'🛡️<b>'+cb.p.block+'</b>':''} <span class="st">${stHTML(cb.p.st,cb.pstr)}</span>${hpbar(run.hp,run.max,'#4caf50')}<span class="muted">❤️ ${Math.max(0,run.hp)}/${run.max}</span></div>${fxHTML('p')}</div>`;
+ h+=`<div id="detail" class="detail">${detailHTML()}</div>`;
+ h+=`<div class="hand">${cb.hand.map((ci,i)=>cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),click:`tapCard(${i})`})).join('')||'<span class="muted" style="padding-top:40px">No cards in hand</span>'}</div>`;
+ h+=`<div class="ctrl"><button class="mini" onclick="S.ov='draw';render()">📚 Draw ${cb.draw.length}</button><button class="mini" onclick="S.ov='disc';render()">🗑️ ${cb.disc.length}</button><button class="mini" onclick="S.ov='exh';render()">✖ ${cb.exh.length}</button>
+ <button class="btn pri" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>${cb.busy?'Enemy turn…':'End Turn ⏭'}</button></div>`;
+ h+=`<div class="log">${cb.log.map((l,i)=>`<div style="opacity:${1-i*.2}">${l}</div>`).join('')}</div>`;
+ const m=cb.mode;
+ if(m&&m.k==='choice')h+=`<div class="ov"><div class="box"><h2>${m.title}</h2>${m.opts.map((o,i)=>`<button class="btn opt" onclick="modeAct('choice',${i})">${o.l}</button>`).join('')}</div></div>`;
+ if(m&&m.k==='slot')h+=`<div class="ov"><div class="box"><h2>${m.title}</h2>${cb.slots.map((w,i)=>`<button class="btn opt slotpick" onclick="modeAct('slot',${i})">${CARDS[w.id].e} ${cname(w)}${w.temp?' (starting)':''}</button>`).join('')}</div></div>`;
+ if(m&&m.k==='chart'){let rows='';for(let i=0;i<m.n;i++){const ci=cb.draw[i];rows+=`<div class="row"><b>#${i+1}</b><span class="nm">${CARDS[ci.id].e} ${cname(ci)} <span class="muted">${cost(ci)}⚡ ${TYPEN[CARDS[ci.id].t]}</span></span><button class="mini" onclick="modeAct('up',${i})">▲</button><button class="mini" onclick="modeAct('dn',${i})">▼</button><button class="mini" ${m.moved?'disabled':''} onclick="modeAct('bot',${i})">⤓ Bottom</button></div>`}
+  h+=`<div class="ov"><div class="box"><h2>🗺️ Chart: reorder the top of your draw pile</h2><div class="muted">#1 is drawn first. You may send one card to the bottom.</div>${rows}<button class="btn pri full" id="chartdone" onclick="modeAct('done')">Done</button></div></div>`}
+ return h}
+function mapScr(){const rows=run.map,H=62,N=rows.length;const av=run.pos.r<0?rows[0].map((_,i)=>i):rows[run.pos.r][run.pos.i].to;
+ const ICON={fight:'⚔️',elite:'💀',rest:'🔥',shop:'💰',event:'❓',treasure:'💎',boss:'🔔'};let svg='',nodes='';
+ rows.forEach((row,r)=>row.forEach((n,i)=>{const x=(n.c+.5)*25,y=(N-1-r)*H+34;
+  n.to.forEach(j=>{const m=rows[r+1][j];const on=run.vis[r+':'+i]&&run.vis[(r+1)+':'+j];svg+=`<line x1="${x}%" y1="${y}" x2="${(m.c+.5)*25}%" y2="${y-H}" stroke="${on?'#7d9bdc':'#3a4258'}" stroke-width="${on?3:2}" stroke-dasharray="${on?'':'4 4'}"/>`});
+  const isAv=r===run.pos.r+1&&av.includes(i),vis=run.vis[r+':'+i];
+  nodes+=`<button class="node ${n.t==='boss'?'boss':''} ${isAv?'av':''} ${vis?'vis':''} ${r<=run.pos.r&&!vis?'dim':''}" style="left:${x}%;top:${y}px" ${isAv?`onclick="goNode(${r},${i})"`:''} title="${n.t}">${ICON[n.t]}</button>`}));
+ return `<h2>Choose your path</h2><div class="legend"><span>⚔️ Fight</span><span>💀 Elite</span><span>❓ Event</span><span>🔥 Rest</span><span>💰 Shop</span><span>💎 Treasure</span><span>🔔 Boss</span></div>
+ <div class="mapwrap" style="height:${N*H+10}px"><svg width="100%" height="${N*H+10}">${svg}</svg>${nodes}</div>`}
+function titleScr(){return `<h1>Tidebound Ascent</h1><div class="sub">A deck-building climb to the Leviathan Bell. Pick a class: each one plays by its own rules.</div>`+
+ Object.entries(CLASSES).map(([k,c])=>`<button class="cls" onclick="newRun('${k}')" data-cls="${k}"><span class="big">${c.e}</span><span><b style="color:${c.col}">${c.n}</b> <span class="muted">❤️ ${c.hp}</span><br><span style="font-size:13px;color:#c9cfdc">${c.rule}</span></span></button>`).join('')+
+ `<div class="muted" style="text-align:center;margin-top:8px">15 floors · 6 enemies · 3 elites · 1 boss · tap to play, works on phone and desktop</div>`}
+function render(){const a=document.getElementById('app');let h='';const s=S.screen;
+ if(s==='title')h=titleScr();
+ else if(s==='map')h=topBar()+mapScr();
+ else if(s==='combat')h=combatScr();
+ else if(s==='reward'){const r=S.rew;h=topBar()+`<h2>${r.title}</h2><div class="sub">💰 +${r.gold} gold${r.upg?' · ⬆️ upgrade after this':''}<br>Choose a card to add to your deck</div><div class="grid">${r.cards.map((id,i)=>cardHTML({id,uid:-1-i,up:false},{click:`rewPick(${i})`})).join('')}</div><button class="btn full" onclick="rewDone()">Skip card</button>`}
+ else if(s==='rest')h=topBar()+`<h2>🔥 Rest Site</h2><div class="sub">The fire crackles. One choice.</div><button class="btn pri full" onclick="restHeal()">❤️ Rest: heal ${Math.floor(run.max*.3)} HP</button><button class="btn full" onclick="openPick('upgrade','Choose a card to upgrade',goMap)">⬆️ Smith: upgrade a card</button>`;
+ else if(s==='event'){const e=S.ev;h=topBar()+`<div class="panel" style="text-align:center"><div style="font-size:54px">${e.e}</div><h2>${e.n}</h2><p>${e.t}</p></div>${e.o.map((o,i)=>`<button class="btn opt" onclick="evOpt(${i})" ${o.ok&&!o.ok()?'disabled':''}>${o.l}</button>`).join('')}`}
+ else if(s==='shop')h=topBar()+`<h2>💰 Bazaar</h2><div class="grid">${S.items.map((it,i)=>`<div style="width:31%;max-width:150px">${cardHTML(it.ci,{click:`buy(${i})`,can:!it.sold&&run.gold>=it.price}).replace('width:31%','')}<span class="price">${it.sold?'SOLD':'💰 '+it.price}</span></div>`).join('')}</div>
+  <button class="btn full" onclick="shopRemove()" ${S.removed||run.gold<75?'disabled':''}>✂️ Remove a card (💰75)${S.removed?' — used':''}</button><button class="btn pri full" onclick="goMap()">Leave shop</button>`;
+ else if(s==='pick'){const list=run.deck.filter(c=>S.mode!=='upgrade'||!c.up);h=topBar()+`<h2>${S.title}</h2>${S.mode==='upgrade'?'<div class="sub">Cards are shown with their upgrade (green).</div>':''}<div class="grid">${list.map(c=>cardHTML(S.mode==='upgrade'?{...c,up:true}:c,{click:`pickCard(${c.uid})`})).join('')}</div>${S.cancel?'<button class="btn full" onclick="S.cancel()">Cancel</button>':'<button class="btn full" onclick="S.then()">Skip</button>'}`}
+ else if(s==='msg')h=topBar()+`<div class="panel" style="text-align:center;margin-top:30px"><h2>${S.title}</h2><p>${S.text}</p></div><button class="btn pri full" onclick="S.next()">Continue</button>`;
+ else if(s==='end'){const K=CLASSES[run.cls];h=`<div class="end"><div class="big">${run.won?'🏆':'🪦'}</div><h1>${run.won?'Victory!':'Defeated'}</h1><p class="sub">${run.won?`The Leviathan Bell falls silent. ${K.e} ${K.n} conquered the climb.`:`${K.e} ${K.n} fell on floor ${run.floor} of 15.`}</p>
+  <div class="panel">Enemies defeated: ${run.kills} · Deck size: ${run.deck.length} · Gold: ${run.gold}</div><button class="btn pri full" id="restart" onclick="S={screen:'title'};render()">🔄 Play again</button></div>`}
+ if(S.ov){const list=S.ov==='deck'?run.deck:cb?(S.ov==='draw'?(run.cls==='carto'?cb.draw:cb.draw.slice().sort((a,b)=>a.id<b.id?-1:1)):S.ov==='disc'?cb.disc:cb.exh):[];
+  const t={deck:'Your deck',draw:run.cls==='carto'?'Draw pile (in order: Open Map)':'Draw pile (order hidden)',disc:'Discard pile',exh:'Exhausted'}[S.ov];
+  h+=`<div class="ov" onclick="S.ov=null;render()"><div class="box"><h2>${t} (${list.length})</h2><div class="grid">${list.map(c=>cardHTML(c)).join('')}</div><button class="btn full">Close</button></div></div>`}
+ a.innerHTML=h;
+ if(s==='map'){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
+window.G={get S(){return S},get run(){return run},get cb(){return cb},CARDS,EN,CLASSES,newRun,startCombat};
+render();
+</script></body></html>

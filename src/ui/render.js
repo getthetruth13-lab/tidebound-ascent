@@ -25,6 +25,7 @@ import {drag} from './input.js';
 import {mapHTML} from './map.js';
 import {titleScr} from './screens/title.js';
 import {decorateKeywords} from './kwtip.js';
+import {eventSceneHTML} from './eventscene.js';
 import {decorateCardRefs} from './cardref.js';
 import {tileHTML,tilesRow,relicTile,potionTile,optionHTML,emblemHTML,splitLabel,esc as tesc} from './tiles.js';
 import {lampSummaryHTML,tasksHTML,lampBtnLabel} from './screens/lamp.js';
@@ -38,8 +39,8 @@ const lbl=o=>typeof o.l==='function'?o.l():o.l;
 function cardArtHTML(id,d,full){if(assetEntry('cards',id))return slotHTML('cards',id,'art','');const P=CARD_ART[id];
  if(P)return `<div class="slot art has-img ph-art painted" data-asset="cardArt.${id}"><img src="${full?P.art:P.thumb}" alt="" draggable="false" decoding="async" onerror="this.remove()"></div>`;const k=d.curse?'curse':d.cls==='status'?'status':TH[d.cls]?d.cls:'colorless';
  const a=assetEntry('cardPH',k);return `<div class="slot art has-img ph-art" data-asset="cardPH.${k}"><img src="${a.src}" srcset="${a.srcset}" sizes="${a.sizes}" alt="" draggable="false" decoding="async" onerror="this.remove()"></div>`}
-// B12: one short rules line on resting landscape hand cards (the dark panel sits below the fold). Full text if it fits on one
-// 10px line, else the first sentence, else a gold "Tap to read" chip. A tap lifts the card with no transition.
+// One short effect line over the resting hand art. The fitter uses full text when it fits,
+// otherwise the first sentence with ellipsis; the complete rules panel remains unchanged.
 const plain=h=>String(h).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
 function restLineHTML(ci,d){const t=plain(d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci));if(!t)return'';const first=(t.match(/^[^.]*\.?/)||[t])[0];
  return `<span class="rline" data-full="${esc(t)}" data-first="${esc(first)}">${esc(t)}</span>`}
@@ -58,7 +59,7 @@ export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const ba
  const cls=['card','t'+d.t,'r-'+d.r,'theme-'+(TH[d.cls]||''),o.sel?'sel':'',o.can===false?'unp':'',d.curse?'curse':'',d.cls==='status'?'status':'',o.mark?'markable':'',o.flourish?'flourishable':'',ci.open?'opening':'',d.unplay?'nocost':''].filter(Boolean).join(' ');
  return `<div class="${cls}" ${o.click?`onclick="${o.click}"`:''} data-id="${ci.id}" data-uid="${ci.uid}" data-up="${up?1:0}"${o.i!=null?` data-i="${o.i}"`:''}>
  <i class="cfr"></i>${cardArtHTML(ci.id,d,!!(o.sel||o.full))}
- <span class="cost${c<base?' cheap':c>base?' dear':''}">${d.unplay?'':(d.c==='X'?'X':c)}</span><span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.r!=='s'&&d.r!=='x'?`<span class="rarity ${d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}<i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}</div>`}
+ <span class="cost${c<base?' cheap':c>base?' dear':''}">${d.unplay?'':(d.c==='X'?'X':c)}</span><span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.r!=='s'&&d.r!=='x'?`<span class="rarity ${d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}<i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}${o.i!=null?restLineHTML(ci,d):''}</div>`}
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
@@ -250,9 +251,11 @@ export function settingsHTML(){return `<div class="settings"><label><input type=
  <label>SFX <input id="setsfx" aria-label="SFX volume" type="range" min="0" max="1" step="0.01" value="${settings.sfxVolume}" oninput="setAudioSetting('sfxVolume',this.value)"></label>
  <label><input id="setmute" type="checkbox" ${settings.audioMuted?'checked':''} onchange="setAudioSetting('audioMuted',this.checked)"> Mute audio</label>
  <label><input id="sethints" type="checkbox" ${settings.coach!==false?'checked':''} onchange="setCoach(this.checked)"> First-fight hints</label>
+ <label><input id="setcardskip" type="checkbox" ${settings.confirmCardSkip!==false?'checked':''} onchange="setConfirmCardSkip(this.checked)"> Confirm skipping card rewards</label>
  <label><input id="setshake" type="checkbox" ${settings.screenShake!==false?'checked':''} onchange="setScreenShake(this.checked)"> Screen shake</label>
  <label><input id="setreduce" type="checkbox" ${settings.reduceMotion?'checked':''} onchange="setReduceMotion(this.checked)"> Reduced motion</label>
  </div>`}
+export function setConfirmCardSkip(on){settings.confirmCardSkip=!!on;saveSettings()}
 export function setCoach(on){settings.coach=!!on;saveSettings();render()}
 export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
@@ -278,11 +281,12 @@ function rowHTML(r,i,click){const done=!!r.done,c=done?'':`${click}(${i})`;
  if(r.k==='relic')return relicTile(r.id,{click:c,done,disabled:done,sum:RELICS[r.id].d});
  if(r.k==='potion')return potionTile(r.id,{click:c,done,disabled:done});
  return tileHTML({id:'reward-cards',emoji:'🂠',name:r.took?`Took ${CARDS[r.took].n}`:r.skipped?'Skipped':'Choose a card',sum:r.took||r.skipped?'':`Add 1 of ${r.cards.length} to your deck.`,cls:'k-cards',click:c,done,disabled:done,tid:'row'+i,info:'Card reward: pick one card for your deck, or skip.'})}
-function rewardScr(){const S=W.S;let h=topBar()+`<h2>${S.title}</h2>`;
+function rewardScr(){const S=W.S;let h=topBar()+`<h2 class="reward-banner">${S.title}</h2>`;
  if(S.kind==='boss'&&S.boss&&EN[S.boss]&&S.cardsOpen==null&&S.swap==null)h+=`<div class="bossvic" style="${anim(S.t,2600)||''}"><i class="bv-rays"></i><b>${EN[S.boss].n}</b><q>${BOSS_DEFEAT[S.boss]||''}</q></div>`;
  if(S.cardsOpen!=null){const row=S.rows[S.cardsOpen];const boss=S.kind==='boss';
-  h+=`<div class="sub">Choose a card to add to your deck <span class="muted">(hold a card to enlarge)</span></div><div class="grid rewgrid">${row.cards.map((id,j)=>`<div class="rcw">${cardHTML({id,uid:-1-j,up:false},{click:`rewCard(${j})`,isNew:isNewCard(id)})}${cardBackHTML()}</div>`).join('')}</div>
-  <div class="actions"><button class="btn" onclick="rewCloseCards()">↩ Back</button><button class="btn" id="skipcard" onclick="rewSkipCards()">Skip card</button></div>`;return h}
+  h+=`<div class="sub">Tap to select a card, then Continue <span class="muted">(hold to read · release to close)</span></div><div class="grid rewgrid">${row.cards.map((id,j)=>`<div class="rcw${S.cardSelected===j?' reward-selected':''}" aria-selected="${S.cardSelected===j}">${cardHTML({id,uid:-1-j,up:false},{click:`rewCard(${j})`,isNew:isNewCard(id)})}${cardBackHTML()}</div>`).join('')}</div>
+  <div class="actions"><button class="btn" onclick="rewCloseCards()">↩ Back</button><button class="btn" id="skipcard" onclick="rewSkipCards()">Skip card</button><button class="btn pri" id="confirmcard" onclick="rewConfirmCards()">Continue${S.cardSelected!=null?' · '+CARDS[row.cards[S.cardSelected]].n:''}</button></div>`;
+  if(S.skipConfirm)h+=`<div class="ov" role="dialog" aria-modal="true" aria-labelledby="skipquestion"><div class="box card-skip-box"><h2 id="skipquestion">No card has been selected. Do you wish to continue?</h2><label><input type="checkbox" id="skipdont"> Don't show this again</label><div class="actions"><button class="btn pri" id="skipyes" onclick="rewSkipAnswer(true,document.getElementById('skipdont').checked)">Yes</button><button class="btn" id="skipno" onclick="rewSkipAnswer(false)">No</button></div></div></div>`;return h}
  if(S.swap!=null){const row=S.rows[S.swap],p=POTIONS[row.id];
   h+=`<div class="sub">Your potion slots are full. Swap <b>${p.e} ${p.n}</b> for one you hold, or discard it.</div>${tilesRow([...W.run.potions.map((id,s)=>potionTile(id,{click:`potionSwap(${s})`,tag:'Replace',cls:'swap'})),tileHTML({id:'opt-remove',emoji:'🗑️',name:`Discard ${p.n}`,sum:'Leave it behind.',click:'potionSwap(-1)',cls:'k-discard',tid:'discardnew'})],'swaptiles')}`;return h}
  h+=`${tilesRow(S.rows.map((r,i)=>rowHTML(r,i,'claimRow')),'rewtiles')}<div class="actions"><button class="btn pri" id="proceed" onclick="rewDone()">${S.kind==='boss'?'🏆 Finish the act':'Proceed ➜'}</button></div>`;return h}
@@ -294,15 +298,14 @@ function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();
  const card=(it,sh,i)=>`<div class="shopitem${it.sold?' sold':''}${it.sale?' sale':''}${anim(it.noT,400)?' no':''}">${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`buy('${sh}',${i})`,can:g>=it.price})}<span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':(it.sale?'<s>'+Math.round(it.base)+'</s> ':'')+'💰 '+it.price}</span>${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
  const icon=(it,sh,i,group,def)=>`<button class="shopicon${it.sold?' sold':''}${it.right?' right':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="buy('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}">${slotHTML(group,it.id,'',def.e)}<span class="inm">${def.n}</span><span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':'💰 '+it.price}</span>${it.right?'<i class="shoptag">SHOP</i>':''}</button>`;
  return topBar()+`<div class="shop-wren" aria-hidden="true">${emblemHTML('shop-wren','','wren')}</div><div class="shophead"><h2>🏮 Wren's Driftwood Bazaar</h2><span class="muted">hold a card to enlarge · scroll the card shelf ➜</span><em class="wrenline" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE)}">${wrenLine(bellCount(W.run.seed),currentTier())}</em></div>
- <div class="shelf cards" id="cardshelf"><div class="shlbl">Cards</div>${S.cards.map((it,i)=>card(it,'cards',i)).join('')}<div class="shlbl">Colourless<br><span class="muted">(extra class cards until Phase 2)</span></div>${S.colorless.map((it,i)=>card(it,'colorless',i)).join('')}</div>
+ <div class="shelf cards" id="cardshelf"><div class="shlbl">Cards</div>${S.cards.map((it,i)=>card(it,'cards',i)).join('')}<div class="shlbl">More class cards</div>${S.colorless.map((it,i)=>card(it,'colorless',i)).join('')}</div>
  <div class="shelfrow"><div class="shelf relics"><div class="shlbl">Relics</div>${S.relics.map((it,i)=>icon(it,'relics',i,'relics',RELICS[it.id])).join('')}</div>
  <div class="shelf potions"><div class="shlbl">Potions</div>${S.potions.map((it,i)=>icon(it,'potions',i,'potions',POTIONS[it.id])).join('')}</div>
  <div class="shelf svc">${tileHTML({eid:'scrub',id:'opt-remove',emoji:'✂️',name:'Scrub a card',sum:`💰 ${sp}${S.scrubbed?' (used)':''}`,info:'Scrub a card: pay to remove one card from your deck for good.',click:'shopRemove()',disabled:S.scrubbed||g<sp,cls:'svc-tile'})}<button class="btn pri" id="leaveshop" onclick="goMap()">Leave ➜</button></div></div>`}
 // ---------------- camp / event / pick / misc ----------------
 const CAMP_EMO={mend:'❤️',temper:'⬆️',cook:'🍲',scour:'🪨',trawl:'⚓',annotate:'📘'};
 function restScr(){return topBar()+`<div class="roomhead"><h2>🔥 Stairwell Camp</h2><div class="sub">The fire crackles. Choose one.</div></div>${tilesRow(campOptions().map(o=>{const sp=splitLabel(o.l);return tileHTML({id:'camp-'+o.k,emoji:CAMP_EMO[o.k]||sp.emoji||'🔥',name:sp.name,sum:o.d,info:`${sp.name}: ${o.d}`,click:`campDo('${o.k}')`,cls:'k-camp'+(o.k==='mend'?' pri':''),tid:'camp-'+o.k})}),'camptiles')}`}
-function eventScr(){const e=W.S.ev;const opts=e.o.map((o,i)=>optionHTML(o,`evOpt(${i})`,{disabled:!!(o.ok&&!o.ok()),i}));
- return topBar()+`<div class="evpanel"><div class="evimg">${emblemHTML('event-'+(e.id||'generic'),e.e,'scene')}</div><div class="evtxt"><h2>${e.sub||e.n}</h2><p>${e.t}</p></div></div>${tilesRow(opts,'evtiles')}`}
+function eventScr(){return topBar()+eventSceneHTML(W.S.ev)}
 function pickScr(){const S=W.S;const list=window.pickable(S.mode,S.filter);return topBar()+`<h2>${S.title}</h2>${S.mode==='upgrade'?'<div class="sub">Cards are shown with their upgrade (green).</div>':''}<div class="grid">${list.map(c=>cardHTML(S.mode==='upgrade'?{...c,up:true}:c,{click:`pickCard(${c.uid})`})).join('')}</div><div class="actions">${S.cancel?'<button class="btn full" id="pickcancel" onclick="pickCancel()">Cancel</button>':'<button class="btn full" id="pickskip" onclick="pickCancel()">Skip</button>'}</div>`}
 function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;return topBar()+`<h2>${S.title}</h2><div class="sub">Pick up to ${Math.min(3,free)} (free slots: ${free}).</div>${tilesRow(S.ids.map((id,j)=>potionTile(id,{click:`potPickToggle(${j})`,on:S.chosen.includes(j)})),'pottiles')}<div class="actions"><button class="btn pri" id="potpickdone" onclick="potPickDone()">Done</button></div>`}
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
@@ -350,6 +353,7 @@ function updateHTML(app,html,reset){const next=document.createElement('div');nex
 
 // ---------------- render ----------------
 export function render(){if(W.previewing||W.replaying)return;if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;
+ if(inspecting&&(inspectContext.screen!==s||inspectContext.run!==W.run||inspectContext.cb!==W.cb||inspectContext.ov!==W.S.ov))inspecting=null;
  if(s==='title')h=titleScr();
  else if(s==='travel')h=travelScr();
  else if(s==='map')h=`<div class="page mappage">`+topBar()+mapHTML(true)+'</div>';
@@ -445,7 +449,8 @@ if(typeof document!=='undefined'&&document.fonts){
 if(typeof window!=='undefined'){let resizeFrame;window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{fitCards(document);layoutHand()})})}
 // ===== long-press (or right-click) to enlarge any card =====
 export let inspecting=null;
-export function openInspect(ci){inspecting=ci;render()}
+let inspectContext=null;
+export function openInspect(ci){inspecting=ci;inspectContext={screen:W.S.screen,run:W.run,cb:W.cb,ov:W.S.ov};render()}
 export function closeInspect(){inspecting=null;render()}
 export function inspectHTML(){const ci=inspecting,d=CARDS[ci.id];if(!d)return'';
  return `<div class="ov inspect" id="inspect" onclick="closeInspect()"><div class="insp">${cardHTML(ci,{full:true})}<div class="ikw"><b>${cname(ci)}</b> <span class="muted">${TYPEN[d.t]} · ${RARN[d.r]||''}</span><div>${desc(ci)}</div><div class="kws">${kwFor(ci)}</div>${d.flavour?`<div class="flav">${d.flavour}</div>`:''}<div class="muted">Tap anywhere to close</div></div></div></div>`}

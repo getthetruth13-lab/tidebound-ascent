@@ -32,7 +32,7 @@
 .tile.k-gold .emb .ph{filter:drop-shadow(0 0 12px #ffd84acc)}
 .tile.swap .ttag{color:#f2b36f;border-color:#f2903f66}
 /* page layouts */
-.fit .rewtiles,.fit .camptiles,.fit .evtiles,.fit .pottiles,.fit .swaptiles{flex:0 1 auto;margin-top:4px}
+.fit .rewtiles,.fit .camptiles,.fit .pottiles,.fit .swaptiles{flex:0 1 auto;margin-top:4px}
 .fit-reward,.fit-chest,.fit-rest,.fit-potpick{justify-content:flex-start}
 .fit-reward .rewtiles,.fit-chest .rewtiles,.fit-rest .camptiles,.fit-potpick .pottiles{flex:1 1 auto;align-content:center}
 .roomhead{text-align:center}
@@ -42,14 +42,6 @@
 .chest:hover .emb{border-color:var(--gold);box-shadow:0 0 0 2px #05070b,0 0 30px #d9b46a99}
 .chestwrap.open .emb{animation:tl-pop calc(.5s*var(--us,1)) ease-out}@keyframes tl-pop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
 /* event */
-.evpanel{align-items:center}
-.evpanel .evimg{width:auto;height:auto;border:0;background:none;border-radius:0;box-shadow:none;font-size:inherit;display:block}
-.evpanel .evimg .emb{width:128px;height:96px;--ta:84px}
-.fit-event .evpanel .evimg{width:auto;height:auto;font-size:inherit}
-.evtiles{--ta:min(64px,calc((100dvh - 290px)*.8))}
-.evtiles .tile{--n:3;width:clamp(150px,calc((100vw - 60px)/var(--n,3)),230px)}
-.evtiles .tcard{width:clamp(96px,calc((100vh - 200px)*5/7),150px)}
-.evtiles .tile.many,.evtiles.many .tile{width:clamp(120px,calc((100vw - 90px)/var(--n,5)),168px)}
 /* ---------- real-card choices (combat choice, slot pick, Chart) ---------- */
 .ov .box.tilebox,.ov .box.chartbox{max-width:min(96vw,880px);background:linear-gradient(180deg,#171109f2,#0b0907f5);border:1px solid var(--gold-dim);box-shadow:0 0 0 1px #05070b,0 0 40px #000,inset 0 0 0 1px #d9b46a22;padding:10px 14px 12px;overflow:visible}
 .tilebox h2,.chartbox h2{white-space:normal;margin:0 0 2px;text-align:center;font-size:clamp(15px,4.6vh,22px)}
@@ -195,10 +187,8 @@
 .battle .tilebox .tart .slot>img{object-fit:contain;object-position:center}
 /* Other floating windows and event panels use their content's intrinsic width. */
 body .pop{width:fit-content;max-width:min(440px,92vw)}
-.fit-event .evpanel{width:fit-content;max-width:min(820px,94vw)}
 .tart .slot>.ph{background:transparent}
 /* Codex 19 additions: bigger art slots, tide label fit, menu layering */
-.evpanel .evimg .emb{width:min(40vw,calc((100dvh - 270px)*1.5));height:auto;aspect-ratio:3/2;min-width:128px;--ta:min(120px,calc((100dvh - 270px)*.8))}
 .travel .ferry .emb{width:96px;height:96px;font-size:44px}
 .travel .ferry{max-width:min(620px,90vw)}
 .lp-tower:has(>.ml-art) svg{position:relative;z-index:2;filter:none}
@@ -262,7 +252,8 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 .tile.sp.k-relic .tart::after,.tile.sp.k-potion .tart::after{content:'';position:absolute;left:8%;right:8%;top:56%;height:13%;border-radius:50%/60%;background:radial-gradient(ellipse at 50% 30%,#6b6454,#2a261e 70%,#14110c);box-shadow:0 6px 8px #000c,inset 0 2px 0 #fff2}
 .tile.sp.k-potion{--c1:#14453f;--cg:#58d6c0}
 .tile.sp.k-relic .tart .slot,.tile.sp.k-potion .tart .slot{position:absolute;left:50%;top:15%;width:calc(var(--th)*.42);height:calc(var(--th)*.42);transform:translateX(-50%);z-index:1;border:0;filter:drop-shadow(0 6px 5px #000d) drop-shadow(0 0 14px color-mix(in srgb,var(--cg) 45%,transparent));--phs:calc(var(--th)*.3)}
-.tile.sp.k-relic .tart .ledgeimg,.tile.sp.k-potion .tart .ledgeimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tile.sp.k-relic .tart .ledgeimg,.tile.sp.k-potion .tart .ledgeimg{position:absolute;left:8%;top:35%;width:84%;height:26%;object-fit:fill;filter:drop-shadow(0 2px 2px #000c);pointer-events:none}
+.tile.sp.k-relic .tart.has-ledge::after,.tile.sp.k-potion .tart.has-ledge::after{display:none}
 /* Moon Shell: tiny live tide gauge as the tile art */
 .mg{position:absolute;left:50%;top:9%;height:46%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:7px;z-index:2;pointer-events:none}
 .mg-tube{position:relative;display:block;width:22px;height:100%;border:2px solid #9bdde0aa;border-radius:11px 11px 8px 8px;background:#041015c0;overflow:hidden;box-shadow:inset 0 0 6px #000,0 0 10px #2fb8c455}
@@ -283,7 +274,6 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 .reduce-motion .tile.sp .tglow,.reduce-motion .mg-w{animation:none}
 @media (prefers-reduced-motion:reduce){.tile.sp .tglow,.mg-w{animation:none}}
 /* sizes: events leave room for the scene above; many-tile rows and Lamplight grids keep their own size */
-.evtiles .tile.sp{--th:clamp(110px,calc(100dvh - 285px),260px)}
 .tiles.many .tile.sp{--th:clamp(110px,calc(100dvh - 235px),230px)}
 .tilebox .tiles .tile.sp{--th:clamp(120px,calc(100dvh - 160px),300px)}
 .lp-grid .tile.sp,.lp-offer .tile.sp{height:auto;min-height:calc(var(--gw,112px)*1.4)}
@@ -294,7 +284,6 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 .tile.sp:has(.mg) .tart .ph{display:none}
 .mg-r{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:2px;padding-bottom:2px}
 /* Reserve room for event choices below the scene on short landscape screens. */
-.fit-event .evpanel .evimg .emb{width:min(40vw,calc((100dvh - 310px)*1.5));min-width:80px}
 .mg-l{position:static;margin:0}
 .rewtiles .tile.sp{width:clamp(110px,calc((100vw - 120px)/var(--n,3)),216px);--th:clamp(120px,calc(100dvh - 205px),300px)}
 .tiles .tile.sp .tsum{min-height:2.3em}
@@ -311,3 +300,13 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 .shelf.svc .tile.sp .tname{font-size:11px;padding:2px 4px}.shelf.svc .tile.sp .tsum{font-size:12px;min-height:0}
 .shelf.svc .tile.sp .tart>.emb .ph{font-size:36px;top:30%}
 .shelf.svc .tile.sp .tipi{display:none}
+
+/* Painted open chest and its reward share the available landscape room. */
+@media (max-height:500px) and (orientation:landscape){
+ .page.fit.fit-chest:has(.chestwrap.open){display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto minmax(0,1fr) auto;gap:0}
+ .fit-chest:has(.chestwrap.open)>.topbar,.fit-chest:has(.chestwrap.open)>h2,.fit-chest:has(.chestwrap.open)>.actions{grid-column:1/-1}
+ .fit-chest>.chestwrap.open{grid-column:1;grid-row:3;align-items:center;min-height:0;padding:0}
+ .fit-chest>.chestwrap.open .emb.big{width:192px;height:144px;max-height:100%;aspect-ratio:4/3}
+ .fit-chest:has(.chestwrap.open)>.rewtiles{grid-column:2;grid-row:3;min-height:0;margin:0;padding:4px;align-content:center}
+ .fit-chest:has(.chestwrap.open)>.rewtiles .tile{width:clamp(120px,calc((50vw - 50px)/var(--n,1)),216px)}
+}

@@ -19,7 +19,7 @@ export const keywordNames=()=>{if(!names)build();return [...names.keys()]};
 // 1-2 short sentences of the glossary entry: popups stay small.
 export function shortText(term){if(!names)build();const t=names.get(term)||'';const s=t.split(/(?<=[.!?])\s+/);let out=s[0]||'';
  if(s[1]&&(out+' '+s[1]).length<=190)out+=' '+s[1];return out}
-export const TEXT='.card .text,.tip .desc,.tip .kws,.ikw,.pop,.rrow .rd,.evtxt p,.msgp p,.tb-mech p,.tb-rule,.tb-lbody p,.tb-lbody li,.tb-rel,.tb-cols p,.tb-lore p,.tsum,.tcap,#kwtip .sx,.log div,.toast,.lp-hint,.lp-task b,.lp-tsk,.lp-lines td:first-child,.lp-story,.lp-nxt';
+export const TEXT='.card .text,.tip .desc,.tip .kws,.ikw,.pop,.rrow .rd,.evtxt p,.evdesc,.evo .es,.msgp p,.tb-mech p,.tb-rule,.tb-lbody p,.tb-lbody li,.tb-rel,.tb-cols p,.tb-lore p,.tsum,.tcap,#kwtip .sx,.log div,.toast,.lp-hint,.lp-task b,.lp-tsk,.lp-lines td:first-child,.lp-story,.lp-nxt';
 export function decorateKeywords(root=document){if(!root.querySelectorAll)return;if(!names)build();
  for(const box of root.querySelectorAll(TEXT)){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);const hits=[];
   for(let n=w.nextNode();n;n=w.nextNode()){const p=n.parentElement;if(!p||p.closest('.kw,.cref,.tb-btn')||p.closest('button:not(.rrow)'))continue;if(n.nodeValue.length>=3&&re.test(n.nodeValue))hits.push(n);re.lastIndex=0}
@@ -59,13 +59,13 @@ document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.pr
  const open=anchor===el&&((tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on')));if(open&&Date.now()-shownAt>400){hideTip()}else if(open){/* hover just opened it */}else showTip(el);
  e.stopPropagation();e.preventDefault()},true);
 document.addEventListener('pointerdown',e=>{if(lp){clearTimeout(lp.t);lp=null}if(e.pointerType==='mouse'&&e.button>0)return;
- const el=find(e);if(!el||inHand(el))return;const ok=el.matches('.bd,.hpblk')?e.pointerType!=='mouse':(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
+ const el=find(e);if(!el||inHand(el))return;const ok=el.matches('.bd,.hpblk')?e.pointerType!=='mouse':(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.evo,.rl,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
  lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el)){eat=true;if(el.matches('.bd,.hpblk'))holdEl=el}},LP)}},true);
 document.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){clearTimeout(lp.t);lp=null}},true);
 const release=()=>{if(holdEl){holdEl=null;hideTip()}};
 document.addEventListener('pointercancel',release,true);
 document.addEventListener('pointerup',()=>{release();if(lp){clearTimeout(lp.t);lp=null}setTimeout(()=>{eat=false},350)},true);
-document.addEventListener('contextmenu',e=>{const el=find(e);if(el&&el.matches('.shopicon,.tile,.lp-node,.bd,.hpblk'))e.preventDefault()});
+document.addEventListener('contextmenu',e=>{const el=find(e);if(el&&el.matches('.shopicon,.tile,.evo,.lp-node,.bd,.hpblk'))e.preventDefault()});
 document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))showTip(el)});
 document.addEventListener('pointerout',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))hideTip()});
 addEventListener('scroll',hideTip,true);

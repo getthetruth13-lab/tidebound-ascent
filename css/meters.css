@@ -289,3 +289,17 @@ button.bellbtn:not(.ring) .bell-svg{animation:bellidle 3.2s ease-in-out infinite
 /* Replacement can also be selected directly on the chart while its full-card
    choice window is open. The chart stays in its clear left column. */
 .combat .dais.obj.dais-carto.has-art:has(.wp.pick){z-index:61}
+
+/* Task 35: mechanic labels beside the objects they explain. */
+.meter-label{display:block;font:600 11px/1.15 var(--font-body);color:#f3e3bf;white-space:nowrap;text-shadow:0 1px 2px #000}
+.tide-forecast{position:absolute;top:100%;left:0;padding-top:3px}
+.dais-carto.has-art .map-rank{position:static;transform:none;width:auto;min-height:0;border:0;border-radius:0;background:none;box-shadow:none;font-size:10px}
+.dais-carto.has-art .wp[data-i] .map-rank{left:auto}
+.dais-carto.has-art .advhint{display:block;position:absolute;left:0;right:0;bottom:-14px;text-align:center;font-size:11px}
+.dais-carto.has-art .nexts{bottom:-42px}
+.dais-carto.has-art .advhint{top:calc(79% + 56px);bottom:auto;font-style:normal}
+.dais-carto.has-art .nexts{top:calc(79% + 72px);bottom:auto}
+.dais-carto.has-art:has(.chart[data-slots="4"]) .advhint{top:calc(79% + 90px)}
+.dais-carto.has-art:has(.chart[data-slots="4"]) .nexts{top:calc(79% + 106px)}
+/* Keep the slot's name/rank anchored while its trigger glow animates. */
+.dais-carto.has-art .wp.trig{animation:none}
