@@ -1,1 +1,0 @@
-Read-only, do not edit files. Read /workspace/game/design/world-structure/FINAL.md. Do you agree with this final direction? Reply only: Yes or No, plus one sentence naming your biggest concern.

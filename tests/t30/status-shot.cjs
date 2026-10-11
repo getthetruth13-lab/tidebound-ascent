@@ -1,2 +1,0 @@
-const run=require('./ts.cjs');
-run([['status',`(()=>{window.FAST=1;localStorage.clear();G.newRun('duel',{seed:7,skipTravel:true});G.startCombat('fight',['crab','knight']);const c=G.cb;Object.assign(c.p.st,{str:3,dex:2,parry:0,shell:4,barbs:2,mending:2,weak:2,vuln:1,bleed:3});c.p.block=6;c.parry=10;c.ens.forEach(e=>{Object.assign(e.st,{weak:2,vuln:2,bleed:4,brittle:1,drench:3,reson:2,str:2});e.block=5});G.render()})()`]],process.argv.slice(2).length?process.argv.slice(2):['p2340','p1480']);

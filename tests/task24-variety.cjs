@@ -1,8 +1,0 @@
-// Alternate seeded reward picks cover cards missed by the inherited fixed tier list.
-// Combat and all live source files remain unchanged.
-const fs=require('fs'),os=require('os'),path=require('path'),{spawn}=require('child_process');
-const root=path.resolve(__dirname,'..'),temp=fs.mkdtempSync(path.join(os.tmpdir(),'task24-variety-')),out=path.join(root,'tests/task24-results/variety');fs.mkdirSync(out,{recursive:true});
-for(const f of ['worker.mjs','ai21.mjs','env.mjs','package.json'])fs.copyFileSync(path.join(root,'playtests/task2',f),path.join(temp,f));fs.cpSync(path.join(root,'src'),path.join(temp,'src'),{recursive:true});fs.appendFileSync(path.join(temp,'worker.mjs'),'\nprocess.exit(0);\n');
-const render=path.join(temp,'src/ui/render.js');fs.writeFileSync(render,fs.readFileSync(render,'utf8').replace('export function render(){','export function render(){if(globalThis.NORENDER)return;'));
-const file=path.join(temp,'ai21.mjs');let ai=fs.readFileSync(file,'utf8');ai=ai.replace("const s=tier(id)+noise();if(s>bs)","const s=4+arnd()*2;if(s>bs)");fs.writeFileSync(file,ai);
-(async()=>{try{for(const cls of ['tide','echo','carto','duel']){const dest=path.join(out,cls+'.jsonl');if(fs.existsSync(dest)&&fs.readFileSync(dest,'utf8').trim().split('\n').filter(Boolean).length===20)continue;await new Promise((resolve,reject)=>{const p=spawn(process.execPath,['--max-old-space-size=1536',path.join(temp,'worker.mjs'),cls,'exp','none','1',process.env.N||'20',path.join(out,cls+'.jsonl')],{cwd:root,stdio:'inherit'});p.on('error',reject);p.on('exit',n=>n?reject(Error(cls+': '+n)):resolve())})}}catch(e){console.error(e);process.exitCode=1}finally{fs.rmSync(temp,{recursive:true,force:true})}})();
