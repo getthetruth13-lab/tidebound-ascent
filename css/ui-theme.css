@@ -457,3 +457,34 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 .tb-ledger .lp-pagehead{position:absolute;left:0;right:0;top:108px}
 .tb-ledger .lp-pages{position:absolute;left:0;right:0;top:134px;bottom:0;max-height:none}
 @media (max-height:420px){.tb-cols p{font-size:13px;line-height:1.22}.tb-cols{gap:6px 16px}}
+/* ---- Painted title video + image main menu (art/v2/title). Stage keeps the 16:9 art whole; a blurred copy fills the bars. ---- */
+.tb-vid,.tb-imgmenu{background:#03060a;overflow:hidden}
+.tv-fill{position:absolute;inset:-6%;background:center/cover no-repeat;filter:blur(18px) brightness(.55);transform:scale(1.05)}
+.tv-stage{position:absolute;left:50%;top:50%;width:min(100vw,calc(100dvh*16/9));aspect-ratio:16/9;transform:translate(-50%,-50%)}
+.tv-video,.tv-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-select:none}
+.tv-stage::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 0 6vmin 4vmin #03060a inset}
+.tm-nav{position:absolute;inset:0}
+.tm-hot{position:absolute;background:transparent;border:0;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:40%;transition:background .18s,box-shadow .18s}
+.tm-hot:hover,.tm-hot:focus-visible{outline:none;background:radial-gradient(ellipse 52% 50% at 50% 50%,rgba(255,214,140,.16),rgba(255,190,90,.06) 60%,transparent 75%);mix-blend-mode:screen}
+.tm-hot:active{background:radial-gradient(ellipse 52% 50% at 50% 50%,rgba(255,226,160,.32),rgba(255,190,90,.1) 60%,transparent 78%);mix-blend-mode:screen}
+.tm-hot.off{cursor:default;pointer-events:none;background:radial-gradient(ellipse 50% 46% at 50% 50%,rgba(3,6,10,.78),rgba(3,6,10,.6) 60%,transparent 80%);mix-blend-mode:normal}
+.tm-hot .lp-dot{right:22%;top:10%}
+.tm-sub{position:absolute;left:0;right:0;text-align:center;transform:translateY(-35%);font:italic 400 clamp(10px,1.6dvh,14px) var(--serif);color:#a99f84;text-shadow:0 1px 2px #000;pointer-events:none;opacity:.85}
+.tb-start.tb-vid.leaving{opacity:0}
+
+/* ---- v2: menu = video frame 0 + live engraved words (two columns under the skull emblem). Sizes in stage units (cqh). ---- */
+.tb-imgmenu .tv-stage{container-type:size}
+.tm-words{position:absolute;left:0;right:0;top:77.2%;height:19.5%;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;column-gap:13%;align-items:center}
+.tm-w{position:relative;background:none;border:0;padding:0 .6cqh;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;font:600 4.1cqh/1 'Cinzel',var(--font-display),serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;height:100%;display:flex;align-items:center}
+.tm-w.l{justify-content:flex-end}.tm-w.r{justify-content:flex-start}
+.tm-w span{background:linear-gradient(180deg,#f0d6a6 0%,#c99a62 48%,#8e6238 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .25cqh .3cqh rgba(0,0,0,.95)) drop-shadow(0 0 1.2cqh rgba(0,0,0,.7));transition:filter .18s}
+.tm-w:hover span,.tm-w:focus-visible span{filter:drop-shadow(0 .25cqh .3cqh rgba(0,0,0,.95)) drop-shadow(0 0 1.4cqh rgba(255,196,110,.55));outline:none}
+.tm-w:focus-visible{outline:none}
+.tm-w:active span{filter:drop-shadow(0 0 .6cqh rgba(255,226,160,.9)) drop-shadow(0 0 2cqh rgba(255,190,90,.6))}
+.tm-w.off{cursor:default;pointer-events:none;opacity:.38}
+.tm-w .lp-dot{position:relative;right:auto;top:auto;margin-left:.8cqh;transform:translateY(-40%)}
+.tm-fade .tm-w{animation:tmIn .9s ease-out both;animation-delay:calc(.12s + var(--i)*.07s)}
+.tm-fade .tm-w.off{animation-name:tmInOff}
+@keyframes tmIn{from{opacity:0;transform:translateY(.8cqh)}to{opacity:1;transform:none}}
+@keyframes tmInOff{from{opacity:0}to{opacity:.38}}
+.reduce-motion .tm-fade .tm-w{animation-duration:.01s;animation-delay:0s}

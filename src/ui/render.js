@@ -98,6 +98,7 @@ export function intentHTML(e){const m=intentOf(e),p=[];
  if(m.s||m.grow)add('buff','+'+(m.s||m.grow),'buf');
  for(const [k,nm] of [['w','Soaked'],['v','Exposed'],['brittle','Brittle']])if(m[k])add('debuff',m[k],'deb');
  if(m.heal)add('heal',m.heal,'buf');
+ if(m.healAlly)add('heal',m.healAlly,'buf');
  if(m.status)add('status',m.status.n,'deb');
  if(m.summon)add('summon',m.n>1?'×'+m.n:'');
  if(m.steal)add('steal',m.steal);
@@ -111,7 +112,7 @@ export function intentText(e){const m=intentOf(e);const p=[];if(m.lbl)p.push(m.l
  if(m.none)p.push('Does nothing');
  if(m.a)p.push(`Attack for ${eAtk(e,m.a)}${m.h>1?' × '+m.h:''}`+(m.boom?' then dies':''));if(m.b)p.push(`Gain ${m.b} Guard`);if(m.s)p.push(`Gain ${m.s} Might`);
  if(m.grow)p.push(`All Tendrils gain ${m.grow} Might; summons a Tendril if fewer than 2`);if(m.w)p.push(`Apply ${m.w} Soaked`);if(m.v)p.push(`Apply ${m.v} Exposed`);if(m.brittle)p.push(`Apply ${m.brittle} Brittle`);
- if(m.heal)p.push(`Heal ${m.heal}`);if(m.status)p.push(`Add ${m.status.n} ${CARDS[m.status.id].n} to your ${m.status.pile==='disc'?'discard pile':m.status.pile==='hand'?'hand':'draw pile'}`);
+ if(m.heal)p.push(`Heal ${m.heal}`);if(m.healAlly){const t=alive().find(x=>x.uid===m.tgt);p.push(`Heal ${t?t.n:'itself'} for ${t?m.healAlly:5}`)}if(m.status)p.push(`Add ${m.status.n} ${CARDS[m.status.id].n} to your ${m.status.pile==='disc'?'discard pile':m.status.pile==='hand'?'hand':'draw pile'}`);
  if(m.summon)p.push(`Summon ${m.n||1} ${EN[m.summon].n}${m.max?' (up to '+m.max+' alive)':''}`);if(m.steal)p.push(`Steal ${m.steal} gold and flee`);if(m.ring)p.push(`Add ${m.ring} Ringing to your discard pile`);
  if(m.stealPotion)p.push('Steal a potion');if(m.drainE)p.push(`You lose ${m.drainE} Energy next turn`);
  if(e.passive)p.push(`· Passive ${e.passive.n}: ${e.passive.text}`);return p.join(' ')}

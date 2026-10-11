@@ -8,7 +8,7 @@ import {bgHTML,frameOpen,frameClose} from './frame.js';
 import {selectScr} from './select.js';
 import {learnScr} from './learn.js';
 import {introScr,newGame} from './intro.js';
-import {lampPickScr,ledgerScr,totalPending,menuSceneHTML} from './lamp.js';
+import {lampPickScr,ledgerScr,totalPending} from './lamp.js';
 import {loadProfile} from '../../progress.js';
 const RUN_KEY='tidebound.run.v2';
 function ago(t){if(!t)return'';const m=Math.max(0,Math.round((Date.now()-t)/60000));if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';return Math.round(h/24)+' d ago'}
@@ -30,8 +30,8 @@ let studioTimer=0;
 export function studioNext(){clearTimeout(studioTimer);if(W.S.screen==='title'&&W.S.view==='studio')titleGo('start')}
 // Tap anywhere on the start screen: fade out, then the main menu (the tap also unlocks audio, so the menu music starts).
 export function startTap(){if(W.S.screen!=='title'||W.S.view!=='start'||W.S.leaving)return;
- if(window.FAST)return titleGo('main');W.S.leaving=true;const el=document.querySelector('.tb-start');if(el)el.classList.add('leaving');
- setTimeout(()=>{if(W.S.screen==='title'&&W.S.view==='start')titleGo('main')},500)}
+ // Menu background is the video's frame 0, so swap instantly and fade only the words in.
+ W.S={screen:'title',view:'main',page:0,hero:null,fade:!window.FAST};render()}
 export function titleGo(view){W.S={screen:'title',view:view||'main',page:0,hero:null};render()}
 export function loadSlot(key){if(key===RUN_KEY){continueRun();return}
  const s=listSlots().find(x=>x.key===key);if(!s)return;W.run=s.run;W.uid=Math.max(W.uid,s.data.uid||1);W.cb=null;W.S={screen:'map'};render()}
@@ -48,7 +48,7 @@ const slotHTML=s=>{const K=CLASSES[s.run.cls];return `<div class="tb-slot theme-
 function framed(id,title,body,cls=''){return `<div class="tb-scr tb-title">${bgHTML()}<div class="tb-ov"><div class="tb-frame ${cls}" id="${id}">${frameOpen()}<h2>${title}</h2>${body}<button class="tb-x" aria-label="Back" onclick="titleGo('main')">✕</button>${frameClose()}</div></div></div>`}
 export function titleScr(){const v=W.S.view||'main';
  if(v==='studio'){clearTimeout(studioTimer);studioTimer=setTimeout(studioNext,window.FAST?50:2500);return `<div class="tb-scr tb-studio" id="studio" onclick="studioNext()"><img src="${STUDIO_LOGO}" alt=""></div>`}
- if(v==='start')return `<div class="tb-scr tb-title tb-start" id="startscr" onclick="startTap()">${bgHTML()}<div class="tb-beam" aria-hidden="true"></div>${logoHTML()}<div class="tb-tap">Tap to begin</div></div>`;
+ if(v==='start')return `<div class="tb-scr tb-title tb-start tb-vid" id="startscr" onclick="startTap()"><div class="tv-fill" style="background-image:url(art/v2/title/title-poster.jpg)"></div><div class="tv-stage"><video class="tv-video" src="art/v2/title/title-loop.mp4" poster="art/v2/title/title-poster.jpg" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture preload="auto" aria-label="The Drowned Sun. Tap to begin"></video></div></div>`;
  if(v==='select')return selectScr();
  if(v==='learn')return learnScr();
  if(v==='intro')return introScr();
@@ -59,13 +59,10 @@ export function titleScr(){const v=W.S.view||'main';
  const sv=loadRunData(),K=sv&&CLASSES[sv.run.cls];
  const pend=totalPending(loadProfile()),nsl=listSlots().length;
  const mi=(id,label,act,opt={})=>`<button class="tb-mi${opt.off?' off':''}" id="${id}"${opt.off?' disabled':` onclick="${act}"`}><i class="tb-flame" aria-hidden="true"></i><b>${label}</b>${opt.sub?`<small>${opt.sub}</small>`:''}${opt.dot?`<em class="lp-dot">${opt.dot}</em>`:''}<u aria-hidden="true"></u></button>`;
- return `<div class="tb-scr tb-title tb-main">${bgHTML()}${menuSceneHTML(window.__menuLore)}
- <div class="tb-main-content">${logoHTML()}
- <nav class="tb-menu" aria-label="Main menu">
- ${mi('continue','Continue','continueRun()',{off:!K,sub:K?`${K.n} · Floor ${sv.run.floor}/15`:''})}
- ${mi('newgame','New Game','newGame()')}
- ${mi('loadgame','Load Game',"titleGo('load')",{off:!nsl})}
- ${mi('options','Options',"titleGo('options')")}
- ${mi('learn','Learn to Play',"titleGo('learn')")}
- ${mi('ledger','Ledger','openLedger()',{dot:pend||''})}</nav>
- </div></div>`}
+ // Menu over the video's first frame (art/v2/title/menu-frame.webp = frame 0 with the tagline + "Tap to begin" painted out). Live text words, two columns under the emblem.
+ const R=[['continue','Continue','continueRun()',!K],['newgame','New Game','newGame()'],['loadgame','Load Game',"titleGo('load')",!nsl],
+  ['options','Options',"titleGo('options')"],['learn','Learn to Play',"titleGo('learn')"],['ledger','Ledger','openLedger()']];
+ const w=([id,label,act,off],i)=>`<button class="tm-w ${i%2?'r':'l'}${off?' off':''}" id="${id}" style="--i:${i}" aria-label="${label}${id==='continue'&&K?`: ${K.n}, Floor ${sv.run.floor}/15`:''}"${off?' disabled':` onclick="${act}"`}><span>${label}</span>${id==='ledger'&&pend?`<em class="lp-dot">${pend}</em>`:''}</button>`;
+ const fade=W.S.fade?' tm-fade':'';if(W.S.fade)W.S.fade=0;
+ return `<div class="tb-scr tb-title tb-main tb-imgmenu${fade}"><div class="tv-fill" style="background-image:url(art/v2/title/menu-frame.webp)"></div><div class="tv-stage"><img class="tv-img" src="art/v2/title/menu-frame.webp" alt="" draggable="false">
+ <nav class="tm-nav tm-words" aria-label="Main menu">${R.map(w).join('')}</nav></div></div>`}

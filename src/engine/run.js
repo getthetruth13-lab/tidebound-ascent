@@ -99,7 +99,7 @@ function encKey(e){return e.join('+')}
 // Encounter pools (§1.7): first 3 fights each act are easy; no repeat of the same encounter within 2 fights.
 export function pickEncounter(pool){const run=W.run;const list=ENCOUNTERS[pool];const recent=run.encHist.slice(-2),last=(run.encHist[run.encHist.length-1]||'').split('+');
  const seen=run.encSeen||(run.encSeen={});const sk=x=>pool+':'+encKey(x.e);
- let cand=list.filter(x=>!recent.includes(encKey(x.e)));if(!cand.length)cand=list;
+ let cand=list.filter(x=>!recent.includes(encKey(x.e))&&(!x.fl||(run.floor>=x.fl[0]&&run.floor<=x.fl[1])));if(!cand.length)cand=list;
  // no encounter repeats in a run until the whole pool has been used; then the pool starts over
  const fresh=cand.filter(x=>!seen[sk(x)]);if(fresh.length)cand=fresh;else list.forEach(x=>delete seen[sk(x)]);
  // back-to-back fights prefer a different enemy line-up (shared enemy types are less likely)

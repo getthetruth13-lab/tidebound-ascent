@@ -111,9 +111,16 @@ export const ENEMY_FLAVOUR={
  knight:'Calcified keel-blade, barnacled plate. It still holds the landing it was told to hold.',
  pod:'A brine cyst, swollen with scalding mineral water. It only wants to be somewhere else.',
  bell:'The last ringer of the old Keeper order, faceless, chained to a plain bronze Bell as tall as a door. He swings it like a maul. It does not warn any more. It counts.',
+ penitent:'Rope-bound and barnacled, it climbs the Stair on its knees. It is very patient.',
+ mender:'She mends whatever is nearest. It does not have to be alive.',
+ heap:'It holds together by habit.',
+ novice:'It rings twice a day. Nobody told it to stop.',
+ tenant:'A Wrackfolk tenant who refused to leave. As the terrace sank he lifted what was left of his house onto his back, and walked. He is not cruel. He is home.',
  matriarch:'Edda, last gardener of the terraces. She roots into the stone to hold it together, and faces the green moon in the cistern.'};
+export const TENANT_LINES={phase2:'The door splinters. He does not seem to notice.',defeat:'He sits down on what is left of the step, and does not get up.'};
 export const BOSS_OPEN={
  bell:n=>bellOpening(n),
+ tenant:()=>'"This is my house. You are standing in my doorway."',
  matriarch:()=>'"You are late. The beds are ready for you."'};
 // Gull Nest and the Court share the gull clue at Tier 1 (F06).
 

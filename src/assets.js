@@ -49,7 +49,9 @@ export const ASSETS={
  // Battle sprites (ids in data/sprites.js, generated from art/v2/sprites/sprites.json). Enemies without a sprite file use a placeholder.
  sprites:{figures:{tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist'},
   enemies:{slug:'brine-slug',gull:'gull-thief',knight:'rust-knight',pod:'spore-pod',wisp:'glimmer-wisp',crab:'coral-crab',captain:'drowned-captain',
-   warden:'mirror-warden',eel:['twin-eels-a','twin-eels-b'],bell:['knell-a','knell-b'],leech:'tide-leech',lurker:'kelp-lurker',tendril:'kelp-tendril',matriarch:'kelp-matriarch'}},
+   warden:'mirror-warden',eel:['twin-eels-a','twin-eels-b'],bell:['knell-a','knell-b'],leech:'tide-leech',lurker:'kelp-lurker',tendril:'kelp-tendril',matriarch:'kelp-matriarch',
+   // PLACEHOLDER sprites (Codex Task 20): real art for these five drops in by changing the id here; see design/ACT1-ROSTER-ADDITIONS.md §4.
+   penitent:'drowned-captain',mender:'gull-thief',heap:'coral-crab',limpet:'spore-pod',novice:'rust-knight',tenant:'kelp-matriarch'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.

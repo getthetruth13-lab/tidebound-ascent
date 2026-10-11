@@ -58,7 +58,7 @@ export function startCombat(kind,enc,opts={}){
  // Opening cards go to the top of the draw pile (design §2.1).
  const open=cb.draw.filter(c=>c.open||CARDS[c.id].open);if(open.length){cb.draw=open.concat(cb.draw.filter(c=>!open.includes(c)))}
  enc.forEach(k=>spawn(k));cb.bossKey=(cb.ens.find(e=>e.boss)||{}).key||null;
- {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':'🪸 ')+t);callout(t,'lore')}} // lore: the boss speaks first (bible §16 items 7-9)
+ {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':cb.bossKey==='tenant'?'🏚️ ':'🪸 ')+t);callout(t,'lore')}} // lore: the boss speaks first (bible §16 items 7-9)
  const cls=W.run.cls;
  if(cls==='duel')cb.mom=DU.start_mom;
  if(cls==='carto'&&!hasRelic('trailboots')){
@@ -110,7 +110,7 @@ export function hit(e,base,f,o={}){if(!e||e.hp<=0||e.fled)return 0;const cb=W.cb
  if(W.run.stats&&dealt>W.run.stats.maxHit)W.run.stats.maxHit=dealt;
  return dealt}
 export function loseHpEnemy(e,n,why){if(e.hp<=0)return;e.hp-=n;floatText(e.uid,'-'+n,why==='bleed'?'bleed':'');e.shake=Date.now();afterEnemyDamage(e,null)}
-export function dmgEnemy(e,d,o={}){if(e.hp<=0)return 0;const b=Math.min(e.block,d);e.block-=b;d-=b;e.hp-=d;floatText(e.uid,d>0?'-'+d:(b?'🛡'+b:'0'),d>0?'':'b');e.shake=Date.now();
+export function dmgEnemy(e,d,o={}){if(e.hp<=0)return 0;const b=Math.min(e.block,d);e.block-=b;d-=b;e.hp-=d;const tb=EN[e.key];if(b>0&&e.block===0&&tb.onGuardBroken&&e.hp>0)tb.onGuardBroken(e);floatText(e.uid,d>0?'-'+d:(b?'🛡'+b:'0'),d>0?'':'b');e.shake=Date.now();
  fire('damageDealt',{target:e,amount:d+b,hpLoss:d,f:o.f});afterEnemyDamage(e,o.f);return d}
 function afterEnemyDamage(e,f){const t=EN[e.key];if(e.hp>0&&t.onDamaged)t.onDamaged(e);
  if(e.hp<=0){e.hp=0;W.run.kills++;if(W.run.stats)W.run.stats.kills++;log('💥 '+e.n+' defeated');if(f)f.killed=true;if(t.onDeath)t.onDeath(e);fire('enemyKilled',{enemy:e,summon:e.summoned,f})}}
@@ -329,6 +329,7 @@ export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=inten
  if(m.b)e.block+=m.b;if(m.s)addSt(e,'str',m.s);
  if(m.a){e.atkT=Date.now();for(let h=0;h<(m.h||1);h++){if(W.run.hp<=0||e.hp<=0||!W.cb)break;enemyHitPlayer(e,eAtk(e,m.a))}fire('playerAttacked',{enemy:e})}
  if(!W.cb||e.hp<=0&&!m.boom)return;
+ if(m.healAlly){let t=alive().find(x=>x.uid===m.tgt&&x!==e),n=m.healAlly;if(!t){t=e;n=5}const h=Math.min(n,t.max-t.hp);t.hp+=h;if(h)floatText(t.uid,'+'+h,'h');log(`🪡 ${e.n} stitches ${t===e?'herself':t.n} (+${h})`)}
  if(m.heal){const h=Math.min(m.heal,e.max-e.hp);e.hp+=h;if(h)floatText(e.uid,'+'+h,'h')}
  if(m.w)addSt(cb.p,'weak',m.w);if(m.v)addSt(cb.p,'vuln',m.v);if(m.brittle)addSt(cb.p,'brittle',m.brittle);
  if(m.status){for(let i=0;i<m.status.n;i++)addCard(m.status.id,m.status.pile==='draw'?'drawRandom':m.status.pile||'disc');log(`🌿 ${m.status.n} ${CARDS[m.status.id].n} added to your ${m.status.pile==='draw'?'draw pile':m.status.pile==='hand'?'hand':'discard'}`)}
@@ -337,7 +338,7 @@ export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=inten
  if(m.boom&&e.hp>0){e.hp=0;log(`🍄 ${e.n} bursts`)}
  if(m.summon){const n=m.n||1;for(let i=0;i<n;i++){if(m.max&&countAlive(m.summon)>=m.max)break;spawn(m.summon,{summoned:true});log(`📯 ${EN[m.summon].n} joins the fight`)}}
  if(m.steal){const g=Math.min(m.steal,W.run.gold);W.run.gold-=g;e.fled=true;e.stole=g;log(`🐦 ${e.n} stole ${g} gold and flew off!`)}
- if(m.ring){for(let i=0;i<m.ring;i++)addCard('ringing','disc');log('🔔 2 Ringing added to your discard')}
+ if(m.ring){for(let i=0;i<m.ring;i++)addCard('ringing','disc');log(`🔔 ${m.ring} Ringing added to your discard`)}
  if(m.fx)m.fx(e)}
 function endOfEnemyTurn(e){const t=EN[e.key];if(t.passive&&t.passive.endTurn)t.passive.endTurn(e);
  if(e.st.shell)e.block+=e.st.shell;if(e.st.mending&&e.hp>0){const h=Math.min(e.st.mending,e.max-e.hp);e.hp+=h;if(h)floatText(e.uid,'+'+h,'h')}}
