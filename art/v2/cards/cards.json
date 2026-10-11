@@ -1206,5 +1206,293 @@
    768,
    576
   ]
+ },
+ "atlas": {
+  "art": "art/v2/cards/atlas.webp",
+  "thumb": "art/v2/cards/atlas-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bankcrest": {
+  "art": "art/v2/cards/bankcrest.webp",
+  "thumb": "art/v2/cards/bankcrest-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "basecamp": {
+  "art": "art/v2/cards/basecamp.webp",
+  "thumb": "art/v2/cards/basecamp-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brinedrench": {
+  "art": "art/v2/cards/brinedrench.webp",
+  "thumb": "art/v2/cards/brinedrench-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "crimsontide": {
+  "art": "art/v2/cards/crimsontide.webp",
+  "thumb": "art/v2/cards/crimsontide-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cutpath": {
+  "art": "art/v2/cards/cutpath.webp",
+  "thumb": "art/v2/cards/cutpath-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "endlessfl": {
+  "art": "art/v2/cards/endlessfl.webp",
+  "thumb": "art/v2/cards/endlessfl-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "exsang": {
+  "art": "art/v2/cards/exsang.webp",
+  "thumb": "art/v2/cards/exsang-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "farsight": {
+  "art": "art/v2/cards/farsight.webp",
+  "thumb": "art/v2/cards/farsight-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "fermata": {
+  "art": "art/v2/cards/fermata.webp",
+  "thumb": "art/v2/cards/fermata-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "forcedmarch": {
+  "art": "art/v2/cards/forcedmarch.webp",
+  "thumb": "art/v2/cards/forcedmarch-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "inches": {
+  "art": "art/v2/cards/inches.webp",
+  "thumb": "art/v2/cards/inches-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "keepersopening": {
+  "art": "art/v2/cards/keepersopening.webp",
+  "thumb": "art/v2/cards/keepersopening-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "kingtide": {
+  "art": "art/v2/cards/kingtide.webp",
+  "thumb": "art/v2/cards/kingtide-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "maelheart": {
+  "art": "art/v2/cards/maelheart.webp",
+  "thumb": "art/v2/cards/maelheart-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "moonlock": {
+  "art": "art/v2/cards/moonlock.webp",
+  "thumb": "art/v2/cards/moonlock-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ovation": {
+  "art": "art/v2/cards/ovation.webp",
+  "thumb": "art/v2/cards/ovation-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ripcurrent": {
+  "art": "art/v2/cards/ripcurrent.webp",
+  "thumb": "art/v2/cards/ripcurrent-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tidebreaker": {
+  "art": "art/v2/cards/tidebreaker.webp",
+  "thumb": "art/v2/cards/tidebreaker-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tsunami": {
+  "art": "art/v2/cards/tsunami.webp",
+  "thumb": "art/v2/cards/tsunami-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "perfect": {
+  "art": "art/v2/cards/perfect.webp",
+  "thumb": "art/v2/cards/perfect-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "perfectroute": {
+  "art": "art/v2/cards/perfectroute.webp",
+  "thumb": "art/v2/cards/perfectroute-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "saltedblade": {
+  "art": "art/v2/cards/saltedblade.webp",
+  "thumb": "art/v2/cards/saltedblade-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "scoutroad": {
+  "art": "art/v2/cards/scoutroad.webp",
+  "thumb": "art/v2/cards/scoutroad-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "solo": {
+  "art": "art/v2/cards/solo.webp",
+  "thumb": "art/v2/cards/solo-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "stakenext": {
+  "art": "art/v2/cards/stakenext.webp",
+  "thumb": "art/v2/cards/stakenext-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "secondverse": {
+  "art": "art/v2/cards/secondverse.webp",
+  "thumb": "art/v2/cards/secondverse-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "shorepost": {
+  "art": "art/v2/cards/shorepost.webp",
+  "thumb": "art/v2/cards/shorepost-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "struckbell": {
+  "art": "art/v2/cards/struckbell.webp",
+  "thumb": "art/v2/cards/struckbell-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "symphony": {
+  "art": "art/v2/cards/symphony.webp",
+  "thumb": "art/v2/cards/symphony-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tithe": {
+  "art": "art/v2/cards/tithe.webp",
+  "thumb": "art/v2/cards/tithe-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "seachange": {
+  "art": "art/v2/cards/seachange.webp",
+  "thumb": "art/v2/cards/seachange-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "drawtide": {
+  "art": "art/v2/cards/drawtide.webp",
+  "thumb": "art/v2/cards/drawtide-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "finalchord": {
+  "art": "art/v2/cards/finalchord.webp",
+  "thumb": "art/v2/cards/finalchord-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "finaldest": {
+  "art": "art/v2/cards/finaldest.webp",
+  "thumb": "art/v2/cards/finaldest-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tuningstrike": {
+  "art": "art/v2/cards/tuningstrike.webp",
+  "thumb": "art/v2/cards/tuningstrike-256.webp",
+  "size": [
+   768,
+   576
+  ]
  }
 }

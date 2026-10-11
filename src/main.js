@@ -1,6 +1,7 @@
 // Entry point. Loads content, wires globals used by inline handlers and tests, boots the UI,
 // registers the offline service worker.
 import './data/index.js';
+import {setAnimSpeedValue} from './core/timing.js';
 import {initAudio,setAudioSetting} from './audio.js';
 import './engine/effects.js';
 import {W} from './core/state.js';
@@ -45,6 +46,7 @@ window.G={get S(){return W.S},get run(){return W.run},get cb(){return W.cb},CARD
  run$:runMod,combat$:combat,cards$:cards,debugEnv:env.debugEnv,envState:env.envState,quality:env.quality};
 save.registerSaveActions(runMod);save.registerSaveActions(combat);save.registerSaveActions({tgt:render.tgt});
 if(save.settings.fastAnim&&window.FAST==null)window.FAST=1;
+setAnimSpeedValue(save.settings.animSpeed);
 W.S={screen:'title',view:title.bootView()};
 assets.applyTextures();title.applyMotion();env.initEnv();
 initAudio();

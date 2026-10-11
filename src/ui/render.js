@@ -14,6 +14,7 @@ import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/regis
 import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
 import {loadProfile,saveProfile} from '../progress.js';
 import {W} from '../core/state.js';
+import {T,SPEEDS,SPEED_LABEL,setAnimSpeedValue} from '../core/timing.js';
 import {cname,cost,desc,kwFor,needsTarget,isUp,baseCost} from '../engine/cards.js';
 import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
@@ -81,11 +82,11 @@ function popHTML(){const S=W.S;
   if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${slotHTML('relics',S.relicView,'itemart',d.e)}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${relicFlavour(d.id||S.relicView,d.flavour)}</div>`:''}</div>`}
  return ''}
 export function openOv(k){if(drag)return;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
-export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(blkT,700),who)}
-export function badges(block,blkT,st,extra){return statusRowHTML(st,extra)}
+export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(blkT,T(700)),who)}
+export function badges(block,blkT,st,extra,who){return statusRowHTML(st,extra,who)}
 // Floating numbers (R12): size scales with the amount (22-40 px), stacked numbers fan out, Guard uses its icon, and a number waits for the swing to connect (x.d).
 const FLN=/^([+-]?)(\d+)/;
-export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x.who===who&&now-x.t<900+(x.d||0));
+export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x.who===who&&now-x.t<T(950)+(x.d||0));
  return list.map((x,i)=>{const m=FLN.exec(String(x.txt).replace(/^Parry /,'')),n=m?+m[2]:0,big=(x.cls===''||x.cls==='bleed'||x.cls==='drench')&&n>=15;
   const fs=Math.round(Math.max(22,Math.min(40,22+n*.7))),ox=((i%3)-1)*20,oy=-(i%2)*14;
   const txt=String(x.txt).replace('🛡',iconHTML('status','block','🛡️')).replace('❤','').replace('⚡','⚡');
@@ -105,11 +106,12 @@ export function intentHTML(e){const m=intentOf(e),p=[];
  if(m.ring)add('ring',m.ring);
  if(m.stealPotion)add('potion','');
  if(m.drainE)add('drain','−'+m.drainE);
+ if(m.charge&&m.warn)add('unknown',`⏳ ${eAtk(e,m.warn.a)}${m.warn.h>1?'×'+m.warn.h:''}`,'atk');
  if(!p.length)add('unknown','…');
- return `<div class="intent${m.mirror?' mirror':''}" tabindex="0" role="button" aria-label="${esc(intentText(e))}" data-kw="Intent" data-sname="${esc(m.lbl||'Enemy intent')}" data-sinfo="${esc(intentText(e))}">${p.join('')}</div>`}
+ return `<div class="intent${m.mirror?' mirror':''}${m.charge?' charge':''}" tabindex="0" role="button" aria-label="${esc(intentText(e))}" data-kw="Intent" data-sname="${esc(m.lbl||'Enemy intent')}" data-sinfo="${esc(intentText(e))}">${p.join('')}</div>`}
 export function intentText(e){const m=intentOf(e);const p=[];if(m.lbl)p.push(m.lbl+':');
  if(m.mirror)p.push('(copies the type of the last card you play this turn: Attack → attack 15, Skill → 12 Guard, Power → +2 Might; play nothing and it attacks for 15)');
- if(m.none)p.push('Does nothing');
+ if(m.charge&&m.warn)p.push(`Winds up: next turn it attacks for ${eAtk(e,m.warn.a)}${m.warn.h>1?' × '+m.warn.h:''}${m.b?'; gains '+m.b+' Guard now':''}. Prepare Guard, or break it first`);else if(m.none)p.push('Does nothing');
  if(m.a)p.push(`Attack for ${eAtk(e,m.a)}${m.h>1?' × '+m.h:''}`+(m.boom?' then dies':''));if(m.b)p.push(`Gain ${m.b} Guard`);if(m.s)p.push(`Gain ${m.s} Might`);
  if(m.grow)p.push(`All Tendrils gain ${m.grow} Might; summons a Tendril if fewer than 2`);if(m.w)p.push(`Apply ${m.w} Soaked`);if(m.v)p.push(`Apply ${m.v} Exposed`);if(m.brittle)p.push(`Apply ${m.brittle} Brittle`);
  if(m.heal)p.push(`Heal ${m.heal}`);if(m.healAlly){const t=alive().find(x=>x.uid===m.tgt);p.push(`Heal ${t?t.n:'itself'} for ${t?m.healAlly:5}`)}if(m.status)p.push(`Add ${m.status.n} ${CARDS[m.status.id].n} to your ${m.status.pile==='disc'?'discard pile':m.status.pile==='hand'?'hand':'draw pile'}`);
@@ -125,7 +127,7 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
   let btn='';if(hasRelic('tidetable')&&!cb.tideBtnUsed)btn+=`<button class="tbtn" id="tideup" onclick="tideAct('up')" title="Tide Table: Surge 1 (free, once per turn)">+1</button><button class="tbtn" id="tidedn" onclick="tideAct('down')" title="Tide Table: Recede 1 (free, once per turn)">−1</button>`;
   if(hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir)btn+=`<button class="tbtn" id="tideflip" onclick="tideAct('flip')" title="Helmsman's Wheel: flip the drift arrow">☸️</button>`;
   if(cb.banks&&!cb.busy)btn+=`<button class="tbtn rel" id="relbank" onclick="releaseBank()" title="Release the Bank: ${cb.banks} Banked Crest${cb.banks>1?'s':''}, 1½ x Crest damage to ALL each">🏦 Release ×${cb.banks}</button>`;else if(cb.banks)btn+=`<span class="chip">🏦 ×${cb.banks}</span>`;
-  return `<span class="tst">${st} <b class="tnum">${cb.tide}</b>${arrow}</span><div class="gauge${anim(cb.crestT,700)?' crest':''}${anim(cb.undertowT,700)?' under':''}" title="10 = Crest (${cr.dmg} to ALL) · 0 = Undertow (${un.guard} Guard, draw ${un.draw}) · High ${T.high}+ · Low ${T.low}−">${g}</div>${btn}`}
+  return `<span class="tst">${st} <b class="tnum">${cb.tide}</b>${arrow}</span><div class="gauge${anim(cb.crestT,T(700))?' crest':''}${anim(cb.undertowT,T(700))?' under':''}" title="10 = Crest (${cr.dmg} to ALL) · 0 = Undertow (${un.guard} Guard, draw ${un.draw}) · High ${T.high}+ · Low ${T.low}−">${g}</div>${btn}`}
  if(c==='echo'){const plan=echoPlan(true);let t;
   // Live Echo preview: each Marked card shows what its Echo would do right now (updates as you play cards after it).
   const mchip=(ci,k,after)=>{const pl=echoPlan(true,k);const pv=pl&&echoPreview(pl);const rep=pl&&pl.repeats>1?'×'+pl.repeats:'';
@@ -138,7 +140,7 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
  if(c==='carto'){let s='';const pk=cb.mode&&cb.mode.k==='slot';const lim=mod('advances',{},1);const canAdv=!pk&&cb.advUsed<lim&&!cb.busy&&!cb.mode;
   for(let i=0;i<cb.nslots;i++){const w=cb.slots[i];const r=w?(w.rank||0):0;const pips=w?`<span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span>`:'';
    const adv=w&&canAdv&&r<CORE.carto.rank_max;
-   s+=w?`<button class="wp full${pk?' pick':''}${adv?' adv':''}${r>=CORE.carto.rank_max?' land':''}${anim(w.trigT,600)?' trig':''}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" title="${esc(cname(w)+': '+desc(w).replace(/<[^>]+>/g,'')+(adv?' — tap to Advance (+1 Rank; damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':''))}">${CARDS[w.id].e}<span class="wpn">${cname(w)}</span>${pips}</button>`:`<div class="wp">·</div>`}
+   s+=w?`<button class="wp full${pk?' pick':''}${adv?' adv':''}${r>=CORE.carto.rank_max?' land':''}${anim(w.trigT,T(600))?' trig':''}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" title="${esc(cname(w)+': '+desc(w).replace(/<[^>]+>/g,'')+(adv?' — tap to Advance (+1 Rank; damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':''))}">${CARDS[w.id].e}<span class="wpn">${cname(w)}</span>${pips}</button>`:`<div class="wp">·</div>`}
   const nd=mod('drawCount',{},4);const nx=cb.draw.slice(0,3).map((ci,i)=>`<span class="chip ${i<nd?'next':''}">${CARDS[ci.id].e} ${cname(ci)}</span>`).join('')||'<span class="muted">reshuffle</span>';
   return `<div class="wps">${s}</div><span class="advhint">${canAdv&&cb.slots.length?'⛰️ Tap a Waypoint to Advance':cb.advUsed?'⛰️ Advanced':''}</span><span class="nexts">🗺️ ${nx}</span>`}
  if(c==='duel'){const D=CORE.duel;const max=mod('momMax',{},D.mom_max);let p='';for(let i=0;i<max;i++)p+=`<i class="${i<cb.mom?'on':''}"></i>`;
@@ -148,7 +150,7 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
 // ---------------- combat ----------------
 // ---------------- battle figures (Art Director spec) ----------------
 // Fill the free battle area, keeping foot anchors above the resting hand.
-export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*.70),top:40,heroTop:40}}
+export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vw>vh?Math.min(vh*.70,vh*HAND_REST_TOP+vh*.08-56):vh*.70),top:vw>vh?56:40,heroTop:40}}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
 function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min((role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*.31),g.feet-(role==='hero'?g.heroTop:g.top+32)));
@@ -167,10 +169,10 @@ export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,enemyMaxWidth:(n||
  const flav=ENEMY_FLAVOUR[e.key],nm0=flav?`${e.n}<i class="nmfl">${esc(flav)}</i>`:e.n;
  const name=`${nm0}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}`;const pasH=e.passive?`<span class="pas" title="${esc(e.passive.n+': '+e.passive.text)}">${e.passive.n==='Rooted'?iconHTML('status','rooted','🌿'):'🌿'}${e.passive.n}</span>`:'';
  return figureHTML({sp:spriteFor('enemies',e.key,e.sv!=null?e.sv:vi),role,ph:e.e,g,x:enemyX(k==null?i:k,n||1,g),shake:sh,intent:intentHTML(e),name,hp:hpbar(e.hp,e.max,e.block,e.blkT,'e'+e.uid),
-  badgesH:pasH+badges(0,0,{...e.st,...(e.passive?.n==='Rooted'?{rooted:1}:{})}),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
+  badgesH:pasH+badges(0,0,{...e.st,...(e.passive?.n==='Rooted'?{rooted:1}:{})},undefined,e),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
 export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const sh=motionEnabled()?null:anim(W.cb.pshake,400);
  return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*.25),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:hpbar(W.run.hp,W.run.max,W.cb.p.block,W.cb.p.blkT,'p'),
-  badgesH:badges(0,0,{...W.cb.p.st,...(W.cb.parry&&!W.cb.parryUsed?{parry:W.cb.parry}:{})},playerStates()),fx:fxHTML('p'),cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
+  badgesH:badges(0,0,{...W.cb.p.st,...(W.cb.parry&&!W.cb.parryUsed?{parry:W.cb.parry}:{})},playerStates(),'p'),fx:fxHTML('p'),cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
 export function tipHTML(){const cb=W.cb;
  if(cb.insp!=null&&cb.ens[cb.insp]&&cb.ens[cb.insp].hp>0){const e=cb.ens[cb.insp];return `<div class="tip" id="detail"><b>${e.e} ${e.n}</b> <span class="muted">${e.hp}/${e.max}</span><br>${intentText(e)}</div>`}
  return ''}
@@ -186,14 +188,14 @@ const BEAT_MS={intro:3000,phase:2600};
 function bossBeatHTML(){const b=W.cb.beat;if(!b)return '';const age=Date.now()-b.t;if(age>=(BEAT_MS[b.kind]||2600))return '';
  const epi=b.kind==='intro'?(ENEMY_FLAVOUR[W.cb.bossKey]||'').split('. ')[0].replace(/\.$/,'')+'.':'';
  return `<div class="bossbeat bb-${b.kind}" aria-live="polite" style="animation-delay:-${age}ms"><i class="bb-rule"></i><h2>${b.title}</h2>${epi.length>2?`<div class="bb-epi">${epi}</div>`:''}<p>${b.sub}</p><i class="bb-rule"></i></div>`}
-function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<1300);return c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:''}
+function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<T(1300));return c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:''}
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
 export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}">`+topBar();
  h+=daisHTML();
  const g=sceneGeom();if(cb.mode&&['choice','slot','chart'].includes(cb.mode.k)){g.s*=.7;g.feet=Math.round(innerHeight*.4)}const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
  h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
- if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,560);if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
+ if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,T(560));if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
  h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&d.t!=='P'&&(!d.faint||hasRelic('hollowreed'))&&!d.unplay})}).join('')}</div>
  <div class="ctl"><div><div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy"><span>${cb.energy}/${cb.maxE}</span></div><button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile">${iconHTML('hud','draw','📚')} ${cb.draw.length}</button></div>
@@ -242,6 +244,7 @@ function clampPlates(hand){const rest=[...hand.querySelectorAll('.card:not(.sel)
 
 // ---------------- title / travel ----------------
 export function settingsHTML(){return `<div class="settings"><label><input type="checkbox" id="setfast" ${settings.fastAnim?'checked':''} onchange="setFast(this.checked)"> Fast animations</label>
+ <label>Animation speed <select id="setanimspeed" onchange="setAnimSpeed(this.value)">${Object.keys(SPEEDS).map(v=>`<option value="${v}" ${(settings.animSpeed||'normal')===v?'selected':''}>${SPEED_LABEL[v]}</option>`).join('')}</select></label>
  <label>Effects <select id="setenvfx" onchange="setEnvFx(this.value)">${['full','reduced','off'].map(v=>`<option value="${v}" ${settings.envFx===v?'selected':''}>${envFxSettingLabel(v)}</option>`).join('')}</select></label>
  <label>Music <input id="setmusic" aria-label="Music volume" type="range" min="0" max="1" step="0.01" value="${settings.musicVolume}" oninput="setAudioSetting('musicVolume',this.value)"></label>
  <label>SFX <input id="setsfx" aria-label="SFX volume" type="range" min="0" max="1" step="0.01" value="${settings.sfxVolume}" oninput="setAudioSetting('sfxVolume',this.value)"></label>
@@ -253,6 +256,7 @@ export function settingsHTML(){return `<div class="settings"><label><input type=
 export function setCoach(on){settings.coach=!!on;saveSettings();render()}
 export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
+export function setAnimSpeed(v){settings.animSpeed=SPEEDS[v]?v:'normal';setAnimSpeedValue(settings.animSpeed);saveSettings()}
 export function setEnvFx(v){settings.envFx=v;saveSettings();render()}
 // Act I title card (design-v2 §W.5, art/v2/bg/_src/tc-a1-spec.json): the painted plate (frame + emblem, 60% of the screen width, centred) fades in
 // at 0.8 s over the tr_start travel scene; title + subtitle are HTML text inside the plate's dark panel (text_panel rect). Text fallback if the file fails.
@@ -293,7 +297,7 @@ function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();
  <div class="shelf cards" id="cardshelf"><div class="shlbl">Cards</div>${S.cards.map((it,i)=>card(it,'cards',i)).join('')}<div class="shlbl">Colourless<br><span class="muted">(extra class cards until Phase 2)</span></div>${S.colorless.map((it,i)=>card(it,'colorless',i)).join('')}</div>
  <div class="shelfrow"><div class="shelf relics"><div class="shlbl">Relics</div>${S.relics.map((it,i)=>icon(it,'relics',i,'relics',RELICS[it.id])).join('')}</div>
  <div class="shelf potions"><div class="shlbl">Potions</div>${S.potions.map((it,i)=>icon(it,'potions',i,'potions',POTIONS[it.id])).join('')}</div>
- <div class="shelf svc"><button class="btn" id="scrub" onclick="shopRemove()" ${S.scrubbed||g<sp?'disabled':''}>✂️ Scrub a card<br>💰 ${sp}${S.scrubbed?' (used)':''}</button><button class="btn pri" id="leaveshop" onclick="goMap()">Leave ➜</button></div></div>`}
+ <div class="shelf svc">${tileHTML({eid:'scrub',id:'opt-remove',emoji:'✂️',name:'Scrub a card',sum:`💰 ${sp}${S.scrubbed?' (used)':''}`,info:'Scrub a card: pay to remove one card from your deck for good.',click:'shopRemove()',disabled:S.scrubbed||g<sp,cls:'svc-tile'})}<button class="btn pri" id="leaveshop" onclick="goMap()">Leave ➜</button></div></div>`}
 // ---------------- camp / event / pick / misc ----------------
 const CAMP_EMO={mend:'❤️',temper:'⬆️',cook:'🍲',scour:'🪨',trawl:'⚓',annotate:'📘'};
 function restScr(){return topBar()+`<div class="roomhead"><h2>🔥 Stairwell Camp</h2><div class="sub">The fire crackles. Choose one.</div></div>${tilesRow(campOptions().map(o=>{const sp=splitLabel(o.l);return tileHTML({id:'camp-'+o.k,emoji:CAMP_EMO[o.k]||sp.emoji||'🔥',name:sp.name,sum:o.d,info:`${sp.name}: ${o.d}`,click:`campDo('${o.k}')`,cls:'k-camp'+(o.k==='mend'?' pri':''),tid:'camp-'+o.k})}),'camptiles')}`}

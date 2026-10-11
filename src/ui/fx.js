@@ -3,6 +3,7 @@ import {W} from '../core/state.js';
 import {drag} from './input.js';
 import {CARDS} from '../core/registry.js';
 import {isEx} from '../engine/cards.js';
+import {T} from '../core/timing.js';
 import {motionOn,emit,ring,rectOf,COL,CLASS_COL} from './vfx.js';
 export {syncCombatAnimations} from './anim.js';
 // Visual effects helpers. All animations use transform/opacity only.
@@ -24,7 +25,7 @@ export function flyCard(ci,target){if(!motionOn())return;const el=document.query
  if(!dest)dest={x:innerWidth/2,y:innerHeight*.3};
  const {g,r}=cloneCard(el);const cx=r.left+r.width/2,cy=r.top+r.height/2;
  const tx=dest.x-cx,ty=dest.y-cy,rot=tx>0?8:-8;
- const fly=type==='A'?100:type==='S'?260:520,total=60+fly,k=60/total;
+ const fly=type==='A'?100:type==='S'?260:520,total=T(60+fly),k=60/(60+fly);
  const frames=type==='A'
   ?[{transform:'none',opacity:1},{transform:'translateY(-8px) scale(1.1)',opacity:1,offset:k,easing:'cubic-bezier(.5,0,.9,.6)'},{transform:`translate(${tx}px,${ty}px) scale(.5) rotate(${rot}deg)`,opacity:.9}]
   :type==='S'

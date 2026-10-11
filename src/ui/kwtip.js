@@ -19,7 +19,7 @@ export const keywordNames=()=>{if(!names)build();return [...names.keys()]};
 // 1-2 short sentences of the glossary entry: popups stay small.
 export function shortText(term){if(!names)build();const t=names.get(term)||'';const s=t.split(/(?<=[.!?])\s+/);let out=s[0]||'';
  if(s[1]&&(out+' '+s[1]).length<=190)out+=' '+s[1];return out}
-export const TEXT='.card .text,.tip .desc,.tip .kws,.ikw,.pop,.rrow .rd,.evtxt p,.msgp p,.tb-mech p,.tb-rule,.tb-lbody p,.tb-lbody li,.tb-rel,.tb-cols p,.tb-lore p,.tsum,.tcap,.log div,.toast,.lp-hint,.lp-task b,.lp-tsk,.lp-lines td:first-child,.lp-story,.lp-nxt';
+export const TEXT='.card .text,.tip .desc,.tip .kws,.ikw,.pop,.rrow .rd,.evtxt p,.msgp p,.tb-mech p,.tb-rule,.tb-lbody p,.tb-lbody li,.tb-rel,.tb-cols p,.tb-lore p,.tsum,.tcap,#kwtip .sx,.log div,.toast,.lp-hint,.lp-task b,.lp-tsk,.lp-lines td:first-child,.lp-story,.lp-nxt';
 export function decorateKeywords(root=document){if(!root.querySelectorAll)return;if(!names)build();
  for(const box of root.querySelectorAll(TEXT)){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);const hits=[];
   for(let n=w.nextNode();n;n=w.nextNode()){const p=n.parentElement;if(!p||p.closest('.kw,.cref,.tb-btn')||p.closest('button:not(.rrow)'))continue;if(n.nodeValue.length>=3&&re.test(n.nodeValue))hits.push(n);re.lastIndex=0}
@@ -33,7 +33,7 @@ export function decorateKeywords(root=document){if(!root.querySelectorAll)return
 let tip=null,ctip=null,timer=0,anchor=null,shownAt=0;
 function ensure(){if(!tip){tip=document.createElement('div');tip.id='kwtip';tip.setAttribute('role','tooltip');document.body.appendChild(tip)}return tip}
 export function hideTip(){clearTimeout(timer);anchor=null;if(tip)tip.classList.remove('on');if(ctip)ctip.classList.remove('on')}
-function contentOf(el){if(el.dataset.sinfo)return {title:el.dataset.sname||el.dataset.kw,text:el.dataset.sinfo};if(el.dataset.kw){const k=el.dataset.kw;return {title:k,text:shortText(k)||KW[k]||KW[k+' X']||''}}
+function contentOf(el){if(el.dataset.sinfo)return {title:el.dataset.sname||el.dataset.kw,text:el.dataset.sinfo,kind:el.dataset.skind||''};if(el.dataset.kw){const k=el.dataset.kw;return {title:k,text:shortText(k)||KW[k]||KW[k+' X']||''}}
  if(el.dataset.info){const i=el.dataset.info,c=i.indexOf(': ');return c>0?{title:i.slice(0,c),text:i.slice(c+2)}:{title:'',text:i}}return null}
 function showCard(el){const id=el.dataset.card;if(!CARDS[id])return false;
  if(!ctip){ctip=document.createElement('div');ctip.id='cardtip';ctip.setAttribute('role','tooltip');document.body.appendChild(ctip)}
@@ -43,11 +43,11 @@ function showCard(el){const id=el.dataset.card;if(!CARDS[id])return false;
  ctip.style.left=x+'px';ctip.style.top=y+'px';clearTimeout(timer);timer=setTimeout(hideTip,6500);return true}
 export function showTip(el){if(el.dataset.card)return showCard(el);if(ctip)ctip.classList.remove('on');const c=contentOf(el);if(!c||!c.text){return false}
  const t=ensure();const sl=el.matches('.relic,.potion,.shopicon')&&el.querySelector('.slot');const rl=el.dataset.relic&&RELICS[el.dataset.relic];
- t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>`;t.classList.toggle('item',!!sl);t.classList.add('on');anchor=el;shownAt=Date.now();
- t.style.maxWidth=el.closest('.dais')?'150px':'';const r=el.getBoundingClientRect(),tr=t.getBoundingClientRect();let x,y;if(document.querySelector('.combat')){const sp=pickSpot(tr.width,tr.height,r,el);x=sp.x;y=sp.y}else{x=Math.max(6,Math.min(innerWidth-tr.width-6,r.left+r.width/2-tr.width/2));y=r.top-tr.height-8;if(y<6)y=Math.min(innerHeight-tr.height-6,r.bottom+8)}
+ t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b${c.kind?` class="${c.kind}"`:''}>${c.title}</b>`:''}<span>${c.text}</span>`;t.classList.toggle('item',!!sl);t.classList.toggle('stat',!!c.kind);if(c.kind)decorateKeywords(t);t.classList.add('on');anchor=el;shownAt=Date.now();
+ t.style.maxWidth=el.closest('.dais')?'150px':'';const r=el.getBoundingClientRect(),tr=t.getBoundingClientRect();let x,y;if(document.querySelector('.combat')){const sp=pickSpot(tr.width,tr.height,r,el,!!c.kind);x=sp.x;y=sp.y}else{x=Math.max(6,Math.min(innerWidth-tr.width-6,r.left+r.width/2-tr.width/2));y=r.top-tr.height-8;if(y<6)y=Math.min(innerHeight-tr.height-6,r.bottom+8)}
  t.style.left=x+'px';t.style.top=y+'px';clearTimeout(timer);timer=setTimeout(hideTip,6500);return true}
 // ---------------- input ----------------
-const LP=450;let lp=null,eat=false;
+const LP=450;let lp=null,eat=false,holdEl=null; // holdEl: status icon being held; its tooltip closes on release
 const find=e=>e.target&&e.target.closest?e.target.closest('[data-kw],[data-card],[data-info]'):null;
 const inHand=el=>!!el.closest('.hand .card'); // hand cards: a tap must lift/play the card; hold opens the inspector, where words are tappable
 const inButton=el=>!!el.closest('button');
@@ -59,14 +59,16 @@ document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.pr
  const open=anchor===el&&((tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on')));if(open&&Date.now()-shownAt>400){hideTip()}else if(open){/* hover just opened it */}else showTip(el);
  e.stopPropagation();e.preventDefault()},true);
 document.addEventListener('pointerdown',e=>{if(lp){clearTimeout(lp.t);lp=null}if(e.pointerType==='mouse'&&e.button>0)return;
- const el=find(e);if(!el||inHand(el))return;const ok=(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
- lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el))eat=true},LP)}},true);
+ const el=find(e);if(!el||inHand(el))return;const ok=el.matches('.bd,.hpblk')?e.pointerType!=='mouse':(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
+ lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el)){eat=true;if(el.matches('.bd,.hpblk'))holdEl=el}},LP)}},true);
 document.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){clearTimeout(lp.t);lp=null}},true);
-document.addEventListener('pointerup',()=>{if(lp){clearTimeout(lp.t);lp=null}setTimeout(()=>{eat=false},350)},true);
-document.addEventListener('contextmenu',e=>{const el=find(e);if(el&&el.matches('.shopicon,.tile,.lp-node'))e.preventDefault()});
+const release=()=>{if(holdEl){holdEl=null;hideTip()}};
+document.addEventListener('pointercancel',release,true);
+document.addEventListener('pointerup',()=>{release();if(lp){clearTimeout(lp.t);lp=null}setTimeout(()=>{eat=false},350)},true);
+document.addEventListener('contextmenu',e=>{const el=find(e);if(el&&el.matches('.shopicon,.tile,.lp-node,.bd,.hpblk'))e.preventDefault()});
 document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))showTip(el)});
 document.addEventListener('pointerout',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))hideTip()});
 addEventListener('scroll',hideTip,true);
 
-document.addEventListener('focusin',e=>{const el=find(e);if(el&&el.matches('.bd,.hpblk,.intent'))showTip(el)});
+document.addEventListener('focusin',e=>{const el=find(e);if(el&&el.matches('.bd,.hpblk,.intent')&&el.matches(':focus-visible'))showTip(el)}); // keyboard focus only: a touch release must not reopen the hold tip
 document.addEventListener('focusout',e=>{if(e.target.matches('.bd,.hpblk,.intent'))hideTip()});

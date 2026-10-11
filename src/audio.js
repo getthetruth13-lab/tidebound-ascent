@@ -34,7 +34,11 @@ function startTrack(){if((!unlocked&&context!=='menu')||!context||current||docum
  el.onerror=()=>{if(current===voice)retire()};
  el.play().then(()=>{if(current===voice&&unlocked)ramp(voice,level('musicVolume'),2)}).catch(()=>{voice.blocked=true});
 }
-export function syncAudio(){syncUIState();const s=W.S.screen;
+const bossPhases=new WeakMap(),phaseHeard=new WeakSet();
+function syncBossPhases(){for(const e of W.cb?.ens||[]){if(!e.boss)continue;const phase=e.bloomed?2:e.ph||1,previous=bossPhases.get(e);bossPhases.set(e,phase);
+ if(previous!==undefined&&phase>previous&&!phaseHeard.has(e)){phaseHeard.add(e);if(!document.hidden)playSound('bossPhase')}
+}}
+export function syncAudio(){syncUIState();syncBossPhases();const s=W.S.screen;
  const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:'map'):null;
  if(next!==context){retire();context=next;startTrack()}
  if(s==='end'&&lastScreen!==s)playSound(W.run&&W.run.won?'victory':'defeat');lastScreen=s;
@@ -51,7 +55,8 @@ const tones={tap:[220,150,.07],lift:[270,410,.12],play:[340,170,.19],draw:[200,3
 // UI voices: [pitch start, pitch end, seconds, peak, noise mix, cutoff].
 Object.assign(tones,{
  endTurn:[110,82,.65,.15,.08,1800],crest:[90,38,.38,.14,.45,950],echo:[440,660,.3,.09,.04,1600],rank:[260,390,.24,.08,.08,1200],landmark:[196,392,.42,.12,.06,1600],flourish:[180,55,.32,.13,.35,1700],critical:[125,42,.28,.13,.3,1500],
- draw:[650,950,.085,.055,.7,3600],shuffle:[190,310,.3,.07,.8,2400],
+ draw:[650,950,.085,.04,.5,3000],shuffle:[190,310,.3,.07,.8,2400],
+ bossPhase:[73,49,.85,.13,.18,900],
  uiTap:[190,130,.065,.045,.12,750],select:[285,210,.09,.05,.1,950],
  menuOpen:[170,280,.14,.045,.35,800],menuClose:[240,150,.1,.04,.3,750],
  tab:[260,320,.075,.04,.22,850],confirm:[280,420,.16,.05,.08,1000],cancel:[210,135,.1,.04,.12,750],
@@ -73,6 +78,7 @@ export function playSound(name,pitch=1){if(W.replaying||!ctx||ctx.state!=='runni
  const noise=ctx.createBufferSource();noise.buffer=buffer;osc.connect(filter);noise.connect(filter);filter.connect(gain);gain.connect(master);
  osc.start(now);noise.start(now);osc.stop(now+duration);noise.stop(now+duration);osc.onended=()=>{osc.disconnect();noise.disconnect();filter.disconnect();gain.disconnect()};
  if(name==='endTurn'){for(const ratio of [2.76,4.07]){const bell=ctx.createOscillator();bell.frequency.value=from*ratio;bell.connect(gain);bell.start(now);bell.stop(now+duration);bell.onended=()=>bell.disconnect()}}
+ if(name==='bossPhase'){for(const ratio of [2.76,4.07]){const bell=ctx.createOscillator(),partial=ctx.createGain();partial.gain.value=.3;bell.frequency.setValueAtTime(from*ratio,now);bell.frequency.exponentialRampToValueAtTime(to*ratio,now+duration);bell.connect(partial);partial.connect(gain);bell.start(now);bell.stop(now+duration);bell.onended=()=>{bell.disconnect();partial.disconnect()}}}
  if(name==='victory'||name==='reward'||name==='room'||name==='levelUp'||name==='taskComplete'||name==='sparkle'){const bell=ctx.createOscillator();bell.frequency.value=from*1.5;bell.connect(gain);bell.start(now+.08);bell.stop(now+duration);bell.onended=()=>bell.disconnect()}
 }
 // Observe real state changes, so rerenders and rejected actions stay silent.
@@ -144,6 +150,7 @@ export function initAudio(){
  document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const node=e.target.closest?.('.node');if(node&&!node.contains(e.relatedTarget))playSound('mapHover')});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){retire();for(const voice of voices){if(voice.frame)cancelAnimationFrame(voice.frame);voice.el.pause();voice.el.removeAttribute('src');voice.el.load()}voices.clear();if(ctx)ctx.suspend().catch(()=>{})}else if(unlocked){if(ctx)ctx.resume().catch(()=>{});startTrack()}});
  observeEvents((event,c)=>{queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={cardPlayed:'play',shuffle:'shuffle',guardGained:'guard',enemyKilled:'death',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward',potionUsed:'confirm'};
+ if(event==='bossBeat'&&c.kind==='phase'){if(c.enemy)phaseHeard.add(c.enemy);if(!document.hidden)playSound('bossPhase')}
  if(!fxOn()&&!document.hidden){const combo={crest:'crest',undertow:'guard',echo:'echo',flourish:'flourish',parry:'guard',waypointPlaced:'rank',waypointTrigger:'rank',advance:(c.wp?.rank||0)>=3?'landmark':'rank'};if(combo[event])playSound(combo[event])}
  if(event==='playerHit'&&c.blocked>0&&!c.amount)playSound('guard');
  if(event==='damageDealt'&&c.amount>0)playSound(c.amount>=15?'heavy':'light');

@@ -5,6 +5,7 @@
 import {CARDS,RELICS,POTIONS} from '../core/registry.js';
 import {slotHTML} from '../assets.js';
 import {cardHTML} from './render.js';
+import {CORE} from '../engine/combat.js';
 export const TILES={};
 export async function loadTiles(){try{const r=await fetch('art/v2/ui/tiles.json',{cache:'no-cache'});if(!r.ok)return 0;const j=await r.json();
  for(const k in TILES)delete TILES[k];for(const [id,v] of Object.entries(j.tiles||{}))if(v&&v.path)TILES[id]=v;return Object.keys(TILES).filter(k=>TILES[k].ready).length}catch(e){return 0}}
@@ -13,10 +14,18 @@ export const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&qu
 // A framed emblem: the real file when ready, otherwise a themed placeholder (framed silhouette + emoji).
 export function emblemHTML(id,emoji,cls=''){const t=id&&TILES[id];const img=t&&t.ready?`<img src="${t.path}" alt="" draggable="false" onerror="this.remove()">`:'';
  return `<span class="emb ${cls}${img?' has-img':''}" data-tile="${id||''}"><b class="ph">${emoji||'◈'}</b>${img}</span>`}
-// One illustrated tile. o: {id,emoji,art,name,sum,info,click,disabled,on,done,cls,tag}. art = ready-made inner HTML (relic / potion icons).
-export function tileHTML(o){const info=o.info?esc(o.info):'';
- return `<button class="tile ${o.cls||''}${o.on?' on':''}${o.done?' done':''}" ${o.click&&!o.disabled?`onclick="${o.click}"`:''} ${o.disabled?'disabled':''} ${info?`data-info="${info}"`:''}${o.tid?` data-tid="${esc(o.tid)}"`:''}>
- ${o.tag?`<i class="ttag">${o.tag}</i>`:''}<span class="tart">${o.art||emblemHTML(o.id,o.emoji)}</span><span class="tname">${o.name}</span><span class="tsum">${o.sum||''}</span>${info?`<span class="tipi" data-info="${info}" aria-label="Details">i</span>`:''}${o.done?'<span class="tck">✔</span>':''}</button>`}
+// Task 30 (A3 scene plates): every tile is a full-bleed scene plate. The art slot fills the tile; while no painting exists a category
+// gradient + the big glyph stands in. Shared carved-stone frame, lantern glow and engraved name plate come from css/tiles.css.
+const CAT=[[/gold|coin/,'gold'],[/blood|fight|curse|destroy|boss/,'blood'],[/heal|mend|cook|spring|potion/,'heal'],[/upgrade|temper|anvil|scour/,'forge'],
+ [/card|annotate|transform|cartomancer|mirror|loom/,'card'],[/relic|offering|gift/,'relic'],[/tide|moon|surge|recede|wheel|trawl|undertow/,'tide'],[/leave|back|other|stranger|sailor/,'dusk']];
+export const catOf=(id,cls)=>{const k=(id||'')+' '+(cls||'');for(const [re,c] of CAT)if(re.test(k))return c;return 'dusk'};
+// Tiny live Tide gauge for Moon Shell / Moonpull / Moon Draught tiles (3 / 5 / 7 ...). Number drawn by code, never painted.
+export const miniGauge=v=>`<span class="mg" aria-hidden="true"><i class="mg-tube"><i class="mg-w" style="height:${Math.max(0,Math.min(10,v))*10}%"></i><i class="mg-t" style="bottom:${CORE.tide.low*10}%"></i><i class="mg-t" style="bottom:${CORE.tide.high*10}%"></i></i><span class="mg-r"><b class="mg-n">${v}</b><em class="mg-l">${v>=CORE.tide.high?'High':v<=CORE.tide.low?'Low':'Mid'}</em></span></span>`;
+// One illustrated tile. o: {id,emoji,art,name,sum,info,click,disabled,on,done,cls,tag,over}. art = ready-made inner HTML (relic / potion icons).
+// o.over = extra overlay HTML (mini gauge, sigil). Relic / potion art sits on a painted ledge (cls k-relic / k-potion).
+export function tileHTML(o){const info=o.info?esc(o.info):'';const cat=catOf(o.id,o.cls);
+ return `<button ${o.eid?`id="${o.eid}" `:''}class="tile sp cat-${cat} ${o.cls||''}${o.on?' on':''}${o.done?' done':''}" ${o.click&&!o.disabled?`onclick="${o.click}"`:''} ${o.disabled?'disabled':''} ${info?`data-info="${info}"`:''}${o.tid?` data-tid="${esc(o.tid)}"`:''}>
+ <span class="tart">${o.art||emblemHTML(o.id,o.emoji)}</span><i class="tglow"></i>${o.over||''}${o.tag?`<i class="ttag">${o.tag}</i>`:''}<span class="tname">${o.name}</span><span class="tsum">${o.sum||''}</span>${info?`<span class="tipi" data-info="${info}" aria-label="Details">i</span>`:''}${o.done?'<span class="tck">✔</span>':''}</button>`}
 export const tilesRow=(tiles,cls='')=>`<div class="tiles ${cls}${tiles.length>4?' many':''}" style="--n:${tiles.length}">${tiles.join('')}</div>`;
 // ---- label parsing for text options ("🎲 Spin the wheel (roll 1d6)", "🌙 Moon Shell: Tide 5") ----
 const EMO=/^((?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:️|‍\p{Extended_Pictographic}|\p{Emoji_Modifier})*)\s*/u;
@@ -40,4 +49,5 @@ export function optionHTML(o,click,extra={}){const label=typeof o.l==='function'
  if(!o.tile&&sp.emoji!==undefined){const cid=N.card.get(nm);if(cid&&!sp.sum)return `<div class="tcard opt${dis?' off':''}">${cardHTML({id:cid,uid:-300-(extra.i||0),up:/\+$/.test(sp.name)},{click:dis?null:click})}</div>`;
   const rid=N.relic.get(nm);if(rid)return relicTile(rid,{click:dis?null:click,disabled:dis,sum:sp.sum||undefined});
   const pid=N.potion.get(nm);if(pid)return potionTile(pid,{click:dis?null:click,disabled:dis,sum:sp.sum||undefined})}
- return tileHTML({id:o.tile||optIconId(sp.emoji),emoji:sp.emoji||'◈',name:sp.name||label,sum:o.sum||sp.sum||(/^(leave|back|skip)/i.test(sp.name)?'Walk on.':''),info:o.info||((o.sum||sp.sum)?`${sp.name}: ${o.sum||sp.sum}`:''),click,disabled:dis,cls:'opt '+(o.cls||''),tag:o.tag})}
+ const tv=/^choice-(tide|moonpull)/.test(o.tile||'')?/Tide (\d+)/.exec(label):null;
+ return tileHTML({over:tv?miniGauge(+tv[1]):'',id:o.tile||optIconId(sp.emoji),emoji:sp.emoji||'◈',name:sp.name||label,sum:o.sum||sp.sum||(/^(leave|back|skip)/i.test(sp.name)?'Walk on.':''),info:o.info||((o.sum||sp.sum)?`${sp.name}: ${o.sum||sp.sum}`:''),click,disabled:dis,cls:'opt '+(o.cls||''),tag:o.tag})}

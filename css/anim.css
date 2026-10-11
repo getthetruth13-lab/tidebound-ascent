@@ -5,13 +5,13 @@
 @keyframes combat-hover{50%{transform:translateY(-5px) rotate(1.4deg) scale(1.015)}}
 .combat-motion .spr-slot::after{content:'';position:absolute;left:42%;top:38%;width:15%;height:18%;pointer-events:none;background:radial-gradient(ellipse,var(--class-accent,var(--env-rim,#8fa3c7)),transparent 70%);opacity:.07;animation:accent-breathe var(--idle-period,4400ms) ease-in-out var(--idle-phase,0ms) infinite}
 @keyframes accent-breathe{50%{opacity:.17}}
-.combat-action{position:fixed;z-index:35;pointer-events:none;width:100px;height:70px;margin:-35px -50px;--action-color:#a6f2e8;border:2px solid var(--action-color);border-radius:50%;opacity:0;animation:action-ring 480ms ease-out forwards}
+.combat-action{position:fixed;z-index:35;pointer-events:none;width:100px;height:70px;margin:-35px -50px;--action-color:#a6f2e8;border:2px solid var(--action-color);border-radius:50%;opacity:0;animation:action-ring calc(480ms*var(--ts,1)) ease-out forwards}
 @keyframes action-ring{10%{opacity:.65;transform:scale(.3)}65%{opacity:.4}100%{opacity:0;transform:scale(1.7)}}
 .combat-action.rings{--action-color:#a07bff;box-shadow:0 0 0 10px #a07bff22,0 0 0 22px #a07bff15}
 .combat-action.wave,.combat-action.crest{width:210px;height:85px;border-width:5px 0 0;border-radius:55% 80% 0 0;background:linear-gradient(transparent,#2fb8c433);animation-name:action-wave}
 .combat-action.crest{width:420px;height:140px;border-top-width:9px}
 @keyframes action-wave{10%{opacity:.65;transform:translateX(-40px) rotate(-12deg) scale(.5)}100%{opacity:0;transform:translateX(170px) rotate(8deg) scale(1.2)}}
-.combat-action.undertow{width:220px;border-color:#2fb8c4;animation:action-pull 520ms ease-out forwards}
+.combat-action.undertow{width:220px;border-color:#2fb8c4;animation:action-pull calc(520ms*var(--ts,1)) ease-out forwards}
 @keyframes action-pull{10%{opacity:.6;transform:translateX(140px) scale(1.8,.4)}100%{opacity:0;transform:translateX(-30px) scale(.2,.15)}}
 .combat-action.slash,.combat-action.flourish{--action-color:#ec5f4a;border-width:3px 0 0;transform:rotate(-35deg);animation-name:action-slash}
 .combat-action.flourish{box-shadow:10px 12px 0 -8px #d3dbe6,-10px -15px 0 -8px #ec5f4a}
@@ -22,12 +22,12 @@
 .combat-action.landmark{width:90px;height:100px;background:linear-gradient(transparent,#d8a44633)}
 @keyframes action-raise{15%{opacity:.7;transform:translateY(25px) scale(.5)}100%{opacity:0;transform:translateY(-25px) scale(1.1)}}
 .combat-action.guard{background:linear-gradient(110deg,transparent,#5fa3ea33,transparent)}
-.action-ghost{position:fixed;pointer-events:none;z-index:34;animation:ghost-echo 520ms ease-out forwards}
+.action-ghost{position:fixed;pointer-events:none;z-index:34;animation:ghost-echo calc(520ms*var(--ts,1)) ease-out forwards}
 .action-ghost .fig,.action-ghost .spr-slot{animation:none!important;transform:none!important}
 @keyframes ghost-echo{0%{opacity:.4;transform:translateX(-8px)}100%{opacity:0;transform:translateX(36px)}}
 .action-ghost.death-sink{animation:none;transform-origin:50% 100%}
 @keyframes ghost-death{0%{opacity:.85}100%{opacity:0;transform:translateY(22px) scale(.94,.85)}}
-.echo-card{position:fixed!important;left:27%!important;top:30%!important;width:65px!important;pointer-events:none!important;z-index:34!important;animation:ghost-echo 520ms ease-out forwards!important}
+.echo-card{position:fixed!important;left:27%!important;top:30%!important;width:65px!important;pointer-events:none!important;z-index:34!important;animation:ghost-echo calc(520ms*var(--ts,1)) ease-out forwards!important}
 /* R9 acting-enemy highlight: the acting foe lifts, the others dim */
 .foes.has-act .en{opacity:.7;transition:opacity .15s}
 .foes.has-act .en.act{opacity:1;translate:0 -6px;z-index:2}

@@ -68,3 +68,12 @@ export function claim(p,track,id,CARDS){const o=offerFor(p,track,CARDS);if(!o)re
 export function firstLevel(track,kind,id,CARDS){if(track==='climb'){const plan=CLIMB_PLAN,want=kind==='relic'?['relics','mixed']:['potions','mixed'];const i=plan.findIndex(x=>want.includes(x.k));return i+1}
  if(kind==='relic'){const R=LOCK_CLASS_RELICS[track]||{};return (id===R.shop?5:9)}
  return rarityOf(CARDS,id)==='r'?8:1}
+
+// ---- Hero locking (Task 30) ----
+// DEV FLAG: HERO_LOCK_DEFAULT=false keeps ALL four Lampbearers open while the game is in development. For release flip it to true (or test with
+// ?herolock=1 / localStorage 'tidebound.herolock'='1'; '0' forces it off). Recommended release locks: Tidecaller and Cartographer; the Duelist and
+// Echo Mage are open from the first run. A locked hero shows as a silhouette under an unlit lantern with the unlock hint.
+export const HERO_LOCK_DEFAULT=false;
+export function heroLockingOn(){try{const v=localStorage.getItem('tidebound.herolock');if(/[?&]herolock=1/.test(location.search)||v==='1')return true;if(v==='0')return false}catch(_){}return HERO_LOCK_DEFAULT}
+export const HERO_LOCKS={tide:{hint:'Raise any Lampbearer\'s Lamp to level 2.',test:p=>CLASS_ORDER.some(c=>lampLevel(p,c)>=2)},carto:{hint:'Climb the Stair to Stair level 2.',test:p=>climbLevel(p)>=2}};
+export const heroUnlocked=(p,cls)=>!heroLockingOn()||!HERO_LOCKS[cls]||HERO_LOCKS[cls].test(p);

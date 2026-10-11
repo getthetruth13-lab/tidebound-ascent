@@ -6,6 +6,7 @@
 // Everything is transform / opacity (canvas for particles). Quality follows the Effects option (env.quality()).
 import {settings} from '../save.js';
 import {quality} from './env.js';
+import {T,U} from '../core/timing.js';
 const mq=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
 export const reducedMotion=()=>mq.matches||!!settings.reduceMotion;
 // effects that are allowed at all (flashes, particles)
@@ -63,25 +64,25 @@ export function emit(kind,x,y,a,b,c){if(!fxOn()||!PRE[kind])return;ensure();PRE[
 export const rectOf=el=>{const r=el.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height,l:r.left,t:r.top}};
 // ---------- vignette flash ----------
 export function vignette(kind,strength=.5,ms=380){if(!fxOn())return;ensure();const el=layer.querySelector('.vig.'+kind);if(!el||!el.animate)return;
- el.getAnimations().forEach(a=>a.cancel());el.animate([{opacity:0},{opacity:strength,offset:.18},{opacity:0}],{duration:ms,easing:'ease-out'})}
+ el.getAnimations().forEach(a=>a.cancel());el.animate([{opacity:0},{opacity:strength,offset:.18},{opacity:0}],{duration:T(ms),easing:'ease-out'})}
 // ---------- shake: decaying, transform only. amp in px; returns keyframes for WAAPI ----------
 export function shakeFrames(amp){const n=7,f=[];for(let i=0;i<=n;i++){const k=1-i/n,s=i%2?-1:1;f.push({translate:i===n?'0 0':`${(s*amp*k).toFixed(2)}px ${(-s*amp*k*.45).toFixed(2)}px`})}return f}
 // ---------- slow-motion beat: every running animation at `rate` for `ms` ----------
-export function slowmo(ms=400,rate=.5){if(!motionOn()||!document.getAnimations)return;const list=document.getAnimations();
+export function slowmo(ms=400,rate=.5){if(!motionOn()||!document.getAnimations)return;ms=T(ms);const list=document.getAnimations();
  list.forEach(a=>{try{a.updatePlaybackRate(rate)}catch(_){}});setTimeout(()=>list.forEach(a=>{try{a.updatePlaybackRate(1)}catch(_){}}),ms)}
 // ---------- hit-stop for idle loops: pause the CSS animations under `el` for `ms` ----------
-export function freezeIdle(el,ms){if(!el||!el.getAnimations)return;const as=el.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);
+export function freezeIdle(el,ms){if(!el||!el.getAnimations)return;ms=T(ms);const as=el.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);
  as.forEach(a=>a.pause());setTimeout(()=>as.forEach(a=>{try{a.play()}catch(_){}}),ms)}
 // ---------- impact timing: damage numbers and reactions land when the swing connects ----------
 let base=0,counts={};
 export function setImpact(ms){base=fxOn()&&!reducedMotion()?ms:0;counts={}}
 export const impactBase=()=>base;
-export function impactDelay(who){if(!base)return 0;const n=counts[who]=(counts[who]||0)+1;return base+(n-1)*85}
+export function impactDelay(who){if(!base)return 0;const n=counts[who]=(counts[who]||0)+1;return T(base+(n-1)*85)}
 export function stackIndex(who){return counts[who]||0}
 // ---------- one-shot DOM bits on the persistent layer ----------
 export function ring(x,y,col=COL.teal,size=70,ms=360){if(!fxOn())return;ensure();const el=document.createElement('i');el.className='fxring';
  Object.assign(el.style,{left:x+'px',top:y+'px',width:size+'px',height:size+'px',borderColor:col});layer.appendChild(el);
- const done=()=>el.remove();if(!el.animate||reducedMotion()){el.animate&&el.animate([{opacity:.7},{opacity:0}],{duration:200}).finished.then(done,done);if(!el.animate)done();return}
+ ms=T(ms);const done=()=>el.remove();if(!el.animate||reducedMotion()){el.animate&&el.animate([{opacity:.7},{opacity:0}],{duration:200}).finished.then(done,done);if(!el.animate)done();return}
  el.animate([{transform:'translate(-50%,-50%) scale(.2)',opacity:.85},{transform:'translate(-50%,-50%) scale(1)',opacity:0}],{duration:ms,easing:'ease-out'}).finished.then(done,done)}
 // an emoji/icon node flies from a rect to another element (reward -> HUD counter), then calls done
 export function flyIcon(fromEl,toEl,{html,ms=520,col=COL.gold,done}={}){
@@ -90,7 +91,7 @@ export function flyIcon(fromEl,toEl,{html,ms=520,col=COL.gold,done}={}){
  Object.assign(el.style,{left:a.x+'px',top:a.y+'px'});layer.appendChild(el);
  const dx=b.x-a.x,dy=b.y-a.y;let tr=0;const t0=performance.now();
  const tick=()=>{if(!el.isConnected)return;const r=el.getBoundingClientRect();emit('trail',r.left+r.width/2,r.top+r.height/2,col);tr=requestAnimationFrame(tick)};tr=requestAnimationFrame(tick);
- el.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${dx*.4}px),calc(-50% + ${dy*.4-34}px)) scale(1.15)`,opacity:1,offset:.45},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.5)`,opacity:.9}],{duration:ms,easing:'cubic-bezier(.4,0,.4,1)'}).finished.then(()=>{cancelAnimationFrame(tr);el.remove();emit('coin',b.x,b.y);ring(b.x,b.y,col,44,300);done&&done()},()=>{cancelAnimationFrame(tr);el.remove();done&&done()})}
+ el.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${dx*.4}px),calc(-50% + ${dy*.4-34}px)) scale(1.15)`,opacity:1,offset:.45},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.5)`,opacity:.9}],{duration:U(ms),easing:'cubic-bezier(.4,0,.4,1)'}).finished.then(()=>{cancelAnimationFrame(tr);el.remove();emit('coin',b.x,b.y);ring(b.x,b.y,col,44,300);done&&done()},()=>{cancelAnimationFrame(tr);el.remove();done&&done()})}
 // ---------- screen crossfade: the old #app contents fade out over the new screen ----------
 let xf=null;
 export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!app||!app.firstChild)return;

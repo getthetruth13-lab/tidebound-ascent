@@ -9,6 +9,7 @@ import {CARDS} from '../core/registry.js';
 import {observeEvents} from '../core/bus.js';
 import {playSound} from '../audio.js';
 import {alive} from '../engine/combat.js';
+import {T,U} from '../core/timing.js';
 import {cardHTML} from './render.js';
 import {cloneCard,IMPACT_MS} from './fx.js';
 import {fxOn,motionOn,reducedMotion,fxQueue,emit,ring,vignette,shakeFrames,slowmo,freezeIdle,rectOf,setImpact,impactBase,crossfade,flyIcon,COL,CLASS_COL} from './vfx.js';
@@ -21,11 +22,11 @@ const figOf=sel=>sel&&$(sel+' .fig');
 const centre=sel=>{const el=sel&&($(sel+' .fig')||$(sel));return el?rectOf(el):null};
 // ---------- entries ----------
 let activeEntry=null;
-function entry(total,apply){const e={t0:performance.now(),total,animations:new Map(),slot:0};
+function entry(total,apply){total=T(total);const e={t0:performance.now(),total,animations:new Map(),slot:0};
  e.apply=elapsed=>{const previous=activeEntry;activeEntry=e;e.slot=0;try{apply(elapsed)}finally{activeEntry=previous}};
  entries.push(e);return e}
 // element.animate with a delay and an elapsed offset (resume); frames use individual transform properties (translate/scale/rotate) so they stack
-function play(el,frames,dur,elapsed,delay=0,easing='linear'){const slot=activeEntry?activeEntry.slot++:0;
+function play(el,frames,dur,elapsed,delay=0,easing='linear'){const slot=activeEntry?activeEntry.slot++:0;dur=T(dur);delay=T(delay);
  if(!el||!el.animate||elapsed>=delay+dur)return;
  // A retained element already runs this entry at its original timeline position.
  const previous=activeEntry?.animations.get(slot);if(previous?.el===el)return previous.animation;
@@ -33,7 +34,9 @@ function play(el,frames,dur,elapsed,delay=0,easing='linear'){const slot=activeEn
  if(activeEntry)activeEntry.animations.set(slot,{el,animation});return animation}
 const at=(ms,total)=>+(ms/total).toFixed(4);
 // ---------- one-shot visuals at a fixed time ----------
-const later=(ms,fn)=>ms>0?fxQueue.push(ms,fn):fn();
+// All durations in this file are written in the original (design) ms; entry/play/later apply the central scale (core/timing.js).
+const later=(ms,fn)=>ms>0?fxQueue.push(T(ms),fn):fn();
+const laterU=(ms,fn)=>ms>0?fxQueue.push(U(ms),fn):fn();
 function burstAt(sel,kind,ms=0,...args){later(ms,()=>{const c=centre(sel);if(c)emit(kind,c.x,c.y,...args)})}
 function ringAt(sel,col,size,ms=0,ms2=360){later(ms,()=>{const c=centre(sel);if(c)ring(c.x,c.y,col,size,ms2)})}
 // ---------- ghosts (persistent copies of a figure) ----------
@@ -42,34 +45,34 @@ function ghost(selector,kind,opts={}){const source=selector&&$(selector);if(!sou
  const el=document.createElement('div');el.className=`action-ghost ${kind}`;el.setAttribute('aria-hidden','true');
  Object.assign(el.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
  if(fig){el.appendChild(fig.cloneNode(true));el.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));el.querySelectorAll('.fig').forEach(n=>{n.className='fig';n.style.animation='none'})}
- document.body.appendChild(el);const ms=opts.life||580;el.addEventListener('animationend',e=>{if(e.target===el&&!opts.keep)el.remove()});setTimeout(()=>el.remove(),ms);
+ document.body.appendChild(el);const ms=opts.life||T(580);el.addEventListener('animationend',e=>{if(e.target===el&&!opts.keep)el.remove()});setTimeout(()=>el.remove(),ms);
  return {el,r}}
 function effect(selector,kind,col){const source=selector&&$(selector);if(!source)return;
  const r=source.getBoundingClientRect(),el=document.createElement('i');el.className=`combat-action ${kind}`;el.setAttribute('aria-hidden','true');
  Object.assign(el.style,{left:r.left+r.width/2+'px',top:r.top+r.height*.5+'px'});if(col)el.style.setProperty('--action-color',col);
- document.body.appendChild(el);setTimeout(()=>el.remove(),580);
+ document.body.appendChild(el);setTimeout(()=>el.remove(),T(580));
 }
 // ---------- death (R10): flash, hit-stop, bottom-up dissolve + ash. Elites/bosses take longer. ----------
 let finalKillAt=0,finalKillBig=false;
 function death(e,lead){const sel=enemy(e);const el=sel&&$(sel);if(!el)return;
- const big=e.boss||e.elite,hold=big?120:60,sink=big?800:430,total=lead+hold+sink;
+ const big=e.boss||e.elite;lead=T(lead);const hold=T(big?120:60),sink=T(big?800:430),total=lead+hold+sink;
  const g=ghost(sel,'death-sink',{life:total+120,keep:true});if(!g)return;
  el.classList.add('gone');
  const last=alive().length===0;if(last){finalKillAt=performance.now();finalKillBig=big}
  const fig=g.el.firstChild||g.el;
- const T=lead+hold+sink,o=ms=>at(ms,T),L=lead;
+ const TT=lead+hold+sink,o=ms=>at(ms,TT),L=lead;
  const frames=[{filter:'none',transform:'none',clipPath:'inset(0 0 0% 0)',opacity:1,offset:0},
   {filter:'none',transform:'none',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L)},
   {filter:'brightness(3)',transform:'scale(1.07)',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L)+.0001},
-  {filter:'brightness(1.5)',transform:'scale(1.06)',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L+Math.min(55,hold*.8))},
+  {filter:'brightness(1.5)',transform:'scale(1.06)',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L+Math.min(T(55),hold*.8))},
   {filter:'brightness(1.2)',transform:'scale(1.06)',clipPath:'inset(0 0 0% 0)',opacity:1,offset:o(L+hold),easing:'ease-in'},
   {filter:'brightness(.8)',transform:`translateY(${big?26:20}px) scale(.96,.9)`,clipPath:big?'inset(0 0 100% 0)':'inset(0 0 45% 0)',opacity:big?.9:0,offset:1}];
- g.el.animate(frames,{duration:T,fill:'forwards'}).finished.then(()=>g.el.remove(),()=>g.el.remove());
+ g.el.animate(frames,{duration:TT,fill:'forwards'}).finished.then(()=>g.el.remove(),()=>g.el.remove());
  const {x,y,w,h}={x:g.r.left+g.r.width/2,y:g.r.top+g.r.height,w:g.r.width*.7,h:g.r.height*.8};
  const steps=big?5:2;for(let i=0;i<steps;i++)fxQueue.push(lead+hold+i*(sink/steps)*.8,()=>emit('death',x,y-(i/steps)*h*.4,w,h*(1-i/steps)*.6,big?9:7));
  if(last)fxQueue.push(lead+hold,()=>slowmo(400,.5));
 }
-export const deathHold=()=>performance.now()-finalKillAt<250?(finalKillBig?950:560):0;
+export const deathHold=()=>performance.now()-finalKillAt<T(250)?T(finalKillBig?950:560):0;
 // Combo beats are presentation only: never delay input or combat resolution.
 let lastBeat=0,phase=null,phaseTimer=null,drawTimer=0;
 function comboBeat(kind,size=1,delay=impactBase()){
@@ -87,7 +90,7 @@ function phaseSweep(text){
  phase?.remove();clearTimeout(phaseTimer);if(!fxOn())return;
  phase=document.createElement('div');phase.className='banner turn-sweep'+(reducedMotion()?' still':'');
  phase.setAttribute('role','status');phase.textContent=text;document.body.appendChild(phase);
- const node=phase;phaseTimer=setTimeout(()=>{node.remove();if(phase===node)phase=null},750);
+ const node=phase;phaseTimer=setTimeout(()=>{node.remove();if(phase===node)phase=null},T(750));
  vignette('gold',.12,340);
  if(enabled())entry(320,e=>play($('#hand'),[{translate:'0 0',opacity:1},{translate:'0 55px',opacity:.25},{translate:'0 0',opacity:1}],320,e));
 }
@@ -115,7 +118,7 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
   // Recreate the actual echoed card, including its art, without interactive attributes.
   const holder=document.createElement('div');holder.innerHTML=cardHTML(c.card);const card=holder.firstElementChild;
   if(card){const g=card.cloneNode(true);g.querySelectorAll('*').forEach(n=>{for(const a of [...n.attributes])if(a.name.startsWith('on'))n.removeAttribute(a.name)});for(const a of [...g.attributes])if(a.name.startsWith('on')||a.name.startsWith('data-'))g.removeAttribute(a.name);
-   g.className+=' echo-card';g.setAttribute('aria-hidden','true');document.body.appendChild(g);setTimeout(()=>g.remove(),550)}
+   g.className+=' echo-card';g.setAttribute('aria-hidden','true');document.body.appendChild(g);setTimeout(()=>g.remove(),T(550))}
  }
  if(event==='flourish'){effect(enemy(c.f.tgt)||hero,'flourish');comboBeat('flourish',c.mom/2)}
  if(event==='parry'){effect(hero,'spark');playSound('guard');burstAt(hero,'guard',0)}
@@ -148,17 +151,17 @@ const cardBack=()=>{const b=document.createElement('i');b.className='cardback';b
 function reshuffle(){if(!enabled())return;const a=$('#discpile'),b=$('#drawpile');if(!a||!b)return;const ra=rectOf(a),rb=rectOf(b);
  for(let i=0;i<6;i++){const el=cardBack();Object.assign(el.style,{left:ra.x+'px',top:ra.y+'px'});document.body.appendChild(el);
   const dx=rb.x-ra.x,dy=rb.y-ra.y,lift=-26-(i%3)*10;
-  el.animate([{transform:'translate(-50%,-50%) scale(.9) rotate(0deg)',opacity:0},{transform:`translate(calc(-50% + ${dx*.5}px),calc(-50% + ${dy*.5+lift}px)) scale(1) rotate(${i%2?14:-14}deg)`,opacity:1,offset:.5},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.9) rotate(0deg)`,opacity:0}],{duration:360,delay:i*45,easing:'ease-in-out',fill:'backwards'}).finished.then(()=>el.remove(),()=>el.remove())}
- b.animate([{transform:'scale(1)'},{transform:'scale(1.14)',offset:.7},{transform:'scale(1)'}],{duration:260,delay:330})}
+  el.animate([{transform:'translate(-50%,-50%) scale(.9) rotate(0deg)',opacity:0},{transform:`translate(calc(-50% + ${dx*.5}px),calc(-50% + ${dy*.5+lift}px)) scale(1) rotate(${i%2?14:-14}deg)`,opacity:1,offset:.5},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.9) rotate(0deg)`,opacity:0}],{duration:T(360),delay:T(i*45),easing:'ease-in-out',fill:'backwards'}).finished.then(()=>el.remove(),()=>el.remove())}
+ b.animate([{transform:'scale(1)'},{transform:'scale(1.14)',offset:.7},{transform:'scale(1)'}],{duration:T(260),delay:T(330)})}
 function discardHand(){if(!enabled()||!W.cb)return;const pile=$('#discpile');if(!pile)return;const dest=rectOf(pile);
  const cards=$$('.hand .card').filter(el=>W.cb.hand.some(ci=>ci.uid==el.dataset.uid));const rects=new Map(cards.map(el=>[el,el.getBoundingClientRect()]));let n=0;
  for(const el of cards){const ci=W.cb.hand.find(c=>c.uid==el.dataset.uid),d=CARDS[ci.id];if(d.moor||ci.moor)continue;
-  const {g,r}=cloneCard(el,rects.get(el));const i=n++,delay=i*40;
+  const {g,r}=cloneCard(el,rects.get(el));const i=n++,delay=T(i*40);
   if(d.fleet){emit('death',r.left+r.width/2,r.top+r.height/2,r.width*.7,r.height*.6,8);
-   g.animate([{opacity:1,filter:'none',transform:'none'},{opacity:.9,filter:'brightness(1.8) grayscale(.5)',transform:'scale(1.04)',offset:.35},{opacity:0,filter:'brightness(.7) grayscale(1)',transform:'translateY(-14px) scale(.9)'}],{duration:320,delay,easing:'ease-out',fill:'backwards'}).finished.then(()=>g.remove(),()=>g.remove());continue}
+   g.animate([{opacity:1,filter:'none',transform:'none'},{opacity:.9,filter:'brightness(1.8) grayscale(.5)',transform:'scale(1.04)',offset:.35},{opacity:0,filter:'brightness(.7) grayscale(1)',transform:'translateY(-14px) scale(.9)'}],{duration:T(320),delay,easing:'ease-out',fill:'backwards'}).finished.then(()=>g.remove(),()=>g.remove());continue}
   const tx=dest.x-(r.left+r.width/2),ty=dest.y-(r.top+r.height/2);
-  g.animate([{transform:'none',opacity:1},{transform:`translate(${tx*.7}px,${ty*.7}px) scale(.55) rotate(-10deg)`,opacity:.8,offset:.7},{transform:`translate(${tx}px,${ty}px) scale(.25) rotate(-16deg)`,opacity:0}],{duration:250,delay,easing:'cubic-bezier(.5,0,.8,.5)',fill:'backwards'}).finished.then(()=>{g.remove()},()=>g.remove())}
- if(n)dest.pulse=pile.animate([{transform:'scale(1)'},{transform:'scale(1.16)',offset:.8},{transform:'scale(1)'}],{duration:260,delay:n*40+120})}
+  g.animate([{transform:'none',opacity:1},{transform:`translate(${tx*.7}px,${ty*.7}px) scale(.55) rotate(-10deg)`,opacity:.8,offset:.7},{transform:`translate(${tx}px,${ty}px) scale(.25) rotate(-16deg)`,opacity:0}],{duration:T(250),delay,easing:'cubic-bezier(.5,0,.8,.5)',fill:'backwards'}).finished.then(()=>{g.remove()},()=>g.remove())}
+ if(n)dest.pulse=pile.animate([{transform:'scale(1)'},{transform:'scale(1.16)',offset:.8},{transform:'scale(1)'}],{duration:T(260),delay:T(n*40+120)})}
 // ---------- screen shake on #scene (transform only; reduced motion gets the vignette instead) ----------
 function shakeNow(amp){if(!enabled()||settings.screenShake===false)return;entry(300,el=>play($('.scene'),shakeFrames(amp),300,el,0,'linear')).apply(0)}
 // ---------- hp bars: delayed ghost chunk, flash on loss, heal motes ----------
@@ -275,64 +278,65 @@ function statusFx(r){const sel=r.sel;if(!sel)return;const k=r.key;
 }
 // ---------- screens other than combat: reveals, reward flights, chest, map travel ----------
 let revealed=null,revealKey='',holdUntil=0;
-export const holdLeft=()=>Math.max(0,holdUntil-performance.now());
+const holdReal=()=>Math.max(0,holdUntil-performance.now());
+export const holdLeft=()=>holdReal()/T(1); // in design ms, ready for entry()/play()/later()
 export function holdFor(ms){holdUntil=performance.now()+ms}
 function reveal(sel,from,dur,gap,delay,tilt){const els=$$(sel);els.forEach((el,i)=>{if(!el.animate)return;const rot=tilt?(i%2?1:-1)*(3+i):0;
- el.animate([{translate:`${from[0]}px ${from[1]}px`,scale:from[2]||'.92',rotate:`${rot}deg`,opacity:0},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],{duration:dur,delay:delay+i*gap,easing:'cubic-bezier(.2,.9,.3,1.1)',fill:'backwards'})})}
+ el.animate([{translate:`${from[0]}px ${from[1]}px`,scale:from[2]||'.92',rotate:`${rot}deg`,opacity:0},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],{duration:U(dur),delay:U(delay+i*gap),easing:'cubic-bezier(.2,.9,.3,1.1)',fill:'backwards'})})}
 // Card rewards: cards start face-down, flip in one by one; rares get a light burst and a sparkle.
 function flipReveal(delay){const ws=$$('.rewgrid .rcw');ws.forEach((w,i)=>{const card=w.querySelector('.card'),back=w.querySelector('.cardback');if(!card||!back||!card.animate)return;
  const t0=delay+i*190,half=170,rare=card.classList.contains('r-r');
- back.animate([{opacity:1,transform:'rotateY(0deg)'},{opacity:1,transform:'rotateY(90deg)'}],{duration:half,delay:t0,easing:'ease-in',fill:'both'}).finished.then(()=>back.remove(),()=>back.remove());
- card.animate([{transform:'rotateY(-90deg)'},{transform:'rotateY(0deg)'}],{duration:half+60,delay:t0+half,easing:'ease-out',fill:'backwards'});
- later(t0,()=>playSound('flip'));
- if(rare)later(t0+half+80,()=>{const r=rectOf(card);playSound('sparkle');emit('burst',r.x,r.y,COL.gold,26);ring(r.x,r.y,COL.gold,170,560);
-  card.classList.add('foiling');card.style.setProperty('--fx','0%');card.animate([{filter:'brightness(2.2)'},{filter:'brightness(1)'}],{duration:520,easing:'ease-out'});
+ back.animate([{opacity:1,transform:'rotateY(0deg)'},{opacity:1,transform:'rotateY(90deg)'}],{duration:U(half),delay:U(t0),easing:'ease-in',fill:'both'}).finished.then(()=>back.remove(),()=>back.remove());
+ card.animate([{transform:'rotateY(-90deg)'},{transform:'rotateY(0deg)'}],{duration:U(half+60),delay:U(t0+half),easing:'ease-out',fill:'backwards'});
+ laterU(t0,()=>playSound('flip'));
+ if(rare)laterU(t0+half+80,()=>{const r=rectOf(card);playSound('sparkle');emit('burst',r.x,r.y,COL.gold,26);ring(r.x,r.y,COL.gold,170,560);
+  card.classList.add('foiling');card.style.setProperty('--fx','0%');card.animate([{filter:'brightness(2.2)'},{filter:'brightness(1)'}],{duration:U(520),easing:'ease-out'});
   const beam=document.createElement('div');beam.className='rarebeam';beam.style.left=r.x+'px';beam.style.top=r.y+'px';document.body.appendChild(beam);
-  beam.animate([{opacity:.95,transform:'scale(.3)'},{opacity:0,transform:'scale(2.6)'}],{duration:620,easing:'ease-out'}).finished.then(()=>beam.remove(),()=>beam.remove());
-  setTimeout(()=>card.classList.remove('foiling'),900)})})}
+  beam.animate([{opacity:.95,transform:'scale(.3)'},{opacity:0,transform:'scale(2.6)'}],{duration:U(620),easing:'ease-out'}).finished.then(()=>beam.remove(),()=>beam.remove());
+  setTimeout(()=>card.classList.remove('foiling'),U(900))})})}
 function syncScreens(){if(!motionOn())return;const S=W.S,s=S.screen;
  const key=(s==='reward'?'r'+(S.cardsOpen!=null?'c'+S.cardsOpen:S.swap!=null?'s':'rows'):s==='chest'?'x'+(S.opened?'o':'c'):(s==='title'&&S.view==='lamp'&&S.got)?'lamp':'');
- if(!key||(revealed===S&&revealKey===key))return;revealed=S;revealKey=key;const hold=holdLeft();
+ if(!key||(revealed===S&&revealKey===key))return;revealed=S;revealKey=key;const hold=holdReal();
  if(key==='rrows'||key==='xo'){reveal('.rewtiles .tile',[0,26,'.9'],340,95,hold+40);
-  if(key==='xo'){const c=$('.chestwrap');if(c){const r=rectOf(c);later(hold+10,()=>{emit('burst',r.x,r.y,COL.gold,22);ring(r.x,r.y,COL.gold,140,520);vignette('gold',.4,520)});
-   c.animate([{filter:'brightness(3)',scale:'1.12'},{filter:'brightness(1.4)',scale:'1.04',offset:.4},{filter:'none',scale:'1'}],{duration:520,delay:hold,easing:'ease-out',fill:'backwards'})}}}
+  if(key==='xo'){const c=$('.chestwrap');if(c){const r=rectOf(c);laterU(hold+10,()=>{emit('burst',r.x,r.y,COL.gold,22);ring(r.x,r.y,COL.gold,140,520);vignette('gold',.4,520)});
+   c.animate([{filter:'brightness(3)',scale:'1.12'},{filter:'brightness(1.4)',scale:'1.04',offset:.4},{filter:'none',scale:'1'}],{duration:U(520),delay:U(hold),easing:'ease-out',fill:'backwards'})}}}
  else if(key.startsWith('rc'))flipReveal(hold+30);
- else if(key==='lamp'){const els=$$('.lp-offer.got .tile,.lp-offer.got .lp-pick');els.forEach(el=>{const r=rectOf(el);later(120,()=>{emit('burst',r.x,r.y,COL.gold,22);ring(r.x,r.y,COL.gold,120,520)})});vignette('gold',.35,520)}
+ else if(key==='lamp'){const els=$$('.lp-offer.got .tile,.lp-offer.got .lp-pick');els.forEach(el=>{const r=rectOf(el);laterU(120,()=>{emit('burst',r.x,r.y,COL.gold,22);ring(r.x,r.y,COL.gold,120,520)})});vignette('gold',.35,520)}
 }
 // capture-phase click hooks: flights start before the click's own handler re-renders the screen
 addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.closest)return;
  const card=t.closest('.rewgrid .card');
  if(card){const deck=$('#deckbtn');if(deck){const all=$$('.rewgrid .card').filter(c=>c!==card);const b=rectOf(deck),rects=new Map([card,...all].map(c=>[c,c.getBoundingClientRect()]));const {g,r}=cloneCard(card,rects.get(card));
-   all.forEach(c=>{const o=cloneCard(c,rects.get(c));o.g.animate([{opacity:1},{opacity:0,transform:'translateY(18px) scale(.9)'}],{duration:260,easing:'ease-in'}).finished.then(()=>o.g.remove(),()=>o.g.remove())});
+   all.forEach(c=>{const o=cloneCard(c,rects.get(c));o.g.animate([{opacity:1},{opacity:0,transform:'translateY(18px) scale(.9)'}],{duration:U(260),easing:'ease-in'}).finished.then(()=>o.g.remove(),()=>o.g.remove())});
    const dx=b.x-(r.left+r.width/2),dy=b.y-(r.top+r.height/2);let raf=0;
    const trail=()=>{if(!g.isConnected)return;const q=g.getBoundingClientRect();emit('trail',q.left+q.width/2,q.top+q.height/2,COL.gold);raf=requestAnimationFrame(trail)};raf=requestAnimationFrame(trail);
-   const end=()=>{cancelAnimationFrame(raf);g.remove();ring(b.x,b.y,COL.gold,54,360);emit('burst',b.x,b.y,COL.gold,10);deck.animate([{transform:'scale(1)'},{transform:'scale(1.3)',offset:.4},{transform:'scale(1)'}],{duration:320})};
-   g.animate([{transform:'none',opacity:1},{transform:`translate(${dx*.3}px,${dy*.3-30}px) scale(.8) rotate(-6deg)`,opacity:1,offset:.4},{transform:`translate(${dx}px,${dy}px) scale(.18)`,opacity:.6}],{duration:520,easing:'cubic-bezier(.4,0,.5,1)'}).finished.then(end,end)}return}
+   const end=()=>{cancelAnimationFrame(raf);g.remove();ring(b.x,b.y,COL.gold,54,360);emit('burst',b.x,b.y,COL.gold,10);deck.animate([{transform:'scale(1)'},{transform:'scale(1.3)',offset:.4},{transform:'scale(1)'}],{duration:U(320)})};
+   g.animate([{transform:'none',opacity:1},{transform:`translate(${dx*.3}px,${dy*.3-30}px) scale(.8) rotate(-6deg)`,opacity:1,offset:.4},{transform:`translate(${dx}px,${dy}px) scale(.18)`,opacity:.6}],{duration:U(520),easing:'cubic-bezier(.4,0,.5,1)'}).finished.then(end,end)}return}
  const tile=t.closest('.rewtiles .tile:not(.done)');
  if(tile){const k=tile.classList.contains('k-gold')?'gold':tile.classList.contains('k-potion')?'potion':tile.classList.contains('k-relic')?'relic':'';
   const art=tile.querySelector('.tart')||tile;
   if(k==='gold'){const dst=$('.topbar .stat.gold');if(dst){const from=W.run.gold;const html=tile.querySelector('.tart').innerHTML;flyIcon(art,dst,{html,col:COL.gold});
-    setTimeout(()=>countUp('.topbar .stat.gold',from,W.run.gold),520)}}
+    setTimeout(()=>countUp('.topbar .stat.gold',from,W.run.gold),U(520))}}
   else if(k==='potion'||k==='relic'){const dst=$(k==='potion'?'#potions':'#relicbar');if(dst)flyIcon(art,dst,{html:art.innerHTML,col:COL.pale})}}
  const chest=t.closest('#openchest');
  if(chest&&!chest.dataset.shaking){chest.dataset.shaking=1;ev.stopImmediatePropagation();ev.preventDefault();
-  chest.animate([{translate:'0 0'},{translate:'-5px 0',rotate:'-3deg',offset:.15},{translate:'5px 0',rotate:'3deg',offset:.3},{translate:'-4px 0',rotate:'-2deg',offset:.45},{translate:'4px 0',rotate:'2deg',offset:.6},{translate:'0 0',rotate:'0deg'}],{duration:340});
-  setTimeout(()=>{if(window.openChestLid)window.openChestLid()},340)}
+  chest.animate([{translate:'0 0'},{translate:'-5px 0',rotate:'-3deg',offset:.15},{translate:'5px 0',rotate:'3deg',offset:.3},{translate:'-4px 0',rotate:'-2deg',offset:.45},{translate:'4px 0',rotate:'2deg',offset:.6},{translate:'0 0',rotate:'0deg'}],{duration:U(340)});
+  setTimeout(()=>{if(window.openChestLid)window.openChestLid()},U(340))}
  // map travel: a lantern glides from the current node (or the foot of the map) to the chosen node while the old map lingers
  const node=t.closest('.node.av');
  if(node&&W.S.screen==='map'&&!W.S.ov){const cur=$('.node.cur'),from=cur?rectOf(cur):{x:innerWidth/2,y:innerHeight+20},to=rectOf(node);
   const m=document.createElement('i');m.className='travelmark';m.setAttribute('aria-hidden','true');Object.assign(m.style,{left:from.x+'px',top:from.y+'px'});document.body.appendChild(m);
   const dx=to.x-from.x,dy=to.y-from.y;let raf=0;const trail=()=>{if(!m.isConnected)return;const q=m.getBoundingClientRect();emit('trail',q.left+q.width/2,q.top+q.height/2,COL.gold);raf=requestAnimationFrame(trail)};raf=requestAnimationFrame(trail);
   const end=()=>{cancelAnimationFrame(raf);m.remove();ring(to.x,to.y,COL.gold,56,320)};
-  m.animate([{transform:'translate(-50%,-50%) translate(0,0)'},{transform:`translate(-50%,-50%) translate(${dx*.5}px,${dy*.5-8}px)`,offset:.5},{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px)`}],{duration:480,easing:'ease-in-out'}).finished.then(end,end);
-  holdFor(480)}
+  m.animate([{transform:'translate(-50%,-50%) translate(0,0)'},{transform:`translate(-50%,-50%) translate(${dx*.5}px,${dy*.5-8}px)`,offset:.5},{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px)`}],{duration:U(480),easing:'ease-in-out'}).finished.then(end,end);
+  holdFor(U(480))}
 },true);
-function countUp(sel,from,to){if(from===to)return;const t0=performance.now(),dur=420;const tick=()=>{const el=$(sel);if(!el)return;const k=Math.min(1,(performance.now()-t0)/dur);const v=Math.round(from+(to-from)*k);
+function countUp(sel,from,to){if(from===to)return;const t0=performance.now(),dur=U(420);const tick=()=>{const el=$(sel);if(!el)return;const k=Math.min(1,(performance.now()-t0)/dur);const v=Math.round(from+(to-from)*k);
  const tn=[...el.childNodes].reverse().find(n=>n.nodeType===3);if(tn)tn.textContent=' '+v;if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
 // ---------- screen change: old screen lingers and fades (called by render()) ----------
 const quiet=new Set(['title']);
 export function screenChange(app,prev,next){if(!prev||prev===next||quiet.has(prev)||quiet.has(next))return;
- const hero=W.run&&W.run.hp<=0&&prev==='combat';const hold=Math.max(prev==='combat'?deathHold():0,holdLeft(),hero?700:0);
+ const hero=W.run&&W.run.hp<=0&&prev==='combat';const hold=Math.max(prev==='combat'?deathHold():0,holdReal(),hero?U(700):0);
  if(hold)holdUntil=Math.max(holdUntil,performance.now()+hold);
- crossfade(app,{hold,ms:prev==='combat'?340:260,gray:hero})}
+ crossfade(app,{hold,ms:prev==='combat'?T(340):U(260),gray:hero})}
 matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',syncCombatAnimations);

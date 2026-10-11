@@ -28,7 +28,10 @@ document.addEventListener('pointerout',ev=>{if(ev.pointerType==='mouse'&&(!ev.re
 document.addEventListener('click',ev=>{if(eatClick){eatClick=false;ev.stopPropagation();ev.preventDefault()}},true);
 document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
 document.addEventListener('pointerdown',ev=>{const c=ev.target.closest&&ev.target.closest('.hand .card');if(!c||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;
- if(ev.button!=null&&ev.button>0)return;rafPending=null;drag={el:c,i:+c.dataset.i,x0:ev.clientX,y0:ev.clientY,id:ev.pointerId,moved:false,bx:+c.dataset.x||0,by:+c.dataset.y||0};
+ if(ev.button!=null&&ev.button>0)return;
+ // A second finger (multi-touch) supersedes the first press instead of leaving its card lifted.
+ if(drag&&drag.id!==ev.pointerId){if(drag.raf)cancelAnimationFrame(drag.raf);if(drag.moved)drag.el.style.removeProperty('transform');drag.el.classList.remove('drag','armed');drag=null;clearTargets()}
+ dropSel(c);rafPending=null;drag={el:c,i:+c.dataset.i,x0:ev.clientX,y0:ev.clientY,id:ev.pointerId,moved:false,bx:+c.dataset.x||0,by:+c.dataset.y||0};
  peekCard(c);
  try{c.setPointerCapture(ev.pointerId)}catch(_){}});
 export let rafPending=null;
@@ -70,7 +73,7 @@ export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)retur
  // Pointer release can arrive before the queued animation-frame move.
  if(!cancel&&rafPending&&rafPending.pointerId===d.id)dragMove(d,rafPending);
  drag=null;rafPending=null;clearPeek();clearTargets();eatClick=true;
- if(cancel||!W.cb){if(W.cb)render();return}
+ if(cancel||!W.cb){if(W.cb){W.cb.sel=null;render()}return}
  if(!d.moved)return tapCard(d.i);
  const ci=W.cb.hand[d.i],target=ci&&canPlay(ci)?dropTarget(ci,ev.clientX,ev.clientY):null;
  if(target!=null){if(target!=='hero')W.cb.tgt=target;return playCard(d.i)}
@@ -83,7 +86,14 @@ addEventListener('resize',()=>{if(W.S.screen==='combat'&&!drag)requestAnimationF
 
 // Stable resting centres, independent of the enlarged card's hit box and pointer capture.
 let peek=null;
-function clearPeek(){peek=null;document.querySelectorAll('.hand .card.peek,.hand .card.peek-neighbour').forEach(c=>{c.classList.remove('peek','peek-neighbour');c.style.removeProperty('--x')});if(W.S.screen==='combat')layoutHand();clearOutcome()}
+// Only one card may ever be lifted: pressing a card lowers the previously selected one in place
+// (class removal, no re-render) so it animates back into the fan while the pressed card peeks up.
+function dropSel(keep){if(!W.cb)return;let any=false;document.querySelectorAll('.hand .card.sel').forEach(c=>{if(c!==keep){c.classList.remove('sel');any=true}});
+ if(W.cb.sel!=null&&(!keep||+keep.dataset.i!==W.cb.sel)){W.cb.sel=null;W.cb.insp=null;any=true}
+ if(any){const t=document.getElementById('detail');if(t)t.remove();clearOutcome()}}
+// Restore the resting --x from dataset (not removeProperty): layoutHand's unchanged-hand cache returns early
+// and would otherwise leave the peek neighbours collapsed onto the centre.
+function clearPeek(){peek=null;document.querySelectorAll('.hand .card.peek,.hand .card.peek-neighbour').forEach(c=>{c.classList.remove('peek','peek-neighbour');if(c.dataset.x!=null)c.style.setProperty('--x',c.dataset.x+'px');else c.style.removeProperty('--x')});if(W.S.screen==='combat')layoutHand();clearOutcome()}
 function peekCard(c){if(peek===c)return;clearPeek();peek=c;c.classList.add('peek');
  const cards=[...document.querySelectorAll('.hand .card')],i=cards.indexOf(c);
  cards.forEach((el,k)=>{if(Math.abs(k-i)===1){el.classList.add('peek-neighbour');el.style.setProperty('--x',(+el.dataset.x+(k<i?-12:12))+'px')}});
@@ -104,3 +114,10 @@ document.addEventListener('pointermove',ev=>{if(ev.pointerType!=='mouse'||drag)r
  document.addEventListener('pointerdown',ev=>{if(ev.pointerType==='mouse')return;const f=fig(ev);if(f)on(f);else off()},true);
  for(const t of ['pointerup','pointercancel'])document.addEventListener(t,ev=>{if(ev.pointerType!=='mouse')off()},true);
  document.addEventListener('pointerleave',off);document.addEventListener('pointerout',ev=>{if(ev.pointerType==='mouse'&&nmEl&&!nmEl.contains(ev.relatedTarget))off()});}
+// Choice screens: a frantic double tap must not fall through onto the next screen (e.g. chained upgrade/remove picks
+// or a reward pick reopening the list). A card click is ignored when it lands <350 ms after the screen changed AND follows another card click
+// at the same spot (<600 ms, <40 px), i.e. a continuation of the same frantic tapping; a single deliberate tap always goes through.
+{let lastS=null,sAt=0,lastPick=-1e9,lpX=0,lpY=0;const watch=()=>{if(W.S!==lastS){lastS=W.S;sAt=performance.now()}requestAnimationFrame(watch)};requestAnimationFrame(watch);
+ document.addEventListener('click',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('.hand,#inspect'))return;
+  if(W.S!==lastS){lastS=W.S;sAt=performance.now()}
+  const now=performance.now();if(now-sAt<350&&now-lastPick<600&&Math.hypot(ev.clientX-lpX,ev.clientY-lpY)<40){ev.stopPropagation();ev.preventDefault();return}lastPick=now;lpX=ev.clientX;lpY=ev.clientY},true);}

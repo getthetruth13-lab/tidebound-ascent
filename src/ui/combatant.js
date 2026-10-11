@@ -2,6 +2,7 @@
 // STATUS is the single icon map: each status has a name, kind (buff/debuff), rule text, duration rule and a placeholder SVG.
 // Painted art replaces a placeholder with no code change: add the status to art/v2/ui/icons.json (assets.js ST_ICON) and it is used first.
 import {KW,CARDS,RELICS} from '../core/registry.js';
+import {intentOf,CORE} from '../engine/combat.js';
 import {W} from '../core/state.js';
 import {assetSrc} from '../assets.js';
 const S=(d,x='')=>`<svg class="sti" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" stroke="#05070b" stroke-width="1" stroke-linejoin="round">${d}</g>${x}</svg>`;
@@ -77,9 +78,46 @@ export const statusInfo=k=>STATUS[k];
 export function iconOf(k){const a=assetSrc('status',k);return `<span class="status-art">${ICON[k]}${a?`<img class="uic" src="${a}" alt="" draggable="false" onerror="this.remove()">`:''}</span>`}
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 const sentence=t=>{const s=(t||'').split(/(?<=[.!?])\s+/);return s.slice(0,2).join(' ')};
-export function statusText(k,v){const d=STATUS[k];if(!d)return '';
- const rule=d.rule||(d.kw&&(KW[d.kw]||KW[d.kw.replace(/ X$/,'')]))||(k==='mightTmp'?'Changes Attack damage by the shown amount.':k==='rooted'?'Gains 4 Guard per living Tendril at the end of her turn.':k==='parry'?'Reduces the first enemy Attack against you this turn by this much and reflects half of it back.':'');
- return `${v>0?'×'+v+' ':'−'+Math.abs(v)+' '}${esc(sentence(rule))} Duration: ${esc(d.dur)}`}
+// ---- Task 33: status tooltip content. describe() -> {line, now, dur}: the rule, the live numbers, and how long it lasts.
+// `who` is 'p' (the hero) or the enemy object that owns the status. Every number mirrors engine/combat.js.
+const turns=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
+const atkVal=(e,a,vuln)=>{let d=a+(e.st.str||0)+(e.st.mightTmp||0);if(e.st.weak)d=Math.floor(d*.75);if(vuln)d=Math.floor(d*1.5);return Math.max(0,d)};
+// What the enemies' shown Attacks would deal to you, with and without your Exposed.
+function incoming(){const cb=W.cb;let a=0,b=0;if(!cb)return null;
+ for(const e of cb.ens){if(e.hp<=0||e.fled)continue;const m=intentOf(e);if(!m||!m.a)continue;const h=m.h||1;a+=atkVal(e,m.a,true)*h;b+=atkVal(e,m.a,false)*h}
+ return a?{with:a,without:b}:null}
+function enemyAtk(e,drop){const m=intentOf(e);if(!m||!m.a)return null;const h=m.h||1;
+ const base=m.a+(e.st.str||0)+(e.st.mightTmp||0),vu=W.cb&&W.cb.p.st.vuln;
+ const f=(d,w)=>Math.max(0,Math.floor(w?Math.floor(d*.75):d)*(vu?1.5:1));
+ const cur=Math.floor(f(base,!!e.st.weak)),alt=Math.floor(f(base,drop==='weak'?false:!!e.st.weak));return {cur:cur*h,alt:alt*h}}
+function describe(k,v,who){const cb=W.cb,P=who==='p',e=P?null:who,n=Math.abs(v),more=v>0?'more':'less';
+ const held=e&&e.hold&&e.hold[k]?1:0;
+ const gone=P?`Wears off by 1 at the start of each enemy turn.`:`Fades by 1 after each of its turns: gone after ${turns(n+held,'turn')}.`;
+ switch(k){
+ case 'str':return P?{line:`Raises the damage of your Attacks.`,now:`Your Attacks deal ${n} ${more} damage.`,dur:'Until the end of combat.'}
+  :{line:'Raises the damage of its Attacks.',now:`Its Attacks deal ${n} ${more} damage.`,dur:'Until the end of combat.'};
+ case 'dex':return {line:'Changes the Guard your cards give.',now:`Cards give ${n} ${v>0?'more':'less'} Guard.`,dur:'Until the end of combat.'};
+ case 'weak':{if(P)return {line:'Soaked weakens your Attacks.',now:`Your Attacks deal 25% less damage (a 10-damage Attack deals 7).`,dur:`Your next ${turns(n,'turn')}; it wears off by 1 at the start of each enemy turn.`};
+  const a=enemyAtk(e,'weak');return {line:'Soaked weakens its Attacks.',now:a&&a.cur!==a.alt?`Its next Attack deals ${a.cur} instead of ${a.alt}.`:'Its Attacks deal 25% less damage.',dur:gone}}
+ case 'vuln':{if(P){const i=incoming();return {line:'Exposed makes enemy Attacks hit you harder.',now:i&&i.with!==i.without?`Incoming Attacks deal ${i.with} instead of ${i.without}.`:'Enemy Attacks deal 50% more damage to you.',dur:n===1?'Until the start of the next enemy turn.':`Wears off by 1 at the start of each enemy turn: ${turns(n-1,'more enemy turn')} of hits after this one.`}}
+  return {line:'Exposed makes it take extra damage.',now:'It takes 50% more damage from your hits (a 6-damage hit deals 9).',dur:gone}}
+ case 'brittle':return P?{line:'Brittle weakens the Guard your cards give.',now:`Guard from your cards is reduced by 25% (an 8-Guard card gives 6).`,dur:`Your next ${turns(n,'turn')}; it wears off by 1 at the start of each enemy turn.`}
+  :{line:'Brittle only reduces Guard gained from cards, so it does nothing to an enemy.',now:'No effect on this enemy.',dur:gone};
+ case 'bleed':{const b=Math.ceil(n);return {line:'Bleed hurts each time it is struck by an Attack.',now:`Your next Attack makes it lose ${b} HP (ignores Guard), then Bleed drops to ${n-1}.`,dur:'Loses 1 each time an Attack hits it. Max 20.'}}
+ case 'drench':return {line:'Drenched hurts it whenever the Tide turns, Crests or Undertows.',now:`It loses ${n} HP each time (ignores Guard).`,dur:`Loses 1 at the end of its turn: ${turns(n+held,'turn')} left. Max 12.`};
+ case 'reson':return {line:'Resonating makes Echo hits land harder.',now:`Your Echoes deal ${n} more damage to it.`,dur:`Loses 1 at the end of its turn: ${turns(n+held,'turn')} left. Max 12.`};
+ case 'shell':return {line:'Shell gives it Guard every turn.',now:`It gains ${n} Guard at the end of its turn.`,dur:'Until the end of combat.'};
+ case 'barbs':return {line:'Barbs punish Attacks.',now:`You take ${n} damage each time you Attack it (your Guard absorbs it first).`,dur:'Until the end of combat.'};
+ case 'ward':return {line:'Rebuff turns aside debuffs.',now:`Blocks its next ${turns(n,'debuff')}.`,dur:'Each debuff blocked uses up 1 stack.'};
+ case 'mending':{const h=e?Math.min(n,Math.max(0,e.max-e.hp)):n;return {line:'Mending heals it every turn.',now:`It heals ${n} HP at the end of its turn${e&&h<n?(h?` (${h} right now)`:' (already at full HP)'):''}.`,dur:'Until the end of combat.'}}
+ case 'parry':{const back=Math.floor(n*(CORE.duel.parry_back_frac||.5));return {line:'Parry stops the first enemy Attack.',now:`The first Attack against you loses ${n} damage and ${back} is reflected to the attacker.`,dur:'Until the first Attack hits you, or the start of your next turn.'}}
+ case 'mightTmp':return {line:'A short-lived change to its Attacks.',now:`Its Attacks deal ${n} ${more} damage.`,dur:'Until the end of its next turn.'};
+ case 'rooted':{const t=W.cb?W.cb.ens.filter(x=>x.key==='tendril'&&x.hp>0&&!x.fled).length:0;return {line:'Rooted gives her Guard from her Tendrils.',now:`She gains ${4*t} Guard at the end of her turn (4 per living Tendril; ${t} alive).`,dur:'Passive: lasts the whole combat.'}}
+ }return null}
+export function statusText(k,v,who,extraText){const d=STATUS[k];if(!d)return '';
+ const x=describe(k,v,who||'p');
+ const line=x?x.line:(extraText||d.rule||(d.kw&&(KW[d.kw]||KW[d.kw.replace(/ X$/,'')]))||''),now=x?x.now:(extraText?'':(v>1?`Stacked ${v} times.`:'')),dur=x?x.dur:d.dur;
+ return `<span class="sx">${esc(sentence(line))}</span>${now?`<span class="sx now">${esc(now)}</span>`:''}<span class="sx dur">${esc(dur)}</span>`}
 const plain=t=>String(t||'').replace(/<[^>]+>/g,'').replace(/\{([^|}]*)\|([^}]*)\}/g,'$1');
 // Listener ids registered through thisTurn()/forCombat() (cards and potions) with the rule shown on their badge.
 export const LISTENER_INFO={
@@ -122,14 +160,20 @@ export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
  for(const l of cb.fx||[]){if(l.dead||!l.id||INTERNAL_LISTENERS.has(l.id))continue;const i=LISTENER_INFO[l.id];add('queued',1,i?i[0]:l.id,i?i[1]:'A card or potion effect is waiting to happen.')}
  for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.ready&&d.ready(r))add('armed',1,d.n,d.d?plain(d.d):'Ready.')}
  return out}
-export function statusRowHTML(st,extra){const p=[];
+export function statusRowHTML(st,extra,who='p'){const p=[],all=[];
+ const entry=(k,v,name,kind,txt,x)=>{const nm=name+(v<0?' (negative)':'');
+  all.push({nm:name+(Math.abs(v)>1||x==null?' '+Math.abs(v):''),kind,html:txt});
+  p.push(`<span class="bd st-${k} ${kind}" tabindex="0" role="button" aria-label="${esc(name)} ${v}" data-kw="${esc(name)}" data-skind="${kind}" data-sinfo="${esc(txt)}" data-sname="${esc(nm)}">${iconOf(k)}<b>${x==null?Math.abs(v):(v>1?v:'')}</b></span>`)};
  for(const k of ORDER){let v=st&&st[k];if(!v||!STATUS[k])continue;const d=STATUS[k];
   const bad=d.kind==='debuff'||((k==='str'||k==='dex'||k==='mightTmp')&&v<0);
-  p.push(`<span class="bd ${bad?'debuff':'buff'}" tabindex="0" role="button" aria-label="${d.n} ${v}" data-kw="${d.n}" data-sinfo="${esc(statusText(k,v))}" data-sname="${d.n}${v<0?' (negative)':''}">${iconOf(k)}<b>${Math.abs(v)}</b></span>`)}
- for(const x of extra||[]){const d=STATUS[x.k];if(!d)continue;const name=x.n||d.n;
-  const info=x.t?`${esc(sentence(x.t))} Duration: ${esc(d.dur)}`:statusText(x.k,x.v);
-  p.push(`<span class="bd st-${x.k} ${d.kind==='debuff'?'debuff':'buff'}" tabindex="0" role="button" aria-label="${esc(name)} ${x.v}" data-kw="${esc(name)}" data-sinfo="${info}" data-sname="${esc(name)}">${iconOf(x.k)}<b>${x.v>1?x.v:''}</b></span>`)}
+  entry(k,v,d.n,bad?'debuff':'buff',statusText(k,v,who))}
+ for(const x of extra||[]){const d=STATUS[x.k];if(!d)continue;
+  entry(x.k,x.v,x.n||d.n,d.kind==='debuff'?'debuff':'buff',statusText(x.k,x.v,'p',x.t),1)}
+ // One row: beyond MAXB icons the rest fold into a "+N" chip whose tooltip lists every hidden status with its numbers and duration.
+ const MAXB=6;if(p.length>MAXB){const hid=all.slice(MAXB-1);
+  const list=hid.map(h=>`<span class="sx lst"><b class="${h.kind}">${esc(h.nm)}</b> ${h.html.replace(/<span class="sx">[^]*?<\/span>/,'').replace(/<span class="sx[^"]*">/g,'<span class="li">')}</span>`).join('');
+  p.splice(MAXB-1,p.length,`<span class="bd st-more" tabindex="0" role="button" aria-label="${hid.length} more statuses" data-kw="More" data-skind="more" data-sname="${hid.length} more statuses" data-sinfo="${esc(list)}"><span class="status-art more-chip">+${hid.length}</span></span>`)}
  return `<div class="badges">${p.join('')}</div>`}
 // HP bar: bronze frame, blood fill, a ghost chunk for damage, a pale steel overlay while Guard is up, and the Guard shield on its left end.
 export function barHTML(h,m,blk,sh,who){const pc=Math.max(0,Math.min(1,h/m)),low=pc<=.3;
- return `<div class="hpbar${blk?' blk':''}${low?' low':''}"${who!=null?` data-who="${who}" data-hp="${Math.max(0,h)}" data-max="${m}" data-blk="${blk||0}"`:''}><span class="hpin"><i class="gh" style="transform:scaleX(${pc})"></i><i style="transform:scaleX(${pc})"></i><em class="steel"></em></span><span class="hpnum">${Math.max(0,h)}<small>/${m}</small></span>${blk?`<span class="hpblk${sh?' shim':''}" ${sh?`style="${sh}"`:''} tabindex="0" role="button" aria-label="Guard ${blk}" data-kw="Guard" data-sinfo="${esc('Absorbs '+blk+' damage. Duration: normally cleared at the start of its next turn; retaining effects can preserve it.')}"><span class="guard-art">${GUARD_SVG}${assetSrc('status','block')?`<img class="uic" src="${assetSrc('status','block')}" alt="" draggable="false" onerror="this.remove()">`:''}</span><b>${blk}</b></span>`:''}</div>`}
+ return `<div class="hpbar${blk?' blk':''}${low?' low':''}"${who!=null?` data-who="${who}" data-hp="${Math.max(0,h)}" data-max="${m}" data-blk="${blk||0}"`:''}><span class="hpin"><i class="gh" style="transform:scaleX(${pc})"></i><i style="transform:scaleX(${pc})"></i><em class="steel"></em></span><span class="hpnum">${Math.max(0,h)}<small>/${m}</small></span>${blk?`<span class="hpblk${sh?' shim':''}" ${sh?`style="${sh}"`:''} tabindex="0" role="button" aria-label="Guard ${blk}" data-kw="Guard" data-skind="buff" data-sinfo="${esc(`<span class="sx">Guard soaks up damage before your HP.</span><span class="sx now">Absorbs the next ${blk} damage.</span><span class="sx dur">Cleared at the start of its owner's next turn, unless an effect keeps it.</span>`)}"><span class="guard-art">${GUARD_SVG}${assetSrc('status','block')?`<img class="uic" src="${assetSrc('status','block')}" alt="" draggable="false" onerror="this.remove()">`:''}</span><b>${blk}</b></span>`:''}</div>`}

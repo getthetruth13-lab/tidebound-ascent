@@ -12,6 +12,7 @@ import {BOSS_OPEN,bellCount} from '../data/lore.js';
 import {combatRewards,gainCard,goMap,endRun} from './run.js';
 import {flyCard} from '../ui/fx.js';
 import {impactDelay} from '../ui/vfx.js';
+import {T} from '../core/timing.js';
 import {render} from '../ui/render.js';
 export const CORE=DATA.v21.sim.core;
 const DU=CORE.duel,TI=CORE.tide,EC=CORE.echo,CA=CORE.carto;
@@ -317,7 +318,7 @@ function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  if(W.run.cls==='duel'&&!cb.keepMom&&!mod('keepMomentum',{},false))cb.mom=Math.max(0,cb.mom-DU.decay);cb.keepMom=false;
  cb.fx=cb.fx.filter(l=>l.combat||(l.turns&&--l.turns>0));
  cb.busy=true;cb.banner={txt:'Enemy Turn',t:Date.now(),en:1};render();
- if(window.FAST)enemyPhase();else setTimeout(enemyPhase,280)}
+ if(window.FAST)enemyPhase();else setTimeout(enemyPhase,T(280))}
 export function eAtk(e,a){let d=a+(e.st.str||0)+(e.st.mightTmp||0);if(e.st.weak)d=Math.floor(d*.75);if(W.cb.p.st.vuln)d=Math.floor(d*1.5);return Math.max(0,d)}
 export function intentOf(e){const t=EN[e.key];const m=t.intent?t.intent(e):e.next;return mod('intentDisplay',{enemy:e},m)||{none:1}}
 // Enemy Attack on the player: Parry first (reduce the first Attack, reflect half, once per turn), then Guard, then HP.
@@ -353,12 +354,12 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;
  const step=()=>{if(!W.cb||W.cb!==cb)return;
   while(k<list.length&&(list[k].hp<=0||list[k].fled))k++;
   if(k>=list.length)return finish();
-  const e=list[k++];cb.tele=e;if(!window.FAST&&!telegraphed.has(e)){telegraphed.add(e);k--;fire('enemyTelegraph',{enemy:e});render();return setTimeout(step,TELEGRAPH)}
+  const e=list[k++];cb.tele=e;if(!window.FAST&&!telegraphed.has(e)){telegraphed.add(e);k--;fire('enemyTelegraph',{enemy:e});render();return setTimeout(step,T(TELEGRAPH))}
   if(!(e.passive&&e.passive.keepGuard))e.block=0;act(e);if(!W.cb)return;cb.acting=null;e.t++;if(e.hp>0)endOfEnemyTurn(e);tick(e.st,e.hold);e.hold=null;delete e.st.mightTmp;
   if(e.hp>0&&!e.fled){if(e.keepNext)e.keepNext=false;else e.next=EN[e.key].ai(e)}
   if(W.run.hp<=0&&!cheatDeath())return lose();
   if(!alive().length)return finish();
-  if(window.FAST)return step();render();setTimeout(step,260)};
+  if(window.FAST)return step();render();setTimeout(step,T(260))};
  const finish=()=>{if(!W.cb)return;cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
  step()}
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});

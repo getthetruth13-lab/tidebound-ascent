@@ -7,7 +7,7 @@ const inter=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))
 export function obstacles(skip){if(!document.querySelector('.combat'))return [];
  return [...document.querySelectorAll(OBST)].filter(e=>!(skip&&(e===skip||(e.classList.contains('dais')&&e.contains(skip))))).map(e=>e.getBoundingClientRect()).filter(r=>r.width>2&&r.height>2)}
 // Returns {x,y} (viewport px, top-left) for a popup of size w*h next to `anchor` (a DOMRect or null for a free popup).
-export function pickSpot(w,h,anchor,anchorEl){const W=innerWidth,H=innerHeight,m=6,obs=obstacles(anchorEl);
+export function pickSpot(w,h,anchor,anchorEl,scan){const W=innerWidth,H=innerHeight,m=6,obs=obstacles(anchorEl);
  const clampX=x=>Math.max(m,Math.min(W-w-m,x)),clampY=y=>Math.max(m,Math.min(H-h-m,y));const c=[];
  if(anchor){const cx=anchor.left+anchor.width/2-w/2,cy=anchor.top+anchor.height/2-h/2;
   const dz=anchorEl&&anchorEl.closest&&anchorEl.closest('.dais');
@@ -15,6 +15,10 @@ export function pickSpot(w,h,anchor,anchorEl){const W=innerWidth,H=innerHeight,m
   c.push([anchor.right+8,cy],[anchor.left-w-8,cy],[cx,anchor.top-h-8],[cx,anchor.bottom+8])}
  // free spots in the empty middle of the battlefield (between hero and enemies), then the top-centre
  c.push([W*.5-w/2,H*.2],[W*.5-w/2,H*.42],[W*.36,H*.12],[W*.5-w/2,H*.55]);
+ // scan: also try a grid of spots; least overlap wins, then the one nearest the anchor (status tooltips: never cover the described figure or the hand)
+ if(scan&&anchor){const ax=anchor.left+anchor.width/2,ay=anchor.top+anchor.height/2;let g=null;
+  for(let y=m;y<=H-h-m;y+=10)for(let x=m;x<=W-w-m;x+=10){const r={left:x,top:y,right:x+w,bottom:y+h},o=obs.reduce((t,q)=>t+inter(r,q),0),d=Math.hypot(x+w/2-ax,y+h/2-ay);if(!g||o<g.o-1||(Math.abs(o-g.o)<=1&&d<g.d))g={x,y,o,d}}
+  if(g)return {x:g.x,y:g.y,s:g.o}}
  let best=null;for(const [x0,y0] of c){const x=clampX(x0),y=clampY(y0),r={left:x,top:y,right:x+w,bottom:y+h};
   const s=obs.reduce((t,o)=>t+inter(r,o),0)+(anchor?0:0);if(!best||s<best.s){best={x,y,s};if(s===0)break}}
  return best}

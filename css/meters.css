@@ -1,0 +1,291 @@
+/* ===== meters.css (Task 30): class meters as drawn objects beside the hero. No panel, no title bar.
+   T1 brass tide-gauge, E1 hanging verdigris hand-bell with ripple rings, C1 chart strip with rope and cairns, D1 planted rapier with wick flame.
+   Everything that moves is CSS; objects are SVG/CSS stand-ins until painted pieces exist (icons.json 'dais'). Gold dashed = live drag preview. ===== */
+.dais.obj{--brass:#c9a45a;--brass-d:#6a4a1c;--pvg:#ffe29a;position:absolute;left:max(8px,env(safe-area-inset-left));top:46px;width:104px;height:min(190px,calc(100dvh - 205px));max-height:none;padding:0;gap:0;display:block;overflow:visible;
+ background:none;border:0;box-shadow:none;border-radius:0;pointer-events:none;z-index:6}
+.dais.obj::before,.dais.obj::after{display:none}
+.dais.obj .dais-body{display:block;height:100%;position:relative}
+.dais.obj [data-info],.dais.obj button{pointer-events:auto}
+.dais.obj *{text-shadow:0 1px 2px #000,0 0 5px #000}
+.dais.obj .dais-art{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:1;z-index:0}
+@media (orientation:portrait){.dais.obj{position:relative;left:auto;top:auto;margin:4px 8px;height:190px}}
+.dais.obj .tbtn{min-height:24px;min-width:30px;border-radius:5px;border:1px solid var(--brass-d);background:linear-gradient(#3a2e18,#150f07);color:var(--brass);font:700 11px var(--font-display);padding:1px 5px;cursor:pointer;box-shadow:inset 0 1px 0 #fff2,0 1px 3px #000}
+.dais.obj .chip{font-size:10px;padding:1px 4px;margin:0}
+/* ---------- T1: brass tide-gauge ---------- */
+.tg2{position:relative;height:100%;width:100%}
+.tg2-cap{position:absolute;left:0;width:100%;line-height:1;white-space:nowrap;color:var(--brass);transition:color calc(.2s*var(--ts,1))}
+.tg2-cap b{display:block;font:700 9px var(--font-display);letter-spacing:.14em;text-transform:uppercase}
+.tg2-cap i{display:block;font:italic 600 9px var(--font-body);color:#9fd9d0;font-style:normal;margin-top:1px}
+.tg2-cap.top{top:0}.tg2-cap.bot{bottom:0}
+.tg2-cap.fire,.tg2-cap.pvon{color:#fff;animation:tg-fire .5s ease-in-out infinite alternate}
+.tg2-cap.pvon{text-shadow:0 0 8px var(--pvg),0 0 14px var(--pvg)}
+@keyframes tg-fire{to{text-shadow:0 0 10px #bff6f0,0 0 18px #2fb8c4}}
+.tg2-main{position:absolute;left:0;right:0;top:24px;bottom:24px}
+.tg2-main::before,.tg2-main::after{content:'';position:absolute;left:1px;width:38px;height:7px;border-radius:3px;background:linear-gradient(#e6c47a,#7a5a24 55%,#3a2810);box-shadow:0 2px 3px #000;z-index:3}
+.tg2-main::before{top:-4px}.tg2-main::after{bottom:-4px}
+.tg2-tube{position:absolute;left:7px;top:0;bottom:0;width:24px;border-radius:12px;border:3px solid #a8803c;background:linear-gradient(90deg,#02080bf2,#0b1d28ee 45%,#02080bf2);overflow:hidden;
+ box-shadow:inset 0 0 7px #000,0 0 0 1px #1e1407,0 0 10px #2fb8c455}
+.tg2-tube::after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 calc(10% - 1px),#ffffff38 calc(10% - 1px) 10%)}
+.tg2-hi{position:absolute;left:0;right:0;top:0;height:30%;background:linear-gradient(#d9fbff55,transparent);opacity:.35;transition:opacity calc(.3s*var(--ts,1))}
+.tg2-lo{position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(transparent,#1a2a7a88);opacity:.4;transition:opacity calc(.3s*var(--ts,1))}
+.is-hi .tg2-hi{opacity:1}.is-lo .tg2-lo{opacity:1}
+.tg2-w{position:absolute;left:0;right:0;bottom:0;display:block;background:linear-gradient(90deg,#17678a,#58cfe0 45%,#17678a);transition:height calc(.5s*var(--ts,1)) cubic-bezier(.3,1.3,.5,1),background calc(.3s*var(--ts,1))}
+.tg2-w::before{content:'';position:absolute;left:-30%;right:-30%;top:-4px;height:8px;border-radius:50%;background:radial-gradient(ellipse at 50% 70%,#eaffff,#7fe0ee66 55%,transparent 72%);animation:tg-breathe 3.6s ease-in-out infinite}
+@keyframes tg-breathe{0%,100%{transform:translateY(0) scaleX(1)}50%{transform:translateY(-3px) scaleX(1.12)}}
+.is-hi .tg2-w{background:linear-gradient(90deg,#2fb8c4,#c4fbf4 50%,#2fb8c4)}.is-lo .tg2-w{background:linear-gradient(90deg,#27408f,#5a78e0 50%,#27408f)}
+.tg2-pv{position:absolute;left:-2px;right:-2px;bottom:var(--pv,0);height:0;border-top:2px dashed var(--pvg);display:none;z-index:4;filter:drop-shadow(0 0 4px var(--pvg))}
+.tg2-tube.pvon .tg2-pv{display:block}
+.tg2-tube s{position:absolute;left:30%;width:4px;height:4px;border-radius:50%;background:#e8ffff;opacity:0;z-index:2}
+.tg2-tube s:nth-of-type(2){left:58%}.tg2-tube s:nth-of-type(3){left:44%}
+.d-up s{animation:bub-up 2.2s linear infinite}.d-up s:nth-of-type(2){animation-delay:-.7s}.d-up s:nth-of-type(3){animation-delay:-1.4s}
+.d-dn s{animation:bub-dn 2.2s linear infinite}.d-dn s:nth-of-type(2){animation-delay:-.7s}.d-dn s:nth-of-type(3){animation-delay:-1.4s}
+@keyframes bub-up{0%{bottom:5%;opacity:0}20%{opacity:.9}100%{bottom:90%;opacity:0}}@keyframes bub-dn{0%{bottom:90%;opacity:0}20%{opacity:.9}100%{bottom:5%;opacity:0}}
+.tg2-scale{position:absolute;left:36px;right:0;top:0;bottom:0}
+.tg2-scale .tk{position:absolute;left:25px;transform:translateY(50%);font:700 8px var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:#8a7a50;text-decoration:none;white-space:nowrap}
+.tg2-scale .tk::before{content:'';position:absolute;left:-30px;top:50%;width:26px;border-top:1px solid #8a7a5088}
+.tg2-scale .tk.lit{color:#bff6f0;text-shadow:0 0 6px #2fb8c4}
+.tg2-n{position:absolute;left:0;transform:translateY(50%);font:700 21px/1 var(--font-number);color:#e6fffb;text-shadow:0 0 9px #2fb8c4,0 2px 2px #000;transition:bottom calc(.5s*var(--ts,1)) cubic-bezier(.3,1.3,.5,1);white-space:nowrap}
+.tg2-n .drift{display:inline-block;text-decoration:none;width:0;height:0;margin-left:3px;vertical-align:middle}
+.tg2-n .drift.d-up{border:4px solid transparent;border-bottom:7px solid #a6f2e8;border-top:0}
+.tg2-n .drift.d-dn{border:4px solid transparent;border-top:7px solid #a6f2e8;border-bottom:0}
+.tg2-n .drift.d-lock{width:8px;height:6px;border:2px solid #ffd36a;border-radius:2px;background:#6a4a1c}
+.tg2-pvn{position:absolute;left:0;margin-top:0;transform:translateY(50%);font:700 11px var(--font-number);font-style:normal;color:var(--pvg);z-index:2;white-space:nowrap;margin-left:26px;text-shadow:0 0 6px #000}
+.tg2-btns{position:absolute;left:74px;top:30px;display:flex;flex-direction:column;gap:3px;z-index:5}
+/* ---------- E1: hanging hand-bell ---------- */
+.dais-echo .bells{display:flex;gap:0;justify-content:flex-start;align-items:flex-start;padding-left:2px}
+.bellcol{position:relative;display:flex;flex-direction:column;align-items:center;width:64px;min-width:0}
+.bellbtn{position:relative;display:block;width:54px;height:68px;padding:0;margin:0;background:none;border:0;cursor:help;-webkit-tap-highlight-color:transparent}
+button.bellbtn{cursor:pointer}
+.bell-svg{display:block;width:100%;height:100%;filter:drop-shadow(0 3px 3px #000);overflow:visible}
+.bellbtn.ring .bell-svg{animation:bellsway 3s ease-in-out infinite;transform-origin:10% 3%}
+.bellbtn.empty .bell-svg{opacity:.62;filter:saturate(.55) drop-shadow(0 2px 2px #000)}
+button.bellbtn:not(.ring) .bell-svg{animation:bellidle 3.2s ease-in-out infinite;transform-origin:10% 3%}
+.bellbtn.arm .bell-svg{filter:drop-shadow(0 0 7px #a9ffe9) drop-shadow(0 0 14px #5fd0b0)}
+.bellbtn.pvon .bell-svg{filter:drop-shadow(0 0 8px var(--pvg)) drop-shadow(0 0 14px var(--pvg))}
+@keyframes bellsway{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(3.5deg)}}@keyframes bellidle{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+.rings{position:absolute;left:55%;top:58%;width:0;height:0;pointer-events:none}
+.rg{position:absolute;left:0;top:0;width:calc(30px + var(--k)*16px);height:calc(30px + var(--k)*16px);border:1.5px solid #9fe8d4;border-radius:50%;transform:translate(-50%,-50%);opacity:0}
+.rg.on{opacity:.75;animation:ripple 2.4s ease-out infinite;animation-delay:calc(var(--k)*.3s)}
+.rg.cap{opacity:.5;border-style:dotted;border-color:#d8c88a}
+.rg.pv{display:none;border:1.5px dashed var(--pvg)}.bellcol.pvon .rg.pv{display:block;opacity:1;box-shadow:0 0 6px var(--pvg)}
+@keyframes ripple{from{transform:translate(-50%,-50%) scale(.82);opacity:.9}to{transform:translate(-50%,-50%) scale(1.06);opacity:.25}}
+.charm{position:relative;display:flex;flex-direction:column;align-items:center;max-width:92px;margin-top:2px;padding-top:7px}
+.charm::before{content:'';position:absolute;top:0;left:50%;height:7px;border-left:1px solid #b08a4a}
+.chm{display:block}.chm .slot{width:38px;height:28px;aspect-ratio:auto;border:1px solid #d9b46a;border-radius:2px;background:#14100a;box-shadow:0 2px 4px #000;overflow:hidden;--phs:16px}
+.charm b{font:600 9.5px/1.1 var(--font-body);color:#d8f4ea;max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.charm.ghost{opacity:.55;border:0;margin-left:8px}.charm.ghost .chm .slot{border-style:dashed}.charm.ghost i{font:italic 600 9px var(--font-body);color:#cdbbf5}
+.ptot{font:700 12px var(--font-number);color:#fff;white-space:nowrap}.ptot em{font-style:normal;color:var(--pvg)}
+.bellcol.pvon .charm .chm .slot{box-shadow:0 0 8px var(--pvg)}
+/* ---------- C1: chart strip, rope, cairns ---------- */
+.chart{position:relative;margin-top:2px;padding:9px 3px 5px;color:#2a1a0a;background:radial-gradient(120% 60% at 50% 0,#f3e6c4aa,transparent),linear-gradient(180deg,#d6bf8a,#b49762);box-shadow:inset 0 0 14px #5a3a1488,0 3px 6px #000c;
+ clip-path:polygon(0 8px,7% 2px,15% 7px,24% 1px,33% 6px,44% 0,55% 7px,66% 2px,78% 6px,88% 1px,100% 7px,100% 100%,0 100%);text-shadow:none!important}
+.dais.obj .chart *{text-shadow:none}
+.chart .stub{position:absolute;right:4px;top:1px;width:16px;height:5px;background:#8a6a3a;opacity:.5;clip-path:polygon(0 0,100% 0,85% 100%,10% 100%)}
+.chart .rope{position:absolute;left:5px;top:12px;width:30px;bottom:8px;height:calc(100% - 20px);overflow:visible;pointer-events:none}
+.chart .rope path{fill:none;stroke:#7a4a1c;stroke-width:1.6;stroke-dasharray:3 3;vector-effect:non-scaling-stroke}
+.dais-carto .wps{position:relative;display:flex;flex-direction:column;gap:2px}
+.dais-carto .wp{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:3px;align-items:center;min-width:0;min-height:36px;padding:0 2px;margin:0;text-align:left;background:none;border:0;border-radius:4px;color:#2a1a0a;font:inherit;cursor:help;-webkit-tap-highlight-color:transparent}
+.dais-carto .wp.adv,.dais-carto .wp.pick{cursor:pointer}
+.cairn{position:relative;grid-row:1/3;width:34px;height:34px;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;padding-bottom:2px;box-sizing:border-box}
+.cairn .st{display:block;height:7px;margin-top:-1px;border-radius:50%/60%;background:radial-gradient(ellipse at 38% 28%,#cfc9ba,#6f6a5e 72%);box-shadow:0 1px 1px #000a}
+.cairn .flag{position:absolute;left:50%;top:-2px;width:7px;height:9px;margin-left:-3px;border-radius:50% 50% 40% 40%;background:radial-gradient(#fff4c4,#ffb347 60%,#b5472f);box-shadow:0 0 8px #ffb347,0 0 14px #ff9a2a88;animation:tl-flick 2.4s ease-in-out infinite alternate}
+.wp.adv .cairn::after,.wp.pick .cairn::after{content:'';display:block;width:12px;height:6px;margin-bottom:1px;border:1px dashed #b5472f;border-radius:50%/60%;opacity:.8;animation:wpglow 1.6s ease-in-out infinite}
+.wp.land .cairn{filter:drop-shadow(0 0 5px #ffb347)}
+.wp.trig .cairn{animation:wptrig calc(.6s*var(--ts,1)) ease-out}@keyframes wptrig{0%{transform:scale(1.35);filter:drop-shadow(0 0 10px #ffb347)}100%{transform:none}}
+@keyframes wpglow{50%{opacity:.35}}
+.wp .wpn{grid-column:2;font:700 10.5px/1.05 var(--font-body);color:#2a1a0a;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wp .pips{grid-column:2;display:flex;gap:3px}.wp .pips i{width:6px;height:6px;transform:rotate(45deg);border:1px solid #6a4a1c;background:transparent}.wp .pips i.on{background:#b5472f;border-color:#7a2a1a}
+.wp.empty .pinn{grid-row:1/3;justify-self:center;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d97a4a,#6a2a14);box-shadow:0 1px 2px #000a;opacity:.75}
+.wp.empty .wpn{color:#6a5230bb;font-style:italic;font-weight:600}
+.wp.empty.pvon .pinn{width:22px;height:8px;border-radius:50%/60%;background:none;border:1.5px dashed #c0701a;box-shadow:0 0 6px #ffb347;opacity:1}
+.dais-carto .nexts{display:flex;flex-direction:column;gap:0;margin-top:3px;font-size:10px;line-height:1.15;color:#f3e3bf;white-space:nowrap;overflow:hidden;max-width:100%}
+.dais-carto .nexts b{font:700 8.5px var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.dais-carto .nexts .nx{overflow:hidden;text-overflow:ellipsis;opacity:.75}.dais-carto .nexts .nx.next{opacity:1;color:#fff3cf}
+.dais-carto .advhint{font:italic 600 9.5px var(--font-body);color:#f3e3bf;text-align:left}
+/* ---------- D1: rapier planted in the step; the wick flame is Momentum; tap it to Flourish ---------- */
+.rap{position:relative;height:100%;width:100%;--f:calc(.32 + .68*var(--m)/var(--mx))}
+.wick{position:absolute;left:4px;top:0;width:46px;height:44px;padding:0;border:0;background:none;display:flex;align-items:flex-end;justify-content:center;cursor:help;-webkit-tap-highlight-color:transparent;--fl0:#c8501c;--fl1:#ffb347;--fl2:#fff1b8}
+.wick:not(:disabled){cursor:pointer}
+.wick-svg{width:26px;height:34px;transform-origin:50% 100%;transform:scale(var(--f));transition:transform calc(.35s*var(--ts,1)) cubic-bezier(.3,1.5,.5,1);animation:wick-dance 1.3s ease-in-out infinite alternate;filter:drop-shadow(0 0 6px #ff9a2a)}
+@keyframes wick-dance{0%{transform:scale(var(--f)) skewX(-3deg)}100%{transform:scale(calc(var(--f)*1.06)) skewX(3deg)}}
+.wick.st-cold .wick-svg{filter:saturate(.4) drop-shadow(0 0 2px #ff9a2a88);animation-duration:2.4s}
+.wick.st-hot{--fl0:#e8e0c8;--fl1:#fff6d0;--fl2:#ffffff}.wick.st-hot .wick-svg{filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 16px #ffe29a)}
+.wick.st-armed{--fl0:#fff;--fl1:#fff;--fl2:#fff}.wick.st-armed .wick-svg{filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 22px #ffcf70);animation-duration:.5s}
+.wick.on::after{content:'';position:absolute;left:50%;bottom:-2px;width:36px;height:36px;margin-left:-18px;border:1.5px solid #fff;border-radius:50%;opacity:.7;animation:ripple 1.1s ease-out infinite;pointer-events:none}
+.wick-pv{position:absolute;left:4px;top:0;width:46px;height:44px;display:none;pointer-events:none}
+.wick-pv::before{content:'';position:absolute;left:50%;bottom:0;width:20px;height:calc(10px + 24px*var(--pm,0)/var(--mx));margin-left:-10px;border:1.5px dashed var(--pvg);border-radius:50% 50% 45% 45%/70% 70% 30% 30%;filter:drop-shadow(0 0 4px var(--pvg))}
+.rap.pvon .wick-pv{display:block}
+.rap-x{position:absolute;left:52px;top:8px;font:700 15px var(--font-number);color:#ffe9a8;opacity:0}.rap-x.can{opacity:1;text-shadow:0 0 8px #ffb347,0 1px 2px #000}
+.rap-pvn{position:absolute;left:52px;top:24px;font:700 11px var(--font-number);font-style:normal;color:var(--pvg);white-space:nowrap}
+.rap-blade{position:absolute;left:22px;width:10px;top:46px;bottom:44px;background:linear-gradient(90deg,#6c7888,#eef3fa 45%,#5d6878);clip-path:polygon(50% 0,100% 6%,100% 100%,0 100%,0 6%);box-shadow:0 0 6px #0008}
+.rap-blade .notches{position:absolute;left:0;right:0;top:8%;bottom:0;display:flex;flex-direction:column;gap:2px;padding:2px 2px}
+.rap-blade .notches i{flex:1;background:#2a2c34;box-shadow:inset 0 0 2px #000}
+.rap-blade .notches i.on{background:linear-gradient(90deg,#c84a1c,#ffb347 50%,#c84a1c);box-shadow:0 0 5px #ff9a2a}
+.rap-blade .notches i.mark{outline:1px solid #ffe29a;outline-offset:0}
+.rap.pvon .rap-blade{box-shadow:0 0 6px var(--pvg)}
+.rap-guard{position:absolute;left:8px;width:38px;height:6px;bottom:40px;border-radius:3px;background:linear-gradient(#e6c47a,#6a4a1c);box-shadow:0 2px 3px #000}
+.rap-grip{position:absolute;left:23px;width:8px;bottom:14px;height:26px;border-radius:3px;background:repeating-linear-gradient(0deg,#3a2810 0 3px,#5a3e1c 3px 6px);box-shadow:0 2px 3px #000}
+.rap::after{content:'';position:absolute;left:4px;width:46px;height:14px;bottom:0;border-radius:3px 3px 6px 6px;background:linear-gradient(#8d8676,#4a463c 60%,#201d17);box-shadow:0 3px 4px #000c}
+.dag{position:absolute;left:46px;bottom:6px;width:36px;height:30px;display:flex;align-items:flex-end;justify-content:center;opacity:.5}
+.dag i{position:absolute;left:4px;bottom:3px;width:30px;height:4px;transform:rotate(-24deg);transform-origin:0 50%;background:linear-gradient(90deg,#e6c47a 0 18%,#c9d2de 18%);border-radius:2px;box-shadow:0 1px 2px #000}
+.dag b{position:relative;font:700 13px var(--font-number);color:#cfe3ff;margin-bottom:6px;margin-left:8px}
+.dag.on{opacity:1}.dag.on i{box-shadow:0 0 6px #9fc0ff}.dag.pvon{opacity:1}.dag.pvon b{color:var(--pvg)}
+.mom-read{position:absolute;left:56px;top:50%;transform:translateY(-50%);line-height:1;font:700 22px var(--font-number);color:#ffd9a0;text-shadow:0 0 8px #ec5f4a,0 1px 2px #000}
+.mom-read i{font:600 11px var(--font-number);font-style:normal;color:#b9ad90}
+.reduce-motion .wick-svg,.reduce-motion .rg,.reduce-motion .tg2-w::before,.reduce-motion .tg2-tube s,.reduce-motion .bell-svg,.reduce-motion .cairn .flag{animation:none!important}
+@media (prefers-reduced-motion:reduce){.wick-svg,.rg,.tg2-w::before,.tg2-tube s,.bell-svg,.cairn .flag{animation:none!important}}
+.combat .dais.obj{width:104px;top:44px;transform:none}
+.tg2-main{top:30px}.tg2-btns{left:100px;top:34px}
+.wick{width:56px;height:56px;left:0}.wick-svg{width:34px;height:44px}.wick-pv{width:56px;height:56px;left:0}
+.rap-blade{top:58px}.rap-x{left:58px;top:12px}.rap-pvn{left:58px;top:30px}
+.dais-carto .wp .wpn{font-size:10px}
+@media (max-height:330px){.combat .dais.obj{height:190px;transform:scale(.62);transform-origin:0 0}}
+/* Card-driven Waypoint placement and ranks use the same cairn as the resulting slot. */
+.dais-carto .wp{position:relative}
+.wp-pv{position:absolute;left:2px;top:1px;pointer-events:none;color:var(--pvg);filter:drop-shadow(0 0 3px var(--pvg))}
+.wp-pv .cairn{outline:1px dashed var(--pvg);outline-offset:1px;border-radius:3px}
+.wp.pvon>.cairn,.wp.empty.pvon>.pinn{opacity:.2}
+/* Keep the predicted number in its own column beside the High/Low labels. */
+.tg2-pvn{margin-left:0;transform:translateY(50%)}
+.tg2-scale .tk{left:35px;font-size:7px}
+.tg2-n.pvon{visibility:hidden}
+
+/* ===== Painted Tidecaller gauge (art/v2/ui/dais-tide.webp 139x570; glass x 61-76, y 63-432). All sizes in cqh of the box. ===== */
+.dais.obj.dais-tide.has-art,.combat .dais.obj.dais-tide.has-art{container-type:size;width:150px;height:clamp(190px,calc(100dvh - 102px),330px);--gw:24.39cqh;--tt:11.6cqh;--tb:24.9cqh}
+.dais-tide.has-art .dais-art{width:var(--gw);height:100cqh;inset:0 auto auto 0;object-fit:fill;z-index:2;pointer-events:none;filter:drop-shadow(0 4px 6px #000d) drop-shadow(0 0 10px #2fe0d022)}
+.tg3{position:relative;width:100%;height:100%}
+.dais-tide.has-art .tg2-main{position:absolute;top:var(--tt);bottom:var(--tb);left:0;width:var(--gw)}
+.dais-tide.has-art .tg2-main::before,.dais-tide.has-art .tg2-main::after{display:none}
+.dais-tide.has-art .tg2-tube{left:10.8cqh;width:2.55cqh;top:0;bottom:0;border:0;border-radius:1.3cqh;z-index:1;overflow:hidden;background:linear-gradient(90deg,#020c10,#06222a 50%,#020c10);box-shadow:none}
+.dais-tide.has-art .tg2-tube::after{display:none}
+/* water */
+.dais-tide.has-art .tg2-w{z-index:1;overflow:visible;background:linear-gradient(90deg,#0f8f92,#7ffff0 48%,#0f8f92);box-shadow:0 0 8px #3ff5e0,0 0 18px #2fe0d0aa;transition:height calc(1.1s*var(--ts,1)) cubic-bezier(.22,1.15,.36,1),background calc(.5s*var(--ts,1)),box-shadow calc(.5s*var(--ts,1))}
+.dais-tide.has-art .tg2-w::before{left:-20%;right:-20%;top:-2px;height:4px;border-radius:50%;background:linear-gradient(#ffffff,#c8fff8);box-shadow:0 0 6px #fff,0 0 12px #9ffff4;animation:tg3-swell 3.8s ease-in-out infinite}
+.dais-tide.has-art .tg2-w::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(170deg,transparent 0 6px,#ffffff1c 6px 8px);background-size:100% 40px;animation:tg3-flow 4s linear infinite;mix-blend-mode:screen}
+@keyframes tg3-swell{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-3px) scaleY(1.5)}}
+@keyframes tg3-flow{to{background-position:0 40px}}
+.dais-tide.has-art .tg2-tube.is-hi .tg2-w{background:linear-gradient(90deg,#22c4c0,#d6fffa 48%,#22c4c0);box-shadow:0 0 10px #8ffff2,0 0 22px #3ff5e0}
+.dais-tide.has-art .tg2-tube.is-lo .tg2-w{background:linear-gradient(90deg,#0f5a8a,#5cc8f0 48%,#0f5a8a);box-shadow:0 0 8px #3aa8e0,0 0 14px #1f6fb8aa}
+/* foam / sparkle at High */
+.tg3-foam{position:absolute;left:-10%;right:-10%;top:-5px;height:10px;opacity:0;pointer-events:none;background:radial-gradient(circle at 20% 60%,#fff 0 1px,transparent 2px),radial-gradient(circle at 70% 40%,#fff 0 1px,transparent 2px),radial-gradient(circle at 45% 80%,#e8fffb 0 1px,transparent 2px);background-size:100% 10px;animation:tg3-spark 1.4s ease-in-out infinite alternate}
+.is-hi .tg3-foam{opacity:1}
+@keyframes tg3-spark{0%{filter:brightness(1);transform:translateY(0)}100%{filter:brightness(2.2);transform:translateY(-2px)}}
+/* darker swirl at Low */
+.tg3-swirl{position:absolute;inset:0;opacity:0;pointer-events:none;z-index:2;background:repeating-linear-gradient(35deg,#00081255 0 4px,transparent 4px 9px,#2a5fa033 9px 11px,transparent 11px 16px);background-size:100% 32px;animation:tg3-swirl 2.6s linear infinite;transition:opacity calc(.5s*var(--ts,1))}
+.is-lo .tg3-swirl{opacity:1}
+@keyframes tg3-swirl{to{background-position:0 -32px}}
+/* splash when the level moves */
+.tg3-splash{position:absolute;left:-60%;right:-60%;top:-6px;height:10px;opacity:0;border-radius:50%;background:radial-gradient(ellipse,#fff 0,#bffff6aa 40%,transparent 70%)}
+.moved .tg3-splash{animation:tg3-splash calc(.9s*var(--ts,1)) ease-out calc(.9s*var(--ts,1)) 1}
+@keyframes tg3-splash{0%{opacity:0;transform:scale(.4)}30%{opacity:1;transform:scale(1.4,1.8)}100%{opacity:0;transform:scale(2,.6) translateY(-4px)}}
+/* bubbles */
+.dais-tide.has-art .tg2-tube s{width:2px;height:2px;z-index:2;background:#f0fffd;box-shadow:0 0 3px #fff;animation:tg3-bub 3.2s linear infinite;left:30%}
+.dais-tide.has-art .tg2-tube s:nth-of-type(2){left:62%;animation-delay:-.6s;animation-duration:2.7s}
+.dais-tide.has-art .tg2-tube s:nth-of-type(3){left:45%;animation-delay:-1.3s;width:3px;height:3px}
+.dais-tide.has-art .tg2-tube s:nth-of-type(4){left:22%;animation-delay:-2s;animation-duration:3.8s}
+.dais-tide.has-art .tg2-tube s:nth-of-type(5){left:55%;animation-delay:-2.6s}
+@keyframes tg3-bub{0%{bottom:2%;opacity:0;transform:translateX(0)}15%{opacity:.95}50%{transform:translateX(1px)}85%{opacity:.8}100%{bottom:calc(var(--lv,50%) - 4px);opacity:0;transform:translateX(-1px)}}
+.tg3[data-lvl="0"] .tg2-tube s{display:none}
+/* crest burst at 10 / drain swirl at 0 */
+.tg3-burst{position:absolute;inset:0;opacity:0;pointer-events:none;z-index:3}
+.tg2-tube.crest .tg3-burst{background:radial-gradient(ellipse at 50% 0,#fff,#9ffff4 30%,transparent 70%);animation:tg3-crest 1.2s ease-out infinite}
+.tg2-tube.under .tg3-burst{background:conic-gradient(from 0deg at 50% 100%,#04304a,#1f8fb0,#020c18,#1f8fb0,#04304a);animation:tg3-drain 1.1s linear infinite}
+/**/
+.dais-tide.has-art .tg2-cap.bot::before{top:auto;bottom:0}
+@keyframes tg3-crest{0%{opacity:1}100%{opacity:.15}}
+@keyframes tg3-drain{0%{opacity:.85;filter:hue-rotate(0)}100%{opacity:.85;filter:hue-rotate(40deg)}}
+.dais-tide.has-art .tg2-tube.crest::before{content:'';position:absolute;inset:-40% -300%;z-index:0}
+.dais-tide.has-art:has(.tg2-tube.crest) .dais-art{filter:drop-shadow(0 4px 6px #000d) drop-shadow(0 -4px 8px #9ffff4) drop-shadow(0 0 10px #3ff5e0aa)}
+.dais-tide.has-art:has(.tg2-tube.under) .dais-art{filter:drop-shadow(0 4px 6px #000d) drop-shadow(0 6px 8px #1f5fb0aa)}
+/* preview line */
+.dais-tide.has-art .tg2-pv{left:0;right:0;z-index:4}
+/* High / Low notches beside the glass */
+.tg3-mk{position:absolute;left:14.4cqh;width:6px;height:0;border-top:2px solid #8a6a30;transform:translateY(1px);z-index:3;box-shadow:0 1px 0 #000}
+.tg3-mk.lit{border-color:#bff6f0;box-shadow:0 0 5px #2fe0d0}
+/* engraved plaques */
+.dais-tide.has-art .plq,.tg3-plate{position:absolute;left:calc(var(--gw) + 3px);z-index:3;box-sizing:border-box;border-radius:4px;border:1px solid #6a4a1c;background:linear-gradient(#3a2c16,#1c140a 60%,#120c05);box-shadow:inset 0 1px 0 #f0d49055,inset 0 -1px 2px #000,0 2px 4px #000c;text-shadow:0 -1px 0 #000,0 1px 0 #f0d4902a}
+.dais-tide.has-art .plq{width:58px;padding:3px 2px 3px;white-space:normal;text-align:center}
+.dais-tide.has-art .tg2-cap.bot{transform:translateY(-100%)}
+.dais-tide.has-art .tg2-cap.top{transform:none}
+.dais-tide.has-art .plq b{font:700 9px/1 var(--font-display);letter-spacing:.16em;color:#d9b46a}
+.dais-tide.has-art .plq i{font:600 8.5px/1.1 var(--font-body);color:#9fd9d0;margin-top:1px}
+.dais-tide.has-art .tg2-cap.top{top:var(--tt);bottom:auto}
+.dais-tide.has-art .tg2-cap.bot{top:calc(100cqh - var(--tb));bottom:auto}
+.dais-tide.has-art .plq::before{content:'';position:absolute;right:100%;top:0;width:8px;border-top:1px solid #8a6a30;margin-right:-1px}
+.dais-tide.has-art .tg2-cap.fire,.dais-tide.has-art .tg2-cap.pvon{border-color:#bff6f0;box-shadow:inset 0 1px 0 #f0d49055,0 0 10px #3ff5e0;animation:none}
+.dais-tide.has-art .tg2-cap.fire b,.dais-tide.has-art .tg2-cap.pvon b{color:#fff}
+.tg3-plate{top:calc((var(--tt) + 100cqh - var(--tb)) / 2);transform:translateY(-50%);width:54px;padding:4px 0 5px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;border-color:#8a6a30;border-radius:6px;background:radial-gradient(ellipse at 50% 30%,#3e3018,#1a1209 70%)}
+.tg3-plate::after{content:'';position:absolute;inset:2px;border:1px solid #f0d49022;border-radius:4px;pointer-events:none}
+.dais-tide.has-art .tg2-n{position:static;transform:none;font:700 30px/1 var(--font-number);color:#e8fffb;text-shadow:0 0 10px #2fe0d0,0 0 3px #2fe0d0,0 2px 2px #000;transition:none}
+.dais-tide.has-art .tg2-n.pvon{visibility:visible}
+.tg3-st{font:700 8.5px/1 var(--font-display);letter-spacing:.18em;text-transform:uppercase;color:#a8946a;display:flex;align-items:center;gap:3px}
+.st-high .tg3-st{color:#d6fffa;text-shadow:0 0 6px #3ff5e0}.st-low .tg3-st{color:#8fb8ff;text-shadow:0 0 6px #1f5fb0}
+.st-low .tg2-n{color:#cfe0ff!important;text-shadow:0 0 10px #2f6fe0,0 2px 2px #000!important}
+.tg3-st .drift{display:inline-block;width:0;height:0;text-decoration:none}
+.tg3-st .drift.d-up{border:3px solid transparent;border-bottom:5px solid currentColor;border-top:0}
+.tg3-st .drift.d-dn{border:3px solid transparent;border-top:5px solid currentColor;border-bottom:0}
+.tg3-st .drift.d-lock{width:6px;height:5px;border:1.5px solid #ffd36a;border-radius:1px}
+.dais-tide.has-art .tg2-pvn{position:static!important;transform:none;margin:0;font:700 11px/1 var(--font-number);color:var(--pvg)}
+.dais-tide.has-art .tg2-pvn:empty{display:none}
+.dais-tide.has-art .tg2-btns{left:calc(var(--gw) + 60px);top:calc(50% - 30px)}
+/* Energy orb and draw pile sit side by side at the bottom so the tall gauge has the column (only with the painted gauge). */
+.combat:has(.dais-tide.has-art) #orb{left:calc(68px + env(safe-area-inset-left));bottom:6px;width:56px;font-size:17px}
+@media (prefers-reduced-motion:reduce){.dais-tide.has-art *,.dais-tide.has-art .tg2-w::before,.dais-tide.has-art .tg2-w::after{animation:none!important}}
+.reduce-motion .dais-tide.has-art *,.reduce-motion .dais-tide.has-art .tg2-w::before,.reduce-motion .dais-tide.has-art .tg2-w::after{animation:none!important}
+
+/* Task 28: painted horizontal chart. Ring centres in the 672×312 cutout:
+   (217,138), (332,141), (453,139). Removing has-art restores C1. */
+.map-ink,.map-rank,.map-act{display:none}
+.combat .dais.obj.dais-carto.has-art{left:8px;top:48px;width:min(19vw,280px);height:min(8.82vw,130px);transform:none;zoom:1;padding:0}
+.combat .dais.obj.dais-carto.has-art .dais-art{display:block;object-fit:fill;filter:drop-shadow(0 3px 5px #000a)}
+.dais-carto.has-art .chart{position:absolute;inset:0;margin:0;padding:0;background:none;box-shadow:none;clip-path:none}
+.dais-carto.has-art .stub,.dais-carto.has-art .rope,.dais-carto.has-art .cairn,.dais-carto.has-art .pinn,.dais-carto.has-art .pips{display:none}
+.dais-carto.has-art .wps{position:absolute;inset:0;display:block}
+.dais-carto.has-art .wp{position:absolute;left:calc(32.3% + var(--wi)*17.55%);top:44.6%;width:17%;height:56px;min-height:44px;transform:translate(-50%,-50%);display:flex;flex-direction:column;justify-content:center;gap:2px;text-align:center;padding:2px;border-radius:50%;color:#fff0c9;background:radial-gradient(ellipse,#15100de8 30%,#20180aba 60%,transparent 72%)}
+.dais-carto.has-art .wp::before{content:'';position:absolute;inset:5px 8px;border:1px solid #ba873c88;border-radius:50%;pointer-events:none}
+.dais-carto.has-art .wp.adv::before,.dais-carto.has-art .wp.pick::before{border-color:#ffdb83;box-shadow:0 0 7px #f8b94488}
+.dais-carto.has-art .wp.land::before{border-color:#ffe6a8;box-shadow:0 0 9px #ffbd5b99}
+.dais-carto.has-art .wp .wpn{display:block;font:700 10px/1.05 var(--font-body);color:#fff0c9;max-width:100%;white-space:normal;overflow:hidden;text-shadow:0 1px 2px #000}
+.dais-carto.has-art .map-rank{display:block;font:600 9px/1 var(--font-body);color:#edca80}
+.dais-carto.has-art .map-act{display:block;font:700 8px/1 var(--font-display);color:#ffdf9b}
+.dais-carto.has-art .map-act:empty{display:none}
+.dais-carto.has-art .wp.empty .wpn{font-size:9px;color:#d8c49d}
+.dais-carto.has-art .wp.trig::before{animation:map-reached calc(.9s*var(--ts,1)) ease-out;animation-delay:inherit}
+@keyframes map-reached{0%{box-shadow:0 0 5px #fff,0 0 18px #ffc15b;border-color:#fff4ca}100%{box-shadow:0 0 0 transparent}}
+.dais-carto.has-art .map-ink{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.map-ink path{fill:none;stroke:#8b4c17;stroke-width:2;stroke-dasharray:1;animation:map-draw calc(1.1s*var(--ts,1)) ease-out both}
+@keyframes map-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.dais-carto.has-art .nexts{position:absolute;left:12%;right:12%;bottom:5%;margin:0;display:flex;flex-direction:row;justify-content:center;gap:5px;font-size:9px;max-width:none}
+.dais-carto.has-art .nexts .nx{min-width:0;max-width:30%}
+.dais-carto.has-art .advhint{display:none}
+.dais-carto.has-art .wp.pvon::before{border:2px dashed var(--pvg);box-shadow:0 0 8px var(--pvg)}
+.dais-carto.has-art .wp-pv{position:absolute;top:100%;left:0;right:0;font:700 9px var(--font-body);color:var(--pvg);background:#15100ded;border-radius:3px}
+/* Grand Atlas retains its fourth functional slot on the map's lower margin. */
+.dais-carto.has-art .chart[data-slots="4"] .wp[data-i="3"]{left:50%;top:72%;height:36px;width:30%;border-radius:5px}
+.dais-carto.has-art .chart[data-slots="4"] .wp[data-i="3"]::before{border-radius:5px;inset:0}
+@media(max-height:500px){.combat .dais.obj.dais-carto.has-art{left:8px;top:43px;width:160px;height:74px}}
+@media(prefers-reduced-motion:reduce){.dais-carto.has-art *,.dais-carto.has-art *::before{animation:none!important}}
+.reduce-motion .dais-carto.has-art *,.reduce-motion .dais-carto.has-art *::before{animation:none!important}
+
+@media(max-height:500px){.dais-carto.has-art .wp{height:44px;gap:1px}.dais-carto.has-art .wp .wpn{font-size:8px}.dais-carto.has-art .map-rank{font-size:8px}.dais-carto.has-art .map-act{font-size:6px}.dais-carto.has-art .nexts{bottom:-28px;left:0;right:0;flex-wrap:wrap;gap:2px;font-size:9px}.dais-carto.has-art .nexts .nx{max-width:100%}}
+/* Names/action plaques use the full map width; small rank seals stay on the
+   painted rings, so long card names never collide with neighbouring controls. */
+.dais-carto.has-art .wp{left:calc(16.66% + var(--wi)*33.33%);top:79%;width:32%;height:52px;transform:translateX(-50%);border-radius:4px;background:linear-gradient(#241c10ed,#100d09ee);gap:3px}
+.dais-carto.has-art .wp::before{inset:0;border-radius:4px}
+.dais-carto.has-art .wp .wpn{font-size:10px;line-height:1.05;max-height:32px}
+.dais-carto.has-art .map-act{font-size:8px}
+.dais-carto.has-art .map-rank{position:absolute;top:calc(-.344 * min(8.82vw,130px));left:50%;transform:translate(-50%,-50%);width:38px;min-height:22px;display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid #e5bd71;border-radius:50%;background:#1a130deb;font:700 9px/1 var(--font-body);box-shadow:0 0 5px #ffc96b66;pointer-events:auto}
+.dais-carto.has-art .wp[data-i="0"] .map-rank{left:99%}
+.dais-carto.has-art .wp[data-i="2"] .map-rank{left:1%}
+.dais-carto.has-art .wp.trig .map-rank{animation:map-reached calc(.9s*var(--ts,1)) ease-out;animation-delay:inherit}
+.dais-carto.has-art .nexts{top:calc(79% + 56px);bottom:auto;left:0;right:0;flex-wrap:wrap;gap:3px;font-size:10px}
+.dais-carto.has-art .nexts .nx{max-width:100%}
+.dais-carto.has-art .chart[data-slots="4"] .wp[data-i="3"]{left:50%;top:calc(79% + 54px);width:98%;height:32px}
+.dais-carto.has-art .chart[data-slots="4"] .wp[data-i="3"] .map-rank{position:static;transform:none;width:auto;border:0;background:none;box-shadow:none;min-height:0}
+.dais-carto.has-art:has(.chart[data-slots="4"]) .nexts{top:calc(79% + 90px)}
+@media(max-height:500px){.dais-carto.has-art .map-rank{top:-25px;width:27px;font-size:8px}.dais-carto.has-art .wp .wpn{font-size:10px}.dais-carto.has-art .wp{height:52px;gap:3px}}
+@media(prefers-reduced-motion:reduce){.dais-carto.has-art .wp.trig .map-rank{animation:none!important}}
+.reduce-motion .dais-carto.has-art .wp.trig .map-rank{animation:none!important}
+/* Replacement can also be selected directly on the chart while its full-card
+   choice window is open. The chart stays in its clear left column. */
+.combat .dais.obj.dais-carto.has-art:has(.wp.pick){z-index:61}

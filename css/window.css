@@ -33,7 +33,7 @@
 .btn,.tb-btn,.mini,.tbtn,.cmvb,.tb-x{
  background:linear-gradient(180deg,#5a4224 0%,#3a2a15 48%,#2a1e0f 52%,#3a2a15 100%);color:#f1dfb0;border:1px solid #0a0704;border-radius:7px;
  box-shadow:inset 0 0 0 1px #c79a55aa,inset 0 2px 0 #f0d89055,inset 0 -2px 3px #0009,0 2px 4px #000a;
- text-shadow:0 -1px 0 #000,0 1px 0 #ffffff1a;font-family:var(--font-display);letter-spacing:.05em;text-transform:uppercase;font-weight:700;transition:filter .1s,transform .08s,box-shadow .12s}
+ text-shadow:0 -1px 0 #000,0 1px 0 #ffffff1a;font-family:var(--font-display);letter-spacing:.05em;text-transform:uppercase;font-weight:700;transition:filter calc(.1s*var(--us,1)),transform calc(.08s*var(--us,1)),box-shadow calc(.12s*var(--us,1))}
 .btn{font-size:13px;padding:6px 14px;min-height:40px}
 .btn:hover,.tb-btn:hover,.mini:hover,.tbtn:hover,.cmvb:hover,.btn:focus-visible,.tb-btn:focus-visible{filter:brightness(1.18);box-shadow:inset 0 0 0 1px #f0d890,inset 0 2px 0 #fff3,inset 0 -2px 3px #0009,0 0 12px #d9b46a66,0 2px 4px #000a;border-color:#0a0704}
 .btn:active,.tb-btn:active,.mini:active,.tbtn:active,.cmvb:active{transform:translateY(1px) scale(.985);filter:brightness(.9);box-shadow:inset 0 0 0 1px #c79a55aa,inset 0 3px 6px #000c}

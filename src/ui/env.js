@@ -10,6 +10,7 @@
 //    all visual only (pointer-events:none) and never delay a render or a turn
 //  • quality: settings.envFx Full / Reduced / Off, prefers-reduced-motion, adaptive frame-time downgrade
 import {ENV} from '../core/registry.js';
+import {U} from '../core/timing.js';
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
 const LAYERS=['sky','far','mid','ground'];// fg lives in #env-front (design-v2 §W.7.3 DOM order: over the figures, under the UI)
@@ -158,7 +159,7 @@ function loop(now){requestAnimationFrame(loop);const dtMs=now-lastT;lastT=now;if
  const idle=now-lastInput>30000;const minDt=idle?1000/30:1000/60;if(now-lastDraw<minDt-1)return;
  const dt=Math.min(.05,(now-(lastDraw||now))/1000);lastDraw=now;step(dt);draw()}
 // ---------- transitions (visual only; never block input) ----------
-function playTransition(kind,col){if(!wipe||!wipe.animate)return;const fast=window.FAST?.35:1;const rm=reduceMQ.matches||quality()==='off';
+function playTransition(kind,col){if(!wipe||!wipe.animate)return;const fast=(window.FAST?.35:1)*U(1);const rm=reduceMQ.matches||quality()==='off';
  wipe.className='';wipe.style.setProperty('--wc',col);
  if(rm||kind==='fade'){wipe.className='fade';wipe.animate([{opacity:.6},{opacity:0}],{duration:(rm?200:350)*fast,easing:'ease-out'});return}
  if(kind==='wipe'){wipe.className='wipe';wipe.animate([{transform:'translateX(-110%)'},{transform:'translateX(110%)'}],{duration:800*fast,easing:'cubic-bezier(.4,0,.3,1)'});return}

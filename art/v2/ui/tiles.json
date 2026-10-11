@@ -4,7 +4,7 @@
   "opt-leave": {
    "path": "art/v2/ui/tiles/opt-leave.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a worn stair step leading on, lantern light behind",
@@ -13,7 +13,7 @@
   "opt-blood": {
    "path": "art/v2/ui/tiles/opt-blood.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a bleeding hand over a still pool",
@@ -22,7 +22,7 @@
   "opt-gold": {
    "path": "art/v2/ui/tiles/opt-gold.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a heap of salt-green coins",
@@ -31,7 +31,7 @@
   "opt-gamble": {
    "path": "art/v2/ui/tiles/opt-gamble.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: two bone dice on wet stone",
@@ -40,7 +40,7 @@
   "opt-upgrade": {
    "path": "art/v2/ui/tiles/opt-upgrade.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: an anvil with a glowing seam",
@@ -49,7 +49,7 @@
   "opt-transform": {
    "path": "art/v2/ui/tiles/opt-transform.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a card half turning into a sea-glass shard",
@@ -58,7 +58,7 @@
   "opt-card": {
    "path": "art/v2/ui/tiles/opt-card.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a single face-down painted card",
@@ -67,7 +67,7 @@
   "opt-fight": {
    "path": "art/v2/ui/tiles/opt-fight.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: crossed rusted blades in kelp",
@@ -76,7 +76,7 @@
   "opt-heal": {
    "path": "art/v2/ui/tiles/opt-heal.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a cupped hand with a warm light",
@@ -85,7 +85,7 @@
   "opt-gift": {
    "path": "art/v2/ui/tiles/opt-gift.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a knotted bundle on a driftwood altar",
@@ -94,7 +94,7 @@
   "opt-relic": {
    "path": "art/v2/ui/tiles/opt-relic.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a glowing relic on a velvet cloth",
@@ -103,7 +103,7 @@
   "opt-potion": {
    "path": "art/v2/ui/tiles/opt-potion.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a stoppered vial with a swirl",
@@ -112,7 +112,7 @@
   "opt-curse": {
    "path": "art/v2/ui/tiles/opt-curse.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a black thorned shell",
@@ -121,7 +121,7 @@
   "opt-remove": {
    "path": "art/v2/ui/tiles/opt-remove.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a card being cut by shears",
@@ -130,7 +130,7 @@
   "opt-other": {
    "path": "art/v2/ui/tiles/opt-other.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a question mark carved in coral",
@@ -139,7 +139,7 @@
   "opt-back": {
    "path": "art/v2/ui/tiles/opt-back.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Option icon: a hand closing a book",
@@ -148,7 +148,7 @@
   "camp-mend": {
    "path": "art/v2/ui/tiles/camp-mend.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Camp action: a small campfire with a warm bedroll",
@@ -157,7 +157,7 @@
   "camp-temper": {
    "path": "art/v2/ui/tiles/camp-temper.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Camp action: a hammer and anvil by the fire",
@@ -166,7 +166,7 @@
   "camp-cook": {
    "path": "art/v2/ui/tiles/camp-cook.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Camp action: a pot over the flames",
@@ -175,7 +175,7 @@
   "camp-scour": {
    "path": "art/v2/ui/tiles/camp-scour.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Camp action: a pumice stone scrubbing a card",
@@ -184,7 +184,7 @@
   "camp-trawl": {
    "path": "art/v2/ui/tiles/camp-trawl.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Camp action: a grapnel hook hauling up a net",
@@ -193,7 +193,7 @@
   "camp-annotate": {
    "path": "art/v2/ui/tiles/camp-annotate.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Camp action: an open logbook with ink",
@@ -202,7 +202,7 @@
   "reward-gold": {
    "path": "art/v2/ui/tiles/reward-gold.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Reward tile: a pile of gold coins and salt crystals",
@@ -211,7 +211,7 @@
   "reward-cards": {
    "path": "art/v2/ui/tiles/reward-cards.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Reward tile: three fanned cards",
@@ -220,7 +220,7 @@
   "reward-relic": {
    "path": "art/v2/ui/tiles/reward-relic.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Reward tile fallback: a relic on a cloth",
@@ -229,7 +229,7 @@
   "reward-potion": {
    "path": "art/v2/ui/tiles/reward-potion.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Reward tile fallback: a potion on a shelf",
@@ -238,7 +238,7 @@
   "chest-closed": {
    "path": "art/v2/ui/tiles/chest-closed.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Closed sunken chest, barnacled, dark teal",
@@ -247,7 +247,7 @@
   "chest-open": {
    "path": "art/v2/ui/tiles/chest-open.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Open chest with light spilling out",
@@ -256,7 +256,7 @@
   "choice-tide-low": {
    "path": "art/v2/ui/tiles/choice-tide-low.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a dark new moon over still water (Tide 3)",
@@ -265,7 +265,7 @@
   "choice-tide-mid": {
    "path": "art/v2/ui/tiles/choice-tide-mid.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a half moon on a calm sea (Tide 5)",
@@ -274,7 +274,7 @@
   "choice-tide-high": {
    "path": "art/v2/ui/tiles/choice-tide-high.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a full moon over a towering wave (Tide 7)",
@@ -283,7 +283,7 @@
   "choice-tide-set": {
    "path": "art/v2/ui/tiles/choice-tide-set.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a moon and a dial on the sea",
@@ -292,7 +292,7 @@
   "choice-surge": {
    "path": "art/v2/ui/tiles/choice-surge.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a wave rising",
@@ -301,7 +301,7 @@
   "choice-recede": {
    "path": "art/v2/ui/tiles/choice-recede.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a wave pulling back",
@@ -310,7 +310,7 @@
   "choice-moonpull": {
    "path": "art/v2/ui/tiles/choice-moonpull.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a moon drawing the tide up",
@@ -319,7 +319,7 @@
   "choice-keep": {
    "path": "art/v2/ui/tiles/choice-keep.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a Waypoint flag standing safe",
@@ -328,7 +328,7 @@
   "choice-destroy": {
    "path": "art/v2/ui/tiles/choice-destroy.webp",
    "size": [
-    384,
+    512,
     384
    ],
    "desc": "Combat choice: a Waypoint flag shattering",
@@ -341,7 +341,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Tidal Wheel",
-   "ready": false
+   "ready": true
   },
   "event-anvil": {
    "path": "art/v2/ui/tiles/event-anvil.webp",
@@ -359,7 +359,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Cleansing Spring",
-   "ready": false
+   "ready": true
   },
   "event-changeling": {
    "path": "art/v2/ui/tiles/event-changeling.webp",
@@ -368,7 +368,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Changeling Pool",
-   "ready": false
+   "ready": true
   },
   "event-offering": {
    "path": "art/v2/ui/tiles/event-offering.webp",
@@ -377,7 +377,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Offering Tide",
-   "ready": false
+   "ready": true
   },
   "event-wishing": {
    "path": "art/v2/ui/tiles/event-wishing.webp",
@@ -386,7 +386,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Wishing Undertow",
-   "ready": false
+   "ready": true
   },
   "event-tidepool": {
    "path": "art/v2/ui/tiles/event-tidepool.webp",
@@ -404,7 +404,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Wandering Cartomancer",
-   "ready": false
+   "ready": true
   },
   "event-sunkenchest": {
    "path": "art/v2/ui/tiles/event-sunkenchest.webp",
@@ -422,7 +422,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Campfire Stranger",
-   "ready": false
+   "ready": true
   },
   "event-crabmarket": {
    "path": "art/v2/ui/tiles/event-crabmarket.webp",
@@ -440,7 +440,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Gull Nest",
-   "ready": false
+   "ready": true
   },
   "event-inkgrotto": {
    "path": "art/v2/ui/tiles/event-inkgrotto.webp",
@@ -476,7 +476,7 @@
     384
    ],
    "desc": "Event scene (4:3 painting): Saltwife's Loom",
-   "ready": false
+   "ready": true
   },
   "event-generic": {
    "path": "art/v2/ui/tiles/event-generic.webp",
@@ -586,49 +586,31 @@
    "desc": "Card back for locked cards: dark lantern glyph on teal-black",
    "ready": false
   },
-  "lamp-task-any": {
-   "path": "art/v2/ui/tiles/lamp-task-any.webp",
+  "lamp-task-lit": {
+   "path": "art/v2/ui/tiles/lamp-task-lit.webp",
    "size": [
-    256,
-    256
+    512,
+    384
    ],
-   "desc": "Lantern Task card art (any): a small lantern with a compass motif",
+   "desc": "Lantern Task tile (done): one brass lantern blazing on a stone ledge, warm light, no sigil (the class sigil is stamped in code)",
    "ready": false
   },
-  "lamp-task-tide": {
-   "path": "art/v2/ui/tiles/lamp-task-tide.webp",
+  "lamp-task-dark": {
+   "path": "art/v2/ui/tiles/lamp-task-dark.webp",
    "size": [
-    256,
-    256
+    512,
+    384
    ],
-   "desc": "Lantern Task card art (tide): a small lantern with a wave motif",
+   "desc": "Lantern Task tile (not done): the same lantern, cold and unlit on the same ledge, no sigil",
    "ready": false
   },
-  "lamp-task-echo": {
-   "path": "art/v2/ui/tiles/lamp-task-echo.webp",
+  "lamp-class-any": {
+   "path": "art/v2/ui/tiles/lamp-class-any.webp",
    "size": [
-    256,
-    256
+    128,
+    128
    ],
-   "desc": "Lantern Task card art (echo): a small lantern with a sound ring motif",
-   "ready": false
-  },
-  "lamp-task-carto": {
-   "path": "art/v2/ui/tiles/lamp-task-carto.webp",
-   "size": [
-    256,
-    256
-   ],
-   "desc": "Lantern Task card art (carto): a small lantern with a map motif",
-   "ready": false
-  },
-  "lamp-task-duel": {
-   "path": "art/v2/ui/tiles/lamp-task-duel.webp",
-   "size": [
-    256,
-    256
-   ],
-   "desc": "Lantern Task card art (duel): a small lantern with a blade motif",
+   "desc": "Task sigil for any-class tasks: a small compass rose, engraved, single colour",
    "ready": false
   },
   "lamp-class-tide": {
@@ -637,7 +619,7 @@
     128,
     128
    ],
-   "desc": "Class Lamp emblem: tide",
+   "desc": "Class sigil / Lamp emblem: tide (also stamped on Lantern Task tiles)",
    "ready": false
   },
   "lamp-class-echo": {
@@ -646,7 +628,7 @@
     128,
     128
    ],
-   "desc": "Class Lamp emblem: echo",
+   "desc": "Class sigil / Lamp emblem: echo (also stamped on Lantern Task tiles)",
    "ready": false
   },
   "lamp-class-carto": {
@@ -655,7 +637,7 @@
     128,
     128
    ],
-   "desc": "Class Lamp emblem: carto",
+   "desc": "Class sigil / Lamp emblem: carto (also stamped on Lantern Task tiles)",
    "ready": false
   },
   "lamp-class-duel": {
@@ -664,7 +646,7 @@
     128,
     128
    ],
-   "desc": "Class Lamp emblem: duel",
+   "desc": "Class sigil / Lamp emblem: duel (also stamped on Lantern Task tiles)",
    "ready": false
   },
   "lamp-climb": {
@@ -836,6 +818,33 @@
     384
    ],
    "desc": "Menu ending layer, Cut the Line: a true dawn, no green ring, no line, lanterns lifting off the steps",
+   "ready": false
+  },
+  "tile-ledge": {
+   "path": "art/v2/ui/tiles/tile-ledge.webp",
+   "size": [
+    384,
+    200
+   ],
+   "desc": "Painted stone ledge / tide-pool shelf strip that relic and potion art stands on in reward tiles (cutout bottom third of a tile)",
+   "ready": false
+  },
+  "select-stair": {
+   "path": "art/v2/ui/tiles/select-stair.webp",
+   "size": [
+    1664,
+    768
+   ],
+   "desc": "Character select background: the Foot of the Stair at dusk, four landings climbing left to right, empty (heroes and lanterns are drawn over it)",
+   "ready": false
+  },
+  "select-lantern": {
+   "path": "art/v2/ui/tiles/select-lantern.webp",
+   "size": [
+    128,
+    192
+   ],
+   "desc": "One unlit brass hanging lantern, cutout on transparent, glass dark (the game adds the coloured glow in code)",
    "ready": false
   }
  }

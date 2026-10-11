@@ -1,0 +1,72 @@
+/* ===== select.css (Task 30): character select C1 "Four Lanterns on the Stair" ===== */
+.tb-stair{--sh:96px;--sph:clamp(104px,calc(100dvh - 240px),235px)}
+.stair-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.stair-bg .emb.plain{position:absolute;inset:0;width:100%;height:100%}
+.emb.plain{border:0;border-radius:0;box-shadow:none;background:none}.emb.plain::before,.emb.plain .ph{display:none}.emb.plain img{object-fit:cover}
+.tb-stair>.tb-top{position:relative;z-index:4}
+.stair{position:absolute;left:0;right:0;top:40px;bottom:0;display:flex;align-items:flex-end;z-index:2}
+.st-pick{position:relative;flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;margin:0;padding:0;background:none;border:0;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;--slab:calc(var(--sh) + var(--step)*14px)}
+.st-pick:focus-visible{outline:none}
+.st-fig{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:center;width:100%;margin-bottom:-2px}
+.st-spr{display:block;height:var(--sph);width:auto;max-width:150%;object-fit:contain;transform-origin:50% 100%;transition:transform calc(.3s*var(--us,1)) ease,filter calc(.3s*var(--us,1)) ease;filter:brightness(.6) drop-shadow(0 6px 8px #000c)}
+.st-pick[data-cls="duel"] .st-spr{max-width:none;margin:0 -30%}
+.st-pick:hover .st-spr{filter:brightness(.8) drop-shadow(0 6px 8px #000c)}
+.st-pick.on .st-spr{transform:translateY(-6px) scale(1.04);filter:brightness(1.08) drop-shadow(0 0 12px var(--class-primary)) drop-shadow(0 6px 8px #000c)}
+.st-pick.locked .st-spr{filter:brightness(0) opacity(.5) drop-shadow(0 0 7px #6a7a9a);transform:none}
+.st-slab{position:relative;z-index:3;box-sizing:border-box;width:100%;height:var(--slab);padding:7px 8px 0;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;border-top:2px solid #8a8a7466;border-left:1px solid #05070b;
+ background:linear-gradient(180deg,#3d434b,#20252c 40%,#0d0f13);box-shadow:inset 0 10px 16px #0008,0 -6px 14px #0008}
+.st-pick[data-step="0"] .st-slab{border-left:0}
+.st-slab b{font:700 clamp(14px,1.9vw,21px)/1.1 var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:#bdb49c;text-shadow:0 1px 2px #000}
+.st-pick.on .st-slab b{color:var(--class-primary);text-shadow:0 1px 2px #000,0 0 10px color-mix(in srgb,var(--class-primary) 60%,transparent)}
+.st-slab i{font:italic 400 clamp(11px,1.45vw,15px)/1.2 var(--serif);color:#cfc4a8;text-wrap:balance;max-width:92%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.st-pick:not(.on) .st-slab i{opacity:.75}
+.st-pick.locked .st-slab b{color:#7b8496}.st-pick.locked .st-slab i{color:#9aa4b8;opacity:1}
+.st-slab .lp-chip{display:flex;align-items:center;gap:4px;font:600 11px var(--font-display);text-transform:uppercase;color:var(--class-accent);opacity:.9}
+.st-slab .lp-chip svg{width:16px;height:14px}
+/* lanterns */
+.st-lan{position:absolute;left:0;right:0;top:0;height:calc(100% - var(--slab) - var(--sph) - 6px);min-height:22px;z-index:1;pointer-events:none;transform-origin:50% 0;animation:st-sway 4.2s ease-in-out infinite alternate}
+.st-pick:nth-child(2) .st-lan{animation-delay:-1.3s}.st-pick:nth-child(3) .st-lan{animation-delay:-2.6s}
+@keyframes st-sway{from{transform:rotate(-1.6deg)}to{transform:rotate(1.6deg)}}
+.st-line{position:absolute;left:50%;top:-10px;bottom:28px;width:0;border-left:1px solid #5b564a}
+.st-lamp{position:absolute;left:50%;bottom:0;width:22px;height:30px;margin-left:-11px}
+.st-lamp .emb.plain{position:absolute;inset:-8px -10px;width:auto;height:auto;z-index:3}
+.st-lamp .emb.plain.has-img~b{display:none}
+.st-cap,.st-base{position:absolute;left:2px;right:2px;height:5px;border-radius:2px;background:linear-gradient(#a8803c,#4a3416);display:block}.st-cap{top:0}.st-base{bottom:0}
+.st-cap::before{content:'';position:absolute;left:50%;top:-6px;width:6px;height:6px;margin-left:-3px;border:1.5px solid #8a7440;border-bottom:0;border-radius:3px 3px 0 0}
+.st-glass{position:absolute;left:3px;right:3px;top:5px;bottom:5px;display:block;border:1px solid #6a5a34;border-radius:3px;background:linear-gradient(90deg,#1c1812,#2a2216 50%,#1c1812);transition:background calc(.3s*var(--us,1)),box-shadow calc(.3s*var(--us,1))}
+.st-lan.lit{animation:none;transform:none}
+.st-lan.lit .st-glass{background:radial-gradient(ellipse at 50% 60%,#fff8dc 0,var(--class-primary) 55%,color-mix(in srgb,var(--class-primary) 40%,#000) 100%);border-color:#e8c36a;
+ box-shadow:0 0 calc(12px + var(--lv)*2px) var(--class-primary),0 0 calc(26px + var(--lv)*4px) color-mix(in srgb,var(--class-primary) 55%,transparent);animation:st-flare 2.6s ease-in-out infinite alternate}
+@keyframes st-flare{from{filter:brightness(.92)}to{filter:brightness(1.18)}}
+.st-lan.locked{opacity:.55;animation:none}
+.st-lan.locked .st-glass::after{content:'';position:absolute;left:50%;top:50%;width:7px;height:6px;margin:-1px 0 0 -4px;border-radius:1px;background:#8a8f9c;box-shadow:0 -4px 0 -2px #8a8f9c}
+/* foot: (i) and Begin */
+.st-foot{position:absolute;left:0;right:0;bottom:0;height:56px;z-index:5;pointer-events:none}
+.st-foot>*{pointer-events:auto}
+.st-info{position:absolute;left:12px;bottom:6px;width:44px;height:44px;padding:0;background:none;border:0;cursor:pointer;font:italic 700 24px var(--serif);color:var(--gold);text-shadow:0 0 6px #000,0 1px 2px #000,0 0 12px #000}
+.st-info:disabled{opacity:.3;cursor:default}
+.st-foot .tb-btn{position:absolute;right:12px;bottom:8px}
+/* Begin: the lantern is lifted off its hook */
+.tb-stair.lifting .st-pick.on .st-lan{animation:st-lift calc(.7s*var(--us,1)) ease-in forwards}
+@keyframes st-lift{0%{transform:none}60%{transform:translateY(-24px)}100%{transform:translateY(-70px) scale(1.2);opacity:0}}
+.tb-stair.lifting::after{content:'';position:absolute;inset:0;z-index:20;pointer-events:none;background:radial-gradient(ellipse at var(--lx,50%) 40%,#fff3c488,#000 70%);animation:st-fade calc(.7s*var(--us,1)) ease-in forwards}
+@keyframes st-fade{from{opacity:0}to{opacity:1}}
+/* tiny meter demo loops: the real meter objects, scaled down, 3-second loops */
+.dm{position:absolute;right:-34px;bottom:8px;width:104px;height:190px;transform:scale(.6);transform-origin:100% 100%;pointer-events:none;z-index:2}
+.dm-tide .tg2-tube{position:relative;left:0;top:30px;bottom:auto;height:130px;margin:0 auto 0 38px;width:26px}
+.dm-tide .tg2-w{animation:dm-tide 3s ease-in-out infinite}
+@keyframes dm-tide{0%,100%{height:25%}45%,60%{height:85%}80%{height:50%}}
+.dm-echo .bellbtn{position:absolute;left:25px;top:30px;transform:scale(1.4);transform-origin:50% 0}
+.dm-carto .chart{position:absolute;left:8px;top:24px;width:96px}
+.dm-carto .rope path{animation:dm-ink 3s linear infinite}@keyframes dm-ink{to{stroke-dashoffset:-24}}
+.dm-carto .cairn .st{animation:dm-stone 3s ease-out infinite;animation-delay:calc(var(--d,0)*.4s + var(--i,0)*.12s)}
+.dm-carto .wp:nth-of-type(1){--d:0}.dm-carto .wp:nth-of-type(2){--d:1}.dm-carto .wp:nth-of-type(3){--d:2}
+@keyframes dm-stone{0%{transform:translateY(-14px);opacity:0}15%,85%{transform:none;opacity:1}100%{opacity:0}}
+.dm-duel .rap{position:absolute;inset:0}
+.dm-duel .wick-svg{animation:dm-flame 3s ease-in-out infinite}@keyframes dm-flame{0%,100%{transform:scale(.4)}50%{transform:scale(1.05)}}
+.dm-duel .notches i{animation:dm-notch 3s ease-in-out infinite;animation-delay:calc(var(--d)*.25s)}
+@keyframes dm-notch{0%,12%{background:#2a2c34;box-shadow:none}35%,75%{background:linear-gradient(90deg,#c84a1c,#ffb347 50%,#c84a1c);box-shadow:0 0 5px #ff9a2a}100%{background:#2a2c34;box-shadow:none}}
+.reduce-motion .st-lan,.reduce-motion .st-glass,.reduce-motion .dm *{animation:none!important}
+@media (prefers-reduced-motion:reduce){.st-lan,.st-glass,.dm *{animation:none!important}}
+@media (max-height:330px){.tb-stair{--sh:84px}}
+.st-pick:nth-child(4) .dm{right:auto;left:-26px;transform-origin:0 100%}

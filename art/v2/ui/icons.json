@@ -124,10 +124,10 @@
  },
  "combatant_art_note": "Null slots use distinct inline bronze SVG placeholders. Set a slot to its painted file path; loaded at runtime, no code changes required. Expected missing files: status-drenched.webp, status-resonating.webp, status-temporary-might.webp and intent-<slot>.webp (192x192 transparent).",
  "dais": {
-  "dais-tide": null,
+  "dais-tide": "art/v2/ui/dais-tide.webp",
   "dais-echo": null,
-  "dais-carto": null,
+  "dais-carto": "art/v2/ui/dais-carto.webp",
   "dais-duel": null
  },
- "dais_note": "Class mechanic display backplates (painted slot, ~256x560 transparent webp, drawn behind the live widgets). Set a path to use it; no code change."
+ "dais_note": "Class meter objects (Task 30: gauge cradle / bell / chart strip / rapier; painted transparent cutout ~312x570 px, drawn over the SVG stand-in; see design/ART-NEEDED-UI.md). Set a path to use it; no code change."
 }

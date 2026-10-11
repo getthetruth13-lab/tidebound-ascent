@@ -64,7 +64,7 @@
 .hand.marking .card.markable,.hand.flourishing .card.flourishable{filter:drop-shadow(0 0 7px var(--class-primary))}
 .hand.marking .card:not(.markable),.hand.flourishing .card:not(.flourishable){filter:brightness(.65)}
 /* foil / holo sheen: rare (strong) + uncommon (subtle). Position follows pointer/drag (--mx,--my) or device tilt (--tx,--ty). */
-.card>.foil{display:none;position:absolute;inset:0;border-radius:5.2cqw;pointer-events:none;z-index:4;opacity:.0;transition:opacity .25s;
+.card>.foil{display:none;position:absolute;inset:0;border-radius:5.2cqw;pointer-events:none;z-index:4;opacity:.0;transition:opacity calc(.25s*var(--us,1));
  background:linear-gradient(115deg,transparent 28%,#ff8fd433 38%,#ffe48a55 46%,#8ffff033 54%,#9fa8ff33 62%,transparent 72%) var(--fx,50%) 0/260% 100%,
   radial-gradient(circle at var(--mx,50%) var(--my,30%),#fff5 0,transparent 32%)}
 .card.r-r>.foil{display:block;opacity:.55}
