@@ -65,6 +65,7 @@ function startCombatImpl(kind,enc,opts={}){
  {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':cb.bossKey==='tenant'?'🏚️ ':'🪸 ')+t);const be=cb.ens.find(x=>x.boss);bossBeat('intro',EN[cb.bossKey].n,t,be)}} // lore: the boss speaks first (bible §16 items 7-9)
  const cls=W.run.cls;
  if(cls==='duel')cb.mom=DU.start_mom;
+ if(cls==='carto'&&hasRelic('sextant'))cb.startQ.push(()=>gainBlock(6)); // Brass Sextant: a steady bearing, 6 Guard as the fight opens (Task 42)
  if(cls==='carto'&&!hasRelic('trailboots')){
   const pool=['signal','cache','lookout'];
   if(hasRelic('sextant'))cb.startQ.push(()=>choose('Brass Sextant: choose your starting Waypoint (upgraded, Rank 1)',shuffle(pool.slice(),cs).map(id=>({l:`${CARDS[id].e} ${CARDS[id].n}+`,card:{id,up:true,rank:1},cap:'Rank 1 · upgraded',f:()=>{placeStartWp(id,true,1)}}))));

@@ -65,15 +65,16 @@ document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.pr
  e.stopPropagation();e.preventDefault()},true);
 document.addEventListener('pointerdown',e=>{if(lp){clearTimeout(lp.t);lp=null}if(e.pointerType==='mouse'&&e.button>0)return;
  const el=find(e);if(!el||inHand(el))return;const ok=el.matches('.bd,.hpblk')?e.pointerType!=='mouse':(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.evo,.rl,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
- lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el)){eat=true;if(el.matches('.bd,.hpblk')||el.closest('.dais'))holdEl=el}},LP)}},true);
+ lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el)){eat=true;holdEl=el;clearTimeout(timer)}},LP)}},true);
 document.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){clearTimeout(lp.t);lp=null}},true);
 const release=()=>{if(holdEl){holdEl=null;hideTip()}};
-document.addEventListener('pointercancel',release,true);
+document.addEventListener('touchmove',e=>{if(holdEl)e.preventDefault()},{passive:false});
+document.addEventListener('pointercancel',()=>{release();if(lp){clearTimeout(lp.t);lp=null}},true);
 document.addEventListener('pointerup',()=>{release();if(lp){clearTimeout(lp.t);lp=null}setTimeout(()=>{eat=false},350)},true);
 document.addEventListener('contextmenu',e=>{const el=find(e);if(el&&el.matches('.shopicon,.tile,.evo,.lp-node,.bd,.hpblk'))e.preventDefault()});
 document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))showTip(el)});
-document.addEventListener('pointerout',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))hideTip()});
-addEventListener('scroll',hideTip,true);
+document.addEventListener('pointerout',e=>{if(e.pointerType!=='mouse'||holdEl)return;const el=find(e);if(el&&!el.contains(e.relatedTarget))hideTip()});
+addEventListener('scroll',()=>{if(!holdEl)hideTip()},true);
 
 document.addEventListener('focusin',e=>{const el=find(e);if(el&&el.matches('.bd,.hpblk,.intent')&&el.matches(':focus-visible'))showTip(el)}); // keyboard focus only: a touch release must not reopen the hold tip
 document.addEventListener('focusout',e=>{if(e.target.matches('.bd,.hpblk,.intent'))hideTip()});

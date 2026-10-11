@@ -1055,3 +1055,39 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .card-skip-box input{accent-color:#bda676;width:20px;height:20px}
 @media(max-height:500px) and (orientation:landscape){.page.fit>h2.reward-banner{font-size:29px;margin:2px auto}.fit-reward>.rewgrid{--gw:min(176px,calc((100dvh - 158px)*5/7))}.page.fit.fit-reward .actions .btn{min-width:100px}.card-skip-box h2{font-size:21px}}
 .reduce-motion .rewgrid .rcw{transition:none}
+
+/* Task 37: a fixed printing master. Only the whole master scales, so line
+   breaks and the relationship between ink and frame are identical in every view. */
+.card .card-print{position:absolute;left:0;top:0;width:200px;height:280px;container-type:inline-size;transform-origin:0 0;transform:scale(calc(100cqw / 200px));pointer-events:none}
+.card .card-print .type{font-size:5.2cqw!important}
+.card .card-print .text{font-size:var(--tf,7.5cqw);text-shadow:0 .25px .35px #0009,0 -.25px .3px #fff2}
+.card .card-print .name{font-size:var(--nf,11cqw);text-shadow:0 .6px .7px #000c,0 -.25px .35px #fff3}
+.card .card-print .text>span{overflow-wrap:normal}
+@media(orientation:landscape){
+ .combat{--edge:18px}
+ .combat>.topbar{top:calc(8px + env(safe-area-inset-top));left:calc(var(--edge) + env(safe-area-inset-left));right:calc(var(--edge) + env(safe-area-inset-right));width:calc((100% - 36px - env(safe-area-inset-left) - env(safe-area-inset-right))/var(--ui-scale));transform:scale(var(--ui-scale));transform-origin:top left;padding:0}
+ .combat .relics{flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+ .combat .relic{flex:none}
+ .combat .subbar{top:calc(8px + 50px*var(--ui-scale) + env(safe-area-inset-top));transform:scale(var(--ui-scale));transform-origin:top left}
+ .combat .dais{top:calc(8px + 44px*var(--ui-scale) + env(safe-area-inset-top));transform:scale(calc(.86*var(--ui-scale)))}
+ .combat .hand{left:calc(160px*var(--ui-scale) + env(safe-area-inset-left));right:calc(190px*var(--ui-scale) + env(safe-area-inset-right));--hcw:min(calc(40vh*5/7*var(--ui-scale)),calc(15vw*var(--ui-scale)))}
+ .combat #orb{left:calc(var(--edge) + env(safe-area-inset-left));bottom:calc(82px*var(--ui-scale) + env(safe-area-inset-bottom));transform:scale(var(--ui-scale));transform-origin:bottom left}
+ .combat #drawpile{left:calc(var(--edge) + env(safe-area-inset-left));bottom:calc(20px + env(safe-area-inset-bottom));transform:scale(var(--ui-scale));transform-origin:bottom left}
+ .combat #discpile{right:calc(var(--edge) + env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));transform:scale(var(--ui-scale));transform-origin:bottom right}
+ .combat #exhpile{right:calc(var(--edge) + env(safe-area-inset-right));bottom:calc(20px + 50px*var(--ui-scale) + env(safe-area-inset-bottom));transform:scale(var(--ui-scale));transform-origin:bottom right}
+ .combat #endbtn{right:calc(18px + 56px*var(--ui-scale) + env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));transform:scale(var(--ui-scale));transform-origin:bottom right}
+ .combat .plate .stw .badges{zoom:var(--ui-scale)}
+}
+@media(orientation:landscape){
+ .combat:has(.dais-tide.has-art) #orb{left:calc(18px + 58px*var(--ui-scale) + env(safe-area-inset-left));bottom:calc(20px + env(safe-area-inset-bottom));width:56px}
+}
+@media(orientation:landscape){
+ .combat .dais.obj,.combat .dais.obj.has-art{left:calc(18px + env(safe-area-inset-left));top:calc(8px + 50px*var(--ui-scale) + env(safe-area-inset-top));transform:scale(var(--ui-scale));transform-origin:top left}
+ .combat .dais.obj.dais-tide.has-art{height:min(330px,calc((100dvh - 118px - 50px*var(--ui-scale) - env(safe-area-inset-top) - env(safe-area-inset-bottom))/var(--ui-scale)))}
+ .combat .dais.obj.dais-carto.has-art{top:calc(8px + 50px*var(--ui-scale) + env(safe-area-inset-top));transform:scale(var(--ui-scale))}
+}
+
+/* Held cards sit beside the finger when the landscape height cannot fit them above it. */
+.insp.held-preview{position:absolute;display:block;width:min(260px,calc((100dvh - 24px)*5/7))}
+.insp.held-preview .card{--gw:min(260px,calc((100dvh - 24px)*5/7));width:var(--gw)}
+.insp.held-preview .ikw{display:none}

@@ -54,7 +54,7 @@ export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const ba
  const cls=['card','t'+d.t,'r-'+d.r,'theme-'+(TH[d.cls]||''),o.sel?'sel':'',o.can===false?'unp':'',d.curse?'curse':'',d.cls==='status'?'status':'',o.mark?'markable':'',o.flourish?'flourishable':'',ci.open?'opening':'',d.unplay?'nocost':''].filter(Boolean).join(' ');
  return `<div class="${cls}" ${o.click?`onclick="${o.click}"`:''} data-id="${ci.id}" data-uid="${ci.uid}" data-up="${up?1:0}"${o.i!=null?` data-i="${o.i}"`:''}>
  <i class="cfr"></i>${cardArtHTML(ci.id,d,!!(o.sel||o.full))}
- <span class="cost${c<base?' cheap':c>base?' dear':''}">${d.unplay?'':(d.c==='X'?'X':c)}</span><span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.r!=='s'&&d.r!=='x'?`<span class="rarity ${d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}<i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}</div>`}
+ <div class="card-print"><span class="cost${c<base?' cheap':c>base?' dear':''}">${d.unplay?'':(d.c==='X'?'X':c)}</span><span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.r!=='s'&&d.r!=='x'?`<span class="rarity ${d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}</div><i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}</div>`}
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
@@ -211,7 +211,7 @@ export const HAND_REST_TOP=.67;
 const handLayouts=new WeakMap();
 export function layoutHand(){const hand=document.getElementById('hand');if(!hand)return;const cards=[...hand.querySelectorAll('.card')];const n=cards.length;if(!n)return;
  const land=matchMedia('(orientation:landscape)').matches;const vh=innerHeight;
- const signature=[innerWidth,vh,hand.className,W.cb?.mode?.k,!!W.cb?.busy,
+ const signature=[innerWidth,vh,settings.uiSize,hand.className,W.cb?.mode?.k,!!W.cb?.busy,
   cards.map(c=>c.dataset.uid+':'+c.className+':'+c.style.width+':'+c.style.height).join('|'),
   W.cb?.ens.filter(e=>e.hp>0&&!e.fled).map(e=>e.uid).join(',')].join('/');
  // Enemy telegraphs and HP changes do not change the resting fan.
@@ -239,7 +239,7 @@ function clampPlates(hand){const rest=[...hand.querySelectorAll('.card:not(.sel)
  plates.forEach((p,i)=>{if(offsets[i]>0)p.style.top=(parseFloat(p.style.top)-offsets[i])+'px'})}
 
 // ---------------- title / travel ----------------
-export function settingsHTML(){return `<div class="settings"><label><input type="checkbox" id="setfast" ${settings.fastAnim?'checked':''} onchange="setFast(this.checked)"> Fast animations</label>
+export function settingsHTML(){return `<div class="settings"><label>UI size <input id="setuisize" aria-label="UI size" type="range" min="80" max="120" step="5" value="${settings.uiSize}" oninput="setUISize(this.value)"><output id="uisizevalue">${settings.uiSize}%</output></label><label><input type="checkbox" id="setfast" ${settings.fastAnim?'checked':''} onchange="setFast(this.checked)"> Fast animations</label>
  <label>Animation speed <select id="setanimspeed" onchange="setAnimSpeed(this.value)">${Object.keys(SPEEDS).map(v=>`<option value="${v}" ${(settings.animSpeed||'normal')===v?'selected':''}>${SPEED_LABEL[v]}</option>`).join('')}</select></label>
  <label>Effects <select id="setenvfx" onchange="setEnvFx(this.value)">${['full','reduced','off'].map(v=>`<option value="${v}" ${settings.envFx===v?'selected':''}>${envFxSettingLabel(v)}</option>`).join('')}</select></label>
  <label>Music <input id="setmusic" aria-label="Music volume" type="range" min="0" max="1" step="0.01" value="${settings.musicVolume}" oninput="setAudioSetting('musicVolume',this.value)"></label>
@@ -250,6 +250,7 @@ export function settingsHTML(){return `<div class="settings"><label><input type=
  <label><input id="setshake" type="checkbox" ${settings.screenShake!==false?'checked':''} onchange="setScreenShake(this.checked)"> Screen shake</label>
  <label><input id="setreduce" type="checkbox" ${settings.reduceMotion?'checked':''} onchange="setReduceMotion(this.checked)"> Reduced motion</label>
  </div>`}
+export function setUISize(value){settings.uiSize=Math.max(80,Math.min(120,Math.round((Number(value)||100)/5)*5));saveSettings();document.documentElement.style.setProperty('--ui-scale',settings.uiSize/100);const out=document.getElementById('uisizevalue');if(out)out.value=settings.uiSize+'%';layoutHand()}
 export function setConfirmCardSkip(on){settings.confirmCardSkip=!!on;saveSettings()}
 export function setCoach(on){settings.coach=!!on;saveSettings();render()}
 export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
@@ -347,7 +348,7 @@ function updateHTML(app,html,reset){const next=document.createElement('div');nex
 }
 
 // ---------------- render ----------------
-export function render(){if(W.previewing||W.replaying)return;if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;
+export function render(){if(W.previewing||W.replaying)return;if(drag||(W.chartDrag&&Date.now()-W.chartDrag<10000))return;const a=document.getElementById('app');let h='';const s=W.S.screen;document.documentElement.style.setProperty('--ui-scale',(settings.uiSize||100)/100);
  if(inspecting&&(inspectContext.screen!==s||inspectContext.run!==W.run||inspectContext.cb!==W.cb||inspectContext.ov!==W.S.ov))inspecting=null;
  if(s==='title')h=titleScr();
  else if(s==='travel')h=travelScr();
@@ -374,7 +375,7 @@ export function render(){if(W.previewing||W.replaying)return;if(drag||(W.chartDr
  // Reused nodes need the same cleanup once the drag render gate is released.
  for(const el of a.querySelectorAll('.hand .card.drag,.cslot')){el.style.transform='';el.classList.remove('drag','armed','lift','over-zone')}
  for(const el of a.querySelectorAll('.en.hot,.foes.armed,.chartbox.dragging,.cbottom.hot'))el.classList.remove('hot','armed','dragging');
- decorateCardRefs(a);decorateKeywords(a);fitCards(a);
+ decorateCardRefs(a);decorateKeywords(a);fitCards(a);if(inspecting)placeHeldInspect();
  if(s==='combat'){layoutHand();placeDetail();if(W.cb.sel!=null)showOutcome(W.cb.sel)}
  syncEnv();syncStage();syncAudio();syncCombatAnimations();
  if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
@@ -402,7 +403,7 @@ export function fitCards(root=document){const work=[];
  }
  // Prepare the whole batch before measuring. Applying one cached card at a time
  // otherwise forces a new layout for every card in a freshly drawn hand.
- for(const {c} of work){c.style.transition='none';c.style.transform='none'}
+ for(const {c} of work){c.style.transition='none';c.style.transform='none';const print=c.querySelector('.card-print');if(print)print.style.transform='none'}
  for(const w of work){const rect=w.c.getBoundingClientRect();
   w.key=[fitSignature(w.c),rect.width,rect.height,w.context.map(p=>p.split('@')[0]).join('/')].join('|');w.cached=fitCache.get(w.key);
  }
@@ -432,7 +433,7 @@ export function fitCards(root=document){const work=[];
   fitCache.set(key,{panels:['.name','.cost','.type','.text'].map(q=>[q,c.querySelector(q)?.getAttribute('style')??null])});
   if(fitCache.size>2048)fitCache.delete(fitCache.keys().next().value);
  }
- for(const {c,transform,transition,stamp} of work){c.style.transform=transform;c.style.transition=transition;fittedCards.set(c,stamp)}
+ for(const {c,transform,transition,stamp} of work){c.style.transform=transform;c.style.transition=transition;const print=c.querySelector('.card-print');if(print)print.style.transform='';fittedCards.set(c,stamp)}
 }
 if(typeof document!=='undefined'&&document.fonts){
  const fontsChanged=()=>{fitEpoch++;fitCache.clear();fitCards(document);if(document.getElementById('hand'))layoutHand()};
@@ -442,7 +443,17 @@ if(typeof window!=='undefined'){let resizeFrame;window.addEventListener('resize'
 // ===== long-press (or right-click) to enlarge any card =====
 export let inspecting=null;
 let inspectContext=null;
-export function openInspect(ci){inspecting=ci;inspectContext={screen:W.S.screen,run:W.run,cb:W.cb,ov:W.S.ov};render()}
+export function openInspect(ci,point=null){
+ inspecting=ci;inspectContext={screen:W.S.screen,run:W.run,cb:W.cb,ov:W.S.ov,point};render()
+}
+function placeHeldInspect(){
+ const point=inspectContext?.point,panel=document.querySelector('#inspect .insp');if(!point||!panel)return;
+ panel.classList.add('held-preview');const r=panel.getBoundingClientRect(),gap=60;
+ let x=point.x-r.width/2,y=point.y-r.height-gap;
+ if(y<8){x=point.x+gap+r.width<=innerWidth-8?point.x+gap:point.x-r.width-gap;y=(innerHeight-r.height)/2}
+ panel.style.left=Math.max(8,Math.min(innerWidth-r.width-8,x))+'px';
+ panel.style.top=Math.max(8,Math.min(innerHeight-r.height-8,y))+'px'
+}
 export function closeInspect(){inspecting=null;render()}
 export function inspectHTML(){const ci=inspecting,d=CARDS[ci.id];if(!d)return'';
  return `<div class="ov inspect" id="inspect" onclick="closeInspect()"><div class="insp">${cardHTML(ci,{full:true})}<div class="ikw"><b>${cname(ci)}</b> <span class="muted">${TYPEN[d.t]} · ${RARN[d.r]||''}</span><div>${desc(ci)}</div><div class="kws">${kwFor(ci)}</div>${d.flavour?`<div class="flav">${d.flavour}</div>`:''}<div class="muted">Tap anywhere to close</div></div></div></div>`}
