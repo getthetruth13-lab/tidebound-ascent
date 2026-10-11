@@ -66,7 +66,9 @@ function loadSfx(file){if(sfxBuffers.has(file))return Promise.resolve(sfxBuffers
 }
 let warming=false;
 function warmSfx(){if(!ctx||warming)return;warming=true;sfxReady.then(m=>Promise.all([...new Set(Object.values(m).map(v=>v.file))].map(loadSfx)))}
-export function playSound(name,pitch=1){if(W.replaying||document.hidden||!ctx||ctx.state!=='running'||!level('sfxVolume'))return;
+// Spencer silenced 2026-10-11, do not restore. (These cues all used cloth-open.ogg: title/menu/overlay/popup sound.)
+const SILENT_CUES=new Set(['menuOpen','menuClose','enlarge','tooltip','pile']);
+export function playSound(name,pitch=1){if(SILENT_CUES.has(name))return;if(W.replaying||document.hidden||!ctx||ctx.state!=='running'||!level('sfxVolume'))return;
  const now=ctx.currentTime;if(now-(recent[name]??-10)<.075)return;recent[name]=now;
  const config=sfxManifest[name];if(!config)return;
  const started=performance.now();loadSfx(config.file).then(buffer=>{
