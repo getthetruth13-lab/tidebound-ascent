@@ -14,13 +14,18 @@ let lp=null,eatClick=false;
 function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))return W.cb.hand[+i];const uid=+el.dataset.uid;const piles=W.cb?[W.cb.hand,W.cb.draw,W.cb.disc,W.cb.exh,W.cb.slots]:[];if(W.run)piles.push(W.run.deck);const live=uid>0?piles.flat().find(c=>c&&c.uid===uid&&c.id===el.dataset.id):null;return {...live,id:el.dataset.id,uid,up:el.dataset.up==='1'}}
 export const cancelLongPress=()=>{if(lp){clearTimeout(lp.t);lp=null}clearTimeout(hh);hh=0};
 let hh=0,holdTouch=false;
-function inspectNow(el,touch,point){clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null)}
+// v0.5.1: a held hand card shows its zoom on the opposite side (centre or right card -> left side, left card -> right side).
+// Any other card (reward, shop, rest/temper, deck viewer, events, pick screens) opens away from it by its screen position.
+function handSide(el){const h=el.closest&&el.closest('.hand');if(h&&el.dataset.i!=null){const n=h.querySelectorAll('.card').length;return +el.dataset.i>=(n-1)/2?'left':'right'}const r=el.getBoundingClientRect();return r.left+r.width/2>=innerWidth/2?'left':'right'}
+function inspectNow(el,touch,point){const side=touch?handSide(el):null;clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
 document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;closeInspect();return}let any=ev.target.closest&&ev.target.closest('.card');if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected)any=peek;if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,true,{x:ev.clientX,y:ev.clientY})},LONGPRESS_MS)}},true);
 document.addEventListener('pointermove',ev=>{if(lp&&Math.hypot(ev.clientX-lp.x0,ev.clientY-lp.y0)>10){clearTimeout(lp.t);lp=null}},true);
 document.addEventListener('pointerup',()=>{if(lp){clearTimeout(lp.t);lp=null}if(holdTouch){holdTouch=false;closeInspect()}},true); // A held preview lasts exactly until release.
-document.addEventListener('pointercancel',()=>{cancelLongPress();if(holdTouch){holdTouch=false;closeInspect()}},true);
+document.addEventListener('pointercancel',()=>{cancelLongPress()},true); // v0.5.1: a browser pan/cancel must not close a held zoom; only lifting the finger does
+document.addEventListener('touchend',ev=>{if(holdTouch&&ev.touches.length===0){holdTouch=false;closeInspect()}},true);
+document.addEventListener('touchcancel',ev=>{if(holdTouch&&ev.touches.length===0){holdTouch=false;closeInspect()}},true);
 // Preserve shelf scrolling before the hold; once open, sliding must not become a native pan/cancel.
 document.addEventListener('touchmove',ev=>{if(holdTouch)ev.preventDefault()},{passive:false});
 // Desktop hover-hold: resting the mouse on a card (1.5 s in the hand, 0.9 s elsewhere) enlarges it, like right-click.
@@ -53,6 +58,12 @@ function dropTarget(ci,x,y){
  const hero=document.querySelector('.hero').getBoundingClientRect();
  return upper||(x>=hero.left-45&&x<=hero.right+45&&y>=hero.top-45&&y<=hero.bottom+45&&y<innerHeight*.72)?'hero':null;
 }
+// v0.5.1 (StS mobile): while a long-press zoom is open, the same finger can drag the card into play. Wobble under HOLD_DRAG_PX keeps the zoom.
+export const HOLD_DRAG_PX=36;
+let heldDrag=null;
+document.addEventListener('pointermove',ev=>{const d=heldDrag;if(!d||ev.pointerId!==d.id||!holdTouch)return;const hx=ev.clientX-d.hx,hy=ev.clientY-d.hy;if(hy>-HOLD_DRAG_PX&&Math.abs(hx)<HOLD_DRAG_PX*1.5)return;ev.preventDefault();heldDrag=null;holdToDrag(d);drag=d;d.y0=Math.max(d.y0,ev.clientY+33);dragMove(d,ev)},{passive:false});
+document.addEventListener('pointerup',()=>{heldDrag=null},true);
+function holdToDrag(d){holdTouch=false;closeInspect();const el=document.querySelector(`.hand .card[data-i="${d.i}"]`);if(el){d.el=el;try{el.setPointerCapture(d.id)}catch(_){}}}
 export function dragMove(d,ev){const dy=ev.clientY-d.y0;
  d.x=ev.clientX;d.y=ev.clientY;
  if(!d.moved){if(dy>-32){if(dy>-10&&(d.scrubbing||Math.abs(ev.clientX-d.x0)>12)){d.scrubbing=true;scrubAt(ev.clientX,d.touch)}return}clearPeek();cancelLongPress();d.moved=true;d.el.classList.remove('sel');d.el.classList.add('drag');layoutHand(true);W.cb.sel=null;W.cb.insp=null;const t=document.getElementById('detail');if(t)t.remove()}
@@ -85,7 +96,7 @@ export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)retur
 document.addEventListener('pointerup',ev=>endDrag(ev,false));
 document.addEventListener('pointercancel',ev=>endDrag(ev,true));
 document.addEventListener('lostpointercapture',ev=>endDrag(ev,true));
-addEventListener('blur',()=>{cancelLongPress();if(drag)endDrag({pointerId:drag.id},true);clearPeek();dropSel();if(holdTouch){holdTouch=false;closeInspect()}});
+addEventListener('blur',()=>{cancelLongPress();heldDrag=null;if(drag)endDrag({pointerId:drag.id},true);clearPeek();dropSel();if(holdTouch){holdTouch=false;closeInspect()}});
 addEventListener('resize',()=>{hc=null;if(W.S.screen==='combat'&&!drag)requestAnimationFrame(()=>render())});// figure positions are viewport px
 
 

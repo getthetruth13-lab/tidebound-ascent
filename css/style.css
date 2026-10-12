@@ -1096,6 +1096,8 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .insp.held-preview{position:absolute;display:block;width:min(260px,calc((100dvh - 24px)*5/7))}
 .insp.held-preview .card{--gw:min(260px,calc((100dvh - 24px)*5/7));width:var(--gw)}
 .insp.held-preview .ikw{display:none}
+/* v0.5.1: a held hand card is only the enlarged card + its keyword windows: no dim/blur overlay, and the finger keeps control underneath */
+.ov.inspect.held-hand{background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none}
 
 /* Task 38: open combat HUD, with a bounded relic rail and one corner baseline. */
 .combat #relicbar{background:none!important;border:0!important;border-image:none!important;box-shadow:none!important;padding:0;margin:0;overflow:visible;gap:0;align-self:center;flex:1 1 0;display:grid;grid-template-columns:repeat(var(--relic-columns,1),minmax(0,1fr));grid-auto-rows:48px;height:48px;align-content:start}
@@ -1157,7 +1159,8 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
  .combat #drawpile{left:calc(2.137% - 35*var(--hud-unit));bottom:calc(8.333dvh - 35*var(--hud-unit));transform:none}.combat #discpile{right:calc(2.35% - 35*var(--hud-unit));bottom:calc(8.333dvh - 35*var(--hud-unit));transform:none}
  .combat #exhpile{right:calc(2.35% - 25*var(--hud-unit));bottom:calc(18dvh);width:calc(50*var(--hud-unit));height:calc(50*var(--hud-unit));transform:none}
  .combat #endbtn{left:81.197%;right:auto;bottom:16.667dvh;width:calc(200*var(--hud-unit));height:calc(70*var(--hud-unit));min-width:0;padding:0;transform:none;font-size:var(--hud-text);background:none!important}
- .combat .hand{left:calc(42.735% - 350*var(--hud-unit));right:auto;width:calc(700*var(--hud-unit));--hcw:calc(185*var(--hud-unit))}.combat .hand .card{width:var(--hcw);margin-left:calc(var(--hcw)/-2);bottom:calc(230*var(--unit) - var(--hcw)*1.4)}
+ /* v0.5.1 hotfix: hand centred on screen (Spencer 15:41 override of the spec's x 1000), cards ~12% larger (185 -> 207), StS-mobile rest: ~60% of the card above the screen edge, ~40% off-screen */
+ .combat .hand{left:calc(50% - 390*var(--hud-unit));right:auto;width:calc(780*var(--hud-unit));--hcw:calc(207*var(--hud-unit))}.combat .hand .card{width:var(--hcw);margin-left:calc(var(--hcw)/-2);bottom:calc(var(--hcw)*1.4*-.4)}
  .combat .dais.compact-meter{position:absolute;left:10.043%;top:auto;bottom:26dvh;transform:translateX(-50%);width:max-content;height:auto;display:flex;gap:var(--hud-gap);align-items:center;background:none;border:0;padding:0;font:700 var(--hud-text)/1 var(--font-number);z-index:11}.combat .compact-meter .tbtn{min-height:0;min-width:0;padding:var(--hud-gap);font-size:var(--hud-text)}
  .combat .plate .nm{display:none}.combat .plate .hpbar{height:calc(14*var(--hud-unit));margin-top:calc(16*var(--unit));padding:0}.combat .hpnum{font-size:var(--hud-text)}
  .combat .plate .stw{top:calc(38*var(--hud-unit));max-width:none}.combat .stw .badges{flex-wrap:nowrap;gap:var(--hud-gap);zoom:1}.combat .status-art{width:calc(35*var(--hud-unit));height:calc(35*var(--hud-unit))}.combat .hpblk{width:var(--hud-icon);height:var(--hud-icon);left:calc(-20*var(--hud-unit));margin-top:calc(-20*var(--hud-unit))}

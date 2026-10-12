@@ -220,7 +220,7 @@ function tgtImpl(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return
  cb.insp=cb.insp===i?null:i;cb.sel=null;render()}
 export function sceneTap(ev){if(!W.cb||drag)return;if(ev.target.closest('.en,.tip,.hero'))return;if(W.cb.sel!=null||W.cb.insp!=null){W.cb.sel=null;W.cb.insp=null;render()}}
 // Full framed cards at rest; one card rises above a scrubbing finger or cursor.
-export const HAND_REST_TOP=850/1080;
+export const HAND_REST_TOP=(1080-207*1.4*.6)/1080;export const HAND_REST_W=207,HAND_LIFT_W=310,HAND_LIFT_TOP=640;
 const handLayouts=new WeakMap();
 export function layoutHand(animate=false){const hand=document.getElementById('hand');if(!hand)return;const cards=[...hand.querySelectorAll('.card:not(.drag)')];const n=cards.length;if(!n)return;
  const land=matchMedia('(orientation:landscape)').matches;const vh=innerHeight;
@@ -237,8 +237,8 @@ export function layoutHand(animate=false){const hand=document.getElementById('ha
  // Read every bottom offset before writing transforms to avoid a layout flush per card.
  const bottoms=land?cards.map(el=>parseFloat(getComputedStyle(el).bottom)||0):[];
  cards.forEach((el,i)=>{const off=i-(n-1)/2;const x=off*step,y=(Math.abs(off)*Math.abs(off)-Math.pow((n-1)/2,2))*cw*(land?.012:.018);
-  const zl=land?310/185:zoom;
-  const ly=land?-(vh*210/1080-ch*(310/185-1)):-8;
+  const zl=land?HAND_LIFT_W/HAND_REST_W:zoom;
+  const ly=land?-(vh*(HAND_REST_TOP*1080-HAND_LIFT_TOP)/1080-ch*(zl-1)):-8;
   // a lifted card slides left of the enemy row when there is room, so it doesn't hide the target it's aimed at
   const zw=cw*zl;const lo=zw/2+4-cx;let hi=innerWidth-zw/2-4-cx;if(land&&eL<innerWidth&&eL-zw-10>0)hi=Math.min(hi,eL-zw/2-6-cx);const xs=Math.max(lo,Math.min(hi,x));
   el.style.setProperty('--x',x+'px');el.style.setProperty('--y',y+'px');el.style.setProperty('--r',off*ang+'deg');el.style.setProperty('--xs',xs+'px');
@@ -507,12 +507,16 @@ if(typeof window!=='undefined'){let resizeFrame;window.addEventListener('resize'
 // ===== long-press (or right-click) to enlarge any card =====
 export let inspecting=null;
 let inspectContext=null;
-export function openInspect(ci,point=null){
- inspecting=ci;inspectContext={screen:W.S.screen,run:W.run,cb:W.cb,ov:W.S.ov,point};render()
+export function openInspect(ci,point=null,side=null){
+ inspecting=ci;inspectContext={screen:W.S.screen,run:W.run,cb:W.cb,ov:W.S.ov,point,side};render()
 }
 function placeHeldInspect(){
  const point=inspectContext?.point,panel=document.querySelector('#inspect .insp');if(!panel)return;
  panel.classList.add('held-preview');const r=panel.getBoundingClientRect(),gap=60;
+ const side=inspectContext?.side;panel.closest('#inspect')?.classList.toggle('held-hand',!!side);
+ if(side){const rail=panel.querySelector('.inspect-keywords');const kw=rail?rail.getBoundingClientRect().width+6:0;const m=Math.max(12,innerWidth*.04);
+  panel.style.left=(side==='left'?m:innerWidth-r.width-m)+'px';panel.style.top=Math.max(8,Math.min(innerHeight-r.height-8,(innerHeight-r.height)/2-innerHeight*.06))+'px';
+  if(rail){rail.style.left=side==='left'?'calc(100% + 3px)':(-kw)+'px';rail.style.maxHeight=(innerHeight-16)+'px';rail.style.top='0px'}return}
  if(!point){panel.style.left=(innerWidth-r.width)/2+'px';panel.style.top=(innerHeight-r.height)/2+'px';placeInspectKeywords(panel);return}
  let x=point.x-r.width/2,y=point.y-r.height-gap;
  if(y<8){x=point.x+gap+r.width<=innerWidth-8?point.x+gap:point.x-r.width-gap;y=(innerHeight-r.height)/2}
