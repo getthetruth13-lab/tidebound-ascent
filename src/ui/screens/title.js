@@ -1,5 +1,6 @@
 // ui/screens/title.js: the launch screen and its sub-views (main menu, Load Game, Options, Learn to Play, character select).
 // View lives in W.S.view ('main' by default, so older code that sets W.S={screen:'title'} lands on the menu).
+import {glyph} from '../glyphs.js';
 import {W} from '../../core/state.js';
 import {CLASSES} from '../../core/registry.js';
 import {settings,saveSettings,loadRunData,continueRun,clearRun} from '../../save.js';
@@ -44,9 +45,9 @@ export function applyMotion(){document.body.classList.toggle('reduce-motion',!!s
 export function setReduceMotion(on){settings.reduceMotion=!!on;
  if(on){if(settings.envFx==='full'){settings.envFxBefore='full';settings.envFx='reduced'}}else if(settings.envFxBefore){settings.envFx=settings.envFxBefore;delete settings.envFxBefore}
  saveSettings();applyMotion();render()}
-const slotHTML=s=>{const K=CLASSES[s.run.cls];return `<div class="tb-slot theme-${K.theme}" data-key="${s.key}"><span class="tb-sico">${K.e}</span><span class="tb-sinfo"><b>${K.n}</b> · Floor ${s.run.floor}/15<br><i>❤️ ${s.run.hp}/${s.run.max} · 💰 ${s.run.gold} · ${s.run.deck.length} cards · ${ago(s.t)}</i></span>
+const slotHTML=s=>{const K=CLASSES[s.run.cls];return `<div class="tb-slot theme-${K.theme}" data-key="${s.key}"><span class="tb-sico">${K.e}</span><span class="tb-sinfo"><b>${K.n}</b> · Floor ${s.run.floor}/15<br><i>${glyph('heart')} ${s.run.hp}/${s.run.max} · ${glyph('coin')} ${s.run.gold} · ${s.run.deck.length} cards · ${ago(s.t)}</i></span>
  <button class="tb-btn sm pri" onclick="loadSlot('${s.key}')">Load</button><button class="tb-btn sm${W.S.confirmDel===s.key?' danger':''}" onclick="deleteSlot('${s.key}')">${W.S.confirmDel===s.key?'Sure?':'Delete'}</button></div>`};
-function framed(id,title,body,cls=''){return `<div class="tb-scr tb-title">${bgHTML()}<div class="tb-ov"><div class="tb-frame ${cls}" id="${id}">${frameOpen()}<h2>${title}</h2>${body}<button class="tb-x" aria-label="Back" onclick="titleGo('main')">✕</button>${frameClose()}</div></div></div>`}
+function framed(id,title,body,cls=''){return `<div class="tb-scr tb-title">${bgHTML()}<div class="tb-ov"><div class="tb-frame ${cls}" id="${id}">${frameOpen()}<h2>${title}</h2>${body}${frameClose()}</div></div></div>`}
 export function titleScr(){const v=W.S.view||'main';
  if(v==='studio'){clearTimeout(studioTimer);studioTimer=setTimeout(studioNext,window.FAST?50:2500);return `<div class="tb-scr tb-studio" id="studio" onclick="studioNext()"><img src="${STUDIO_LOGO}" alt=""></div>`}
  if(v==='start')return `<div class="tb-scr tb-title tb-start tb-vid" id="startscr" onclick="startTap()"><div class="tv-stage"><video class="tv-video" src="art/v2/title/title-loop.mp4" poster="art/v2/title/title-poster.jpg" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture preload="auto" aria-label="The Drowned Sun. Tap to begin"></video></div></div>`;
@@ -55,8 +56,8 @@ export function titleScr(){const v=W.S.view||'main';
  if(v==='intro')return introScr();
  if(v==='lamp')return lampPickScr();
  if(v==='ledger')return ledgerScr();
- if(v==='options')return framed('optionswin','Options',`${settingsHTML()}<div class="tb-actions"><button class="tb-btn pri" id="optback" onclick="titleGo('main')">Back</button></div>`,'tb-opt');
- if(v==='load'){const sl=listSlots();return framed('loadwin','Load Game',`<div class="tb-slots">${sl.length?sl.map(slotHTML).join(''):'<p class="tb-none">No saved journeys yet. Begin a new game and your climb is saved automatically.</p>'}</div><div class="tb-actions"><button class="tb-btn pri" id="loadback" onclick="titleGo('main')">Back</button></div>`,'tb-load')}
+ if(v==='options')return framed('optionswin','Options',`${settingsHTML()}<div class="tb-actions"><button class="tb-btn pri" id="optback" onclick="titleGo('main')">${glyph('undo')}<span>Back</span></button></div>`,'tb-opt');
+ if(v==='load'){const sl=listSlots();return framed('loadwin','Load Game',`<div class="tb-slots">${sl.length?sl.map(slotHTML).join(''):'<p class="tb-none">No saved journeys yet. Begin a new game and your climb is saved automatically.</p>'}</div><div class="tb-actions"><button class="tb-btn pri" id="loadback" onclick="titleGo('main')">${glyph('undo')}<span>Back</span></button></div>`,'tb-load')}
  const sv=loadRunData(),K=sv&&CLASSES[sv.run.cls];
  const pend=totalPending(loadProfile()),nsl=listSlots().length;
  const mi=(id,label,act,opt={})=>`<button class="tb-mi${opt.off?' off':''}" id="${id}"${opt.off?' disabled':` onclick="${act}"`}><i class="tb-flame" aria-hidden="true"></i><b>${label}</b>${opt.sub?`<small>${opt.sub}</small>`:''}${opt.dot?`<em class="lp-dot">${opt.dot}</em>`:''}<u aria-hidden="true"></u></button>`;

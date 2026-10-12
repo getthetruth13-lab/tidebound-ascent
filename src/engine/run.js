@@ -12,7 +12,7 @@ import {saveRun,clearRun} from '../save.js';
 import {initRun as lampInit,noteSeen,settleRun} from './lamplight.js';
 import {loadProfile,lockedFor} from '../progress.js';
 import {eventText} from '../data/lore.js';
-import {render,markCardsSeen} from '../ui/render.js';
+import {render,markCardsSeen,updateCardSelection} from '../ui/render.js';
 // ================= economy tables (design-v2 §1.1, §1.4, §1.5) =================
 export const ECON={startGold:99,potionSlots:3,
  gold:{fight:[10,20],elite:[25,35],boss:[90,110]},
@@ -169,7 +169,7 @@ export function combatRewards(kind,{allFled,opts={},cb}={}){const run=W.run;cons
   else if(run.rareNext){run.rareNext=false;cards=rollCards(rewardCardCount(),kind,{forceR:'r'})}
   else cards=rollCards(rewardCardCount(),kind==='elite'?'elite':'fight');
   remember('offerHist',cards);rows.push({k:'cards',cards})}
- W.S={screen:'reward',kind,rows,boss:kind==='boss'?(cb&&cb.bossKey)||run.boss:null,title:kind==='boss'?'🔔 Boss defeated!':kind==='elite'?'💀 Elite defeated!':allFled?'🐦 They fled with your gold…':'⚔️ Victory!',t:Date.now()};
+ W.S={screen:'reward',kind,rows,boss:kind==='boss'?(cb&&cb.bossKey)||run.boss:null,title:kind==='boss'?'Boss defeated!':kind==='elite'?'Elite defeated!':allFled?'They fled with your gold…':'Victory!',t:Date.now()};
  // Keep the map checkpoint; the save journal reconstructs this room and its
  // claimed/unclaimed rewards when the player continues.
  render()}
@@ -180,7 +180,7 @@ function claimRowImpl(i){const S=W.S;const row=S.rows&&S.rows[i];if(!row||row.do
  else if(row.k==='cards'){S.cardsOpen=i;S.cardSelected=null;S.skipConfirm=false}
  render()}
 function rewCardImpl(j){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done||!Number.isInteger(j)||!row.cards[j]||S.skipConfirm)return;
- S.cardSelected=S.cardSelected===j?null:j;render()}
+ S.cardSelected=S.cardSelected===j?null:j;updateCardSelection()}
 function rewConfirmCardsImpl(confirm=settings.confirmCardSkip!==false){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done||S.skipConfirm)return;
  const j=S.cardSelected;if(j==null)return rewSkipCardsImpl(confirm);if(!row.cards[j])return;
  markCardsSeen(row.cards);gainCard(row.cards[j]);row.done=true;row.took=row.cards[j];S.cardsOpen=null;S.cardSelected=null;render()}
@@ -242,7 +242,7 @@ export function pickable(mode,filter){return W.run.deck.filter(c=>{const d=CARDS
  if((mode==='remove'||mode==='transform'||mode==='offer')&&d.noRemove)return false;if(mode==='annotate'&&(c.open||d.open))return false;return !filter||filter(c)})}
 export function openPick(mode,title,then,cancel,filter,onPick){const list=pickable(mode,filter);if(!list.length){then?then(null):goMap();return}
  W.S={screen:'pick',mode,title,then:then||goMap,cancel,filter,onPick};render()}
-function pickCardImpl(uid){const S=W.S;if(S.screen!=='pick')return;const i=W.run.deck.findIndex(c=>c.uid===uid);if(i<0)return;const ci=W.run.deck[i];
+function applyPickCard(uid){const S=W.S;if(S.screen!=='pick')return;const i=W.run.deck.findIndex(c=>c.uid===uid);if(i<0)return;const ci=W.run.deck[i];
  if(!pickable(S.mode,S.filter).includes(ci))return;
  if(S.mode==='upgrade')ci.up=true;
  else if(S.mode==='remove'){W.run.deck.splice(i,1)}
@@ -250,6 +250,10 @@ function pickCardImpl(uid){const S=W.S;if(S.screen!=='pick')return;const i=W.run
  else if(S.mode==='duplicate'){W.run.deck.push(mk(ci.id,ci.up));toast('🪞 Duplicated '+cname(ci),'')}
  else if(S.mode==='annotate'){ci.open=true;toast('📘 '+cname(ci)+' gains Opening','')}
  if(S.onPick)S.onPick(ci);S.then(ci)}
+function pickCardImpl(uid){return applyPickCard(uid)}
+export function selectPickCard(uid){return savedAction('selectPickCard',[uid],()=>{const S=W.S;if(S.screen!=='pick'||S.skipConfirm||!pickable(S.mode,S.filter).some(c=>c.uid===uid))return;S.pickSelected=S.pickSelected===uid?null:uid;updateCardSelection()})}
+export function pickConfirm(){return savedAction('pickConfirm',[],()=>{const S=W.S;if(S.screen!=='pick'||S.skipConfirm)return;if(S.pickSelected!=null)return applyPickCard(S.pickSelected);if(settings.confirmCardSkip!==false){S.skipConfirm=true;render()}else pickCancelImpl()})}
+export function pickSkipAnswer(yes,dont=false){return savedAction('pickSkipAnswer',[yes,dont],()=>{if(W.S.screen!=='pick'||!W.S.skipConfirm)return;if(yes){if(dont&&!W.replaying){settings.confirmCardSkip=false;saveSettings()}pickCancelImpl()}else{W.S.skipConfirm=false;render()}})}
 function pickCancelImpl(){const S=W.S;if(S.cancel)S.cancel();else S.then(null)}
 // ================= chests (§1.5) =================
 function openChestImpl(){const run=W.run;const c=wpick(ECON.chest.map(x=>[x,x.w]),'relics');const rows=[];
@@ -259,15 +263,15 @@ function openChestImpl(){const run=W.run;const c=wpick(ECON.chest.map(x=>[x,x.w]
 function openChestLidImpl(){if(W.S.screen!=='chest')return;W.S.opened=true;W.S.openT=Date.now();render()}
 // ================= camps (§1.8) =================
 export function campOptions(){const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${Math.floor(W.run.max*mod('mendFrac',{},ECON.mend))} HP (30% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
- for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.camp)o.push({k:d.camp,l:{cook:'🍲 Cook',scour:'🪨 Scour',trawl:'⚓ Trawl',annotate:'📘 Annotate'}[d.camp],d:{cook:'Gain 4 Max HP (Galley Pot)',scour:'Remove a card (Pumice Stone)',trawl:'Gain a random Common or Uncommon relic (Grapnel Hook)',annotate:'Give a card Opening (Ship\'s Rutter)'}[d.camp],relic:r.id})}
+ for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.camp)o.push({k:d.camp,l:{cook:'Cook',scour:'🪨 Scour',trawl:'Trawl',annotate:'📘 Annotate'}[d.camp],d:{cook:'Gain 4 Max HP (Galley Pot)',scour:'Remove a card (Pumice Stone)',trawl:'Gain a random Common or Uncommon relic (Grapnel Hook)',annotate:'Give a card Opening (Ship\'s Rutter)'}[d.camp],relic:r.id})}
  return mod('campOptions',{},o)}
 function campDoImpl(k){if(W.S.screen!=='rest')return;
  if(k==='mend'){heal(Math.floor(W.run.max*mod('mendFrac',{},ECON.mend)));return goMap()}
- if(k==='temper')return openPick('upgrade','⬆️ Temper: choose a card to upgrade',goMap,()=>{W.S={screen:'rest'};render()});
- if(k==='cook'){gainMaxHp(4);return msg('🍲 Cook','A hearty stew. +4 Max HP.')}
- if(k==='scour')return openPick('remove','🪨 Scour: choose a card to remove',goMap,()=>{W.S={screen:'rest'};render()});
- if(k==='trawl'){const id=randomRelic({c:60,u:40,r:0},'relics',{noCampfire:true});if(id){gainRelic(id);return msg('⚓ Trawl','Your hook brings up <b>'+RELICS[id].e+' '+RELICS[id].n+'</b>.')}gainGold(50);return msg('⚓ Trawl','Only gold this time. +50 gold.')}
- if(k==='annotate')return openPick('annotate','📘 Annotate: give a card Opening (it starts in your opening hand)',goMap,()=>{W.S={screen:'rest'};render()})}
+ if(k==='temper')return openPick('upgrade','Temper: choose a card to upgrade',goMap,()=>{W.S={screen:'rest'};render()});
+ if(k==='cook'){gainMaxHp(4);return msg('Cook','A hearty stew. +4 Max HP.')}
+ if(k==='scour')return openPick('remove','Scour: choose a card to remove',goMap,()=>{W.S={screen:'rest'};render()});
+ if(k==='trawl'){const id=randomRelic({c:60,u:40,r:0},'relics',{noCampfire:true});if(id){gainRelic(id);return msg('Trawl','Your hook brings up <b>'+RELICS[id].e+' '+RELICS[id].n+'</b>.')}gainGold(50);return msg('Trawl','Only gold this time. +50 gold.')}
+ if(k==='annotate')return openPick('annotate','Annotate: give a card Opening (it starts in your opening hand)',goMap,()=>{W.S={screen:'rest'};render()})}
 export const restHeal=()=>campDo('mend');
 // ================= merchant (§1.4) =================
 export const price=(v,kind)=>Math.max(0,Math.round(mod('price',{kind},v)));
@@ -287,13 +291,15 @@ function openShopImpl(){const run=W.run,P=ECON.price;
  for(const it of [...S.cards,...S.colorless,...S.relics,...S.potions])it.price=price(it.sale?it.base/2:it.base,'shop');
  W.S=S;render()}
 export function shopItems(){const S=W.S;return {cards:S.cards,colorless:S.colorless,relics:S.relics,potions:S.potions}}
+export function selectShopCard(shelf,i){return savedAction('selectShopCard',[shelf,i],()=>{const S=W.S;if(S.screen!=='shop'||!['cards','colorless'].includes(shelf)||!S[shelf]?.[i]||S[shelf][i].sold)return;const key=shelf+':'+i;S.shopSelected=S.shopSelected===key?null:key;updateCardSelection()})}
+export function confirmShopCard(){return savedAction('confirmShopCard',[],()=>{const S=W.S;if(S.screen!=='shop'||!S.shopSelected)return;const [shelf,i]=S.shopSelected.split(':');S.shopSelected=null;buyImpl(shelf,+i)})}
 function buyImpl(shelf,i){const S=W.S;if(S.screen!=='shop')return;const it=S[shelf]&&S[shelf][i];if(!it||it.sold)return;if(W.run.gold<it.price){it.noT=Date.now();return render()}
  if(shelf==='potions'&&!W.run.potions.includes(null)){it.noT=Date.now();toast('Potion slots full','');return render()}
  W.run.gold-=it.price;it.sold=true;
  if(shelf==='cards'||shelf==='colorless')gainCard(it.id);else if(shelf==='relics'){gainRelic(it.id);if(W.S!==S)return}else if(shelf==='potions')addPotion(it.id);
  render()}
 function shopRemoveImpl(){const S=W.S;if(S.screen!=='shop'||S.scrubbed||!pickable('remove').length)return;const p=scrubPrice();if(W.run.gold<p)return;
- openPick('remove',`✂️ Scrub: remove a card (💰${p})`,()=>{W.run.gold-=p;W.run.removals++;S.scrubbed=true;W.S=S;render()},()=>{W.S=S;render()})}
+ openPick('remove',`Scrub: remove a card (${p} gold)`,()=>{W.run.gold-=p;W.run.removals++;S.scrubbed=true;W.S=S;render()},()=>{W.S=S;render()})}
 // ================= flow =================
 function goMapImpl(){W.cb=null;if(W.run&&W.run.hp<=0)return endRun(false);W.S={screen:'map'};fire('mapEnter',{});saveRun();render()}
 export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;clearRun();settleRun(run,won);W.S={screen:'end'};render()}

@@ -27,8 +27,8 @@ const tend=()=>alive().filter(x=>x.key==='tendril');
 registerEnemies({
  slug:{n:'Brine Slug',e:'🐌',hp:hp('slug'),ai:AI(e=>{const lash={a:11,b:5,lbl:'Lash'},wd={b:12,lbl:'Withdraw'};
   return pk(e,[{w:e.t?40:100,m:lash,rep:2},{w:e.t?(hurt(e)>=10?70:35):0,m:wd,rep:1}])})},
- gull:{n:'Gull Thief',e:'🐦',hp:hp('gull'),ai:AI(e=>{const snatch={steal:10,lbl:'Snatch & flee'},peck={a:7,h:2,lbl:'Peck'};
-  const gold=W.run.gold>0;return pk(e,[{w:e.t>=3&&gold?100:e.t>=2&&gold?50:0,m:snatch},{w:e.t>=3&&gold?0:60,m:peck,rep:3},{w:e.t&&e.t<3?25:0,m:{a:5,b:6,lbl:'Wheel & Peck'},rep:1}])})},
+ gull:{n:'Gull Thief',e:'🐦',hp:hp('gull'),ai:AI(e=>{const snatch={steal:10,lbl:'Snatch & flee'},peck={a:5,h:2,lbl:'Peck'};
+  const gold=W.run.gold>0;return pk(e,[{w:e.t>=3&&gold?100:e.t>=2&&gold?50:0,m:snatch},{w:e.t>=3&&gold?0:60,m:peck,rep:2},{w:e.t&&e.t<3?25:0,m:{a:5,b:6,lbl:'Wheel & Peck'},rep:1}])})},
  knight:{n:'Wrack Knight',e:'🤖',hp:hp('knight'),ai:AI(e=>{const sh={s:2,b:8,lbl:'Sharpen'},cl={a:16,b:6,lbl:'Cleave'},br={b:14,lbl:'Brace'};const mt=e.st.str||0;
   if(!e.t)return pk(e,[{w:1,m:sh}]);
   return pk(e,[{w:mt>=6?0:30,m:sh,rep:1},{w:60,m:cl,rep:2},{w:hurt(e)>=14?40:8,m:br,rep:1}])})},
@@ -43,7 +43,7 @@ registerEnemies({
   return pk(e,[{w:40,m:{a:3,brittle:1,lbl:'Latch'},rep:2},{w:e.t&&miss>=4?45:0,m:{a:5,heal:Math.min(5,miss),lbl:'Drink'},rep:1},{w:15,m:{a:6,lbl:'Gnaw'},rep:2}])})},
  lurker:{n:'Kelp Lurker',e:'🌿',hp:[34,38],ai:AI(e=>{const ent={a:4,status:{id:'kelp',n:1,pile:'disc'},lbl:'Entangle'};if(!e.t)return pk(e,[{w:1,m:ent}]);
   return pk(e,[{w:30,m:{a:7,lbl:'Grab'},rep:2},{w:35,m:{a:4,h:2,lbl:'Thrash'},rep:2},{w:35,m:{...ent,a:7},rep:1}])})},
- tendril:{n:'Kelp Tendril',e:'🌱',hp:[12,12],ai:e=>({a:3,lbl:'Lash'})},
+ tendril:{n:'Kelp Tendril',e:'🌱',hp:[10,10],ai:e=>({a:3,lbl:'Lash'})},
  // ---- Act 1 roster additions (design/ACT1-ROSTER-ADDITIONS.md; numbers simmed in CODEX_TASK_20/21) ----
  penitent:{n:'Wrackfolk Penitent',e:'⛓️',hp:[40,44],b0:8,
   passive:{n:'Penance',text:'At the end of each of its turns, it gains 1 Might.',endTurn:e=>{addSt(e,'str',1)}},

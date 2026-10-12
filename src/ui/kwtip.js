@@ -2,7 +2,7 @@
 // are underlined; tap / long-press (touch) or hover (mouse) shows a small themed popup with a 1-2 line rule.
 // The list is built from the KW glossary (data/keywords.js), so new keywords appear automatically.
 import {KW,CARDS,RELICS} from '../core/registry.js';
-import {cardHTML,fitCards} from './render.js';
+import {cardHTML,fitCards,relicCollectionHTML,inspectKeywordsHTML,placeInspectKeywords} from './render.js';
 import {pickSpot} from './place.js';
 import {relicFlavour} from '../data/lore.js';
 const EXTRA={ // statuses and terms the glossary spreads across other entries
@@ -38,12 +38,12 @@ function contentOf(el){if(el.dataset.sinfo)return {title:el.dataset.sname||el.da
 function showCard(el){const id=el.dataset.card;if(!CARDS[id])return false;
  if(!ctip){ctip=document.createElement('div');ctip.id='cardtip';ctip.setAttribute('role','tooltip');document.body.appendChild(ctip)}
  if(tip)tip.classList.remove('on');
- ctip.innerHTML=cardHTML({id,uid:-900,up:el.dataset.up==='1'},{full:true});ctip.classList.add('on');fitCards(ctip);anchor=el;shownAt=Date.now();
+ const ci={id,uid:-900,up:el.dataset.up==='1'};ctip.innerHTML=cardHTML(ci,{full:true})+`<div class="inspect-keywords">${inspectKeywordsHTML(ci)}</div>`;ctip.classList.add('on');fitCards(ctip);anchor=el;shownAt=Date.now();
  const r=el.getBoundingClientRect(),tr=ctip.getBoundingClientRect();const sp=pickSpot(tr.width,tr.height,r,el);const x=sp.x,y=sp.y;
- ctip.style.left=x+'px';ctip.style.top=y+'px';clearTimeout(timer);timer=el.closest('.dais')?0:setTimeout(hideTip,6500);return true}
+ ctip.style.left=x+'px';ctip.style.top=y+'px';placeInspectKeywords(ctip);clearTimeout(timer);timer=el.closest('.dais')?0:setTimeout(hideTip,6500);return true}
 export function showTip(el){if(el.dataset.card)return showCard(el);if(ctip)ctip.classList.remove('on');const c=contentOf(el);if(!c||!c.text){return false}
  const t=ensure();const sl=el.matches('.relic,.potion,.shopicon')&&el.querySelector('.slot');const rl=el.dataset.relic&&RELICS[el.dataset.relic];
- t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b${c.kind?` class="${c.kind}"`:''}>${c.title}</b>`:''}<span>${c.text}</span>`;t.classList.toggle('meter-tip',!!el.closest('.dais'));t.classList.toggle('item',!!sl);t.classList.toggle('stat',!!c.kind);if(c.kind)decorateKeywords(t);t.classList.add('on');anchor=el;shownAt=Date.now();
+ t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b${c.kind?` class="${c.kind}"`:''}>${c.title}</b>`:''}<span>${c.text}</span>`;if(el.matches('.relic-more'))t.innerHTML=`<div class="relic-collection"><h2>Relics</h2>${relicCollectionHTML()}</div>`;t.classList.toggle('meter-tip',!!el.closest('.dais'));t.classList.toggle('item',!!sl);t.classList.toggle('stat',!!c.kind);if(c.kind)decorateKeywords(t);t.classList.add('on');anchor=el;shownAt=Date.now();
  const meter=!!el.closest('.dais');t.style.maxWidth=meter?'150px':'';const r=el.getBoundingClientRect();let x,y;
  if(document.querySelector('.combat')){let best=null;
   for(const width of meter?[150,130,170,200,230,260]:[null]){if(width)t.style.maxWidth=width+'px';const tr=t.getBoundingClientRect(),sp=pickSpot(tr.width,tr.height,r,el,!!c.kind||meter);if(!best||sp.s<best.s){best={...sp,width};if(sp.s===0)break}}
@@ -60,11 +60,11 @@ document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.pr
  if(el&&el.closest('.dais')&&!el.closest('button')){hideTip();e.stopPropagation();e.preventDefault();return}
  if(el&&el.matches('.tipi,.lp-node,.nmf,.wrenline,.dais [data-info]:not(button)')){if(anchor===el&&tip.classList.contains('on'))hideTip();else showTip(el);e.stopPropagation();e.preventDefault();return}
  if(!ref){const on=(tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on'));if(on&&!(e.target.closest&&e.target.closest('#kwtip,#cardtip')))hideTip();return}
- if(inHand(el)||inButton(el))return hideTip();
+ if(inHand(el)||inButton(el)||(el.closest('.card')&&!el.closest('#inspect,#cardtip')))return hideTip();
  const open=anchor===el&&((tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on')));if(open&&Date.now()-shownAt>400){hideTip()}else if(open){/* hover just opened it */}else showTip(el);
  e.stopPropagation();e.preventDefault()},true);
 document.addEventListener('pointerdown',e=>{if(lp){clearTimeout(lp.t);lp=null}if(e.pointerType==='mouse'&&e.button>0)return;
- const el=find(e);if(!el||inHand(el))return;const ok=el.matches('.bd,.hpblk')?e.pointerType!=='mouse':(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.shopicon,.tile,.evo,.rl,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
+ const el=find(e);if(!el||inHand(el))return;const ok=el.matches('.bd,.hpblk')?e.pointerType!=='mouse':(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.relic,.potion,.shopicon,.tile,.evo,.rl,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
  lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el)){eat=true;holdEl=el;clearTimeout(timer)}},LP)}},true);
 document.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){clearTimeout(lp.t);lp=null}},true);
 const release=()=>{if(holdEl){holdEl=null;hideTip()}};

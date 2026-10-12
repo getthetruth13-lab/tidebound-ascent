@@ -1,20 +1,43 @@
 {
  "map": [
-  "map-act1-1.mp3"
+  "map-act1-1.mp3",
+  "map-act1-2.mp3",
+  "map-act1-3.mp3"
  ],
  "fight": [
-  "fight-act1-1.mp3"
+  "fight-act1-1.mp3",
+  "fight-act1-2.mp3",
+  "fight-act1-3.mp3"
  ],
  "elite": [
-  "elite-act1-1.mp3"
+  "elite-act1-1.mp3",
+  "elite-act1-2.mp3",
+  "elite-act1-3.mp3"
  ],
  "boss": [
-  "boss-act1-1.mp3"
+  "boss-act1-1.mp3",
+  "boss-act1-2.mp3",
+  "boss-act1-3.mp3"
  ],
  "intro": [
   "intro-1.mp3"
  ],
  "menu": [
   "menu-1.mp3"
+ ],
+ "shop": [
+  "shop-act1-1.mp3",
+  "shop-act1-2.mp3",
+  "shop-act1-3.mp3"
+ ],
+ "rest": [
+  "rest-act1-1.mp3",
+  "rest-act1-2.mp3",
+  "rest-act1-3.mp3"
+ ],
+ "event": [
+  "event-act1-1.mp3",
+  "event-act1-2.mp3",
+  "event-act1-3.mp3"
  ]
 }

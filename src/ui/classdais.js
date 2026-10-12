@@ -112,14 +112,14 @@ function duel(cb){const D=CORE.duel,max=mod('momMax',{},D.mom_max),fmin=flourish
   <span class="dag${cb.parry?' on':''}" data-info="Parry ${cb.parry}: reduce the first incoming hit by up to ${cb.parry} this turn and reflect damage. The parrying dagger is the off hand."><i></i><b>${cb.parry||''}</b></span>
   <span class="mom-read"><b>${cb.mom}</b></span></div>`)}
 
-export function daisHTML(){const cb=W.cb,c=W.run.cls;return c==='tide'?tide(cb):c==='echo'?echo(cb):c==='carto'?carto(cb):c==='duel'?duel(cb):''}
+export function illustratedDaisHTML(){const cb=W.cb,c=W.run.cls;return c==='tide'?tide(cb):c==='echo'?echo(cb):c==='carto'?carto(cb):c==='duel'?duel(cb):''}
 
 // ---------- live drag previews ----------
 export function clearMeterPreview(){const d=document.getElementById('dais');if(!d)return;d.classList.remove('pv');
  d.querySelectorAll('.wp-pv').forEach(e=>e.remove());
  const dagger=d.querySelector('.dag b');if(dagger&&W.cb)dagger.textContent=W.cb.parry||'';
  d.querySelectorAll('.pvon').forEach(e=>e.classList.remove('pvon'));d.querySelectorAll('.pvt').forEach(e=>{e.textContent=''});d.style.removeProperty('--pv')}
-export function showMeterPreview(res){const d=document.getElementById('dais'),cb=W.cb;clearMeterPreview();if(!d||!res||!res.meter||!cb)return;const m=res.meter,c=d.dataset.cls;let on=false;
+export function showMeterPreview(res){const d=document.getElementById('dais'),cb=W.cb;clearMeterPreview();if(!d||d.classList.contains('compact-meter')||!res||!res.meter||!cb)return;const m=res.meter,c=d.dataset.cls;let on=false;
  if(c==='tide'){const t=m.tide;if(t!==cb.tide||m.crest||m.undertow){const tube=d.querySelector('.tg2-tube');tube.style.setProperty('--pv',t*10+'%');tube.classList.add('pvon');
    d.querySelector('.tg2-pvn').textContent='→ '+t;d.querySelector('.tg2-pvn').style.bottom=`calc(${t*10}% - 0px)`;
    d.querySelector('.tg2-n').classList.toggle('pvon',Math.abs(t-cb.tide)*tube.clientHeight/10<22);
@@ -133,3 +133,27 @@ export function showMeterPreview(res){const d=document.getElementById('dais'),cb
  else if(c==='duel'){const r=d.querySelector('.rap');if(m.mom!==cb.mom){r.style.setProperty('--pm',m.mom);r.classList.add('pvon');r.querySelector('.rap-pvn').textContent='→ '+m.mom;on=true}
   if(m.parry>cb.parry){const g=d.querySelector('.dag');g.classList.add('pvon');g.querySelector('b').textContent=m.parry;on=true}}
  if(on)d.classList.add('pv')}
+
+// Task 41: preserve illustrated paths, render only the live mechanic readout.
+export function daisHTML(){const cb=W.cb,c=W.run.cls;let value=0,tip='',actions='';
+ if(c==='tide'){
+  value=`${cb.tide} ${cb.tide>=CORE.tide.high?'High':cb.tide<=CORE.tide.low?'Low':'Calm'}`;tip=tideInfo(cb);
+  if(hasRelic('tidetable')&&!cb.tideBtnUsed)actions+=btn('tideup','','',0,"tideAct('up')",'Tide Table: Surge 1 (free, once per turn).','+1')+btn('tidedn','','',0,"tideAct('down')",'Tide Table: Recede 1 (free, once per turn).','−1');
+  if(hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir)actions+=btn('tideflip','','',0,"tideAct('flip')","Helmsman's Wheel: flip the drift.",'↕');
+  if(cb.banks)actions+=btn('relbank','','',cb.busy,'releaseBank()',`Release ${cb.banks} Banked Crests.`,`×${cb.banks}`);
+ }else if(c==='echo'){
+  const plan=echoPlan(true),pv=plan&&echoPreview(plan);value=pv?.total||0;
+  tip=`Echo: ${value} at the end of your turn. Mark the next card: +1 per card played after it (max +${CORE.echo.bonus_cap}). Unmarked: last played card Echoes at ${CORE.echo.unmarked_fallback*100}% strength.${cb.armMark?' Armed: next card will be Marked.':''}`;
+  if(canMark())actions+=btn(cb.mark?'markbtn2':'markbtn','',cb.armMark,false,'armMark()',tip,cb.armMark?'✓':'+');
+ }else if(c==='duel'){
+  value=cb.mom;const D=CORE.duel,max=mod('momMax',{},D.mom_max),mult=flourishMult(cb.mom);
+  tip=`Momentum: ${cb.mom}/${max}. Attacks gain 1. Turn end: −${D.decay}${cb.keepMom?' (kept)':''}; unblocked hit: −${mod('momLoss',{},D.lose_on_unblocked)}. Flourish at ${flourishMin()}+: tap to arm; next Attack spends all for ×${mult}${cb.armFlourish?' (armed)':''}. Parry ${cb.parry}: first hit −${cb.parry}, reflect ${Math.floor(cb.parry*mod('parryReflect',{},D.parry_back_frac))}.`;
+  actions+=btn('flourishbtn','',cb.armFlourish,cb.mom<flourishMin()||cb.busy,'armFlourish()',tip,cb.armFlourish?'×'+mult:'×');
+ }else if(c==='carto'){
+  const pk=cb.mode?.k==='slot',lim=mod('advances',{},1),canAdv=!pk&&cb.advUsed<lim&&!cb.busy&&!cb.mode;
+  value=cb.slots.reduce((n,w)=>n+(w?.rank||0),0);
+  tip=`Chart: ${Math.max(0,lim-cb.advUsed)} Advances left. Tap Waypoint: +1 Rank. Rank ${CORE.carto.rank_max}: Landmark, counts twice for Expedition. Waypoint cards place effects. Next: ${cb.draw.slice(0,3).map(cname).join(', ')||'reshuffle'}. Draw pile: face up.`;
+  actions=cb.slots.map((w,i)=>w?`<button class="tbtn" data-slot="${i}" data-info="${esc(cname(w)+': '+plain(desc(w))+'. Rank '+(w.rank||0))}" onclick="${pk?`modeAct('slot',${i})`:canAdv&&(w.rank||0)<CORE.carto.rank_max?`advance(${i})`:''}">${w.rank||0}</button>`:'').join('');
+ }
+ return `<aside class="dais compact-meter dais-${c}" id="dais" data-cls="${c}" aria-label="${c} mechanic"><span data-info="${esc(tip)}" tabindex="0">${value}</span>${actions}</aside>`;
+}

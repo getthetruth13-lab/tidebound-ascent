@@ -3,7 +3,7 @@
 import {registerEncounters} from '../core/registry.js';
 registerEncounters({
  easy:[{e:['slug'],w:2},{e:['gull','gull'],w:2},{e:['wisp'],w:2},{e:['leech'],w:1}],
- hard:[{e:['knight'],w:2},{e:['crab','slug'],w:2},{e:['pod','pod','pod'],w:1},{e:['wisp','gull'],w:2},{e:['crab','crab'],w:1},{e:['lurker'],w:2},{e:['lurker','leech'],w:1},{e:['leech','slug','slug'],w:1},{e:['slug','wisp'],w:1},{e:['crab','leech'],w:1},
+ hard:[{e:['knight'],w:2},{e:['crab','slug'],w:2},{e:['pod','pod','pod'],w:1},{e:['wisp','gull'],w:2},{e:['crab','crab'],w:1},{e:['lurker'],w:2},{e:['lurker','leech'],w:1},{e:['leech','slug'],w:1,fl:[4,14]},{e:['slug','wisp'],w:1},{e:['crab','leech'],w:1},
   // Task 20 additions; fl:[min,max] = floors the fight may appear on. Allies come first so the Mender's Stitch can lock a target on spawn.
   {e:['penitent'],w:2,fl:[3,14]},{e:['penitent','slug'],w:1,fl:[3,10]},{e:['heap'],w:2,fl:[2,10]},{e:['slug','heap'],w:1,fl:[4,10]},
   {e:['knight','mender'],w:1,fl:[6,14]},{e:['lurker','mender'],w:1,fl:[6,14]},{e:['wisp','mender'],w:1,fl:[6,14]},

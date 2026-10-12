@@ -11,7 +11,7 @@ const bags={},lastTrack={},voices=new Set(),recent={};
 const level=k=>settings.audioMuted?0:Math.max(0,Math.min(1,Number(settings[k])||0));
 const indexURL=new URL('../audio/music/index.json',import.meta.url);
 fetch(indexURL).then(r=>{if(!r.ok)throw Error('Music index unavailable');return r.json()}).then(data=>{
- for(const k of ['map','fight','elite','boss'])manifest[k]=(data[k]||[]).filter(f=>new RegExp(`^${k}-act1-\\d+\\.mp3$`).test(f));
+ for(const k of ['map','fight','elite','boss','shop','rest','event'])manifest[k]=(data[k]||[]).filter(f=>new RegExp(`^${k}-act1-\\d+\\.mp3$`).test(f));
  manifest.intro=(data.intro||[]).filter(f=>/^intro-\d+\.mp3$/.test(f));
  manifest.menu=(data.menu||[]).filter(f=>/^menu-\d+\.mp3$/.test(f));
  startTrack();
@@ -41,7 +41,7 @@ function syncBossPhases(){for(const e of W.cb?.ens||[]){if(!e.boss)continue;cons
  if(previous!==undefined&&phase>previous&&!phaseHeard.has(e)){phaseHeard.add(e);if(!document.hidden)playSound('bossPhase')}
 }}
 export function syncAudio(){syncUIState();syncBossPhases();const s=W.S.screen;
- const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:'map'):null;
+ const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:s==='shop'||s==='rest'||s==='event'?(manifest[s]?.length?s:'map'):'map'):null;
  if(next!==context){retire();context=next;startTrack()}
  if(s==='end'&&lastScreen!==s)playSound(W.run&&W.run.won?'victory':'defeat');lastScreen=s;
 }

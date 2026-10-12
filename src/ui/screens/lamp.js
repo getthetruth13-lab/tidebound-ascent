@@ -5,6 +5,7 @@ import {CARDS,CLASSES,RELICS,POTIONS} from '../../core/registry.js';
 import {ACT1_CARDS} from '../../data/act1.js';
 import {LAMP_XP,CLIMB_XP,LAMP_PLAN,CLIMB_PLAN,CLASS_ORDER,LOCK_CARDS,LOCK_CLASS_RELICS,LOCK_SHARED_RELICS,LOCK_POTIONS} from '../../data/lamplight.js';
 import {loadProfile,saveProfile,lampLevel,climbLevel,lampPending,climbPending,totalPending,barOf,offerFor,claim,lockedFor,firstLevel} from '../../progress.js';
+import {glyph} from '../glyphs.js';
 import {slotHTML} from '../../assets.js';
 import {TASKS,taskProgress} from '../../engine/lamplight.js';
 import {emblemHTML,relicTile,potionTile,TILES,esc as tesc} from '../tiles.js';
@@ -72,30 +73,30 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
    const lv=firstLevel(tab,'card',id,CARDS);return lockTile(d.r,TYPE_N[d.t],on.has(id)?'On offer: choose it now':`A lantern waits. Lamp ${lv}+`,on.has(id)?d.n:null)}).join('');
   const R=LOCK_CLASS_RELICS[tab];tiles+=[R.shop,R.rare].map(id=>lock.relics[id]?lockItem('relic',id,on.has(id)?'On offer: choose it now':`A lantern waits. Lamp ${firstLevel(tab,'relic',id,CARDS)}`,on.has(id)):itemTile('relic',id)).join('')}
  else{tiles=[...LOCK_SHARED_RELICS.map(id=>[ 'relic',id]),...LOCK_POTIONS.map(id=>['potion',id])].map(([k,id])=>(k==='relic'?lock.relics[id]:lock.potions[id])?lockItem(k,id,on.has(id)?'On offer: choose it now':`A lantern waits. Stair ${firstLevel('climb',k,id,CARDS)}+`,on.has(id)):itemTile(k,id)).join('')}
- return `<div class="tb-scr tb-ledger${climb?'':' theme-'+TH[tab]}">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">‹ Back</button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
+ return `<div class="tb-scr tb-ledger${climb?'':' theme-'+TH[tab]}">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">${glyph('undo')}<span>Back</span></button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
   <div class="lp-tabs">${tabs}</div>${info}<div class="lp-grid" id="ledgergrid">${tiles}</div></div>`}
 // ---------- the Keeper's Ledger pages: eight reveal stages, one per lit window (design/lore/LORE-BIBLE.md §14.2) ----------
 const pageHTML=(st,got)=>got
  ?`<article class="lp-page${st.cut?' cut':''}${st.twist?' deep':''}" data-stage="${st.n}">${st.cut?'<i class="lp-stub" aria-hidden="true"></i>':''}<span class="lp-pn">${st.n}</span><h3>${st.title}</h3>${st.lines.map(l=>`<p>${l}</p>`).join('')}</article>`
  :`<article class="lp-page sealed${st.twist?' deep':''}" data-stage="${st.n}"><span class="lp-pn">${st.n}</span><h3>${emblemHTML('lore-page-sealed','🕯️','pip')} ???</h3><p class="lp-hint">${stageUnlockedLine(st)} Stair Climb ${st.n}.</p></article>`;
 function pagesScr(tabs,p){const stage=loreStage(p),tier=loreTier(p);
- return `<div class="tb-scr tb-ledger">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">‹ Back</button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
+ return `<div class="tb-scr tb-ledger">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">${glyph('undo')}<span>Back</span></button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
   <div class="lp-tabs">${tabs}</div><div class="lp-pagehead"><i>${lamplightMeaning(tier)}</i><span>${stage} of ${LEDGER_STAGES.length} pages found</span></div>
   <div class="lp-pages" id="ledgerpages">${LEDGER_STAGES.map(st=>pageHTML(st,st.n<=stage)).join('')}</div></div>`}
 // ---------- end-of-run summary ----------
 export function lampSummaryHTML(sum){if(!sum)return '';const K=CLASSES[sum.cls],{lampBar:lb,climbBar:cb}=sum;
  const bar=(label,from,to,emb,emo)=>{const up=to.lvl>from.lvl;return `<div class="lp-row${up?' up':''}"><span class="lp-med">${emblemHTML(emb,emo,'pip')}<b>${to.lvl}</b></span><div class="lp-rb"><span class="lp-rl">${label}${up?` <em class="lvup">level up!</em>`:''}</span><div class="lp-bar anim" style="--from:${from.pct}%;--to:${up?100:to.pct}%"><i></i></div></div></div>`};
  let n=0;
- return `<div class="lp-sum"><div class="lp-banner">${emblemHTML(sum.won?'lamp-banner-win':'lamp-banner-lose',sum.won?'🏮':'🕯️','strip')}<div class="lp-bt"><h3>🏮 Lamplight</h3><div class="lp-story">${sum.won?'The lamp room answers.':`${deathLine(sum.floor,sum.boss)} ${DEATH_LINE}`}</div></div></div>
-  <table class="lp-lines">${sum.lines.map(l=>`<tr style="--i:${n++}"><td>${l.label}</td><td>+${l.pts}</td></tr>`).join('')}${sum.mults.map(m=>`<tr class="mul" style="--i:${n++}"><td>${m.label}</td><td>×${+m.x.toFixed(2)}</td></tr>`).join('')}<tr class="tot" style="--i:${n++}"><td>Total</td><td class="lp-count" style="--v:${sum.total}">+<b>${sum.total}</b></td></tr></table>
+ return `<div class="lp-sum"><div class="lp-banner">${emblemHTML(sum.won?'lamp-banner-win':'lamp-banner-lose',sum.won?'🏮':'🕯️','strip')}<div class="lp-bt"><h3>${glyph('lantern')} Lamplight</h3><div class="lp-story">${sum.won?'The lamp room answers.':`${deathLine(sum.floor,sum.boss)} ${DEATH_LINE}`}</div></div></div>
+  <table class="lp-lines">${sum.lines.map(l=>`<tr style="--i:${n++}"><td>${l.label}</td><td>+${l.pts}</td></tr>`).join('')}${sum.mults.length?`<tr class="subt" style="--i:${n++}"><td>Subtotal</td><td>${sum.sub}</td></tr>`:''}${sum.mults.map(m=>`<tr class="mul" style="--i:${n++}"><td>${m.label}</td><td>×${+m.x.toFixed(2)}</td></tr>`).join('')}<tr class="tot" style="--i:${n++}"><td>Total</td><td class="lp-count" style="--v:${sum.total}">+<b>${sum.total}</b></td></tr></table>
   ${bar(K.n+' Lamp',lb.from,lb.to,'lamp-class-'+sum.cls,K.e)}${bar('Stair Climb',cb.from,cb.to,'lamp-climb','🗼')}
-  <div class="lp-tasks">${sum.tasks.map(t=>`<span class="lp-tsk${t.done?' ok':''}">${emblemHTML(t.done?'lamp-task-lit':'lamp-task-dark',t.done?'🏮':'🕯️','pip')}${t.done?'✔':'○'} ${t.n}</span>`).join('')}</div>
-  <div class="lp-btns">${sum.lampPending?`<button class="btn pri" id="lampclaim" onclick="openLampPick('${sum.cls}')">${K.n} Lamp: choose unlock${sum.lampPending>1?' ('+sum.lampPending+')':''}</button>`:''}${sum.climbPending?`<button class="btn pri" id="climbclaim" onclick="openLampPick('climb')">Stair Climb: choose unlock${sum.climbPending>1?' ('+sum.climbPending+')':''}</button>`:''}</div></div>`}
+  <div class="lp-tasks">${sum.tasks.map(t=>`<span class="lp-tsk${t.done?' ok':''}">${emblemHTML(t.done?'lamp-task-lit':'lamp-task-dark',t.done?'🏮':'🕯️','pip')}${glyph(t.done?'check':'candle')} ${t.n}</span>`).join('')}</div>
+  <div class="lp-btns">${sum.lampPending?`<button class="btn pri" id="lampclaim" onclick="openLampPick('${sum.cls}')">Choose Lamp unlock${sum.lampPending>1?' ('+sum.lampPending+')':''}</button>`:''}${sum.climbPending?`<button class="btn pri" id="climbclaim" onclick="openLampPick('climb')">Choose Climb unlock${sum.climbPending>1?' ('+sum.climbPending+')':''}</button>`:''}</div></div>`}
 // ---------- Lantern Tasks overlay (opened from the 🏮 button): one illustrated card per task, with progress ----------
 export function tasksHTML(){const L=W.run&&W.run.lamp;if(!L)return '';
  const card=t=>{const T=TASKS[t.id],pr=!t.done&&taskProgress(t.id),who=T.cls==='any'?'Any climb':CLASSES[T.cls].n;
   return `<div class="lp-task tile sp cat-dusk static${t.done?' done lit':''}" data-task="${t.id}"><span class="tart">${emblemHTML(t.done?'lamp-task-lit':'lamp-task-dark',t.done?'🏮':'🕯️')}</span><i class="tglow"></i><span class="tsig" data-info="${tesc(who)}">${emblemHTML('lamp-class-'+T.cls,T.cls==='any'?'🧭':CLASSES[T.cls].e,'sig')}</span><span class="tname">${who}</span><span class="tsum">${T.n}</span>
-  ${pr?`<span class="lp-pg"><i style="width:${Math.round(pr[0]/pr[1]*100)}%"></i><em>${pr[0]} / ${pr[1]}</em></span>`:`<span class="lp-st">${t.done?'✔ Lit · +15':'Unlit'}</span>`}</div>`};
+  ${pr?`<span class="lp-pg"><i style="width:${Math.round(pr[0]/pr[1]*100)}%"></i><em>${pr[0]} / ${pr[1]}</em></span>`:`<span class="lp-st">${t.done?glyph('check')+' Lit · +15':'Unlit'}</span>`}</div>`};
  return `<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box tilebox lp-taskbox"><h2>🏮 Lantern Tasks</h2><div class="muted csub">Optional. Each lantern lit is +15 Lamplight when the run ends. Missing them costs nothing.</div>
  <div class="tiles lp-tasktiles" style="--n:${L.tasks.length}">${L.tasks.map(card).join('')}</div><button class="btn full">Close</button></div></div>`}
 export const lampBtnLabel=()=>{const L=W.run&&W.run.lamp;return L?L.tasks.filter(t=>t.done).length+'/'+L.tasks.length:''};

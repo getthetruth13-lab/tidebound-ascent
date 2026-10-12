@@ -387,7 +387,7 @@ function syncScreens(){if(!motionOn())return;const S=W.S,s=S.screen;
 }
 // capture-phase click hooks: flights start before the click's own handler re-renders the screen
 addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.closest)return;
- const card=t.closest('.rewgrid .card');
+ const card=t.closest('#confirmcard')&&W.S.cardSelected!=null&&!W.S.skipConfirm?$('.rewgrid .reward-selected .card'):null;
  if(card){const deck=$('#deckbtn');if(deck){const all=$$('.rewgrid .card').filter(c=>c!==card);const b=rectOf(deck),rects=new Map([card,...all].map(c=>[c,c.getBoundingClientRect()]));const {g,r}=cloneCard(card,rects.get(card));
    all.forEach(c=>{const o=cloneCard(c,rects.get(c));o.g.animate([{opacity:1},{opacity:0,transform:'translateY(18px) scale(.9)'}],{duration:U(260),easing:'ease-in'}).finished.then(()=>o.g.remove(),()=>o.g.remove())});
    const dx=b.x-(r.left+r.width/2),dy=b.y-(r.top+r.height/2);let raf=0;

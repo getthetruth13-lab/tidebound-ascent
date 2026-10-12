@@ -32,7 +32,7 @@ export function introScr(){const n=Math.max(1,Math.min(SCENES.length,W.S.scene|0
  <div class="in-vig"></div>
  <div class="in-text" id="introtext" key="${n}">${textHTML(n)}</div>
  <div class="in-dots">${SCENES.map((_,i)=>`<i class="${i+1===n?'on':''}"></i>`).join('')}</div>
- <button class="tb-btn sm in-skip" id="introskip" onclick="event.stopPropagation();introSkip()">Skip ›</button>
+ <button class="tb-btn sm in-skip" id="introskip" onclick="event.stopPropagation();introSkip()">Skip</button>
  <div class="in-tap">${n===SCENES.length?'Tap to choose your Lampbearer':'Tap to continue'}</div></div>`}
 export function introStart(replay){W.S={screen:'title',view:'intro',scene:1,prev:0,replay:!!replay};render()}
 export function introNext(){if(W.S.screen!=='title'||W.S.view!=='intro')return;const n=W.S.scene;

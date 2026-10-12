@@ -1,7 +1,7 @@
 // ui/screens/heroes.js: presentation text for the four Lampbearers (character select, Learn to Play).
 // Voice and facts follow design-v2 "WORLD LORE & VOICE" (L.1 premise, L.2 why you climb). Mechanic numbers come from CLASSES[k].rule.
 export const SPRITE_OF={tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist'};
-export const ORDER=['duel','echo','carto','tide'];
+export const ORDER=['tide','echo','carto','duel'];
 export const HEROES={
  tide:{epithet:'Moon-Sworn Keeper of the Tides',
   blurb:'A patient caster who bends the sea itself: raise it, lower it, and let it break over every foe.',
@@ -35,3 +35,10 @@ export const HEROES={
    'Every foe is a lesson in tempo, and every parry a promise kept.'],
   plain:'Attacks build Momentum, which carries between turns and fades by 1 at the end of your turn. With enough, tap the glowing blade to Flourish: spend it all for a much bigger hit. Parry reduces the first blow and reflects half the Parry.',
   tips:['Flourish spends all your Momentum: ×2 at 2 Momentum, up to ×3.5 at 5.','Apply Bleed before attacking: it ignores Guard, triggers once per Attack per enemy, then falls by 1.']}};
+// Character select v2 lore window (CHARSEL-IDEAS idea 8). Spoiler-safe: S0/S1 only per design/lore/LORE-BIBLE.md (no Undermoon hints).
+// tags: three "how it plays" icons, one word each. Icon ids map to inline SVGs in select.js (CS_ICON).
+export const CHARSEL={
+ tide:{lore:['The sea once answered every word the keepers spoke. Then the sun sank, and the water forgot its manners.','You climb to make the sea answer to you again.'],tags:[['wave','Tide'],['crest','Crest'],['shell','Undertow']]},
+ echo:{lore:['Forty leagues inland, a single bronze note rolled across the barley and would not fade.','Strike a note and the world strikes it back, a little stronger.'],tags:[['bell','Mark'],['ring','Echo'],['chain','Combo']]},
+ carto:{lore:['Every chart of this coast ends at the same blank margin.','Your road is drawn in advance and walked in blood.'],tags:[['eye','Foresight'],['cairn','Waypoints'],['road','Advance']]},
+ duel:{lore:['The Last Keeper\'s blade came down to your order with a single oath: Light it.','Every foe is a lesson in tempo, and every parry a promise kept.'],tags:[['blade','Momentum'],['star','Flourish'],['drop','Bleed']]}};

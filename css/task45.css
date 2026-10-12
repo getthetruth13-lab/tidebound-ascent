@@ -1,0 +1,153 @@
+/* ==== Task 45: one safe frame, one engraved-title style, one pick-screen layout. Loaded LAST (after eventscene.css). ====
+   Safe frame: nothing interactive or readable inside --sf-x of the left/right edge or --sf-t / --sf-b of the top/bottom edge.
+   Titles are engraved text with a soft glow (the event-screen look); boxed plaques are gone. */
+:root{--sf-x:max(22px,env(safe-area-inset-left));--sf-t:6px;--sf-b:10px;--tap:44px;--foot-h:62px}
+/* ---- engraved title (replaces every boxed plaque) ---- */
+.etitle,.page>h2,.page .roomhead h2,.end h1,.endl h1,.tb-inner>h2{position:relative;display:block;width:fit-content;max-width:90%;margin:2px auto 0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;
+ font:700 clamp(20px,5.2vh,27px)/1.1 var(--font-display);letter-spacing:.09em;text-transform:uppercase;color:#f0dcaa;text-align:center;
+ text-shadow:0 -1px 0 #000,0 1px 0 #ffffff2e,0 0 10px #000,0 0 18px #d9b46a55}
+.etitle::before,.etitle::after,.page>h2::before,.page>h2::after,.tb-inner>h2::before,.tb-inner>h2::after{display:none}
+.etitle .reward-banner{all:unset}
+.pk-sub{font:italic 400 15px/1.25 var(--serif);color:var(--cream-dim,#cdbf9a);text-align:center;margin:1px auto 0;max-width:min(760px,86vw);text-shadow:0 1px 2px #000,0 0 8px #000}
+.pk-sub b{color:#f0dcaa;font-style:normal}.pk-sub .muted{opacity:.8}
+.pk-sub .wrenline{font-size:15px}
+.pk-sub .gi{width:1em;height:1em}
+/* ---- the shared pick layout ---- */
+.page.fit{max-width:none;padding:0 var(--sf-x) 0;height:100dvh;overflow:hidden;gap:0}
+.page.fit>.topbar{flex:none;margin:0 calc(var(--sf-x)*-1)}
+.page.fit-event{padding:0}
+.pk{flex:1 1 0;min-height:0;display:flex;flex-direction:column;position:relative;z-index:1}
+.pk-body{flex:1 1 0;min-height:0;container-type:size;display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 0 4px;position:relative}
+.pk-foot{flex:none;height:var(--foot-h);display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:0 0 var(--sf-b);position:relative;z-index:3}
+.pk-l,.pk-r{display:flex;gap:12px;align-items:center}
+.pkbtn{min-width:150px;min-height:48px;padding:6px 18px;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.pk-r .pkbtn.pri{min-width:190px;min-height:50px;font-size:15px}
+.pkbtn .gi{width:1.15em;height:1.15em;color:inherit}
+.btn .gi{color:inherit;filter:none}
+/* tiles fill the body: one row, sized from the body's own box */
+.pk-body .tiles{flex-wrap:nowrap;max-width:none;width:100%;height:100%;align-items:center;justify-content:center;gap:14px;padding:0;margin:0;--n:3}
+.pk-body .tile.sp{--th:min(calc(100cqh - 10px),300px);height:var(--th);width:min(calc((100cqw - 14px*var(--n,3))/var(--n,3)),216px);min-width:0;flex:0 1 auto}
+.pk-body .tiles.many .tile.sp{width:min(calc((100cqw - 14px*var(--n))/var(--n)),180px)}
+.pk-body .tile.sp .tname{font-size:clamp(12px,calc(var(--th)*.07),16px)}
+.pk-body .tile.sp .tsum{font-size:clamp(12px,calc(var(--th)*.056),14.5px);-webkit-line-clamp:3}
+/* card pick (reward, Temper, remove...): real cards sized from the body */
+.pk-body .grid{padding:0;gap:16px;flex-wrap:nowrap;align-items:center;justify-content:center;width:100%;height:100%;--gw:min(calc(94cqh*5/7),calc((100cqw - 60px)/3))}
+.pk-body .rewgrid .rcw{flex:none;width:var(--gw)}
+.pk-body .rewgrid .rcw .card{width:100%}
+.pk-pick .pk-body{justify-content:flex-start;align-items:stretch}
+.pk-pick .pk-body .grid{flex-wrap:wrap;overflow-y:auto;align-content:flex-start;justify-content:flex-start;gap:12px 12px;--gw:min(calc((100cqw - 5*12px - 24px)/6),150px);padding:6px 6px 14px;scrollbar-width:thin;
+ mask-image:linear-gradient(#000 calc(100% - 22px),transparent);-webkit-mask-image:linear-gradient(#000 calc(100% - 22px),transparent)}
+.pk-pick .pk-body .grid .pick-option{flex:none;width:var(--gw)}
+.pk-pick .pk-body .grid .pick-option .card{width:100%}
+.pk-up .pk-body .grid{--gw:min(calc((100cqw - 250px - 4*12px - 24px)/5),150px);width:auto;flex:1 1 0;min-width:0}
+.pk-up #upgradecompare{position:static!important;right:auto;top:auto;flex:none;width:210px;display:flex;gap:10px;align-items:flex-start;justify-content:center;align-self:center}
+.pk-up #upgradecompare:empty{display:none}
+.pk-up #upgradecompare>div{width:98px;font:600 11px var(--font-display);text-align:center;color:var(--cream-dim);letter-spacing:.06em;text-transform:uppercase}
+.pk-up #upgradecompare .card{width:98px;margin-top:3px}
+/* rest / chest / potpick */
+.pk-rest .pk-body .tiles,.pk-potpick .pk-body .tiles,.pk-swap .pk-body .tiles{gap:18px}
+.pk-rest .pk-body .tile.sp{--th:min(calc(100cqh - 20px),270px)}
+.pk-chest .pk-body{gap:28px}
+.pk-chest .chestwrap{padding:0;background:none;flex:none}
+.pk-chest .chestwrap .emb.big{width:min(220px,40cqw);height:auto;aspect-ratio:4/3;max-height:calc(100cqh - 20px)}
+.pk-chest .chestwrap .chest{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:var(--tap);min-height:var(--tap)}
+.pk-chest .chestwrap .chest .muted{font:italic 400 15px var(--serif);color:var(--cream-dim)}
+.pk-chest.open .pk-body .tiles{width:auto;flex:1 1 0;min-width:0;--n:2}
+.hasboss .pk-body{padding-top:36px}
+/* ---- shop: cards on top (scroll sideways, readable size), relics + potions below, Scrub on the right, Leave bottom-right ---- */
+.pk-shop .pk-body{align-items:stretch;justify-content:flex-start;gap:12px;padding-top:4px}
+.shop-main{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px;min-height:0}
+.shop-side{flex:none;width:148px;display:flex;flex-direction:column;justify-content:center;gap:8px;align-self:center}
+.shop-side .tile.sp{--th:calc(min(100cqh,230px) - 14px);width:100%;min-width:0}
+.pk-shop .shelf{display:flex;flex-direction:row;gap:14px;align-items:flex-start;background:none;border:0;border-radius:0;padding:0;box-shadow:none}
+.pk-shop .shelf.cards{flex:1 1 0;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;--gw:calc((100cqh - 34px - 100px - 22px)*5/7);padding:0 18px 2px 0;
+ mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent);-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 34px),transparent);scrollbar-width:none}
+.pk-shop .shelf.cards .shopitem{flex:0 0 var(--gw);width:var(--gw);scroll-snap-align:start}
+.pk-shop .shelf.cards .shopitem .card{width:100%}
+.pk-shop .shgrp{display:flex;flex-direction:column;gap:2px;flex:none;min-width:0}
+.pk-shop .shrow{display:flex;gap:8px;align-items:flex-start}
+.pk-shop .shlbl{writing-mode:horizontal-tb;transform:none;align-self:flex-start;font:700 12px/1 var(--font-display);letter-spacing:.16em;text-transform:uppercase;color:#bfa56a;text-shadow:0 1px 2px #000;margin:0 0 2px;padding:0 0 3px;border-bottom:1px solid #d9b46a44;min-width:60px}
+.pk-shop .shelfrow{flex:none;display:flex;gap:26px;margin:0}
+.pk-shop .shelf.relics,.pk-shop .shelf.potions{flex:none}
+.pk-shop .shopicon{min-width:92px;min-height:88px}
+.pk-shop .shopitem .price,.pk-shop .shopicon .price{font:700 14px var(--font-number,var(--font-display));display:inline-flex;gap:4px;align-items:center;justify-content:center;color:#f3d48a}
+.pk-shop .price.poor{color:#d98a82}
+.pk-shop .shopicon .inm{font-size:12px}
+.pk-shop .pk-foot .pkbtn:disabled{opacity:.5}
+.shop-wren{display:none!important}
+/* ---- end screens: two balanced columns, engraved, nothing boxed ---- */
+.end{padding:0}
+.end.withlamp{position:fixed;inset:48px var(--sf-x) var(--sf-b);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:28px;align-items:center;max-width:none;max-height:none;overflow:auto;padding:0;margin:0;text-align:center}
+.end:not(.withlamp){padding-top:12vh}
+.end .endl{display:flex;flex-direction:column;align-items:center;gap:6px}
+.end .endl .big{font-size:54px;line-height:1;color:#d9b46a}.end .endl .big .gi{width:1em;height:1em;color:#d9b46a;filter:drop-shadow(0 0 12px #d9b46a66)}
+.end .endl .sub{margin:0;font:italic 400 16px/1.3 var(--serif);color:var(--cream-dim);max-width:34em}
+.endstats{display:flex;flex-wrap:wrap;gap:4px 18px;justify-content:center;max-width:30em;margin:6px 0 8px}
+.endstats .es{display:inline-flex;gap:6px;align-items:baseline;font:500 13.5px var(--serif);color:#cdbf9f;text-shadow:0 1px 2px #000}
+.endstats .es i{font-style:normal;font:600 11px var(--font-display);letter-spacing:.12em;text-transform:uppercase;color:#a99a76}
+.endstats .es b{font:700 15px var(--font-number,var(--serif));color:#f0dcaa}
+.end #restart{min-width:200px;min-height:50px}
+.end .lp-sum{border:0;border-image:none;background:none;box-shadow:none;border-left:1px solid #d9b46a44;border-radius:0;padding:0 0 0 22px;overflow:visible;text-align:left;align-self:center}
+.end .lp-banner{border:0;padding:0 0 4px;min-height:0;background:none}
+.end .lp-banner .emb.strip,.end .lp-banner .strip{display:none}
+.end .lp-sum h3{font-size:18px}.end .lp-story{font-size:14px}
+.end .lp-lines{font-size:14px}.end .lp-lines tr.tot td{font-size:18px}.end .lp-lines tr.subt td{border-top:1px solid #8a744066;color:#cdbf9f}
+.end .lp-sum>*:not(.lp-banner){margin-left:0;margin-right:0}.end .lp-sum .lp-lines{width:100%}
+.end .lp-tsk{border:0;background:none;padding:0;font-size:12.5px;gap:5px}
+.end .lp-tsk .emb{display:none}.end .lp-tsk .gi{width:1em;height:1em}
+.end .lp-btns .btn{min-height:44px;font-size:13px;white-space:nowrap}
+/* toasts (Lantern Task etc.) stay off the title: bottom-left of the safe frame on every non-combat page */
+.page .toasts{top:auto;bottom:calc(var(--foot-h) + 4px);left:var(--sf-x);right:auto;align-items:flex-start}
+/* ---- tap targets: icons keep their size, the hit area grows to >= 44x40 (about 9mm on the S24) ---- */
+.topbar .mini,.topbar .potion,.topbar .relics>*{position:relative}
+.topbar .mini::after,.topbar .potion::after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:max(100%,var(--tap));transform:translateY(-50%)}
+.topbar .mini{min-width:44px;min-height:40px}
+/* ---- checkboxes: label right next to the box, same on both columns ---- */
+.chk{display:inline-flex;align-items:center;gap:10px;cursor:pointer;min-height:var(--tap);font:500 15px var(--serif);color:var(--cream)}
+.chk input{width:22px;height:22px;accent-color:#d9b46a;flex:none;margin:0}
+.ov .box .actions .btn{min-width:110px;min-height:46px}
+.page.fit.fit-chest:has(.chestwrap.open){display:flex;flex-direction:column;gap:0}
+.pk-chest.open .pk-body .chestwrap .emb.big{width:min(240px,34cqw);max-height:calc(100cqh - 16px)}
+.pk-chest.open .pk-body .tiles .tile.sp{width:min(calc((100cqw - 300px - 14px*var(--n))/var(--n)),200px)}
+.pk>.etitle{margin-top:9px}
+.page.fit-event>.topbar{margin:0}
+/* ---- plaques out: options, load, deck, settings, travel quote, chips are engraved text on a dark scrim ---- */
+.tb-frame.tb-opt,.tb-frame.tb-load,.ov .box.plain{border:0;border-image:none;background:radial-gradient(ellipse at 50% 45%,#07090dfa 45%,#07090dd0 100%);box-shadow:0 0 0 1px #d9b46a22,0 12px 40px #000c;border-radius:10px}
+.ov .box.plain>h2{background:none;border:0;box-shadow:none;padding:0;margin:0 auto 6px;font:700 22px var(--font-display);letter-spacing:.09em;color:#f0dcaa;text-shadow:0 -1px 0 #000,0 1px 0 #ffffff2e,0 0 16px #d9b46a55}
+.ov .box.plain>h2::before,.ov .box.plain>h2::after{display:none}
+.tb-opt .tb-actions,.tb-load .tb-actions{display:flex;justify-content:flex-end;margin-top:6px}
+.tb-opt .tb-actions .tb-btn,.tb-load .tb-actions .tb-btn{min-width:160px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.tb-btn .gi,.tb-x .gi{color:inherit;filter:none;width:1.1em;height:1.1em}
+.travel .ferry{background:none;border:0;border-radius:0;padding:0;box-shadow:none}
+.travel .tcboss{text-shadow:0 1px 3px #000}
+.lp-tsk,.ttag,.ov .box .lp-tsk{background:none;border:0;border-radius:0}
+.ttag{padding:0 2px;font:600 11px var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:#d8c58f;text-shadow:0 1px 2px #000,0 0 6px #000;left:10px;top:9px}
+/* options: label right next to its control, same on both columns */
+.settings{display:grid!important;grid-template-columns:1fr 1fr;gap:0 26px;text-align:left!important}
+.settings label,.tb-opt .settings label{display:flex!important;justify-content:flex-start!important;align-items:center;gap:12px;min-height:46px;font:500 15px var(--serif);color:var(--cream);border-bottom:1px solid #8a744033;cursor:pointer}
+.settings label>input[type=range],.settings label>select,.settings label>output{margin-left:auto}
+.settings label>input[type=range]+output{margin-left:0;min-width:3em}
+.settings input[type=checkbox]{width:24px;height:24px;flex:none;accent-color:#d9b46a}
+/* map: the top bar is sticky; the sheet starts below it so header + legend are never covered */
+.page.mappage{padding-top:0}
+.mappage .parch{margin-top:8px}
+.tb-btn,.pkbtn,.btn{align-items:center}
+.tb-btn:has(>.gi),.btn:has(>.gi){display:inline-flex!important;flex-direction:row!important;white-space:nowrap;gap:8px;justify-content:center}
+.tb-btn>span,.btn>span{text-transform:uppercase;font-family:var(--font-display);font-weight:700;font-style:normal;text-shadow:inherit;color:inherit;letter-spacing:inherit}
+.st-foot .tb-btn#beginfocus,.st-foot .tb-btn{right:var(--sf-x);bottom:12px;min-width:190px;min-height:52px;font-size:16px}
+.st-foot{height:70px}
+.ov .box.plain{display:flex;flex-direction:column;width:min(94vw,900px);max-width:none;max-height:calc(100dvh - 22px);overflow:hidden;padding:10px 18px 10px}
+.ov .box.plain .grid{flex:1 1 auto;min-height:0;overflow-y:auto;--gw:128px;gap:10px;justify-content:center;padding:6px 0 18px;
+ mask-image:linear-gradient(#000 calc(100% - 26px),transparent);-webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}
+.ov .box.plain .grid .card{width:var(--gw)}
+.ov .box.plain>.btn.full{flex:none;align-self:flex-end;margin:6px 0 0;min-width:170px;min-height:48px}
+.ov .box.plain>.settings{flex:1 1 auto;min-height:0;overflow-y:auto}
+.mappage .seedtag{color:#6a5230}
+/* events: thumb-sized rows, risk shown as engraved coloured text (no chip) */
+.evo{min-height:44px;align-items:center!important;box-sizing:border-box}
+.evrisk{border:0!important;padding:0!important;background:none!important;margin-left:.5em}
+.tb-x{min-width:44px;min-height:44px}
+/* keeper's ledger scrolls: fade the bottom edge so the cut-off row reads as "more below" */
+.tb-ledger::after{content:"";position:fixed;left:0;right:0;bottom:0;height:38px;pointer-events:none;background:linear-gradient(transparent,#05070bdd);z-index:4}
+/* title menu: unavailable entries are clearly dimmer */
+.tb-mi.off,.tb-mi:disabled{opacity:.38;filter:grayscale(.8) brightness(.8)}
