@@ -484,22 +484,27 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 .tl-stage{overflow:hidden;background:#05080c}
 .tl-stage img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;user-select:none}
 .tl-stage>*{position:absolute;will-change:transform}
-.tl-sky{inset:-2% -4% -2% -4%;animation:tl-drift 60s ease-in-out infinite alternate}
+.tl-sky{inset:-4% -12% -2% -12%;animation:tl-drift 28s ease-in-out infinite alternate}
 .tl-sky img{object-position:50% 50%}
-.tl-sea{inset:-1% -2% 0 -2%;-webkit-mask-image:linear-gradient(transparent 50%,#000 58%);mask-image:linear-gradient(transparent 50%,#000 58%);animation:tl-swell 14s ease-in-out infinite alternate}
+.tl-sea{inset:-3% -6% -2% -6%;-webkit-mask-image:linear-gradient(transparent 50%,#000 58%);mask-image:linear-gradient(transparent 50%,#000 58%);animation:tl-swell 7s ease-in-out infinite alternate}
 .tl-sea img{object-position:50% 56%}
-.tl-shimmer{left:0;right:0;top:50%;bottom:8%;background:linear-gradient(100deg,transparent 30%,#9fd8ff22 45%,transparent 60%) 0 0/60% 100% repeat-x;mix-blend-mode:screen;animation:tl-shim 9s linear infinite;opacity:.8}
-.tl-tower{right:5%;bottom:5%;height:82%;aspect-ratio:300/900}
-.tl-tower img{object-fit:contain;object-position:bottom;filter:brightness(.72) saturate(.85)}
-.tl-lamp{left:44%;top:9.5%;width:12%;aspect-ratio:1;border-radius:50%;background:radial-gradient(#fff2c4,#ffbf4766 45%,transparent 70%);transform:translate(-50%,-50%);animation:tl-glow 4s ease-in-out infinite alternate}
-.tl-beam{left:44%;top:9.5%;width:900%;height:60%;transform-origin:0 50%;background:linear-gradient(90deg,#ffe7b040,#ffe7b012 40%,transparent 90%);clip-path:polygon(0 50%,100% 20%,100% 80%);mix-blend-mode:screen;animation:tl-sweep 12s ease-in-out infinite;translate:0 -50%}
-.tl-steps{left:0;right:0;bottom:0;height:13%;-webkit-mask-image:linear-gradient(transparent,#000 40%);mask-image:linear-gradient(transparent,#000 40%)}
-.tl-ghost{left:74%;bottom:7%;width:3.6%;aspect-ratio:2/3;-webkit-mask-image:radial-gradient(closest-side,#000 55%,transparent);mask-image:radial-gradient(closest-side,#000 55%,transparent);mix-blend-mode:screen;animation:tl-float 7s ease-in-out infinite alternate}
+.tl-shimmer{left:0;right:0;top:50%;bottom:8%;background:linear-gradient(100deg,transparent 30%,#9fd8ff40 45%,transparent 60%) 0 0/60% 100% repeat-x;mix-blend-mode:screen;animation:tl-shim 6s linear infinite,tl-shimop 3.5s ease-in-out infinite alternate}
+.tl-tower{right:5%;bottom:5%;height:82%;aspect-ratio:300/900;animation:tl-par 9s ease-in-out infinite alternate}
+.tl-tower img{position:relative;z-index:1;object-fit:contain;object-position:bottom;filter:brightness(.78) saturate(.85)}
+.tl-lamp{position:absolute;display:block;z-index:2;left:50%;top:29%;width:34%;aspect-ratio:1;border-radius:50%;background:radial-gradient(#fff6d8,#ffc85a99 22%,#ffb34733 45%,transparent 70%);transform:translate(-50%,-50%);mix-blend-mode:screen;animation:tl-glow 2.6s ease-in-out infinite alternate}
+.tl-beam{position:absolute;display:block;z-index:0;left:50%;top:29%;width:520%;height:80%;transform-origin:0 50%;translate:0 -50%;pointer-events:none;background:linear-gradient(90deg,rgba(255,238,204,.40) 0,rgba(240,232,214,.26) 18%,rgba(196,218,236,.12) 50%,rgba(170,200,228,0) 88%);-webkit-mask-image:conic-gradient(from 79deg at 0 50%,transparent 0deg,#000 9deg,#000 13deg,transparent 22deg,transparent 360deg),linear-gradient(90deg,#000 0,#000 10%,rgba(0,0,0,.6) 40%,rgba(0,0,0,.2) 70%,transparent 95%);mask-image:conic-gradient(from 79deg at 0 50%,transparent 0deg,#000 9deg,#000 13deg,transparent 22deg,transparent 360deg),linear-gradient(90deg,#000 0,#000 10%,rgba(0,0,0,.6) 40%,rgba(0,0,0,.2) 70%,transparent 95%);-webkit-mask-composite:source-in;mask-composite:intersect;filter:blur(5px);mix-blend-mode:screen;will-change:rotate,opacity;animation:tl-sweep 12s ease-in-out infinite}
+.tl-steps{left:-3%;right:-3%;bottom:0;height:13%;-webkit-mask-image:linear-gradient(transparent,#000 40%);mask-image:linear-gradient(transparent,#000 40%);animation:tl-par2 9s ease-in-out infinite alternate}
+.tl-ghost{left:74%;bottom:7%;width:3.6%;aspect-ratio:2/3;-webkit-mask-image:radial-gradient(closest-side,#000 55%,transparent);mask-image:radial-gradient(closest-side,#000 55%,transparent);mix-blend-mode:screen;animation:tl-float 5s ease-in-out infinite alternate}
+.tl-rain{inset:-20% -10% 0 -10%;background:repeating-linear-gradient(105deg,transparent 0 46px,#cfe6ff1c 46px 47px,transparent 47px 90px) 0 0/180px 220px,repeating-linear-gradient(100deg,transparent 0 70px,#cfe6ff12 70px 71px,transparent 71px 130px) 0 0/260px 300px;mix-blend-mode:screen;pointer-events:none;animation:tl-rain .9s linear infinite;opacity:.45}
 .tl-vig{inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,transparent 40%,#000a)}
-@keyframes tl-drift{from{transform:translate3d(-2%,0,0)}to{transform:translate3d(2%,.6%,0)}}
-@keyframes tl-swell{from{transform:translate3d(.8%,0,0) scale(1.01)}to{transform:translate3d(-.8%,-.5%,0) scale(1.03)}}
+@keyframes tl-drift{from{transform:translate3d(-8%,0,0)}to{transform:translate3d(8%,1%,0)}}
+@keyframes tl-swell{from{transform:translate3d(2.5%,1.2%,0) scale(1.02)}to{transform:translate3d(-2.5%,-1.5%,0) scale(1.06)}}
+@keyframes tl-par{from{transform:translate3d(-1.2%,0,0)}to{transform:translate3d(1.2%,0,0)}}
+@keyframes tl-par2{from{transform:translate3d(-2.2%,0,0)}to{transform:translate3d(2.2%,0,0)}}
 @keyframes tl-shim{from{background-position:0 0}to{background-position:60vw 0}}
-@keyframes tl-glow{from{opacity:.65}to{opacity:1}}
-@keyframes tl-sweep{0%{rotate:150deg;opacity:0}15%{opacity:1}50%{rotate:205deg}85%{opacity:1}100%{rotate:150deg;opacity:0}}
-@keyframes tl-float{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-14%,0)}}
+@keyframes tl-shimop{from{opacity:.45}to{opacity:1}}
+@keyframes tl-glow{0%{opacity:.55;scale:.85}100%{opacity:1;scale:1.15}}
+@keyframes tl-sweep{0%{rotate:128deg;opacity:0}18%{opacity:1}50%{rotate:155deg}82%{opacity:1}100%{rotate:128deg;opacity:0}}
+@keyframes tl-float{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-22%,0)}}
+@keyframes tl-rain{from{transform:translate3d(0,0,0)}to{transform:translate3d(-40px,220px,0)}}
 .reduce-motion .tl-stage>*{animation:none}
