@@ -67,9 +67,13 @@ export function titleScr(){const v=W.S.view||'main';
   ['options','Options',"titleGo('options')"],['learn','Learn to Play',"titleGo('learn')"],['ledger','Ledger','openLedger()']];
  const w=([id,label,act,off],i)=>`<button class="tm-w${off?' off':''}" id="${id}" data-sfx="confirm" style="--i:${i}" aria-label="${label}${id==='continue'&&K?`: ${K.n}, Floor ${sv.run.floor}/15`:''}"${off?' disabled':` onclick="menuPress(this,&quot;${act.replace(/"/g,'')}&quot;)"`}><span>${label}</span>${id==='ledger'&&pend?`<em class="lp-dot">${pend}</em>`:''}</button>`;
  const fade=W.S.fade?' tm-fade':'';if(W.S.fade){W.S.fade=0;requestAnimationFrame(flyEmblem)}
- return `<div class="tb-scr tb-title tb-main tb-imgmenu${fade}"><div class="tv-stage"><img class="tv-img" src="art/v2/title/menu-plate.webp" alt="" draggable="false"></div><img class="tm-emb" id="tmemb" src="art/v2/title/menu-emblem.webp" alt="The Drowned Sun" draggable="false">
+ return `<div class="tb-scr tb-title tb-main tb-imgmenu${fade}">${TITLE_LAYERED?layeredStage():`<div class="tv-stage"><img class="tv-img" src="art/v2/title/menu-plate.webp" alt="" draggable="false"></div>`}<img class="tm-emb" id="tmemb" src="art/v2/title/menu-emblem.webp" alt="The Drowned Sun" draggable="false">
  <nav class="tm-nav tm-words" aria-label="Main menu">${R.map(w).join('')}</nav><span class="tm-ver" id="tmver">v${VERSION}</span></div>`}
 // Press: warm flash (CSS .tm-hit) then act, so the flash is seen. Click SFX comes from audio.js (data-sfx).
+// Title backdrop flag: true = layered moving scene (v0.6.1.1); false = the old still menu-plate.webp. One-line revert.
+export const TITLE_LAYERED=true;
+const L='art/v2/title/layers/';
+function layeredStage(){return `<div class="tv-stage tl-stage" aria-hidden="true"><div class="tl-sky tl-drift"><img src="${L}sky.webp" alt="" draggable="false"></div><div class="tl-sea"><img src="${L}sea.webp" alt="" draggable="false"></div><i class="tl-shimmer"></i><div class="tl-tower"><i class="tl-beam"></i><img src="${L}lighthouse.webp" alt="" draggable="false"><i class="tl-lamp"></i></div><div class="tl-steps"><img src="${L}steps.webp" alt="" draggable="false"></div><i class="tl-ghost"><img src="${L}ghost.webp" alt="" draggable="false"></i><i class="tl-vig"></i></div>`}
 export function menuPress(el,act){if(el.classList.contains('tm-hit'))return;el.classList.add('tm-hit');
  const go=()=>{try{(new Function(act))()}catch(e){console.error(e)}};dip(go)}
 // Tap from title: the cut-out title/emblem starts exactly where the big one sits in the video (cover, 50% 42%) and glides up to its small slot.
