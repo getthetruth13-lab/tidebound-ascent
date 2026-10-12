@@ -8,7 +8,7 @@ import {barHTML,statusRowHTML,playerStates} from './combatant.js';
 import {CARD_ART,assetEntry,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE} from '../assets.js';
 import {syncAudio} from '../audio.js';
 import {syncEnv,envFxSettingLabel} from './env.js';
-import {groundY,stageAtmosphereHTML,syncStage} from './stage.js';
+import {FEET,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
 import {deathLine} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
 import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
@@ -23,6 +23,7 @@ import {anim,syncCombatAnimations} from './fx.js';
 import {screenChange,motionEnabled} from './anim.js';
 import {drag} from './input.js';
 import {mapHTML} from './map.js';
+import './screens/frame.js';
 import {titleScr} from './screens/title.js';
 import {decorateKeywords,shortText} from './kwtip.js';
 import {eventSceneHTML} from './eventscene.js';
@@ -159,16 +160,16 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
 // ---------------- combat ----------------
 // ---------------- battle figures (Art Director spec) ----------------
 // Fill the free battle area, keeping foot anchors above the resting hand.
-export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*750/1080),top:vw>vh?56:40,heroTop:40}}
+export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*FEET),top:vw>vh?56:40,heroTop:40}}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
-function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){let H=Math.round(Math.min((role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(role==='hero'?g.heroTop:g.top+32)));
+function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const sc=figureScale(role==='boss');let H=Math.round(Math.min(sc*(role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(role==='hero'?g.heroTop:g.top+32)));
  if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*sp.h/sp.w));
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
  const top=g.feet-H-hov,L=Math.max(4,Math.min(g.vw-W-4,x-Math.round(W*(g.multi?.5:ax)))),fx0=Math.round(W*(g.multi?.5:ax));const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.min(g.vh*260/1080,g.multi?g.enemyMaxWidth:Infinity));
- const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px${role!=='hero'&&sp.facing==='right'?';scale:-1 1':''}" onerror="assetFail(this)">`:''}</div>`;
+ const shW=Math.round(W*.7*(role==='boss'?1.3:1)*(hov?.55:1));const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px${role!=='hero'&&sp.facing==='right'?';scale:-1 1':''}" onerror="assetFail(this)">`:''}</div>`;
  return `<div class="${cls}" ${attrs} style="left:${L}px;top:${top}px;width:${W}px;height:${H+hov}px;--bw:${bw}px;--ax:${fx0}px">
- <i class="shadow" style="left:${fx0}px;top:${H+hov}px;width:${Math.round(Math.min(W,H*.9)*.8)}px"></i>
+ <i class="shadow${hov?' float':''}" style="left:${fx0}px;top:${H+hov}px;width:${shW}px;height:${Math.max(8,Math.round(shW*.17))}px"></i>
  <div class="fig ${shake?'shake':''}" style="width:${W}px;height:${H}px;left:0;top:0;${shake||''}">${img}</div>
  ${intent?`<div class="intentw" style="top:${it}px">${intent}</div>`:''}
  <div class="plate" style="top:${H+hov+2}px">${`<div class="nm">${name}</div>`}${hp}<div class="stw">${badgesH}</div></div>${fx}</div>`}
@@ -201,8 +202,8 @@ function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
 export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
  h+=daisHTML();
- const g=sceneGeom();if(cb.mode&&['choice','slot','chart'].includes(cb.mode.k)){g.s*=.7;g.feet=Math.round(innerHeight*.4)}const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
- h+=`<div class="scene" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}`;
+ const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
+ h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,T(560));if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
@@ -280,11 +281,13 @@ export function settingsHTML(){return `<div class="settings"><label><input type=
  <label><input id="setcardskip" type="checkbox" ${settings.confirmCardSkip!==false?'checked':''} onchange="setConfirmCardSkip(this.checked)"><span>Confirm skipping card rewards</span></label>
  <label><input id="setshake" type="checkbox" ${settings.screenShake!==false?'checked':''} onchange="setScreenShake(this.checked)"><span>Screen shake</span></label>
  <label><input id="sethaptic" type="checkbox" ${settings.handHaptic!==false?'checked':''} onchange="setHandHaptic(this.checked)"><span>Hand vibration</span></label>
+ <label><input id="setcharselpar" type="checkbox" ${settings.charselParallax!==false&&!settings.reduceMotion?'checked':''} ${settings.reduceMotion?'disabled':''} onchange="setCharselParallax(this.checked)"><span>Hero select motion</span></label>
  <label><input id="setreduce" type="checkbox" ${settings.reduceMotion?'checked':''} onchange="setReduceMotion(this.checked)"><span>Reduced motion</span></label>
  </div>`}
 export function setConfirmCardSkip(on){settings.confirmCardSkip=!!on;saveSettings()}
 export function setCoach(on){settings.coach=!!on;saveSettings();render()}
 export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
+export function setCharselParallax(on){settings.charselParallax=!!on;saveSettings()}
 export function setHandHaptic(on){settings.handHaptic=!!on;saveSettings()}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
 export function setAnimSpeed(v){settings.animSpeed=SPEEDS[v]?v:'normal';setAnimSpeedValue(settings.animSpeed);saveSettings()}
@@ -361,6 +364,9 @@ function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Mat
 // Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing
 // sources preserves fitted text, sprite animations and stage styles on unchanged nodes.
 let renderTree=null,renderedCombat=null;
+// Per-screen cleanup registry: transient layers (trails, toasts, overlays) register a remover and it runs once when the screen changes.
+const screenCleanups=new Set();export function onScreenLeave(fn){screenCleanups.add(fn)}
+function runScreenCleanups(){for(const fn of [...screenCleanups]){screenCleanups.delete(fn);try{fn()}catch(_){}}}
 const liveNodes=new WeakMap();
 const nodeKey=n=>n.nodeType===1?`${n.tagName}:${n.id|| (n.hasAttribute('data-uid')?'card:'+n.dataset.uid+':'+n.dataset.id:n.hasAttribute('data-en')?'enemy:'+n.dataset.en+':'+n.dataset.key:n.classList[0]||'')}`:'#text';
 function bindTree(source,live){liveNodes.set(source,live);source.childNodes.forEach((n,i)=>bindTree(n,live.childNodes[i]))}
@@ -393,7 +399,8 @@ function patchChildren(old,next,live){
  }
  for(const pool of pools.values())for(const n of pool)liveNodes.get(n)?.remove();
 }
-function updateHTML(app,html,reset){const next=document.createElement('div');next.innerHTML=html;
+// The pristine tree is parsed inside <template> (an inert document): a detached <div> with <img srcset> keeps every parsed tree alive in Chrome (~340 nodes per render).
+function updateHTML(app,html,reset){const tpl=document.createElement('template');tpl.innerHTML=html;const next=tpl.content;
  if(reset||!renderTree){app.replaceChildren(...[...next.childNodes].map(n=>n.cloneNode(true)));bindTree(next,app)}
  else{liveNodes.set(next,app);patchChildren(renderTree,next,app)}renderTree=next;
 }
@@ -420,7 +427,7 @@ export function render(){if(W.previewing||W.replaying)return;if(drag||(W.chartDr
   h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><h2>${t} (${list.length})</h2><div class="grid small">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div><button class="btn full">Close</button></div></div>`}
  if(inspecting)h+=inspectHTML();
  const prev=a.dataset.screen;const changed=prev!==s;
- if(changed){a.dataset.screen=s;screenChange(a,prev,s)}
+ if(changed){a.dataset.screen=s;runScreenCleanups();screenChange(a,prev,s)}
  updateHTML(a,h,changed||(s==='combat'&&renderedCombat!==W.cb));renderedCombat=s==='combat'?W.cb:null;
  // Input used a full rebuild to clear temporary drag poses after drop/cancel.
  // Reused nodes need the same cleanup once the drag render gate is released.
@@ -523,7 +530,11 @@ function placeHeldInspect(){
  panel.style.left=Math.max(8,Math.min(innerWidth-r.width-8,x))+'px';
  panel.style.top=Math.max(8,Math.min(innerHeight-r.height-8,y))+'px';placeInspectKeywords(panel)
 }
-export function placeInspectKeywords(panel){const rail=panel.querySelector('.inspect-keywords');if(!rail)return;const r=panel.getBoundingClientRect(),w=rail.getBoundingClientRect().width;const right=r.right+w+4<=innerWidth;rail.style.left=right?'calc(100% + 3px)':(-w-3)+'px';rail.style.maxHeight=(innerHeight-16)+'px';rail.style.top=Math.max(0,8-r.top)+'px'}
+export function placeInspectKeywords(panel){const rail=panel.querySelector('.inspect-keywords');if(!rail)return;const r=panel.getBoundingClientRect(),w=rail.getBoundingClientRect().width;
+ // Glossary rail sits beside the card (right if it fits, else left) and is clamped fully on screen; it scrolls inside its own max height.
+ const right=r.right+w+4<=innerWidth||r.left-w-3<0;let x=right?r.width+3:-w-3;const abs=r.left+x;if(abs<4)x+=4-abs;else if(abs+w>innerWidth-4)x-=abs+w-(innerWidth-4);
+ rail.style.left=x+'px';rail.style.maxHeight=(innerHeight-16)+'px';rail.style.overflowY='auto';rail.style.touchAction='pan-y';
+ const h=Math.min(rail.scrollHeight,innerHeight-16);rail.style.top=Math.max(8-r.top,Math.min(0,innerHeight-8-h-r.top))+'px'}
 export function closeInspect(){inspecting=null;render()}
 export function inspectKeywordsHTML(ci){return kwList(ci).map(k=>`<div class="keyword-window"><b>${k.replace(/ X$/,'')}</b><span>${shortText(k.replace(/ X$/,''))||KW[k]}</span></div>`).join('')}
 export function inspectHTML(){const ci=inspecting,d=CARDS[ci.id];if(!d)return'';

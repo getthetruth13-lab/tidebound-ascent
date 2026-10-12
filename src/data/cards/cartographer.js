@@ -33,6 +33,6 @@ K('triang',{e:'📐',xu:0,d:'Trigger all your Waypoints.{ Sink.|}',p:f=>{const c
 K('camp',{e:'🏰',wpGuard:1,d:'Waypoint: at the start of your turn, gain {5|6} Guard.',wp:f=>f.blk(f.v(5,6))});
 K('foreknow',{e:'🔮',d:'If the top card of your draw pile is an Attack, deal {6|9}. If it\'s a Skill, gain {6|9} Guard. Then draw it.',p:f=>{refill(1);const t=W.cb.draw[0];if(!t)return;const ty=CARDS[t.id].t;if(ty==='A')f.dmg(f.v(6,9));else if(ty==='S')f.blk(f.v(6,9));drawCards(1)}});
 K('grand',{e:'🌐',d:'You have 4 Waypoint slots.{| Also Chart 3.}',p:f=>{W.cb.nslots=Math.max(W.cb.nslots,4);if(f.u)f.chart(3)},power:{}});
-K('known',{e:'🗾',d:'Draw 1 extra card each turn (5 instead of 4).',power:{mod:{drawCount(inst,ctx,v){return v+1}}}});
-K('finaldest',{e:'🏁',d:'Deal {6|8} per Waypoint. Then destroy a Waypoint and deal 6 more. <b>Expedition.</b>',p:f=>{const n=f.wpCount();if(n)f.dmg(f.v(6,8)*n);
+K('known',{e:'🗾',openU:1,d:'Draw 1 extra card each turn (5 instead of 4).{| <b>Opening.</b>}',power:{mod:{drawCount(inst,ctx,v){return v+1}}}});
+K('finaldest',{e:'🏁',d:'Deal {7|9} per Waypoint. Then destroy a Waypoint and deal 6 more. <b>Expedition.</b>',p:f=>{const n=f.wpCount();if(n)f.dmg(f.v(7,9)*n);
  if(W.cb.slots.length)W.cb.mode={k:'slot',title:'Journey\'s End: destroy which Waypoint?',then:i=>{const w=removeWp(i,'destroyed');log('🏁 '+cname(w)+' destroyed');f.dmg(6)}}}});

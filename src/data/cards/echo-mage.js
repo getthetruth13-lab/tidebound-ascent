@@ -9,7 +9,7 @@ const E=(id,o)=>card('echo',id,o);
 const playedNow=f=>W.cb.stat.playedTurn+(f.echo?0:1);
 E('arc',{e:'⚡',d:'Deal {7|10}.',fx:[['dmg',7,10]]});
 E('shimmer',{e:'🔷',d:'Gain {5|8} Guard.',fx:[['block',5,8]]});
-E('reverb',{e:'📣',d:'Deal {5|7}. <b>Resound:</b> deal {10|13} instead.',p:f=>f.dmg(f.echo?f.v(10,13):f.v(5,7))});
+E('reverb',{e:'📣',d:'Deal {6|8}. <b>Resound:</b> deal {10|13} instead.',p:f=>f.dmg(f.echo?f.v(10,13):f.v(6,8))});
 E('hum',{e:'🎶',d:'Draw {1|2}. Faint.',fx:[['draw',1,2]]});
 E('ping',{e:'🔹',d:'Choose: deal {3|5}; or add 1 Note to your hand.',p:f=>ask(f,'Ping',[{l:'Deal '+f.v(3,5),f:()=>f.dmg(f.v(3,5))},{l:'Add 1 Note',f:()=>addCard('note','hand')}])});
 E('mirror',{e:'🪞',d:'Choose: gain {8|11} Guard; or gain {3|5} Guard and draw 2 next turn.',p:f=>ask(f,'Mirror Step',[{l:'Gain '+f.v(8,11)+' Guard',f:()=>f.blk(f.v(8,11))},{l:'Gain '+f.v(3,5)+' Guard; draw 2 next turn',f:()=>{f.blk(f.v(3,5));W.cb.nextDraw+=2}}])});

@@ -3,7 +3,7 @@ import {W} from './core/state.js';
 import {render} from './ui/render.js';
 // Map checkpoint plus deterministic room actions preserves callback-based choices.
 const RUN_KEY='tidebound.run.v2',SET_KEY='tidebound.settings.v1';
-export const settings=Object.assign({fastAnim:false,envFx:'full',musicVolume:.35,sfxVolume:.55,audioMuted:false,reduceMotion:false,screenShake:true},safeGet(SET_KEY)||{});
+export const settings=Object.assign({fastAnim:false,envFx:'full',musicVolume:.35,sfxVolume:.55,audioMuted:false,reduceMotion:false,screenShake:true,charselParallax:true},safeGet(SET_KEY)||{});
 function safeGet(k){try{return JSON.parse(localStorage.getItem(k))}catch(_){return null}}
 function safeSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}
 export function saveSettings(){safeSet(SET_KEY,settings)}

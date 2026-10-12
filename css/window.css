@@ -1,31 +1,56 @@
-/* The Drowned Sun: ONE shared ornate window + button system (Claude Task 9). Loaded last, after tiles.css.
-   Frame = art/v2/ui/window-frame.svg (9-slice: bronze/iron band, riveted edges, filigree corners with a sea-glass gem).
-   Painted art can replace that file later with no code change (same 96x96 layout). */
-:root{--win-frame:url(../art/v2/ui/window-frame.svg);--win-bw:9px;
- --iron-tex:linear-gradient(rgba(18,14,10,.82),rgba(10,8,6,.93)),url(../art/v2/textures/parchment-dark.webp) center/300px;
+/* The Drowned Sun: ONE shared ornate window + button system (Claude Task 9, frames: Claude Task 49).
+   Frame = Spencer's approved hi-res 9-slice (art/v2/ui/frame/*.webp, slices/scales from /workspace/frames/NOTES.md).
+   Every size is source px * --s. JS (src/ui/screens/frame.js fit()) picks the size class on open / resize:
+   none = full (--s .19), .fr-sm = full at --s .12, .fr-slim = slim frame (tips, keyword popups, toasts, small confirms). */
+:root{--frame-full:url(../art/v2/ui/frame/frame-full9.webp);--frame-slim:url(../art/v2/ui/frame/frame-slim9.webp);--plate:url(../art/v2/ui/frame/plate3.webp);
+ --dia-full-top:url(../art/v2/ui/frame/frame-full-diamond-top.webp);--dia-full-bot:url(../art/v2/ui/frame/frame-full-diamond-bot.webp);
+ --dia-slim-top:url(../art/v2/ui/frame/frame-slim-diamond-top.webp);--dia-slim-bot:url(../art/v2/ui/frame/frame-slim-diamond-bot.webp);
+ /* side roots (Task 49B): seamless vertical tiles drawn by the frame's ::after along the left/right iron band */
+ --fr-side-l:url(../art/v2/ui/frame/side-roots-l.webp);--fr-side-r:url(../art/v2/ui/frame/side-roots-r.webp);
+ --win-iron:#0e1519;--win-verd:#3fb8a4;--win-edge:#5b6a68;
+ --iron-tex:linear-gradient(rgba(12,19,23,.94),rgba(8,13,16,.97)),url(../art/v2/textures/parchment-dark.webp) center/300px;
  --bronze-1:#c79a55;--bronze-2:#8a6434;--bronze-3:#4c3519;--engrave:#1b1209}
 
-/* ----- window frame: every modal / popup / panel ----- */
-.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win{
- position:relative;border:var(--win-bw) solid transparent;border-image:var(--win-frame) 32 fill/28px/8px round;border-radius:0;
- background:var(--iron-tex);box-shadow:0 10px 34px #000d,0 0 0 1px #0008;color:var(--cream)}
-.ov .box{width:fit-content;min-width:min(300px,88vw);max-width:min(94vw,780px);padding:8px 12px 10px;max-height:calc(100dvh - 34px);margin:0 auto}
-.ov .box.tilebox,.ov .box.chartbox{max-width:min(94vw,860px);background:var(--iron-tex);border:var(--win-bw) solid transparent;border-image:var(--win-frame) 32 fill/28px/8px round;box-shadow:0 10px 34px #000d;padding:6px 12px 10px;overflow:auto}
+/* ----- window frame: every modal / popup / panel (zero specificity: size classes and one-off rules win) ----- */
+:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child),:is(.tip,.toast):not(#x),#kwtip{
+ --s:.19;border-style:solid;border-color:transparent;border-radius:0;background:none;box-shadow:none;color:var(--cream);
+ border-width:calc(150px*var(--s));
+ border-image:var(--frame-full) 430 560 fill/calc(430px*var(--s)) calc(560px*var(--s))/0 round;
+ padding:calc(70px*var(--s)) calc(120px*var(--s));filter:drop-shadow(0 8px 18px #000c)}
+.fr-sm:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child){--s:.12}
+.fr-slim:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child),:is(.tip,.toast):not(#x),#kwtip{--s:.11;border-width:calc(60px*var(--s));
+ border-image:var(--frame-slim) 200 220 fill/calc(200px*var(--s)) calc(220px*var(--s))/0 round;
+ padding:calc(40px*var(--s)) calc(80px*var(--s));filter:drop-shadow(0 4px 9px #000c)}
+/* positioned so the pseudo-elements anchor to the frame (zero specificity: existing fixed/absolute rules win) */
+:where(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child,.toast){position:relative}
+/* diamonds (top + bottom centre) in ::before, side-root hook in ::after; both sit over the border band */
+:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child)::before,:is(.tip,.toast):not(#x)::before,#kwtip::before{
+ content:"";position:absolute;pointer-events:none;z-index:3;inset:calc(-150px*var(--s));
+ background:var(--dia-full-top) top center/calc(300px*var(--s)) calc(150px*var(--s)) no-repeat,var(--dia-full-bot) bottom center/calc(300px*var(--s)) calc(150px*var(--s)) no-repeat}
+:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child)::after,:is(.tip,.toast):not(#x)::after,#kwtip::after{
+ content:"";position:absolute;pointer-events:none;z-index:2;inset:0;
+ /* roots live in the side padding strip (inside the border: scrollable boxes clip at the padding edge) and only between the corner pairs.
+    A short window leaves no content box, so nothing is drawn. */
+ box-sizing:border-box;padding:calc(330px*var(--s)) 0;
+ background:var(--fr-side-l) calc(-8px*var(--s)) 0/calc(104px*var(--s)) calc(776px*var(--s)) repeat-y,var(--fr-side-r) right calc(-8px*var(--s)) top 0/calc(104px*var(--s)) calc(776px*var(--s)) repeat-y;
+ background-origin:content-box;background-clip:content-box;
+ -webkit-mask:linear-gradient(transparent,#000 calc(100px*var(--s)),#000 calc(100% - 100px*var(--s)),transparent);mask:linear-gradient(transparent,#000 calc(100px*var(--s)),#000 calc(100% - 100px*var(--s)),transparent)}
+.fr-slim:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child)::before,:is(.tip,.toast):not(#x)::before,#kwtip::before{inset:calc(-60px*var(--s));
+ background:var(--dia-slim-top) top center/calc(220px*var(--s)) calc(110px*var(--s)) no-repeat}
+.fr-slim:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child)::after,:is(.tip,.toast):not(#x)::after,#kwtip::after{inset:calc(-60px*var(--s));background:none}
+.ov .box{width:fit-content;min-width:min(300px,88vw);max-width:min(94vw,780px);max-height:calc(100dvh - 34px);margin:0 auto}
+.ov .box.tilebox,.ov .box.chartbox{max-width:min(96vw,880px);background:none;box-shadow:none;border-width:calc(150px*var(--s));border-color:transparent;
+ border-image:var(--frame-full) 430 560 fill/calc(430px*var(--s)) calc(560px*var(--s))/0 round;padding:calc(70px*var(--s)) calc(120px*var(--s))}
 .ov .box.mapbox{max-width:min(94vw,900px)}
 .ov{padding:16px}
-.pop{border-width:5px;border-image:var(--win-frame) 32 fill/16px/4px round;padding:8px 12px}
-.tip,#kwtip{border:5px solid transparent;border-image:var(--win-frame) 32 fill/14px/3px round;border-radius:0;background:var(--iron-tex)}
-.toast{background:var(--iron-tex);border:5px solid transparent;border-image:var(--win-frame) 32 fill/12px/2px round;border-radius:0;padding:2px 10px;color:var(--cream);font-family:var(--font-display);font-size:12px;letter-spacing:.03em}
-.toast.t-potion{filter:hue-rotate(120deg) saturate(1.3)}.toast.t-curse{filter:hue-rotate(-40deg) saturate(1.6)}.toast.t-gold{filter:brightness(1.15)}
+.toast:not(#x){font-family:var(--font-display);font-size:12px;letter-spacing:.03em}
+.toast.t-potion:not(#x){filter:hue-rotate(120deg) saturate(1.3)}.toast.t-curse{filter:hue-rotate(-40deg) saturate(1.6)}.toast.t-gold{filter:brightness(1.15)}
 
-/* ----- decorative title plate ----- */
-.ov .box>h2,.msgp h2,.pop>h2,.tb-frame>h2,.tb-hero>h2,.win>h2,.ov .box>.wintitle{
- position:relative;display:block;width:fit-content;max-width:100%;margin:-2px auto 6px;padding:3px 30px 4px;text-align:center;
- font:700 17px/1.15 var(--font-display);letter-spacing:.07em;text-transform:uppercase;color:#f3d995;text-shadow:0 1px 0 #000,0 0 8px #d9b46a44;
- background:linear-gradient(180deg,#3a2c17,#1d150b 60%,#2a1f10);border:1px solid #05070b;border-radius:3px;box-shadow:inset 0 0 0 1px #c79a5588,inset 0 1px 0 #f0d89066,0 2px 6px #000a}
-.ov .box>h2::before,.ov .box>h2::after,.msgp h2::before,.msgp h2::after,.tb-frame>h2::before,.tb-frame>h2::after,.win>h2::before,.win>h2::after{
- content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-4.5px;background:radial-gradient(circle at 35% 30%,#b9fff4,#2fb8c4 55%,#0a2a3d);border:1px solid #05070b;transform:rotate(45deg);box-shadow:0 0 0 1px #c79a55}
-.ov .box>h2::before,.msgp h2::before,.tb-frame>h2::before,.win>h2::before{left:9px}.ov .box>h2::after,.msgp h2::after,.tb-frame>h2::after,.win>h2::after{right:9px}
+/* ----- title plate: 3-slice (440px ends of a 1280x511 sheet); widens with the title ----- */
+.ov .box>h2,.msgp h2,.pop>h2,.tb-frame>h2,.tb-hero>h2,.win>h2,.ov .box>.wintitle,.tb-inner>h2{
+ --h:34px;position:relative;display:block;box-sizing:border-box;width:fit-content;max-width:100%;height:var(--h);margin:0 auto 6px;padding:0 6px;text-align:center;white-space:nowrap;
+ border:solid transparent;border-width:0 calc(var(--h)*.86);border-image:var(--plate) 0 440 fill/0 calc(var(--h)*.86)/0 round;border-radius:0;background:none;box-shadow:none;
+ font:600 17px/var(--h) var(--font-display);letter-spacing:.07em;text-transform:uppercase;color:#f3d995;text-shadow:0 1px 0 #000,0 0 8px #d9b46a55}
 .ov .box .csub,.ov .box>.muted,.ov .box>.sub{text-align:center;margin:0 0 6px;font-size:13px;color:var(--cream-dim)}
 
 /* ----- themed buttons: bronze, engraved, gold-trimmed ----- */
@@ -48,7 +73,7 @@
 .pop .row .btn,.ov .box .btn.full{width:auto;min-width:150px;display:block;margin:8px auto 0}
 
 /* ----- compact content inside windows ----- */
-.lp-taskbox{padding-bottom:8px}.lp-taskbox>.btn{width:auto;min-width:160px;margin:6px auto 0;display:block}
+.lp-taskbox{padding-bottom:8px}.ov .box.lp-taskbox .tiles .tile.sp{--th:clamp(120px,calc(100dvh - 205px),300px)}.lp-taskbox>.btn{width:auto;min-width:160px;margin:6px auto 0;display:block}
 .ov .box .tiles,.ov .box .chtiles{gap:10px;justify-content:center}
 .ov .box>.row,.ov .box>.actions{justify-content:center}
 
@@ -61,9 +86,8 @@
 .lp-task.lit{box-shadow:inset 0 0 0 1px #ffd98a,0 0 18px #ffb34766,0 6px 14px #000a}
 
 /* ----- inline panels, page headings, HUD (same system, lighter weight) ----- */
-.panel,.lp-sum,.endr>div:first-child{border:5px solid transparent;border-image:var(--win-frame) 32 fill/16px/3px round;border-radius:0;background:var(--iron-tex);box-shadow:0 6px 18px #000c}
 .roomhead h2,.shophead h2,.page>h2,.end h1,.endl h1{position:relative;display:inline-block;margin:2px auto 4px;padding:3px 26px 4px;font-size:17px;letter-spacing:.07em;text-transform:uppercase;color:#f3d995;
- background:linear-gradient(180deg,#3a2c17,#1d150b 60%,#2a1f10);border:1px solid #05070b;border-radius:3px;box-shadow:inset 0 0 0 1px #c79a5588,inset 0 1px 0 #f0d89066,0 2px 6px #000a}
+ background:linear-gradient(180deg,#232d30,#12191c 60%,#1b2427);border:1px solid #05070b;border-radius:3px;box-shadow:inset 0 0 0 1px #6f807c88,inset 0 1px 0 #cfe0d533,0 2px 6px #000a}
 .roomhead,.shophead{text-align:center}
 .topbar{border-bottom:2px solid #8a6434;box-shadow:0 2px 0 #05070b,0 6px 12px #000a}
 .end h1,.endl h1{font-size:22px}
@@ -74,8 +98,13 @@
 .tb-orn{display:none}
 .tb-frame,.tb-hero{max-height:calc(100dvh - 12px)}
 .tb-inner{padding:6px 14px 8px}
-.tb-inner>h2{position:relative;display:block;width:fit-content;max-width:100%;margin:-2px auto 6px;padding:3px 30px 4px;font-size:18px;letter-spacing:.08em;color:#f3d995;
- background:linear-gradient(180deg,#3a2c17,#1d150b 60%,#2a1f10);border:1px solid #05070b;border-radius:3px;box-shadow:inset 0 0 0 1px #c79a5588,inset 0 1px 0 #f0d89066,0 2px 6px #000a}
-.tb-inner>h2::before,.tb-inner>h2::after{content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-4.5px;background:radial-gradient(circle at 35% 30%,#b9fff4,#2fb8c4 55%,#0a2a3d);border:1px solid #05070b;transform:rotate(45deg);box-shadow:0 0 0 1px #c79a55}
-.tb-inner>h2::before{left:9px}.tb-inner>h2::after{right:9px}
 .tb-cols{gap:6px 18px}.tb-cols p{font-size:13.5px;line-height:1.22}
+
+.end .lp-sum{filter:none}.end .lp-sum::before,.end .lp-sum::after{display:none}
+
+/* short landscape screens (S24: CSS height ~384): full frames shrink a step so content keeps its room */
+@media (max-height:500px){
+ :is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child):not(.fr-sm):not(.fr-slim){--s:.15;padding-top:calc(50px*var(--s));padding-bottom:calc(50px*var(--s))}
+ .tb-frame.tb-opt .settings label,.ov .box .settings label{min-height:38px}
+ .ov .box.tilebox,.ov .box.chartbox{--s:.15;padding-top:calc(50px*var(--s));padding-bottom:calc(50px*var(--s))}
+}

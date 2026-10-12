@@ -53,7 +53,7 @@ K('dismantle',{e:'🔧',d:'Deal {6|8}. You may destroy a Waypoint to deal {10|12
 K('waymarker',{e:'🪧',d:'Waypoint: at the start of your turn, if the top card of your draw pile is an Attack, deal {4|6} to a random enemy. If it\'s a Skill, gain {4|6} Guard.',
  wp:f=>{refill(1);const t=top();if(t==='A')zap(randAlive(),f.v(4,6),f);else if(t==='S')f.blk(f.v(4,6))}});
 K('compassrose',{e:'🧭',d:'Choose: gain {6|9} Guard; or Chart 4 and draw 1.',p:f=>ask(f,'Compass Rose',[{l:'Gain '+f.v(6,9)+' Guard',f:()=>f.blk(f.v(6,9))},{l:'Chart 4; draw 1',f:()=>f.chart(4,()=>drawCards(1))}])});
-K('watchfire',{e:'🔥',d:'Waypoint: at the start of your turn, deal {4|6} to the lowest-HP enemy. Decamp: deal {8|10} to it.',wp:f=>zap(lowest(),f.v(4,6),f),decamp:f=>{const t=lowest();if(t){zap(t,f.v(8,10),f);log('🔥 Decamp: Watchfire hits '+t.n)}}});
+K('watchfire',{e:'🔥',d:'Waypoint: at the start of your turn, deal {5|7} to the lowest-HP enemy. Decamp: deal {10|12} to it.',wp:f=>zap(lowest(),f.v(5,7),f),decamp:f=>{const t=lowest();if(t){zap(t,f.v(10,12),f);log('🔥 Decamp: Watchfire hits '+t.n)}}});
 K('contour',{e:'📐',d:'Gain {3|4} Guard per Waypoint (minimum 1 Waypoint counted). <b>Expedition.</b>',p:f=>f.blk(f.v(3,4)*Math.max(1,f.wpCount()))});
 K('abandon',{e:'🏚️',d:'Destroy one of your Waypoints. Gain 1 Energy.{| Also draw 1.}',req:f=>W.cb.slots.length>0,p:f=>destroyWp(f,'Abandon Post: destroy which Waypoint?',()=>{f.gainEnergy(1);if(f.u)f.draw(1)})});
 K('switchback',{e:'↪️',d:'Deal {4|6} twice. Bearing (Skill): gain 4 Guard.',p:f=>{const b=bearing(f,'S');f.dmg(f.v(4,6),2);if(b)f.blk(4)}});

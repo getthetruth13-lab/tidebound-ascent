@@ -533,15 +533,15 @@ body.env-on .page{background:transparent}
 .bandtoast{position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:66;pointer-events:none;font:700 15px var(--font-display);letter-spacing:.12em;color:var(--ui-parchment);background:linear-gradient(90deg,transparent,#0b0e14dd 20%,#0b0e14dd 80%,transparent);padding:6px 40px;animation:band 1.6s ease-out forwards}
 @keyframes band{0%{opacity:0;transform:translate(-50%,-6px)}15%,75%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 .efx{position:absolute;pointer-events:none;display:block;opacity:var(--a)}
-.efx.fog{left:-30%;width:160%;height:28%;top:calc(38% + var(--i)*13%);background:radial-gradient(ellipse 50% 50% at 50% 50%,var(--c),transparent 70%);filter:blur(8px);animation:fogx calc(120s / var(--spd)) linear infinite alternate;animation-delay:calc(var(--i)*-17s)}
+.efx.fog{left:-30%;width:160%;height:28%;top:calc(38% + var(--i)*13%);background:radial-gradient(ellipse 50% 50% at 50% 50%,var(--c),color-mix(in srgb,var(--c) 40%,transparent) 35%,transparent 72%);animation:fogx calc(120s / var(--spd)) linear infinite alternate;animation-delay:calc(var(--i)*-17s)}
 @keyframes fogx{from{transform:translateX(-12%)}to{transform:translateX(12%)}}
-.efx.shafts{top:-10%;height:85%;width:9%;left:calc(12% + var(--i)*22%);background:linear-gradient(var(--c),transparent);transform-origin:50% 0;transform:rotate(14deg);filter:blur(6px);animation:shaft var(--per) ease-in-out infinite alternate;animation-delay:calc(var(--i)*-2.3s)}
+.efx.shafts{top:-10%;height:85%;width:9%;left:calc(12% + var(--i)*22%);background:radial-gradient(ellipse 50% 100% at 50% 0,var(--c),color-mix(in srgb,var(--c) 45%,transparent) 45%,transparent 100%);transform-origin:50% 0;transform:rotate(14deg);animation:shaft var(--per) ease-in-out infinite alternate;animation-delay:calc(var(--i)*-2.3s)}
 @keyframes shaft{from{transform:rotate(calc(14deg - var(--sway)));opacity:calc(var(--a)*.6)}to{transform:rotate(calc(14deg + var(--sway)));opacity:var(--a)}}
-.efx.caustics{inset:55% 0 0 0;background:repeating-radial-gradient(ellipse 40px 18px at 30% 60%,transparent 0 10px,var(--c) 12px,transparent 15px);mix-blend-mode:screen;animation:caus 9s ease-in-out infinite alternate}
+.efx.caustics{inset:55% 0 0 0;background:repeating-radial-gradient(ellipse 40px 18px at 30% 60%,transparent 0 10px,var(--c) 12px,transparent 15px);animation:caus 9s ease-in-out infinite alternate}
 @keyframes caus{to{transform:translate(20px,4px) scale(1.06)}}
 .efx.ripples{width:46px;height:10px;border:1px solid var(--c);border-radius:50%;left:calc(mod(var(--i)*37, 92)*1% + 4%);top:calc(72% + mod(var(--i)*7, 22)*1%);animation:ripple 2.4s ease-out infinite;animation-delay:calc(var(--i)*-.71s);opacity:0}
 @keyframes ripple{0%{transform:scale(.2);opacity:var(--a)}100%{transform:scale(1.6);opacity:0}}
-.efx.flicker{left:calc(10% + var(--i)*30%);top:20%;width:30%;height:50%;background:radial-gradient(circle,var(--c),transparent 65%);mix-blend-mode:screen;animation:flick calc(1s / var(--hz)) steps(6) infinite;animation-delay:calc(var(--i)*-.37s)}
+.efx.flicker{left:calc(10% + var(--i)*30%);top:20%;width:30%;height:50%;background:radial-gradient(circle,var(--c),transparent 65%);animation:flick calc(1s / var(--hz)) steps(6) infinite;animation-delay:calc(var(--i)*-.37s)}
 @keyframes flick{0%,100%{opacity:var(--a)}30%{opacity:calc(var(--a)*.6)}55%{opacity:calc(var(--a)*.9)}80%{opacity:calc(var(--a)*.7)}}
 .efx.rings{left:50%;top:40%;width:60vh;height:60vh;margin:-30vh;border:2px solid var(--c);border-radius:50%;animation:rings 3s ease-out infinite;animation-delay:calc(var(--i)*-1.5s);opacity:0}
 @keyframes rings{0%{transform:scale(.2);opacity:var(--a)}100%{transform:scale(1.8);opacity:0}}
@@ -549,11 +549,16 @@ body.env-on .page{background:transparent}
 @keyframes sweep{to{transform:rotate(360deg)}}
 .efx.lightning{inset:0;background:var(--c);opacity:0;animation:light 11s steps(1) infinite}
 @keyframes light{0%,96.9%{opacity:0}97%{opacity:.33}97.6%{opacity:0}98.2%{opacity:.2}98.8%,100%{opacity:0}}
-.efx.aurora{inset:0 0 50% 0;background:linear-gradient(100deg,transparent,var(--c),transparent 70%);filter:blur(14px);animation:fogx 18s ease-in-out infinite alternate}
+.efx.aurora{inset:0 0 50% 0;background:linear-gradient(100deg,transparent,var(--c),transparent 70%);-webkit-mask-image:linear-gradient(transparent,#000 40%,transparent);mask-image:linear-gradient(transparent,#000 40%,transparent);animation:fogx 18s ease-in-out infinite alternate}
 .efx.corona{left:40%;top:10%;width:30%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--c),transparent 65%);animation:flick 4s ease-in-out infinite}
 .efx.wavecrash{left:0;right:0;bottom:22%;height:20%;background:linear-gradient(transparent,var(--c));opacity:0;animation:crash 7s ease-out infinite}
 @keyframes crash{0%,85%{opacity:0;transform:translateY(20%)}90%{opacity:var(--a);transform:none}100%{opacity:0}}
 .envfx-back.still .efx{animation:none!important}
+/* load governor (env.js govTo): fades effects by opacity only; nothing is rebuilt, data-q never changes */
+#env .envfx-back{transition:opacity .5s}
+#env.gov-reduced .envfx-back{opacity:.5}
+#env.gov-off .envfx-back{opacity:0}
+#env.gov-off .envfx-back .efx{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){#env .envL,#env-front .envL{animation:none!important}.efx{animation:none!important}.efx.lightning,.efx.rings,.efx.ripples,.efx.wavecrash{display:none}.co,.toast,.bandtoast,.tcard{animation-duration:.01s!important}.co{opacity:1}}
 @media (orientation:landscape) and (max-height:500px){
  .en .slot:not(.win){height:84px;aspect-ratio:auto}
@@ -790,8 +795,12 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
  .combat .scene::before,.combat .scene .ground{display:none}
  .combat .fig>.slot.spr-slot{aspect-ratio:auto!important}
  .combat .fig>.slot.spr-slot>img.spr{filter:var(--stage-grade) drop-shadow(var(--stage-light) -1px 1px color-mix(in srgb,var(--stage-rim) 38%,transparent)) drop-shadow(0 2px 2px #0008)}
- .combat .shadow{height:18px;background:radial-gradient(ellipse,#000b 0%,#0006 32%,#0002 56%,transparent 73%)}
- .combat .shadow::before{content:'';position:absolute;inset:5px 24%;border-radius:50%;background:radial-gradient(ellipse,#000c,transparent 75%)}
+ /* Task 59: contact shadow = soft radial ellipse (~0.7 sprite width, .55) + a 3px dark core; bosses wider, floaters smaller and offset (sizes set in render.js) */
+ .combat .shadow{background:radial-gradient(ellipse,#000 0%,#000a 38%,#0003 62%,transparent 74%);opacity:.55}
+ .combat .shadow::before{content:'';position:absolute;left:22%;right:22%;top:calc(50% - 1.5px);height:3px;border-radius:50%;background:#000;filter:blur(1px)}
+ .combat .shadow.float{opacity:.4;translate:6% 3px}
+ .combat .scene.pick-dim{filter:brightness(.75)}
+ body.env-combat .efx.ripples{display:none}
  .stage-air{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
  .stage-air.front{z-index:2}
  .stage-mist{position:absolute;left:10%;right:8%;top:43%;height:12%;background:radial-gradient(ellipse,color-mix(in srgb,var(--stage-air) 20%,transparent),transparent 70%);opacity:var(--stage-haze);animation:stage-mist 17s ease-in-out infinite alternate}
@@ -1016,14 +1025,14 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .bd .sti{filter:none!important;color:var(--sc)}
 .bd .sti g{stroke:#05070b;stroke-width:.9}
 .bd b,.bd.debuff b{display:block;margin-top:-1px;font:800 11px/1 var(--font-number);color:#fff;-webkit-text-stroke:2.5px #05070b;paint-order:stroke fill;text-shadow:0 1px 2px #000;letter-spacing:0}
-.bd .status-art{animation:stglow 3.2s ease-in-out infinite}
-.bd:nth-child(2n) .status-art{animation-delay:-1.3s}
-@keyframes stglow{0%,100%{filter:drop-shadow(0 1px 1.5px #000d) drop-shadow(0 0 3px color-mix(in srgb,var(--sc) 55%,transparent)) drop-shadow(0 -.5px 0 #fff5)}50%{filter:drop-shadow(0 1px 1.5px #000d) drop-shadow(0 0 7px color-mix(in srgb,var(--sc) 95%,transparent)) drop-shadow(0 -.5px 0 #fff8) brightness(1.15)}}
+.bd::after{content:'';position:absolute;inset:-2px;border-radius:inherit;pointer-events:none;background:radial-gradient(circle,color-mix(in srgb,var(--sc) 55%,transparent),transparent 70%);opacity:0;animation:stglow 3.2s ease-in-out infinite}
+.bd:nth-child(2n)::after{animation-delay:-1.3s}
+@keyframes stglow{0%,100%{opacity:.1}50%{opacity:.4}}
 .bd[data-kw="Drenched"],.bd[data-kw="Resonating"]{border:0}
 .combat .stw .badges,.combat .plate .stw .badges{gap:3px!important;align-items:flex-start}
 @media(max-height:599px){.combat .plate .stw .badges{display:flex!important;flex-wrap:wrap!important;grid-template-rows:none;max-height:none;overflow:visible!important;row-gap:1px;padding:0;justify-content:center}.combat .plate .stw .bd .status-art{width:17px;height:17px}.bd b{font-size:10px}}
 @media(orientation:landscape){.combat .plate .stw .badges{flex-wrap:wrap;overflow:visible;justify-content:center}.combat .plate .status-art{width:17px;height:17px}}
-@media(prefers-reduced-motion:reduce){.bd .status-art{animation:none}}
+@media(prefers-reduced-motion:reduce){.bd::after{animation:none}}
 /* Guard badge matches: same drop shadow + soft glow, number in the same outlined style */
 .hpblk{filter:drop-shadow(0 1px 1.5px #000d) drop-shadow(0 0 5px #5aaeffaa)}
 .hpblk b{-webkit-text-stroke:2.5px #05070b;paint-order:stroke fill;font-weight:800}
@@ -1098,6 +1107,7 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .insp.held-preview .ikw{display:none}
 /* v0.5.1: a held hand card is only the enlarged card + its keyword windows: no dim/blur overlay, and the finger keeps control underneath */
 .ov.inspect.held-hand{background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none}
+.ov.inspect.held-hand .inspect-keywords{pointer-events:auto;touch-action:pan-y;overscroll-behavior:contain}
 
 /* Task 38: open combat HUD, with a bounded relic rail and one corner baseline. */
 .combat #relicbar{background:none!important;border:0!important;border-image:none!important;box-shadow:none!important;padding:0;margin:0;overflow:visible;gap:0;align-self:center;flex:1 1 0;display:grid;grid-template-columns:repeat(var(--relic-columns,1),minmax(0,1fr));grid-auto-rows:48px;height:48px;align-content:start}

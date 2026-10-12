@@ -18,16 +18,21 @@ let hh=0,holdTouch=false;
 // Any other card (reward, shop, rest/temper, deck viewer, events, pick screens) opens away from it by its screen position.
 function handSide(el){const h=el.closest&&el.closest('.hand');if(h&&el.dataset.i!=null){const n=h.querySelectorAll('.card').length;return +el.dataset.i>=(n-1)/2?'left':'right'}const r=el.getBoundingClientRect();return r.left+r.width/2>=innerWidth/2?'left':'right'}
 function inspectNow(el,touch,point){const side=touch?handSide(el):null;clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
-document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;closeInspect();return}let any=ev.target.closest&&ev.target.closest('.card');if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected)any=peek;if(!any||any.closest('#inspect'))return;
+document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest&&ev.target.closest('.card');if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected)any=peek;if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,true,{x:ev.clientX,y:ev.clientY})},LONGPRESS_MS)}},true);
 document.addEventListener('pointermove',ev=>{if(lp&&Math.hypot(ev.clientX-lp.x0,ev.clientY-lp.y0)>10){clearTimeout(lp.t);lp=null}},true);
-document.addEventListener('pointerup',()=>{if(lp){clearTimeout(lp.t);lp=null}if(holdTouch){holdTouch=false;closeInspect()}},true); // A held preview lasts exactly until release.
+document.addEventListener('pointerup',ev=>{if(lp){clearTimeout(lp.t);lp=null}if(holdTouch&&ev.target.closest?.('.inspect-keywords')&&!ev.isPrimary)return;if(holdTouch){holdTouch=false;closeInspect()}},true); // A held preview lasts exactly until release.
 document.addEventListener('pointercancel',()=>{cancelLongPress()},true); // v0.5.1: a browser pan/cancel must not close a held zoom; only lifting the finger does
+document.addEventListener('click',ev=>{if(holdTouch&&ev.target.closest?.('.inspect-keywords')){ev.stopPropagation();ev.preventDefault()}},true);
 document.addEventListener('touchend',ev=>{if(holdTouch&&ev.touches.length===0){holdTouch=false;closeInspect()}},true);
 document.addEventListener('touchcancel',ev=>{if(holdTouch&&ev.touches.length===0){holdTouch=false;closeInspect()}},true);
 // Preserve shelf scrolling before the hold; once open, sliding must not become a native pan/cancel.
-document.addEventListener('touchmove',ev=>{if(holdTouch)ev.preventDefault()},{passive:false});
+// While a card is held, a second finger on the glossary scrolls it by hand: the held card's touch sequence blocks native panning.
+const kwScroll=new Map();
+document.addEventListener('touchstart',ev=>{if(!holdTouch)return;for(const t of ev.changedTouches){const k=t.target?.closest?.('.inspect-keywords');if(k)kwScroll.set(t.identifier,{k,y:t.clientY,st:k.scrollTop})}},true);
+document.addEventListener('touchmove',ev=>{if(!holdTouch){kwScroll.clear();return}ev.preventDefault();for(const t of ev.changedTouches){const s=kwScroll.get(t.identifier);if(s)s.k.scrollTop=s.st-(t.clientY-s.y)}},{passive:false});
+const kwEnd=ev=>{for(const t of ev.changedTouches)kwScroll.delete(t.identifier)};document.addEventListener('touchend',kwEnd,true);document.addEventListener('touchcancel',kwEnd,true);
 // Desktop hover-hold: resting the mouse on a card (1.5 s in the hand, 0.9 s elsewhere) enlarges it, like right-click.
 document.addEventListener('pointerover',ev=>{if(ev.pointerType!=='mouse')return;clearTimeout(hh);hh=0;const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('#inspect,#cardtip,.cslot.lift')||ev.buttons)return;
  const hand=!!c.closest('.hand');hh=setTimeout(()=>{hh=0;if(!c.isConnected||!c.matches(':hover')||drag||(hand&&(c.classList.contains('sel')||c.classList.contains('drag')))||(W.cb&&W.cb.busy&&hand))return;inspectNow(c,false)},hand?1500:900)},true);
@@ -86,7 +91,7 @@ export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)retur
  if(d.raf)cancelAnimationFrame(d.raf);
  // Pointer release can arrive before the queued animation-frame move.
  if(!cancel&&rafPending&&rafPending.pointerId===d.id)dragMove(d,rafPending);
- drag=null;rafPending=null;clearPeek();dropSel();d.el.classList.remove('drag','armed');d.el.style.removeProperty('transform');clearTargets();eatClick=true;
+ drag=null;rafPending=null;if(!d.moved&&!cancel)releasePeek();else clearPeek();dropSel();d.el.classList.remove('drag','armed');d.el.style.removeProperty('transform');clearTargets();eatClick=true;
  if(cancel||!W.cb){if(W.cb){W.cb.sel=null;render()}return}
  if(!d.moved){W.cb.sel=null;W.cb.insp=null;layoutHand();return}
  const ci=W.cb.hand[d.i],target=ci&&canPlay(ci)?dropTarget(ci,ev.clientX,ev.clientY):null;
@@ -113,6 +118,8 @@ let relT=0,hc=null,leanX=null,leanDir=0,lastBuzz=0;
 // Haptic tick when the lifted card changes: touch only, ~50 ms rate limit so a fast sweep is a soft riffle. No sound (UI tap sounds were removed on purpose).
 function buzz(){if(settings.handHaptic===false||!navigator.vibrate)return;const t=performance.now();if(t-lastBuzz<50)return;lastBuzz=t;try{navigator.vibrate(4)}catch(_){}}
 const NB_SHIFT=[16,6,2]; // px pushed from the lifted card: neighbour, next, then the third card out
+// Soft release (Task 43): an undragged tap keeps the lifted card ~150 ms, then lowers.
+function releasePeek(){const p=peek;if(!p)return;clearTimeout(relT);relT=setTimeout(()=>{relT=0;if(peek===p)clearPeek(true)},150)}
 function clearPeek(soft){clearTimeout(relT);relT=0;peek=null;leanDir=0;document.querySelectorAll('.hand .card.peek,.hand .card.peek-neighbour').forEach(c=>{c.classList.remove('peek','peek-neighbour','peek-fast');for(const v of ['--roll','--pn','--nl','--nr'])c.style.removeProperty(v);if(c.dataset.x!=null)c.style.setProperty('--x',c.dataset.x+'px');else c.style.removeProperty('--x')});if(W.S.screen==='combat')layoutHand();if(!soft)clearOutcome()}
 // The finger's sweep direction leans the lifted card (roll) and slides it a little away so the thumb does not cover the art.
 function lean(c,dir){if(leanDir===dir)return;leanDir=dir;c.style.setProperty('--roll',dir*3+'deg');c.style.setProperty('--pn',(-dir*.2*c.offsetWidth).toFixed(1)+'px')}

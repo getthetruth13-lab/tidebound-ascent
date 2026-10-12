@@ -73,28 +73,28 @@ registerEnemies({
  bell:{n:'The Knell',e:'🔔',hp:hp('bell'),boss:1,randomSprite:1,
   ai:AI(e=>{const mt=e.st.str||0,tl={a:18,s:V.bell.toll_might,lbl:'Toll'};
    if(e.crackNext){e.crackNext=0;return pk(e,[{w:1,m:{a:22,lbl:'Crack'}}])}
-   if(e.ph===2)return pk(e,[{w:35,m:{a:22,lbl:'Crack'},rep:2},{w:25,m:{a:10,ring:2,lbl:'Shatter Wave'},rep:1},{w:mt>=6?0:20,m:tl,rep:1},{w:canWind(e,2,4)?30:0,m:{b:10,lbl:'The Bell tilts…'},wind:{a:34,ring:1,lbl:'Death Knell'}}]);
+   if(e.ph===2)return pk(e,[{w:35,m:{a:22,lbl:'Crack'},rep:2},{w:25,m:{a:10,ring:2,lbl:'Shatter Wave'},rep:1},{w:mt>=6?0:20,m:tl,rep:1},{w:canWind(e,2,4)?30:0,m:{b:10,lbl:'The Bell tilts…'},wind:{a:32,ring:1,lbl:'Death Knell'}}]);
    if(!e.t)return pk(e,[{w:1,m:tl}]);
    return pk(e,[{w:mt>=4?0:30,m:tl,rep:1},{w:35,m:{a:6,h:3,lbl:'Chain Sweep'},rep:2},{w:e.block>=15?0:hurt(e)>=25?55:25,m:{b:15,w:2,lbl:'Haul the Bell'},rep:1},
-    {w:canWind(e,2,4)?30:0,m:{b:10,lbl:'The Bell swings wide…'},wind:{a:32,ring:1,lbl:'Great Peal'}}])}),
-  // Phase 2 at <= 80 HP: clears debuffs, +2 Might, and starts on Crack — even when it cracks during its own turn (Parry; Playtester bug 2).
-  onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.hist=[];e.queued=null;e.crackNext=1;e.next=EN_bell().ai(e);if(W.cb.acting===e)e.keepNext=true;
-   log('🔔 The Knell\'s Bell CRACKS! Phase 2: +2 Might, debuffs cleared');log('🔔 '+BELL_LINES.crack);callout('THE BELL CRACKS!','boss')}}},
+    {w:canWind(e,2,4)?30:0,m:{b:10,lbl:'The Bell swings wide…'},wind:{a:30,ring:1,lbl:'Great Peal'}}])}),
+  // Phase 2 at <= 80 HP: clears debuffs, +1 Might, and starts on Crack — even when it cracks during its own turn (Parry; Playtester bug 2).
+  onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',1);e.ci=0;e.hist=[];e.queued=null;e.crackNext=1;e.next=EN_bell().ai(e);if(W.cb.acting===e)e.keepNext=true;
+   log('🔔 The Knell\'s Bell CRACKS! Phase 2: +1 Might, debuffs cleared');log('🔔 '+BELL_LINES.crack);callout('THE BELL CRACKS!','boss')}}},
  matriarch:{n:'The Kelp Matriarch',e:'🪸',hp:[90,90],boss:1,
-  passive:{n:'Rooted',text:'At the end of each of her turns, she gains 4 Guard per living Tendril.',endTurn:e=>{const n=tend().length;if(n){e.block+=4*n;e.blkT=Date.now()}}},
+  passive:{n:'Rooted',text:'At the end of each of her turns, she gains 3 Guard per living Tendril.',endTurn:e=>{const n=tend().length;if(n){e.block+=3*n;e.blkT=Date.now()}}},
   onSpawn:e=>{if(W.cb){spawn('tendril',{summoned:true});spawn('tendril',{summoned:true})}},
   ai:AI(e=>{const n=tend().length,grown=n>=2&&tend().every(t=>(t.st.str||0)>=4);
    if(!e.t)return pk(e,[{w:1,m:{a:14,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'}}]);
    return pk(e,[{w:35,m:{a:14,status:{id:'kelp',n:2,pile:'drawRandom'},lbl:'Entangle'},rep:1},{w:grown?0:30,m:{grow:1,fx:grow,lbl:'Grow'},rep:1},{w:40,m:{a:7,h:2,lbl:'Crushing Embrace'},rep:2},
     {w:n&&canWind(e,2,3)?30:0,m:{b:10,lbl:'Roots tighten…'},wind:{a:26,status:{id:'kelp',n:1,pile:'drawRandom'},lbl:'Strangle'}}])}),
   onDamaged:e=>{if(!e.bloomed&&e.hp<=45){e.bloomed=true;spawn('tendril',{summoned:true});spawn('tendril',{summoned:true});addSt(e,'str',2);log('🌸 The Matriarch BLOOMS: 2 Tendrils, +2 Might');callout('BLOOM!','boss')}}},
- tenant:{n:'The Last Tenant',e:'🏚️',hp:[180,180],b0:30,boss:1,
-  passive:{n:'Home',text:'His Guard does not expire. Break all of it in one go and he is Breached: he loses his next action and takes 50% more damage, then rebuilds 30 Guard.',keepGuard:true},
+ tenant:{n:'The Last Tenant',e:'🏚️',hp:[180,180],b0:24,boss:1,
+  passive:{n:'Home',text:'His Guard does not expire. Break all of it in one go and he is Breached: he loses his next action and takes 50% more damage, then rebuilds 24 Guard.',keepGuard:true},
   ai:AI(e=>{const p2=e.ph===2;if(!e.t)return pk(e,[{w:1,m:{a:p2?24:20,lbl:'Shoulder'}}]);
-   return pk(e,[{w:40,m:{a:p2?24:20,lbl:'Shoulder'},rep:2},{w:30,m:{a:7,h:2,v:1,lbl:'Boathook'},rep:2},{w:e.block>=24?0:hurt(e)>=20?60:30,m:{b:14,lbl:'Board Up'},rep:1},
+   return pk(e,[{w:40,m:{a:p2?24:20,lbl:'Shoulder'},rep:2},{w:30,m:{a:7,h:2,v:1,lbl:'Boathook'},rep:2},{w:e.block>=24?0:hurt(e)>=20?60:30,m:{b:12,lbl:'Board Up'},rep:1},
     {w:canWind(e,2,4)?28:0,m:{b:10,lbl:'Hefts the door…'},wind:{a:p2?42:36,lbl:'Slam the Door'}}])}),
-  // Breached (Guard >0→0 in one hit sequence): the next action is skipped (Reeling), Exposed for that turn, 30 Guard back after it.
-  onGuardBroken:e=>{if(e.ph!==1||W.cb.acting===e)return;e.queued=null;e.next={none:1,b:30,lbl:'Reeling'};addSt(e,'vuln',1);log('🏚️ The Last Tenant is BREACHED: he reels, Exposed');callout('BREACHED!','boss')},
+  // Breached (Guard >0→0 in one hit sequence): the next action is skipped (Reeling), Exposed for that turn, 24 Guard back after it.
+  onGuardBroken:e=>{if(e.ph!==1||W.cb.acting===e)return;e.queued=null;e.next={none:1,b:24,lbl:'Reeling'};addSt(e,'vuln',1);log('🏚️ The Last Tenant is BREACHED: he reels, Exposed');callout('BREACHED!','boss')},
   onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;e.passive=null;e.hist=[];e.queued=null;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.next=EN.tenant.ai(e);if(W.cb.acting===e)e.keepNext=true;
    log('🏚️ '+TENANT_LINES.phase2);bossBeat('phase','The door splinters','He does not seem to notice. He hits harder now.',e)}},
   onDeath:e=>{log('🏚️ '+TENANT_LINES.defeat)}},

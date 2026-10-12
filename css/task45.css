@@ -112,9 +112,7 @@
 .pk>.etitle{margin-top:9px}
 .page.fit-event>.topbar{margin:0}
 /* ---- plaques out: options, load, deck, settings, travel quote, chips are engraved text on a dark scrim ---- */
-.tb-frame.tb-opt,.tb-frame.tb-load,.ov .box.plain{border:0;border-image:none;background:radial-gradient(ellipse at 50% 45%,#07090dfa 45%,#07090dd0 100%);box-shadow:0 0 0 1px #d9b46a22,0 12px 40px #000c;border-radius:10px}
-.ov .box.plain>h2{background:none;border:0;box-shadow:none;padding:0;margin:0 auto 6px;font:700 22px var(--font-display);letter-spacing:.09em;color:#f0dcaa;text-shadow:0 -1px 0 #000,0 1px 0 #ffffff2e,0 0 16px #d9b46a55}
-.ov .box.plain>h2::before,.ov .box.plain>h2::after{display:none}
+/* Task 47: options / load / deck / settings windows use the shared frame (window.css) like every other window */
 .tb-opt .tb-actions,.tb-load .tb-actions{display:flex;justify-content:flex-end;margin-top:6px}
 .tb-opt .tb-actions .tb-btn,.tb-load .tb-actions .tb-btn{min-width:160px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .tb-btn .gi,.tb-x .gi{color:inherit;filter:none;width:1.1em;height:1.1em}
@@ -151,3 +149,5 @@
 .tb-ledger::after{content:"";position:fixed;left:0;right:0;bottom:0;height:38px;pointer-events:none;background:linear-gradient(transparent,#05070bdd);z-index:4}
 /* title menu: unavailable entries are clearly dimmer */
 .tb-mi.off,.tb-mi:disabled{opacity:.38;filter:grayscale(.8) brightness(.8)}
+/* Task 48: build number, bottom-right corner of the main menu (StS shows its version in a menu corner). */
+.tm-ver{position:absolute;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(6px + env(safe-area-inset-bottom,0px));font:500 11px/1 'Crimson Pro',serif;letter-spacing:.06em;color:#c7ccd4;opacity:.5;pointer-events:none;text-shadow:0 0 4px #000,0 0 8px #000;z-index:3}

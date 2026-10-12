@@ -23,7 +23,10 @@ function ramp(voice,to,seconds,dispose=false){
   if(t<1)voice.frame=requestAnimationFrame(tick);else{voice.frame=null;if(dispose){voice.el.pause();voice.el.removeAttribute('src');voice.el.load();voices.delete(voice)}}};
  voice.frame=requestAnimationFrame(tick);
 }
-function retire(){if(current){current.el.onended=null;current.el.onerror=null;current.el.ontimeupdate=null;ramp(current,0,2,true);current=null}}
+// Crossfade: a retired track keeps playing until its successor is audible, then both fade over XFADE seconds (no gap, short overlap).
+const XFADE=.8,outgoing=new Set();let handoffTimer=0;
+function retire(){if(current){current.el.onended=null;current.el.onerror=null;current.el.ontimeupdate=null;outgoing.add(current);current=null;clearTimeout(handoffTimer);handoffTimer=setTimeout(releaseOutgoing,4000)}}
+function releaseOutgoing(sec=XFADE){clearTimeout(handoffTimer);for(const voice of outgoing)ramp(voice,0,sec,true);outgoing.clear()}
 function nextFile(){let bag=bags[context];if(!bag||!bag.length){bag=[...(manifest[context]||[])];for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]]}
  if(bag.length>1&&bag[bag.length-1]===lastTrack[context])[bag[0],bag[bag.length-1]]=[bag[bag.length-1],bag[0]];bags[context]=bag}
  return bag.pop();
@@ -33,8 +36,8 @@ function startTrack(){if((!unlocked&&context!=='menu')||!context||current||docum
  el.onended=()=>{if(current===voice){retire();startTrack()}};
  el.ontimeupdate=()=>{if(!el.loop&&current===voice&&Number.isFinite(el.duration)&&el.duration-el.currentTime<=2&&el.currentTime>0){retire();startTrack()}};
  // A missing track must not spin through an unavailable playlist forever.
- el.onerror=()=>{if(current===voice)retire()};
- el.play().then(()=>{if(current===voice&&unlocked)ramp(voice,level('musicVolume'),2)}).catch(()=>{voice.blocked=true});
+ el.onerror=()=>{if(current===voice){retire();releaseOutgoing()}};
+ el.play().then(()=>{if(current===voice&&unlocked){ramp(voice,level('musicVolume'),outgoing.size?XFADE:2);releaseOutgoing()}}).catch(()=>{voice.blocked=true;if(current===voice)releaseOutgoing()});
 }
 const bossPhases=new WeakMap(),phaseHeard=new WeakSet();
 function syncBossPhases(){for(const e of W.cb?.ens||[]){if(!e.boss)continue;const phase=e.bloomed?2:e.ph||1,previous=bossPhases.get(e);bossPhases.set(e,phase);
@@ -42,7 +45,7 @@ function syncBossPhases(){for(const e of W.cb?.ens||[]){if(!e.boss)continue;cons
 }}
 export function syncAudio(){syncUIState();syncBossPhases();const s=W.S.screen;
  const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:s==='shop'||s==='rest'||s==='event'?(manifest[s]?.length?s:'map'):'map'):null;
- if(next!==context){retire();context=next;startTrack()}
+ if(next!==context){retire();context=next;startTrack();if(!current)releaseOutgoing()}
  if(s==='end'&&lastScreen!==s)playSound(W.run&&W.run.won?'victory':'defeat');lastScreen=s;
 }
 // Battle-won beat: the music dips for a moment, then recovers (the map track takes over right after).
@@ -157,7 +160,7 @@ export function initAudio(){
  document.addEventListener('pointerup',drop,true);document.addEventListener('pointercancel',drop,true);
  document.addEventListener('keydown',unlock,{once:true});
  document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const node=e.target.closest?.('.node');if(node&&!node.contains(e.relatedTarget))playSound('mapHover');else {const el=e.target.closest?.('button,.btn,.tile,.hand .card');if(el&&!el.contains(e.relatedTarget)&&!el.matches('[disabled],[aria-disabled="true"]'))playSound('hover')}});
- document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const source of activeSfx)source.stop();retire();for(const voice of voices){if(voice.frame)cancelAnimationFrame(voice.frame);voice.el.pause();voice.el.removeAttribute('src');voice.el.load()}voices.clear();if(ctx)ctx.suspend().catch(()=>{})}else if(unlocked){if(ctx)ctx.resume().catch(()=>{});startTrack()}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const source of activeSfx)source.stop();retire();for(const voice of voices){if(voice.frame)cancelAnimationFrame(voice.frame);voice.el.pause();voice.el.removeAttribute('src');voice.el.load()}voices.clear();outgoing.clear();clearTimeout(handoffTimer);if(ctx)ctx.suspend().catch(()=>{})}else if(unlocked){if(ctx)ctx.resume().catch(()=>{});startTrack()}});
  observeEvents((event,c)=>{if(event==='parry'&&fxOn())playSound('parry');queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={shuffle:'shuffle',guardGained:'guard',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward',potionUsed:'potion'};
  contextSound(event,c);
  if(event==='enemyKilled'&&!document.hidden){const e=c.enemy,sound=deathSoundOf(e);if(fxOn())setTimeout(()=>{if(!document.hidden)playSound(sound)},T(impactBase()));else playSound(sound)}

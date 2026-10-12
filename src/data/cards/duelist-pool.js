@@ -16,7 +16,7 @@ const momAfter=(f,n,why)=>afterPlay(f,()=>{const g=gainMom(n);if(g)floatText('p'
 // ---------------- Common ----------------
 D('nick',{e:'🩸',d:'Deal 2. Apply {2|3} Bleed.',p:f=>{f.dmg(2);bleed(f.tg,f.v(2,3))}});
 D('serrate',{e:'🪚',d:'Deal {6|8}. Apply {3|4} Bleed.',p:f=>{f.dmg(f.v(6,8));bleed(f.tg,f.v(3,4))}});
-D('quickstep',{e:'👟',d:'Gain {5|8} Guard. Gain 1 Momentum.',fx:[['block',5,8],['mom',1]]});
+D('quickstep',{e:'👟',d:'Gain {6|8} Guard. Gain 1 Momentum.',fx:[['block',6,8],['mom',1]]});
 D('advance',{e:'➡️',d:'Deal {6|9}. If you have 2+ Momentum, draw 1.',p:f=>{const ok=mom()>=2;f.dmg(f.v(6,9));if(ok)f.draw(1)}});
 D('hiltguard',{e:'🛡️',d:'Parry {4|6}. Gain {4|6} Guard.',fx:[['parry',4,6],['block',4,6]]});
 D('retort',{e:'💬',d:'Deal {7|9}. <b>Retort:</b> deal {7|9} more.',p:f=>{const r=retort();f.dmg(f.v(7,9),r?2:1);if(r)callout('RETORT!','parry')}});
@@ -30,7 +30,7 @@ D('glancing',{e:'🌙',d:'Deal {6|8}. Gain {3|5} Guard.',fx:[['dmg',6,8],['block
 D('bleededge',{e:'🗡️',d:'Your next Attack this turn also applies {3|4} Bleed. Draw 1.',p:f=>{const n=f.v(3,4),src=f.ci;
  thisTurn({id:'bleededge',on:{cardPlayed(inst,ctx){if(inst.dead||ctx.card===src||ctx.type!=='A')return;inst.dead=true;const all=ctx.f&&ctx.f.def&&/ALL/.test(ctx.f.def.d);bleedHit(ctx.f,n,all);log('🗡️ Bleeding Edge: +'+n+' Bleed')}}});f.draw(1)}});
 D('disengage',{e:'🔙',d:'Gain {8|11} Guard. Your Momentum doesn\'t fade at the end of this turn.',p:f=>{f.blk(f.v(8,11));W.cb.keepMom=true;floatText('p','🔒 Momentum held','')}});
-D('readystance',{e:'🧍',d:'Parry {7|9}. If you have 0 Momentum, gain 1.',p:f=>{f.parry(f.v(7,9));if(mom()===0)f.mom(1)}});
+D('readystance',{e:'🧍',d:'Parry {8|9}. Gain 1 Momentum.',p:f=>{f.parry(f.v(8,9));f.mom(1)}});
 D('salute',{e:'🫡',d:'Gain 1 Momentum. Your next Parry this turn is +{3|5}.',p:f=>{f.mom(1);const n=f.v(3,5);thisTurn({id:'salute',mod:{parry(inst,ctx,v){if(inst.dead)return v;inst.dead=true;return v+n}}})}});
 // Pierce: Guard is set aside for this hit and restored afterwards ("ignores", not "removes").
 D('pierce',{e:'📌',d:'Deal {13|17}. This damage ignores Guard.',p:f=>{const t=f.tg;if(!t)return;const b=t.block;t.block=0;f.dmg(f.v(13,17));t.block+=b;if(b)floatText(t.uid,'📌 through Guard','')}});

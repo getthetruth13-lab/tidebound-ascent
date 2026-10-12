@@ -7,7 +7,7 @@ import {pickSpot} from './place.js';
 import {relicFlavour} from '../data/lore.js';
 const EXTRA={ // statuses and terms the glossary spreads across other entries
  Landmark:'A Waypoint at Rank 3. Landmarks count twice for Expedition cards.',
- Rooted:'At the end of each of her turns, she gains 4 Guard per living Tendril.'};
+ Rooted:'At the end of each of her turns, she gains 3 Guard per living Tendril.'};
 let names=null,re=null;
 const clean=k=>k.replace(/\s+X$/,'');
 function build(){const m=new Map();

@@ -35,7 +35,7 @@ export const HEROES={
    'Every foe is a lesson in tempo, and every parry a promise kept.'],
   plain:'Attacks build Momentum, which carries between turns and fades by 1 at the end of your turn. With enough, tap the glowing blade to Flourish: spend it all for a much bigger hit. Parry reduces the first blow and reflects half the Parry.',
   tips:['Flourish spends all your Momentum: ×2 at 2 Momentum, up to ×3.5 at 5.','Apply Bleed before attacking: it ignores Guard, triggers once per Attack per enemy, then falls by 1.']}};
-// Character select v2 lore window (CHARSEL-IDEAS idea 8). Spoiler-safe: S0/S1 only per design/lore/LORE-BIBLE.md (no Undermoon hints).
+// Character select v2 lore window (CHARSEL-IDEAS idea 8). Spoiler-safe: S0/S1 only per design/lore/LORE-BIBLE.md (no later-act hints).
 // tags: three "how it plays" icons, one word each. Icon ids map to inline SVGs in select.js (CS_ICON).
 export const CHARSEL={
  tide:{lore:['The sea once answered every word the keepers spoke. Then the sun sank, and the water forgot its manners.','You climb to make the sea answer to you again.'],tags:[['wave','Tide'],['crest','Crest'],['shell','Undertow']]},

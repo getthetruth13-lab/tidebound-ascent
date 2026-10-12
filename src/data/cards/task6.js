@@ -20,14 +20,14 @@ T('bankcrest',{e:'🏦',power:{mod:{bankCrest(){return true},drawCount(inst,ctx,
 T('ripcurrent',{e:'🌪️',power:{mod:{driftCount(inst,ctx,v){return v+stacks(inst)}}}});
 // ---------------- Echo Mage ----------------
 E('secondverse',{e:'🎶',p:f=>{W.cb.extraMarks=1;log('🔔 Second Verse: you may Mark a second card');callout('SECOND MARK','echo')}});
-E('tuningstrike',{e:'🔔',p:f=>{f.dmg(f.v(6,8));const t=f.tg;if(t)addSt(t,'reson',f.v(2,3))}});
+E('tuningstrike',{e:'🔔',p:f=>{f.dmg(f.v(7,8));const t=f.tg;if(t)addSt(t,'reson',f.v(2,3))}});
 E('struckbell',{e:'🛎️',p:f=>{f.all(f.v(7,10));alive().forEach(e=>addSt(e,'reson',f.v(2,3)))}});
 // ---------------- Cartographer ----------------
 K('scoutroad',{e:'🔭',p:f=>{revealRows(f.v(1,2));f.chart(f.v(2,3))}});
-K('cutpath',{e:'✂️',p:f=>{W.run.cut=(W.run.cut||0)+1;log('✂️ Cut a Path: after this fight you may travel to any room on the next floor')}});
+K('cutpath',{e:'✂️',p:f=>{f.blk(6);W.run.cut=(W.run.cut||0)+1;log('✂️ Cut a Path: after this fight you may travel to any room on the next floor');f.chart(2)}});
 K('stakenext',{e:'🚩',req:()=>W.cb.slots.length>0,p:f=>{const cb=W.cb;
  const set=i=>{const w=cb.slots[i];if(!w)return;W.run.preWp={id:w.id,up:isUp(w),rank:w.rank||0};log('🚩 Your next fight begins with a copy of '+cname(w)+(w.rank?' (Rank '+w.rank+')':''))};
- if(f.echo||cb.ending||cb.mode||cb.slots.length===1)return set(0);pickSlot('Stake the Next Shore: send which Waypoint ahead?',set)}});
+ if(f.echo||cb.ending||cb.mode||cb.slots.length===1)return set(0);pickSlot('Stake the Shore: send which Waypoint ahead?',set)}});
 K('forcedmarch',{e:'🥾',power:{mod:{advances(inst,ctx,v){return v+stacks(inst)}}}});
 // ---------------- Duelist ----------------
 D('ovation',{e:'🎭',p:f=>{const n=f.v(3,4);thisTurn({id:'ovation',mod:{flourishPlan(inst,ctx,v){if((inst.n||0)>=2)return v;inst.n=(inst.n||0)+1;return {mom:n,free:true}}}});log('🎭 Standing Ovation: your next 2 Attacks are free Flourishes at '+n)}});

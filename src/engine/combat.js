@@ -60,7 +60,7 @@ function startCombatImpl(kind,enc,opts={}){
  Object.defineProperty(cb,'pstr',{get(){return cb.p.st.str||0},set(v){cb.p.st.str=v;if(!v)delete cb.p.st.str},enumerable:false});
  Object.defineProperty(cb,'tdir',{get(){return cb.tideDir},set(v){cb.tideDir=v},enumerable:false});
  // Opening cards go to the top of the draw pile (design §2.1).
- const open=cb.draw.filter(c=>c.open||CARDS[c.id].open);if(open.length){cb.draw=open.concat(cb.draw.filter(c=>!open.includes(c)))}
+ const open=cb.draw.filter(c=>c.open||CARDS[c.id].open||(CARDS[c.id].openU&&isUp(c)));if(open.length){cb.draw=open.concat(cb.draw.filter(c=>!open.includes(c)))}
  enc.forEach(k=>spawn(k));cb.bossKey=(cb.ens.find(e=>e.boss)||{}).key||null;
  {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':cb.bossKey==='tenant'?'🏚️ ':'🪸 ')+t);const be=cb.ens.find(x=>x.boss);bossBeat('intro',EN[cb.bossKey].n,t,be)}} // lore: the boss speaks first (bible §16 items 7-9)
  const cls=W.run.cls;

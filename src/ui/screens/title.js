@@ -12,6 +12,7 @@ import {introScr,newGame} from './intro.js';
 import {lampPickScr,ledgerScr,totalPending} from './lamp.js';
 import {loadProfile} from '../../progress.js';
 import {dip} from '../dip.js';
+import {VERSION} from '../../../version.js';
 const RUN_KEY='tidebound.run.v2';
 function ago(t){if(!t)return'';const m=Math.max(0,Math.round((Date.now()-t)/60000));if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';return Math.round(h/24)+' d ago'}
 // Every stored run slot (today a single autosave; any extra 'tidebound.run*' keys show up here too).
@@ -67,7 +68,7 @@ export function titleScr(){const v=W.S.view||'main';
  const w=([id,label,act,off],i)=>`<button class="tm-w${off?' off':''}" id="${id}" data-sfx="confirm" style="--i:${i}" aria-label="${label}${id==='continue'&&K?`: ${K.n}, Floor ${sv.run.floor}/15`:''}"${off?' disabled':` onclick="menuPress(this,&quot;${act.replace(/"/g,'')}&quot;)"`}><span>${label}</span>${id==='ledger'&&pend?`<em class="lp-dot">${pend}</em>`:''}</button>`;
  const fade=W.S.fade?' tm-fade':'';if(W.S.fade){W.S.fade=0;requestAnimationFrame(flyEmblem)}
  return `<div class="tb-scr tb-title tb-main tb-imgmenu${fade}"><div class="tv-stage"><img class="tv-img" src="art/v2/title/menu-plate.webp" alt="" draggable="false"></div><img class="tm-emb" id="tmemb" src="art/v2/title/menu-emblem.webp" alt="The Drowned Sun" draggable="false">
- <nav class="tm-nav tm-words" aria-label="Main menu">${R.map(w).join('')}</nav></div>`}
+ <nav class="tm-nav tm-words" aria-label="Main menu">${R.map(w).join('')}</nav><span class="tm-ver" id="tmver">v${VERSION}</span></div>`}
 // Press: warm flash (CSS .tm-hit) then act, so the flash is seen. Click SFX comes from audio.js (data-sfx).
 export function menuPress(el,act){if(el.classList.contains('tm-hit'))return;el.classList.add('tm-hit');
  const go=()=>{try{(new Function(act))()}catch(e){console.error(e)}};dip(go)}

@@ -44,7 +44,7 @@ const FX={
 const reduce=()=>reducedMotion()||document.body.classList.contains('reduce-motion');
 const lockedK=k=>!heroUnlocked(loadProfile(),k);
 function heroHTML(k,i,foc){const S=STAGE[k],K=CLASSES[k],lk=lockedK(k),on=foc===k&&!lk,a=ART+S.art;
- return `<button class="st-pick cs-hero theme-${TH[k]}${on?' on':''}${lk?' locked':''}" data-cls="${k}" data-i="${i}" style="--x:${S.x};--h:${S.h};--sun:${S.sun};--spr:url('${a}-base.webp');--tint:${S.tint}" onclick="selectHero('${k}')" aria-label="${K.n}${lk?' (locked)':''}" aria-pressed="${on}">
+ return `<button class="st-pick cs-hero theme-${TH[k]}${on?' on':''}${lk?' locked':''}" data-cls="${k}" data-i="${i}" style="--x:${S.x};--h:${S.h};--sun:${S.sun};--spr:url('${new URL(a+'-base.webp',document.baseURI).href}');--tint:${S.tint}" onclick="selectHero('${k}')" aria-label="${K.n}${lk?' (locked)':''}" aria-pressed="${on}">
  <span class="cs-floor"><i class="cs-shadow"></i><img class="cs-refl" src="${a}-refl.webp" alt="" draggable="false"></span>
  <span class="st-fig"><img class="cs-base" src="${a}-base.webp" alt="" draggable="false"><img class="cs-lit${LIT_ART[k]?'':' standin'}" src="${a}-lit.webp" alt="" draggable="false"><i class="cs-rim"></i>${S.lamp?`<i class="cs-lamp" style="--lx:${S.lamp[0]};--ly:${S.lamp[1]};--lc:${S.lampc}"><i></i></i>`:''}${lk?CHAINS:FX[k](k)}</span>
  <span class="st-slab cs-name"><b data-n="${K.n}">${K.n}</b><i>${lk?'Locked':HEROES[k].epithet}</i></span></button>`}
@@ -97,25 +97,27 @@ export function beginFocused(){const S=W.S,cls=S.hero&&CLASSES[S.hero]?S.hero:nu
 // Tap empty space closes the logbook page.
 document.addEventListener('click',e=>{if(!root()||!W.S.heroPanel)return;if(e.target.closest('.cs-hero,.cs-word,button'))return;closeHero()});
 // ---------- motion engine: parallax + particles, one rAF loop, self-throttling (S24 notes in CHARSEL-IDEAS) ----------
-const motes={focus:.5,run:false};
+const motes={focus:.5,run:false,size:null};
 const PAR={tx:0,ty:0,x:0,y:0,gyro:false};
 addEventListener('pointermove',e=>{if(PAR.gyro||!root())return;PAR.tx=(e.clientX/innerWidth-.5)*2;PAR.ty=(e.clientY/innerHeight-.5)*2},{passive:true});
 addEventListener('deviceorientation',e=>{if(!root()||e.gamma==null)return;PAR.gyro=true;const land=Math.abs(window.orientation||screen.orientation?.angle||0)===90;
  const a=land?e.beta:e.gamma,b=land?e.gamma:e.beta;PAR.tx=Math.max(-1,Math.min(1,(a||0)/18));PAR.ty=Math.max(-1,Math.min(1,((b||0)-35)/18))},{passive:true});
 function startMotion(){const r=root();if(!r||motes.run)return;const cv=r.querySelector('.cs-motes'),layers=[...r.querySelectorAll('.cs-layer')].map(l=>[l,+l.dataset.depth]);
- const parOn=settings.charselParallax!==false&&!reduce(),fxOn=settings.envFx!=='off'&&!reduce();
+ const parOn=()=>settings.charselParallax!==false&&!reduce(),fxOn=settings.envFx!=='off'&&!reduce();
  const dpr=Math.min(2,devicePixelRatio||1),c=cv.getContext('2d');let w=0,h=0;const size=()=>{w=cv.clientWidth;h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;c.setTransform(dpr,0,0,dpr,0,0)};size();
  const P=[];const spawn=(p,gold,first)=>{p.gold=gold;if(gold){p.x=(Math.random()<.5?motes.focus+(Math.random()-.5)*.25:Math.random())*w;p.y=first?Math.random()*h:h*(.75+Math.random()*.25);p.vx=(Math.random()-.5)*6;p.vy=-(6+Math.random()*12);p.r=.6+Math.random()*1.4;p.life=0;p.max=4+Math.random()*5}
   else{p.x=Math.random()*w*1.2;p.y=first?Math.random()*h:-10;p.vx=-40-Math.random()*30;p.vy=160+Math.random()*90;p.r=.5;p.len=6+Math.random()*8}return p};
  for(let i=0;i<48;i++)P.push(spawn({},i<20,true));
- let last=performance.now(),acc=0,n=0,dropped=!fxOn;if(dropped)cv.style.display='none';motes.run=true;
- const tick=now=>{if(!cv.isConnected){motes.run=false;SND.stopBed();return}const dt=Math.min(.05,(now-last)/1000);if(!document.hidden){
+ let parRan=false,last=performance.now(),acc=0,n=0,dropped=!fxOn;if(dropped)cv.style.display='none';motes.run=true;
+ const tick=now=>{if(!cv.isConnected){motes.run=false;motes.size=null;SND.stopBed();return}const dt=Math.min(.05,(now-last)/1000);if(!document.hidden){
   if(n<240){acc+=now-last;n++;if(n===240&&acc/240>17.5&&!dropped){dropped=true;cv.style.display='none';root()?.classList.add('lowfx')}}
-  if(parOn){PAR.x+=(PAR.tx-PAR.x)*.06;PAR.y+=(PAR.ty-PAR.y)*.06;for(const [l,d] of layers)l.style.transform=`translate3d(${(-PAR.x*10*d).toFixed(2)}px,${(-PAR.y*5*d).toFixed(2)}px,0)`}
+  if(parOn()){PAR.x+=(PAR.tx-PAR.x)*.06;PAR.y+=(PAR.ty-PAR.y)*.06;parRan=true;for(const [l,d] of layers)l.style.transform=`translate3d(${(-PAR.x*10*d).toFixed(2)}px,${(-PAR.y*5*d).toFixed(2)}px,0)`}
+  else if(parRan){parRan=false;PAR.x=PAR.y=0;for(const [l] of layers)l.style.transform=''}
   if(!dropped){c.clearRect(0,0,w,h);for(const p of P){p.x+=p.vx*dt;p.y+=p.vy*dt;
    if(p.gold){p.life+=dt;const f=Math.sin(Math.PI*Math.min(1,p.life/p.max));c.globalAlpha=.75*f;c.fillStyle='#ffcf7a';c.beginPath();c.arc(p.x+Math.sin(p.life*1.3+p.r)*4,p.y,p.r,0,6.283);c.fill();if(p.life>p.max)spawn(p,true)}
    else{c.globalAlpha=.10;c.strokeStyle='#bcd2ea';c.lineWidth=.6;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(p.x-p.vx*.03,p.y-p.len);c.stroke();if(p.y>h+10)spawn(p,false)}}c.globalAlpha=1}}
-  last=now;requestAnimationFrame(tick)};requestAnimationFrame(tick);addEventListener('resize',size,{passive:true});SND.startBed()}
+  last=now;requestAnimationFrame(tick)};requestAnimationFrame(tick);motes.size=size;SND.startBed()}
+addEventListener('resize',()=>{if(root()&&motes.run)motes.size?.()},{passive:true}); // once, module-level: startMotion re-runs per visit and must not stack listeners
 // Called after every render (render() is synchronous; a microtask lands after the DOM swap).
 const mo=new MutationObserver(()=>{const r=root();if(!r)return;for(const b of r.querySelectorAll('.cs-hero.on.locked'))b.classList.remove('on');if(!motes.run)startMotion();const l=r.querySelector('.cs-lore:not(.out)');if(l&&!l.style.left)placeLore(l);if(r.dataset.focus)motes.focus=STAGE[r.dataset.focus]?.x??.5});
 if(typeof document!=='undefined')document.addEventListener('DOMContentLoaded',()=>mo.observe(document.body,{childList:true,subtree:true}),{once:true});

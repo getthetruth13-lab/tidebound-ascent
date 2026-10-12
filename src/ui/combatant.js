@@ -112,7 +112,7 @@ function describe(k,v,who){const cb=W.cb,P=who==='p',e=P?null:who,n=Math.abs(v),
  case 'mending':{const h=e?Math.min(n,Math.max(0,e.max-e.hp)):n;return {line:'Mending heals it every turn.',now:`It heals ${n} HP at the end of its turn${e&&h<n?(h?` (${h} right now)`:' (already at full HP)'):''}.`,dur:'Until the end of combat.'}}
  case 'parry':{const back=Math.floor(n*(CORE.duel.parry_back_frac||.5));return {line:'Parry stops the first enemy Attack.',now:`The first Attack against you loses ${n} damage and ${back} is reflected to the attacker.`,dur:'Until the first Attack hits you, or the start of your next turn.'}}
  case 'mightTmp':return {line:'A short-lived change to its Attacks.',now:`Its Attacks deal ${n} ${more} damage.`,dur:'Until the end of its next turn.'};
- case 'rooted':{const t=W.cb?W.cb.ens.filter(x=>x.key==='tendril'&&x.hp>0&&!x.fled).length:0;return {line:'Rooted gives her Guard from her Tendrils.',now:`She gains ${4*t} Guard at the end of her turn (4 per living Tendril; ${t} alive).`,dur:'Passive: lasts the whole combat.'}}
+ case 'rooted':{const t=W.cb?W.cb.ens.filter(x=>x.key==='tendril'&&x.hp>0&&!x.fled).length:0;return {line:'Rooted gives her Guard from her Tendrils.',now:`She gains ${3*t} Guard at the end of her turn (3 per living Tendril; ${t} alive).`,dur:'Passive: lasts the whole combat.'}}
  }return null}
 export function statusText(k,v,who,extraText){const d=STATUS[k];if(!d)return '';
  const x=describe(k,v,who||'p');
