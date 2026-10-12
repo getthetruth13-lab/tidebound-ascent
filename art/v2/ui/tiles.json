@@ -8,7 +8,7 @@
     384
    ],
    "desc": "Option icon: a worn stair step leading on, lantern light behind",
-   "ready": false
+   "ready": true
   },
   "opt-blood": {
    "path": "art/v2/ui/tiles/opt-blood.webp",
@@ -17,7 +17,7 @@
     384
    ],
    "desc": "Option icon: a bleeding hand over a still pool",
-   "ready": false
+   "ready": true
   },
   "opt-gold": {
    "path": "art/v2/ui/tiles/opt-gold.webp",
@@ -26,7 +26,7 @@
     384
    ],
    "desc": "Option icon: a heap of salt-green coins",
-   "ready": false
+   "ready": true
   },
   "opt-gamble": {
    "path": "art/v2/ui/tiles/opt-gamble.webp",
@@ -35,7 +35,7 @@
     384
    ],
    "desc": "Option icon: two bone dice on wet stone",
-   "ready": false
+   "ready": true
   },
   "opt-upgrade": {
    "path": "art/v2/ui/tiles/opt-upgrade.webp",
@@ -44,7 +44,7 @@
     384
    ],
    "desc": "Option icon: an anvil with a glowing seam",
-   "ready": false
+   "ready": true
   },
   "opt-transform": {
    "path": "art/v2/ui/tiles/opt-transform.webp",
@@ -53,7 +53,7 @@
     384
    ],
    "desc": "Option icon: a card half turning into a sea-glass shard",
-   "ready": false
+   "ready": true
   },
   "opt-card": {
    "path": "art/v2/ui/tiles/opt-card.webp",
@@ -62,7 +62,7 @@
     384
    ],
    "desc": "Option icon: a single face-down painted card",
-   "ready": false
+   "ready": true
   },
   "opt-fight": {
    "path": "art/v2/ui/tiles/opt-fight.webp",
@@ -71,7 +71,7 @@
     384
    ],
    "desc": "Option icon: crossed rusted blades in kelp",
-   "ready": false
+   "ready": true
   },
   "opt-heal": {
    "path": "art/v2/ui/tiles/opt-heal.webp",
@@ -80,7 +80,7 @@
     384
    ],
    "desc": "Option icon: a cupped hand with a warm light",
-   "ready": false
+   "ready": true
   },
   "opt-gift": {
    "path": "art/v2/ui/tiles/opt-gift.webp",
@@ -89,7 +89,7 @@
     384
    ],
    "desc": "Option icon: a knotted bundle on a driftwood altar",
-   "ready": false
+   "ready": true
   },
   "opt-relic": {
    "path": "art/v2/ui/tiles/opt-relic.webp",
@@ -98,7 +98,7 @@
     384
    ],
    "desc": "Option icon: a glowing relic on a velvet cloth",
-   "ready": false
+   "ready": true
   },
   "opt-potion": {
    "path": "art/v2/ui/tiles/opt-potion.webp",
@@ -107,7 +107,7 @@
     384
    ],
    "desc": "Option icon: a stoppered vial with a swirl",
-   "ready": false
+   "ready": true
   },
   "opt-curse": {
    "path": "art/v2/ui/tiles/opt-curse.webp",
@@ -116,7 +116,7 @@
     384
    ],
    "desc": "Option icon: a black thorned shell",
-   "ready": false
+   "ready": true
   },
   "opt-remove": {
    "path": "art/v2/ui/tiles/opt-remove.webp",
@@ -125,7 +125,7 @@
     384
    ],
    "desc": "Option icon: a card being cut by shears",
-   "ready": false
+   "ready": true
   },
   "opt-other": {
    "path": "art/v2/ui/tiles/opt-other.webp",
@@ -134,7 +134,7 @@
     384
    ],
    "desc": "Option icon: a question mark carved in coral",
-   "ready": false
+   "ready": true
   },
   "opt-back": {
    "path": "art/v2/ui/tiles/opt-back.webp",
@@ -143,7 +143,7 @@
     384
    ],
    "desc": "Option icon: a hand closing a book",
-   "ready": false
+   "ready": true
   },
   "camp-mend": {
    "path": "art/v2/ui/tiles/camp-mend.webp",
@@ -260,7 +260,7 @@
     384
    ],
    "desc": "Combat choice: a dark new moon over still water (Tide 3)",
-   "ready": false
+   "ready": true
   },
   "choice-tide-mid": {
    "path": "art/v2/ui/tiles/choice-tide-mid.webp",
@@ -269,7 +269,7 @@
     384
    ],
    "desc": "Combat choice: a half moon on a calm sea (Tide 5)",
-   "ready": false
+   "ready": true
   },
   "choice-tide-high": {
    "path": "art/v2/ui/tiles/choice-tide-high.webp",
@@ -278,7 +278,7 @@
     384
    ],
    "desc": "Combat choice: a full moon over a towering wave (Tide 7)",
-   "ready": false
+   "ready": true
   },
   "choice-tide-set": {
    "path": "art/v2/ui/tiles/choice-tide-set.webp",
@@ -287,7 +287,7 @@
     384
    ],
    "desc": "Combat choice: a moon and a dial on the sea",
-   "ready": false
+   "ready": true
   },
   "choice-surge": {
    "path": "art/v2/ui/tiles/choice-surge.webp",
@@ -296,7 +296,7 @@
     384
    ],
    "desc": "Combat choice: a wave rising",
-   "ready": false
+   "ready": true
   },
   "choice-recede": {
    "path": "art/v2/ui/tiles/choice-recede.webp",
@@ -305,7 +305,7 @@
     384
    ],
    "desc": "Combat choice: a wave pulling back",
-   "ready": false
+   "ready": true
   },
   "choice-moonpull": {
    "path": "art/v2/ui/tiles/choice-moonpull.webp",
@@ -314,7 +314,7 @@
     384
    ],
    "desc": "Combat choice: a moon drawing the tide up",
-   "ready": false
+   "ready": true
   },
   "choice-keep": {
    "path": "art/v2/ui/tiles/choice-keep.webp",
@@ -323,7 +323,7 @@
     384
    ],
    "desc": "Combat choice: a Waypoint flag standing safe",
-   "ready": false
+   "ready": true
   },
   "choice-destroy": {
    "path": "art/v2/ui/tiles/choice-destroy.webp",
@@ -332,7 +332,7 @@
     384
    ],
    "desc": "Combat choice: a Waypoint flag shattering",
-   "ready": false
+   "ready": true
   },
   "event-tidalwheel": {
    "path": "art/v2/ui/tiles/event-tidalwheel.webp",
@@ -485,7 +485,7 @@
     384
    ],
    "desc": "Fallback event scene: a lantern-lit shoreline",
-   "ready": false
+   "ready": true
   },
   "lamp-lantern-lit": {
    "path": "art/v2/ui/tiles/lamp-lantern-lit.webp",
@@ -494,7 +494,7 @@
     192
    ],
    "desc": "A lit brass lantern, warm glow (level pip)",
-   "ready": false
+   "ready": true
   },
   "lamp-lantern-dark": {
    "path": "art/v2/ui/tiles/lamp-lantern-dark.webp",
@@ -503,7 +503,7 @@
     192
    ],
    "desc": "The same lantern, cold and unlit",
-   "ready": false
+   "ready": true
   },
   "lamp-track-card": {
    "path": "art/v2/ui/tiles/lamp-track-card.webp",
@@ -512,7 +512,7 @@
     128
    ],
    "desc": "Lamp track reward marker: card",
-   "ready": false
+   "ready": true
   },
   "lamp-track-relic": {
    "path": "art/v2/ui/tiles/lamp-track-relic.webp",
@@ -521,7 +521,7 @@
     128
    ],
    "desc": "Lamp track reward marker: relic",
-   "ready": false
+   "ready": true
   },
   "lamp-track-potion": {
    "path": "art/v2/ui/tiles/lamp-track-potion.webp",
@@ -530,7 +530,7 @@
     128
    ],
    "desc": "Lamp track reward marker: potion",
-   "ready": false
+   "ready": true
   },
   "lamp-track-mixed": {
    "path": "art/v2/ui/tiles/lamp-track-mixed.webp",
@@ -539,7 +539,7 @@
     128
    ],
    "desc": "Lamp track reward marker: mixed",
-   "ready": false
+   "ready": true
   },
   "lamp-track-all": {
    "path": "art/v2/ui/tiles/lamp-track-all.webp",
@@ -548,7 +548,7 @@
     128
    ],
    "desc": "Lamp track reward marker: all",
-   "ready": false
+   "ready": true
   },
   "lamp-lock-card": {
    "path": "art/v2/ui/tiles/lamp-lock-card.webp",
@@ -557,7 +557,7 @@
     384
    ],
    "desc": "Locked card silhouette, dark and chained, no readable detail",
-   "ready": false
+   "ready": true
   },
   "lamp-lock-relic": {
    "path": "art/v2/ui/tiles/lamp-lock-relic.webp",
@@ -566,7 +566,7 @@
     384
    ],
    "desc": "Locked relic silhouette, dark and chained, no readable detail",
-   "ready": false
+   "ready": true
   },
   "lamp-lock-potion": {
    "path": "art/v2/ui/tiles/lamp-lock-potion.webp",
@@ -575,7 +575,7 @@
     384
    ],
    "desc": "Locked potion silhouette, dark and chained, no readable detail",
-   "ready": false
+   "ready": true
   },
   "lamp-cardback": {
    "path": "art/v2/ui/tiles/lamp-cardback.webp",
@@ -584,7 +584,7 @@
     700
    ],
    "desc": "Card back for locked cards: dark lantern glyph on teal-black",
-   "ready": false
+   "ready": true
   },
   "lamp-task-lit": {
    "path": "art/v2/ui/tiles/lamp-task-lit.webp",
@@ -593,7 +593,7 @@
     384
    ],
    "desc": "Lantern Task tile (done): one brass lantern blazing on a stone ledge, warm light, no sigil (the class sigil is stamped in code)",
-   "ready": false
+   "ready": true
   },
   "lamp-task-dark": {
    "path": "art/v2/ui/tiles/lamp-task-dark.webp",
@@ -602,7 +602,7 @@
     384
    ],
    "desc": "Lantern Task tile (not done): the same lantern, cold and unlit on the same ledge, no sigil",
-   "ready": false
+   "ready": true
   },
   "lamp-class-any": {
    "path": "art/v2/ui/tiles/lamp-class-any.webp",
@@ -611,7 +611,7 @@
     128
    ],
    "desc": "Task sigil for any-class tasks: a small compass rose, engraved, single colour",
-   "ready": false
+   "ready": true
   },
   "lamp-class-tide": {
    "path": "art/v2/ui/tiles/lamp-class-tide.webp",
@@ -620,7 +620,7 @@
     128
    ],
    "desc": "Class sigil / Lamp emblem: tide (also stamped on Lantern Task tiles)",
-   "ready": false
+   "ready": true
   },
   "lamp-class-echo": {
    "path": "art/v2/ui/tiles/lamp-class-echo.webp",
@@ -629,7 +629,7 @@
     128
    ],
    "desc": "Class sigil / Lamp emblem: echo (also stamped on Lantern Task tiles)",
-   "ready": false
+   "ready": true
   },
   "lamp-class-carto": {
    "path": "art/v2/ui/tiles/lamp-class-carto.webp",
@@ -638,7 +638,7 @@
     128
    ],
    "desc": "Class sigil / Lamp emblem: carto (also stamped on Lantern Task tiles)",
-   "ready": false
+   "ready": true
   },
   "lamp-class-duel": {
    "path": "art/v2/ui/tiles/lamp-class-duel.webp",
@@ -647,7 +647,7 @@
     128
    ],
    "desc": "Class sigil / Lamp emblem: duel (also stamped on Lantern Task tiles)",
-   "ready": false
+   "ready": true
   },
   "lamp-climb": {
    "path": "art/v2/ui/tiles/lamp-climb.webp",
@@ -656,7 +656,7 @@
     128
    ],
    "desc": "Stair Climb emblem: the Pale Lighthouse",
-   "ready": false
+   "ready": true
   },
   "lamp-banner-win": {
    "path": "art/v2/ui/tiles/lamp-banner-win.webp",
@@ -665,7 +665,7 @@
     160
    ],
    "desc": "End screen banner, the lamp room blazing (win)",
-   "ready": false
+   "ready": true
   },
   "lamp-banner-lose": {
    "path": "art/v2/ui/tiles/lamp-banner-lose.webp",
@@ -674,7 +674,7 @@
     160
    ],
    "desc": "End screen banner, a single lantern burning on in the dark (loss)",
-   "ready": false
+   "ready": true
   },
   "shop-wren": {
    "path": "art/v2/ui/tiles/shop-wren.webp",
@@ -692,7 +692,7 @@
     128
    ],
    "desc": "Ferryman portrait, small, shown at the crossing: a hooded oarsman who never looks up, lantern at the bow",
-   "ready": false
+   "ready": true
   },
   "lore-page-sealed": {
    "path": "art/v2/ui/tiles/lore-page-sealed.webp",
@@ -701,7 +701,7 @@
     128
    ],
    "desc": "Sealed Ledger page icon: a folded page tied with wet cord",
-   "ready": false
+   "ready": true
   },
   "lore-torn-page": {
    "path": "art/v2/ui/tiles/lore-torn-page.webp",
@@ -710,7 +710,7 @@
     256
    ],
    "desc": "Torn Ledger Page icon: a page with a visible cut stub along the top edge",
-   "ready": false
+   "ready": true
   },
   "lore-page-frame": {
    "path": "art/v2/ui/tiles/lore-page-frame.webp",
@@ -719,7 +719,7 @@
     384
    ],
    "desc": "Logbook page frame: parchment with a cut stub, iron corner rivets",
-   "ready": false
+   "ready": true
   },
   "menu-sky": {
    "path": "art/v2/ui/tiles/menu-sky.webp",
@@ -728,7 +728,7 @@
     384
    ],
    "desc": "Menu layer: the last hour before dawn over a black Pale Sea; left two-thirds kept clear for buttons",
-   "ready": false
+   "ready": true
   },
   "menu-sea": {
    "path": "art/v2/ui/tiles/menu-sea.webp",
@@ -746,7 +746,7 @@
     900
    ],
    "desc": "Menu layer: the Pale Lighthouse, right third, eight windows spiralling up (windows are lit in code over this art)",
-   "ready": false
+   "ready": true
   },
   "menu-ring": {
    "path": "art/v2/ui/tiles/menu-ring.webp",
@@ -782,7 +782,7 @@
     96
    ],
    "desc": "Menu layer: one ghost lantern on a step (the game places one per lifetime death, capped at 40)",
-   "ready": false
+   "ready": true
   },
   "menu-dawn-light": {
    "path": "art/v2/ui/tiles/menu-dawn-light.webp",
@@ -836,7 +836,7 @@
     768
    ],
    "desc": "Character select background: the Foot of the Stair at dusk, four landings climbing left to right, empty (heroes and lanterns are drawn over it)",
-   "ready": false
+   "ready": true
   },
   "select-lantern": {
    "path": "art/v2/ui/tiles/select-lantern.webp",
@@ -845,7 +845,7 @@
     192
    ],
    "desc": "One unlit brass hanging lantern, cutout on transparent, glass dark (the game adds the coloured glow in code)",
-   "ready": false
+   "ready": true
   }
  }
 }

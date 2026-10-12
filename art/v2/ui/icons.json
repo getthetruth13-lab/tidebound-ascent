@@ -12,10 +12,10 @@
   "rooted": "art/v2/ui/status-rooted.webp",
   "shell": "art/v2/ui/status-shell.webp",
   "soaked": "art/v2/ui/status-soaked.webp",
-  "drenched": null,
-  "resonating": null,
+  "drenched": "art/v2/ui/status-drenched.webp",
+  "resonating": "art/v2/ui/status-resonating.webp",
   "temporary-might": null,
-  "guard": null
+  "guard": "art/v2/ui/status-guard.webp"
  },
  "relic": {
   "abyssalpearl": "art/v2/ui/relic-abyssalpearl.webp",
@@ -114,13 +114,13 @@
   "intent-buff": "art/v2/ui/intent-buff.webp",
   "intent-debuff": "art/v2/ui/intent-debuff.webp",
   "intent-unknown": "art/v2/ui/intent-unknown.webp",
-  "intent-heal": null,
-  "intent-summon": null,
-  "intent-status": null,
-  "intent-steal": null,
-  "intent-ring": null,
-  "intent-potion": null,
-  "intent-drain": null
+  "intent-heal": "art/v2/ui/intent-heal.webp",
+  "intent-summon": "art/v2/ui/intent-summon.webp",
+  "intent-status": "art/v2/ui/intent-status.webp",
+  "intent-steal": "art/v2/ui/intent-steal.webp",
+  "intent-ring": "art/v2/ui/intent-ring.webp",
+  "intent-potion": "art/v2/ui/intent-potion.webp",
+  "intent-drain": "art/v2/ui/intent-drain.webp"
  },
  "combatant_art_note": "Null slots use distinct inline bronze SVG placeholders. Set a slot to its painted file path; loaded at runtime, no code changes required. Expected missing files: status-drenched.webp, status-resonating.webp, status-temporary-might.webp and intent-<slot>.webp (192x192 transparent).",
  "dais": {

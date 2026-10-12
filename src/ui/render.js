@@ -62,7 +62,7 @@ export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const ba
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
-export function topBar(){const K=CLASSES[W.run.cls];return `<div class="topbar theme-${TH[W.run.cls]}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act I</small></span></span>
+export function topBar(){const K=CLASSES[W.run.cls];return `<div class="topbar theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act I</small></span></span>
  <span class="stat hp" style="color:var(--status-damage)">${iconHTML('hud','heart','❤️')} ${Math.max(0,W.run.hp)}/${W.run.max}</span><span class="stat gold" style="color:var(--rarity-rare)">${iconHTML('hud','gold','💰')} ${W.run.gold}</span><span class="stat floor">${iconHTML('hud','floor','🏔️')} ${W.run.floor}/15</span>${potionSlots()}${relicBar()}<span class="sp"></span>
  ${W.run.lamp?`<button class="mini" id="lampbtn" onclick="openOv('tasks')" title="Lantern Tasks">${LANTERN_SVG} ${lampBtnLabel()}</button>`:''}<button class="mini" id="deckbtn" onclick="openOv('deck')" title="Deck">${iconHTML('hud','deck','🂠')} <span class="deck-count">${W.run.deck.length}</span></button><button class="mini" id="mapbtn" onclick="openOv('map')" title="Map">${iconHTML('hud','map','🗺️')}</button><button class="mini" id="setbtn" onclick="openOv('settings')" title="Settings">${iconHTML('hud','settings','⚙️')}</button></div>${toastsHTML()}`}
 export function potionSlots(){const ps=W.run.potions;return `<span class="potions" id="potions">${ps.map((id,i)=>{const p=id&&POTIONS[id];
@@ -209,7 +209,7 @@ export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
  h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&d.t!=='P'&&(!d.faint||hasRelic('hollowreed'))&&!d.unplay})}).join('')}</div>
  <div class="ctl"><div><div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy"><span>${cb.energy}/${cb.maxE}</span></div><button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
- <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk (removed for this combat)">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>${cb.busy?'Enemy…':'End Turn'}</button></div></div></div>`;
+ <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk (removed for this combat)">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>END</button></div></div></div>`;
  const m=cb.mode;
  if(m&&m.k==='choice')h+=`<div class="ov battle"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
  if(m&&m.k==='slot')h+=`<div class="ov battle"><div class="box tilebox" id="slotbox">${titleHTML(m.title)}<div class="tiles chtiles slottiles" style="--n:${cb.slots.length}">${cb.slots.map((w,i)=>`<div class="tcard opt slotpick">${cardHTML(w,{click:`modeAct('slot',${i})`})}<span class="tcap">${w.rank?'Rank '+w.rank:'Rank 0'}${w.temp?' · starting':''}</span></div>`).join('')}</div></div></div>`;
@@ -221,7 +221,7 @@ function tgtImpl(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return
  cb.insp=cb.insp===i?null:i;cb.sel=null;render()}
 export function sceneTap(ev){if(!W.cb||drag)return;if(ev.target.closest('.en,.tip,.hero'))return;if(W.cb.sel!=null||W.cb.insp!=null){W.cb.sel=null;W.cb.insp=null;render()}}
 // Full framed cards at rest; one card rises above a scrubbing finger or cursor.
-export const HAND_REST_TOP=(1080-207*1.4*.6)/1080;export const HAND_REST_W=207,HAND_LIFT_W=310,HAND_LIFT_TOP=640;
+export const HAND_REST_TOP=(1080-238*1.4*.6)/1080;export const HAND_REST_W=238,HAND_LIFT_W=340,HAND_LIFT_TOP=550;
 const handLayouts=new WeakMap();
 export function layoutHand(animate=false){const hand=document.getElementById('hand');if(!hand)return;const cards=[...hand.querySelectorAll('.card:not(.drag)')];const n=cards.length;if(!n)return;
  const land=matchMedia('(orientation:landscape)').matches;const vh=innerHeight;
@@ -271,19 +271,19 @@ function placeStatusRows(){
 }
 
 // ---------------- title / travel ----------------
-export function settingsHTML(){return `<div class="settings"><label><input type="checkbox" id="setfast" ${settings.fastAnim?'checked':''} onchange="setFast(this.checked)"><span>Fast animations</span></label>
- <label>Animation speed <select id="setanimspeed" onchange="setAnimSpeed(this.value)">${Object.keys(SPEEDS).map(v=>`<option value="${v}" ${(settings.animSpeed||'normal')===v?'selected':''}>${SPEED_LABEL[v]}</option>`).join('')}</select></label>
- <label>Effects <select id="setenvfx" onchange="setEnvFx(this.value)">${['full','reduced','off'].map(v=>`<option value="${v}" ${settings.envFx===v?'selected':''}>${envFxSettingLabel(v)}</option>`).join('')}</select></label>
- <label>Music <input id="setmusic" aria-label="Music volume" type="range" min="0" max="1" step="0.01" value="${settings.musicVolume}" oninput="setAudioSetting('musicVolume',this.value)"></label>
- <label>SFX <input id="setsfx" aria-label="SFX volume" type="range" min="0" max="1" step="0.01" value="${settings.sfxVolume}" oninput="setAudioSetting('sfxVolume',this.value)"></label>
- <label><input id="setmute" type="checkbox" ${settings.audioMuted?'checked':''} onchange="setAudioSetting('audioMuted',this.checked)"><span>Mute audio</span></label>
- <label><input id="sethints" type="checkbox" ${settings.coach!==false?'checked':''} onchange="setCoach(this.checked)"><span>First-fight hints</span></label>
- <label><input id="setcardskip" type="checkbox" ${settings.confirmCardSkip!==false?'checked':''} onchange="setConfirmCardSkip(this.checked)"><span>Confirm skipping card rewards</span></label>
- <label><input id="setshake" type="checkbox" ${settings.screenShake!==false?'checked':''} onchange="setScreenShake(this.checked)"><span>Screen shake</span></label>
- <label><input id="sethaptic" type="checkbox" ${settings.handHaptic!==false?'checked':''} onchange="setHandHaptic(this.checked)"><span>Hand vibration</span></label>
- <label><input id="setcharselpar" type="checkbox" ${settings.charselParallax!==false&&!settings.reduceMotion?'checked':''} ${settings.reduceMotion?'disabled':''} onchange="setCharselParallax(this.checked)"><span>Hero select motion</span></label>
- <label><input id="setreduce" type="checkbox" ${settings.reduceMotion?'checked':''} onchange="setReduceMotion(this.checked)"><span>Reduced motion</span></label>
+const sxSw=(id,label,on,fn,dis)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-sw" id="${id}" type="checkbox" ${on?'checked':''} ${dis?'disabled':''} onchange="${fn}(this.checked)"></label>`;
+const sxSeg=(id,label,vals,cur,fn)=>`<div class="sx-row"><span class="sx-t">${label}</span><span class="sx-seg" id="${id}" role="radiogroup" aria-label="${label}">${vals.map(([v,t])=>`<button type="button" role="radio" aria-checked="${v===cur}" class="${v===cur?'on':''}" data-v="${v}" onclick="${fn}('${v}');render()">${t}</button>`).join('')}</span></div>`;
+const sxRange=(id,label,key,val)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-rng" id="${id}" aria-label="${label} volume" type="range" min="0" max="1" step="0.01" value="${val}" style="--p:${Math.round(val*100)}%" oninput="this.style.setProperty('--p',this.value*100+'%');setAudioSetting('${key}',this.value)"></label>`;
+export function settingsHTML(){return `<div class="settings sx">
+ ${sxSeg('setanimspeed','Animation speed',Object.keys(SPEEDS).map(v=>[v,SPEED_LABEL[v]]),settings.animSpeed||'normal','setAnimSpeed')}
+ ${sxSeg('setenvfx','Effects',['full','reduced','off'].map(v=>[v,envFxSettingLabel(v)]),settings.envFx,'setEnvFx')}
+ ${sxRange('setmusic','Music','musicVolume',settings.musicVolume)}${sxRange('setsfx','SFX','sfxVolume',settings.sfxVolume)}
+ ${sxSw('setfast','Fast animations',settings.fastAnim,'setFast')}${sxSw('setmute','Mute audio',settings.audioMuted,'setMute')}
+ ${sxSw('sethints','First-fight hints',settings.coach!==false,'setCoach')}${sxSw('setcardskip','Confirm skipping card rewards',settings.confirmCardSkip!==false,'setConfirmCardSkip')}
+ ${sxSw('setshake','Screen shake',settings.screenShake!==false,'setScreenShake')}${sxSw('sethaptic','Hand vibration',settings.handHaptic!==false,'setHandHaptic')}
+ ${sxSw('setcharselpar','Hero select motion',settings.charselParallax!==false&&!settings.reduceMotion,'setCharselParallax',settings.reduceMotion)}${sxSw('setreduce','Reduced motion',settings.reduceMotion,'setReduceMotion')}
  </div>`}
+export function setMute(on){setAudioSetting('audioMuted',!!on)}
 export function setConfirmCardSkip(on){settings.confirmCardSkip=!!on;saveSettings()}
 export function setCoach(on){settings.coach=!!on;saveSettings();render()}
 export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
@@ -302,7 +302,7 @@ function travelScr(){const ok=Date.now()-(W.S.t||0)>1000;const T=tcA1(),[px,py,p
  return `<div class="page travel" onclick="skipTravel()"><div class="tcard tcplate" style="aspect-ratio:${T.w}/${T.h}"><img class="tcimg" src="${T.src}" alt="" draggable="false" onerror="this.parentNode.classList.add('noimg');this.remove()">
  <div class="tcpanel" style="left:${pc(px,T.w)};top:${pc(py,T.h)};width:${pc(pw,T.w)};height:${pc(ph,T.h)}"><h1>${T.title}</h1><div class="sub">${T.sub}</div></div></div>
  <div class="boss muted tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>
- <div class="ferry" id="ferryman" data-info="${tesc('The Ferryman: He carries every Lampbearer to the Stair\'s foot, and never looks up.')}">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div><div class="skip muted">${ok?'Tap to begin':'…'}</div></div>`}
+ <div class="ferry win" id="ferryman" data-info="${tesc('The Ferryman: He carries every Lampbearer to the Stair\'s foot, and never looks up.')}">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div><div class="skip muted">${ok?'Tap to begin':'…'}</div></div>`}
 export function skipTravel(){if(W.S.screen!=='travel')return;if(Date.now()-(W.S.t||0)<1000&&!window.FAST)return;W.S={screen:'map'};
  if(W.run&&W.run.lamp&&!W.run.lamp.shown&&W.run.floor===0){W.run.lamp.shown=true;W.S.ov='tasks'} // Lantern Tasks are shown once, when the climb begins
  render()}
@@ -329,18 +329,19 @@ function chestScr(){const S=W.S,t=stripEmoji(S.name);
  if(!S.opened)return topBar()+pkScreen({cls:'pk-chest',title:t,sub:'Something glints inside.',body:`<div class="chestwrap"><button class="chest ${S.chest}" id="openchest" onclick="openChestLid()">${emblemHTML('chest-closed','🧰','big')}<span class="muted">Tap to open</span></button></div>`,right:pkBtn('Leave it','goMap()')});
  return topBar()+pkScreen({cls:'pk-chest open',title:t,sub:'Take what you want.',body:`<div class="chestwrap open ${S.chest}" style="${anim(S.openT,600)||''}">${emblemHTML('chest-open','✨','big')}</div>${tilesRow(S.rows.map((r,i)=>rowHTML(r,i,'claimRow')),'rewtiles')}`,right:pkBtn('Proceed','goMap()',{pri:1,id:'proceed',icon:'arrowright'})})}
 // ---------------- merchant (4 shelves + Scrub; prices rolled on entry) ----------------
+const SHOP_MIN_CARD=60; // px: shop cards never shrink below this width (row scrolls sideways, page scrolls down instead)
 function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();const coin=glyph('coin');
  const card=(it,sh,i)=>`<div data-shop-card="${sh}:${i}" class="shopitem${it.sold?' sold':''}${it.sale?' sale':''}${anim(it.noT,400)?' no':''}">${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`selectShopCard('${sh}',${i})`,can:g>=it.price})}<span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':(it.sale?'<s>'+Math.round(it.base)+'</s> ':'')+coin+' '+it.price}</span>${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
  const icon=(it,sh,i,group,def)=>`<button class="shopicon${it.sold?' sold':''}${it.right?' right':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="buy('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}">${slotHTML(group,it.id,'',def.e)}<span class="inm">${def.n}</span><span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':coin+' '+it.price}</span>${it.right?'<i class="shoptag">SHOP</i>':''}</button>`;
  const grp=(lbl,items,cls)=>`<div class="shgrp ${cls}"><div class="shlbl">${lbl}</div><div class="shrow">${items}</div></div>`;
  return topBar()+`<div class="shop-wren" aria-hidden="true">${emblemHTML('shop-wren','','wren')}</div>`+pkScreen({cls:'pk-shop',title:"Wren's Driftwood Bazaar",sub:`<em class="wrenline" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE)}">${wrenLine(bellCount(W.run.seed),currentTier())}</em>`,
-  body:`<div class="shop-main"><div class="shelf cards" id="cardshelf">${grp('Cards',S.cards.map((it,i)=>card(it,'cards',i)).join(''),'g-cards')}${grp('More class cards',S.colorless.map((it,i)=>card(it,'colorless',i)).join(''),'g-cards')}</div>
+  body:`<div class="shop-main"><div class="shelf cards" id="cardshelf" style="--gw:max(${SHOP_MIN_CARD}px,calc((100cqh - 34px - 100px - 22px)*5/7))">${grp('Cards',S.cards.map((it,i)=>card(it,'cards',i)).join(''),'g-cards')}${grp('More class cards',S.colorless.map((it,i)=>card(it,'colorless',i)).join(''),'g-cards')}</div>
    <div class="shelfrow"><div class="shelf relics">${grp('Relics',S.relics.map((it,i)=>icon(it,'relics',i,'relics',RELICS[it.id])).join(''),'g-icons')}</div><div class="shelf potions">${grp('Potions',S.potions.map((it,i)=>icon(it,'potions',i,'potions',POTIONS[it.id])).join(''),'g-icons')}</div></div></div>
    <div class="shop-side">${tileHTML({eid:'scrub',id:'opt-remove',emoji:'✂️',name:'Scrub a card',sum:`${coin} ${sp}${S.scrubbed?' (used)':''}`,info:'Scrub a card: pay to remove one card from your deck for good.',click:'shopRemove()',disabled:S.scrubbed||g<sp,cls:'svc-tile'})}</div>`,
   left:pkBtn('Select a card to buy','confirmShopCard()',{id:'buyselected',dis:1}),right:pkBtn('Leave','goMap()',{pri:1,id:'leaveshop',icon:'arrowright'})})}
 // ---------------- camp / event / pick / misc ----------------
 const CAMP_EMO={mend:'❤️',temper:'⬆️',cook:'🍲',scour:'🪨',trawl:'⚓',annotate:'📘'};
-function restScr(){return topBar()+pkScreen({cls:'pk-rest',title:'Stairwell Camp',sub:'The fire crackles. Choose one.',body:tilesRow(campOptions().map(o=>{const sp=splitLabel(o.l);return tileHTML({id:'camp-'+o.k,emoji:CAMP_EMO[o.k]||sp.emoji||'🔥',name:sp.name,sum:o.d,info:`${sp.name}: ${o.d}`,click:`campDo('${o.k}')`,cls:'k-camp'+(o.k==='mend'?' pri':''),tid:'camp-'+o.k})}),'camptiles')})}
+function restScr(){return topBar()+pkScreen({cls:'pk-rest',title:'Stairwell Camp',sub:'The fire crackles. Choose one.',body:tilesRow(campOptions().map(o=>{const sp=splitLabel(o.l);return tileHTML({id:'camp-'+o.k,emoji:CAMP_EMO[o.k]||sp.emoji||'🔥',name:sp.name,sum:o.d,click:`campDo('${o.k}')`,cls:'k-camp'+(o.k==='mend'?' pri':''),tid:'camp-'+o.k})}),'camptiles')})}
 function eventScr(){return topBar()+eventSceneHTML(W.S.ev)}
 function pickScr(){const S=W.S,list=window.pickable(S.mode,S.filter);const up=S.mode==='upgrade';
  return topBar()+pkScreen({cls:'pk-pick'+(up?' pk-up':''),title:stripEmoji(S.title),sub:cardSelSub(null),
@@ -357,10 +358,10 @@ export function updateCardSelection(){const S=W.S;
 }
 function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;return topBar()+pkScreen({cls:'pk-potpick',title:stripEmoji(S.title),sub:`Pick up to ${Math.min(3,free)} (free slots: ${free}).`,body:tilesRow(S.ids.map((id,j)=>potionTile(id,{click:`potPickToggle(${j})`,on:S.chosen.includes(j)})),'pottiles'),right:pkBtn('Done','potPickDone()',{pri:1,id:'potpickdone'})})}
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
- const stat=(k,v)=>`<span class="es"><i>${k}</i><b>${v}</b></span>`;
+ const stat=(k,v,g)=>`<span class="es" title="${k}" aria-label="${k}: ${v}">${glyph(g)}<b>${v}</b></span>`;
  return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?'Act 1 cleared!':'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.`:`${K.n} fell on floor ${run.floor} of 15. ${deathLine(run.floor,run.boss)}`}</p>
- <div class="endstats">${stat('Enemies',run.kills)}${stat('Elites',st.elites.reduce((a,b)=>a+b,0))}${stat('Relics',run.relics.length)}${stat('Deck',run.deck.length)}${stat('Gold',run.gold)}${stat('Biggest hit',st.maxHit)}${stat('Time',mins+' min')}${stat('Seed',run.seed)}</div>
- <button class="btn pri" id="restart" onclick="W.S={screen:'title'};render()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
+ <div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}${stat('Deck',run.deck.length,'book')}${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
+ <button class="endlink" id="restart" onclick="W.S={screen:'title'};render()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
 // Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing
 // sources preserves fitted text, sprite animations and stage styles on unchanged nodes.
 let renderTree=null,renderedCombat=null;

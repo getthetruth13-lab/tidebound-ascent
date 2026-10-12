@@ -1,4 +1,4 @@
-import {showOutcome,clearOutcome} from './outcome.js';
+import {showOutcome,clearOutcome,outcomeLayout} from './outcome.js';
 // ui/input.js
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
@@ -14,10 +14,9 @@ let lp=null,eatClick=false;
 function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))return W.cb.hand[+i];const uid=+el.dataset.uid;const piles=W.cb?[W.cb.hand,W.cb.draw,W.cb.disc,W.cb.exh,W.cb.slots]:[];if(W.run)piles.push(W.run.deck);const live=uid>0?piles.flat().find(c=>c&&c.uid===uid&&c.id===el.dataset.id):null;return {...live,id:el.dataset.id,uid,up:el.dataset.up==='1'}}
 export const cancelLongPress=()=>{if(lp){clearTimeout(lp.t);lp=null}clearTimeout(hh);hh=0};
 let hh=0,holdTouch=false;
-// v0.5.1: a held hand card shows its zoom on the opposite side (centre or right card -> left side, left card -> right side).
-// Any other card (reward, shop, rest/temper, deck viewer, events, pick screens) opens away from it by its screen position.
-function handSide(el){const h=el.closest&&el.closest('.hand');if(h&&el.dataset.i!=null){const n=h.querySelectorAll('.card').length;return +el.dataset.i>=(n-1)/2?'left':'right'}const r=el.getBoundingClientRect();return r.left+r.width/2>=innerWidth/2?'left':'right'}
-function inspectNow(el,touch,point){const side=touch?handSide(el):null;clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
+// Held zoom uses the actual finger position; render's side rails keep edge cards on screen.
+function handSide(point){return point.x>=innerWidth/2?'left':'right'}
+function inspectNow(el,touch,point){const side=touch?handSide(point):null;clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
 document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest&&ev.target.closest('.card');if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected)any=peek;if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,true,{x:ev.clientX,y:ev.clientY})},LONGPRESS_MS)}},true);
@@ -49,18 +48,18 @@ document.addEventListener('pointerdown',ev=>{const hit=ev.target.closest&&ev.tar
  try{c.setPointerCapture(ev.pointerId)}catch(_){}});
 export let rafPending=null;
 document.addEventListener('pointermove',ev=>{const d=drag;if(!d||ev.pointerId!==d.id)return;if(d.moved)ev.preventDefault();rafPending=ev;if(d.raf)return;d.raf=requestAnimationFrame(()=>{d.raf=0;if(drag===d&&rafPending)dragMove(d,rafPending)})},{passive:false});
-function clearTargets(){document.querySelectorAll('.drop-valid,.drop-invalid,.drop-over,.en.hot,.foes.armed').forEach(e=>e.classList.remove('drop-valid','drop-invalid','drop-over','hot','armed'));clearOutcome()}
-function dropTarget(ci,x,y){
+function clearTargets(outcome=true){document.querySelectorAll('.drop-valid,.drop-invalid,.drop-over,.en.hot,.foes.armed').forEach(e=>e.classList.remove('drop-valid','drop-invalid','drop-over','hot','armed'));if(outcome)clearOutcome()}
+function dropTarget(ci,x,y,geometry=null){
  const upper=y>48&&y<innerHeight*.65;
  const blocked=document.elementsFromPoint(x,y).some(e=>e.closest?.('.topbar,.dais,.ctl button,.ov,.pop'));
  if(blocked)return null;
  if(needsTarget(ci)){
   const en=enemyAt(x,y);if(en!=null&&W.cb.ens[en]?.hp>0&&!W.cb.ens[en].fled)return en;
-  const live=alive();if(live.length===1){const el=document.querySelector(`.en[data-en="${W.cb.ens.indexOf(live[0])}"]`),r=el.getBoundingClientRect();
+  const live=alive();if(live.length===1){const el=document.querySelector(`.en[data-en="${W.cb.ens.indexOf(live[0])}"]`),r=geometry?.enemies.get(el)||el.getBoundingClientRect();
    if(upper||(x>=r.left-45&&x<=r.right+45&&y>=r.top-45&&y<=r.bottom+45&&y<innerHeight*.72))return W.cb.ens.indexOf(live[0]);}
   return null;
  }
- const hero=document.querySelector('.hero').getBoundingClientRect();
+ const hero=geometry?.hero||document.querySelector('.hero').getBoundingClientRect();
  return upper||(x>=hero.left-45&&x<=hero.right+45&&y>=hero.top-45&&y<=hero.bottom+45&&y<innerHeight*.72)?'hero':null;
 }
 // v0.5.1 (StS mobile): while a long-press zoom is open, the same finger can drag the card into play. Wobble under HOLD_DRAG_PX keeps the zoom.
@@ -71,20 +70,21 @@ document.addEventListener('pointerup',()=>{heldDrag=null},true);
 function holdToDrag(d){holdTouch=false;closeInspect();const el=document.querySelector(`.hand .card[data-i="${d.i}"]`);if(el){d.el=el;try{el.setPointerCapture(d.id)}catch(_){}}}
 export function dragMove(d,ev){const dy=ev.clientY-d.y0;
  d.x=ev.clientX;d.y=ev.clientY;
- if(!d.moved){if(dy>-32){if(dy>-10&&(d.scrubbing||Math.abs(ev.clientX-d.x0)>12)){d.scrubbing=true;scrubAt(ev.clientX,d.touch)}return}clearPeek();cancelLongPress();d.moved=true;d.el.classList.remove('sel');d.el.classList.add('drag');layoutHand(true);W.cb.sel=null;W.cb.insp=null;const t=document.getElementById('detail');if(t)t.remove()}
+ if(!d.moved){if(dy>-32){if(dy>-10&&(d.scrubbing||Math.abs(ev.clientX-d.x0)>12)){d.scrubbing=true;scrubAt(ev.clientX,d.touch)}return}clearPeek();cancelLongPress();d.moved=true;d.el.classList.remove('sel');d.el.classList.add('drag');layoutHand(true);W.cb.sel=null;W.cb.insp=null;const t=document.getElementById('detail');if(t)t.remove();
+ const hand=document.getElementById('hand').getBoundingClientRect(),cw=d.el.offsetWidth,ch=d.el.offsetHeight;
+ d.geometry={hand,cw,ch,scale:Math.max(1.12,(+d.el.dataset.zl||1.2)*.75),baseY:hand.bottom-(parseFloat(getComputedStyle(d.el).bottom)||0)-ch/2,
+ hero:document.querySelector('.hero').getBoundingClientRect(),enemies:new Map([...document.querySelectorAll('.en')].map(e=>[e,e.getBoundingClientRect()])),outcome:outcomeLayout()};}
  // Keep the painted card beside the pointer so the aimed-at HP/intent remains visible.
- const scale=Math.max(1.12,(+d.el.dataset.zl||1.2)*.75),cw=d.el.offsetWidth,ch=d.el.offsetHeight;
- const hand=document.getElementById('hand').getBoundingClientRect();
+ const {scale,cw,ch,hand,baseY}=d.geometry;
  const cx=ev.clientX>innerWidth*.5?ev.clientX-cw*scale/2-45:ev.clientX+cw*scale/2+45;
  const x=Math.max(cw*scale/2+4,Math.min(innerWidth-cw*scale/2-4,cx));
  const y=Math.max(ch*scale/2+44,Math.min(innerHeight-ch*scale/2-8,ev.clientY-40));
- const baseY=hand.bottom-(parseFloat(getComputedStyle(d.el).bottom)||0)-ch/2;
  d.el.style.transform=`translate(${x-hand.left-hand.width/2}px,${y-baseY}px) scale(${scale.toFixed(3)})`;
- const ci=W.cb.hand[d.i];clearTargets();if(!ci)return;
- const playable=canPlay(ci),target=playable?dropTarget(ci,d.x,d.y):null,nt=needsTarget(ci);
+ const ci=W.cb.hand[d.i];clearTargets(false);if(!ci){clearOutcome();return}
+ const playable=canPlay(ci),target=playable?dropTarget(ci,d.x,d.y,d.geometry):null,nt=needsTarget(ci);
  document.querySelectorAll('.en').forEach(e=>e.classList.add(playable&&nt&&W.cb.ens[+e.dataset.en].hp>0&&!W.cb.ens[+e.dataset.en].fled?'drop-valid':'drop-invalid'));
  const hero=document.querySelector('.hero');hero.classList.add(playable&&!nt?'drop-valid':'drop-invalid');
- if(target!=null){const el=target==='hero'?hero:document.querySelector(`.en[data-en="${target}"]`);el.classList.add('drop-over');if(target!=='hero')el.classList.add('hot');showOutcome(d.i,target==='hero'?W.cb.tgt:target)}
+ if(target!=null){const el=target==='hero'?hero:document.querySelector(`.en[data-en="${target}"]`);el.classList.add('drop-over');if(target!=='hero')el.classList.add('hot');showOutcome(d.i,target==='hero'?W.cb.tgt:target,d.geometry.outcome)}else clearOutcome()
  d.el.classList.toggle('armed',target!=null);
 }
 export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)return;cancelLongPress();

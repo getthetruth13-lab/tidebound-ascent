@@ -310,3 +310,15 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
  .fit-chest:has(.chestwrap.open)>.rewtiles{grid-column:2;grid-row:3;min-height:0;margin:0;padding:4px;align-content:center}
  .fit-chest:has(.chestwrap.open)>.rewtiles .tile{width:clamp(120px,calc((50vw - 50px)/var(--n,1)),216px)}
 }
+/* Task 56: shop sizing. Card width comes from the available height (inline --gw on #cardshelf, floor SHOP_MIN_CARD); if the shelves then need
+   more than the room, the shop column scrolls down instead of shrinking the cards. */
+/* Task 56B: .page.fit is only a flex column inside the short-viewport media query, so on tall viewports (2340x1080) .pk collapsed to ~128px and hid the cards. Make the shop page a flex column everywhere. */
+.page.fit.fit-shop{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0}
+.page.fit-shop .pk-shop .shop-main{overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.page.fit-shop .pk-shop .shop-main::-webkit-scrollbar{display:none}
+.page.fit-shop .pk-shop .shop-main>.shelf.cards{flex:1 0 auto;min-height:calc(var(--gw)*7/5 + 40px)}
+.page.fit-shop .pk-shop .shop-main>.shelfrow{flex:none}
+.page.fit-shop .pk-shop .shop-main{gap:2px}
+.page.fit-shop .pk-shop .shop-main>.shelf.cards{min-height:calc(var(--gw)*7/5 + 36px)}
+.page.fit-shop .pk-shop .shopicon{min-height:72px;padding-top:3px;padding-bottom:3px;gap:1px}
+.page.fit-shop .pk-shop .shop-main .shelfrow{margin-top:-2px}

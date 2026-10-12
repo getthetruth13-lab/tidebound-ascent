@@ -41,7 +41,10 @@ export const ASSETS={
  enemies:{slug:win('brine-slug'),gull:win('gull-thief','50% 35%'),knight:win('rust-knight','50% 35%'),pod:win('spore-pod'),wisp:win('glimmer-wisp','50% 40%'),
   crab:win('coral-crab','50% 55%'),captain:win('drowned-captain','50% 30%'),warden:win('mirror-warden','50% 35%'),eel:win('twin-eels'),
   // Bell (The Knell): map boss node always uses variant A (art/v2/sprites/knell-a.webp), contained in its window.
-  bell:{src:'art/v2/sprites/knell-a.webp',fit:'contain',pos:'50% 60%'}},
+  bell:{src:'art/v2/sprites/knell-a.webp',fit:'contain',pos:'50% 60%'},
+  // ART_TASK_63: map portraits for the 10 newer enemies (window art where it exists, else the battle sprite contained).
+  leech:win('tide-leech'),lurker:win('kelp-lurker'),tendril:win('kelp-tendril'),matriarch:win('kelp-matriarch'),
+  penitent:{src:'art/v2/sprites/penitent.webp',fit:'contain',pos:'50% 60%'},mender:{src:'art/v2/sprites/mender.webp',fit:'contain',pos:'50% 60%'},heap:{src:'art/v2/sprites/heap.webp',fit:'contain',pos:'50% 60%'},limpet:{src:'art/v2/sprites/limpet.webp',fit:'contain',pos:'50% 60%'},novice:{src:'art/v2/sprites/novice.webp',fit:'contain',pos:'50% 60%'},tenant:{src:'art/v2/sprites/tenant.webp',fit:'contain',pos:'50% 60%'}},
  cards:{},
  // Card-art placeholders until per-card art exists: the class card painting cropped 4:3 into the frame's art window.
  cardPH:Object.fromEntries([['tide','tidecaller'],['echo','echo-mage'],['carto','cartographer'],['duel','duelist'],['curse','curse'],['status','status'],['colorless','colorless']]

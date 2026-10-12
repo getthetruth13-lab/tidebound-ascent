@@ -50,18 +50,20 @@ export function lampPickScr(){const S=W.S,p=loadProfile(),track=S.track,name=TRA
  if(S.got){const left=track==='climb'?climbPending(p):lampPending(p,track);
   return framedLamp('lamppick',head+`<div class="lp-sub">Lit and inked in the Ledger.</div><div class="lp-offer got">${S.got.map(i=>itemTile(i.kind,i.id,{})).join('')}</div>
   <div class="tb-actions"><button class="tb-btn pri" id="lampnext" onclick="lampNext()">${left>0&&offerFor(p,track,CARDS)?`Next unlock (${left})`:'Done'}</button></div>`)}
- const o=offerFor(p,track,CARDS);if(!o)return framedLamp('lamppick',head+`<div class="tb-none">Nothing is waiting.</div><div class="tb-actions"><button class="tb-btn pri" onclick="lampLeave()">Back</button></div>`);
+ const o=offerFor(p,track,CARDS);if(!o)return framedLamp('lamppick',head+`<div class="lp-empty">${emptyArt()}<div class="tb-none">Nothing is waiting.</div><div class="lp-sub">Every lantern that has been lit is inked in the Ledger. Climb again to light the next.</div></div><div class="tb-actions"><button class="tb-btn pri" onclick="lampLeave()">Back</button></div>`);
  const left=track==='climb'?climbPending(p):lampPending(p,track);
  const sub=o.final?`Level ${o.level}: the ${track==='climb'?'whole stair':'Lamp'} blazes. Every lantern still dark is lit at once.`:`Level ${o.level}${left>1?` (${left} waiting)`:''}: a lantern is lit. Choose one. The others wait for the next level.`;
  return framedLamp('lamppick',head+`<div class="lp-sub">${sub}</div><div class="lp-offer${o.final?' final':''}">${o.items.map((i,n)=>itemTile(i.kind,i.id,{click:o.final?null:`lampChoose('${i.id}')`,i:n})).join('')}</div>
   <div class="tb-actions">${o.final?`<button class="tb-btn pri" id="lampall" onclick="lampChoose('*')">Light them all</button>`:''}<button class="tb-btn" id="lamplater" onclick="lampLeave()">Later</button></div>`)}
+// Empty Lamplight: an unlit lantern on a stair ledge. Placeholder svg until a painted 'lamp-empty' tile exists in the art manifest.
+const emptyArt=()=>{const t=TILES['lamp-empty'];return `<img class="lp-emptyart" decoding="async" src="${t&&t.ready?t.path:'art/v2/ui/lamp/lamp-empty.svg'}" alt="" draggable="false">`};
 function framedLamp(id,body){const S=W.S;return asy(`<div class="tb-scr tb-title tb-lampscr${S.track&&S.track!=='climb'?' theme-'+TH[S.track]:''}">${bgHTML()}<div class="tb-ov"><div class="tb-frame tb-lamp" id="${id}">${frameOpen()}${body}${frameClose()}</div></div></div>`)}
 // ---------- Keeper's Ledger ----------
 export function openLedger(tab){W.S={screen:'title',view:'ledger',tab:tab||(W.S&&W.S.tab)||'tide',page:0,hero:null};render()}
 export function ledgerTab(t){W.S={...W.S,tab:t};render()}
 function barHTML(xp,table,cls=''){const b=barOf(xp,table);return `<div class="lp-bar ${cls}"><i style="width:${b.pct}%"></i></div>`}
 export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=lockedFor(p);
- const tabs=[...CLASS_ORDER,'climb','pages'].map(t=>{const pend=t==='pages'?0:t==='climb'?climbPending(p):lampPending(p,t);return `<button class="tb-btn sm lp-tab${t===tab?' on':''}" data-tab="${t}" onclick="ledgerTab('${t}')">${t==='climb'?'Stair Climb':t==='pages'?'Pages':CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
+ const tabs=[...CLASS_ORDER,'climb','pages'].map(t=>{const pend=t==='pages'?0:t==='climb'?climbPending(p):lampPending(p,t);return `<button class="lp-tab${t===tab?' on':''}" data-tab="${t}" onclick="ledgerTab('${t}')">${t==='climb'?'Stair Climb':t==='pages'?'Pages':CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
  if(tab==='pages')return pagesScr(tabs,p);
  const climb=tab==='climb',xp=climb?p.climb:(p.xp[tab]||0),table=climb?CLIMB_XP:LAMP_XP,b=barOf(xp,table),pend=climb?climbPending(p):lampPending(p,tab);
  const offer=pend?offerFor(p,tab,CARDS):null,on=new Set(offer&&!offer.final?offer.items.map(i=>i.id):[]);

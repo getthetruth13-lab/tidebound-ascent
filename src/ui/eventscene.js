@@ -1,8 +1,8 @@
 // ui/eventscene.js: full-screen event scenes (Task 40). The event painting fills the whole screen; title, text and the engraved
-// choices sit on the empty side of the painting. No panel box, no tiles. Choices are words with a number, keywords coloured,
+// choices sit on the empty side of the painting. Choices are illustrated plates (Task 56: emblem + name + summary), keywords coloured,
 // a "Risky" mark when the outcome is rolled, and a hover / hold tooltip (data-info, handled by ui/kwtip.js).
 import {RELICS,POTIONS} from '../core/registry.js';
-import {TILES,esc} from './tiles.js';
+import {TILES,esc,emblemHTML,splitLabel,optIconId} from './tiles.js';
 import {U} from '../core/timing.js';
 // Per-event setting, chosen by looking at each painting: side = which side of the screen holds the words (the empty side);
 // fx 0..1 slides the (slightly oversized) painting so its subject moves away from the words (1 = push painting left);
@@ -38,7 +38,7 @@ function optHTML(o,i,out){const dis=!!(o.ok&&!o.ok());let name,sum;
  const info=[val(o.d)||'',rk!=null?(typeof rk==='number'?`Risky: ${Math.round(rk*100)}% good outcome, ${100-Math.round(rk*100)}% bad. Rolled with the run seed.`:`Risky: ${rk}.`):'',dis&&o.why?`Locked: ${val(o.why)}`:''].filter(Boolean).join(' ');
  const cont=out&&o.cont;
  return `<li><button ${cont?'id="msgok" ':''}class="evo${dis?' off':''}${rk!=null?' risky':''}${cont?' cont':''}" ${dis?'aria-disabled="true" ':`onclick="evOpt(${i})" `}${info?`data-info="${esc((name?name+': ':'')+info)}"`:''}>`+
-  `${cont?'':`<span class="evnum">${i+1}.</span>`}<span class="evlab"><b class="evname">${hl(name)}</b>${sum?`<span class="evdash"> — </span><span class="es">${hl(sum)}</span>`:''}${risk}${why}</span></button></li>`}
+  `${cont?'':`<span class="evico">${emblemHTML(o.tile||optIconId(splitLabel(val(o.l)).emoji),splitLabel(val(o.l)).emoji||o.e||'◈','evemb')}</span>`}<span class="evlab"><b class="evname">${hl(name)}</b>${sum?`<span class="evdash"> — </span><span class="es">${hl(sum)}</span>`:''}${risk}${why}</span></button></li>`}
 export function eventSceneHTML(e){const sc={...DEF,...(SCENES[e.id]||{})};const t=TILES['event-'+(e.id||'generic')]||TILES['event-generic'];
  const scenePath=SCENES[e.id]?`art/v2/ui/scenes/task36-event-${e.id}.webp`:t?.path;
  const img=t&&t.ready?`<img src="${scenePath}" alt="" draggable="false">`:'';const out=e.out;

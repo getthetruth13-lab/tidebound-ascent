@@ -41,6 +41,22 @@ function showCard(el){const id=el.dataset.card;if(!CARDS[id])return false;
  const ci={id,uid:-900,up:el.dataset.up==='1'};ctip.innerHTML=cardHTML(ci,{full:true})+`<div class="inspect-keywords">${inspectKeywordsHTML(ci)}</div>`;ctip.classList.add('on');fitCards(ctip);anchor=el;shownAt=Date.now();
  const r=el.getBoundingClientRect(),tr=ctip.getBoundingClientRect();const sp=pickSpot(tr.width,tr.height,r,el);const x=sp.x,y=sp.y;
  ctip.style.left=x+'px';ctip.style.top=y+'px';placeInspectKeywords(ctip);clearTimeout(timer);timer=el.closest('.dais')?0:setTimeout(hideTip,6500);return true}
+// Choice tips use the whole plate as their anchor, including its nested info button.
+const CHOICES='.tile,.evo,.camptiles > *, .lp-pick,.lp-tile';
+function besideChoice(el,tr){
+ const tile=el.closest(CHOICES);if(!tile)return null;
+ const r=tile.getBoundingClientRect(),pad=6,gap=8;
+ if(tr.width>innerWidth-pad*2||tr.height>innerHeight-pad*2)return null;
+ const choices=[...document.querySelectorAll(CHOICES)].filter(e=>e!==tile&&!tile.contains(e)&&!e.contains(tile)).map(e=>e.getBoundingClientRect()).filter(r=>r.width&&r.height);
+ const clamp=y=>Math.max(pad,Math.min(innerHeight-tr.height-pad,y));
+ for(const x of [r.right+gap,r.left-tr.width-gap]){
+  if(x<pad||x+tr.width>innerWidth-pad)continue;
+  // Move vertically only when another option occupies the preferred side.
+  const ys=[clamp(r.top+(r.height-tr.height)/2),...choices.flatMap(q=>[clamp(q.top-tr.height-gap),clamp(q.bottom+gap)])];
+  for(const y of ys)if(!choices.some(q=>x<q.right&&x+tr.width>q.left&&y<q.bottom&&y+tr.height>q.top))return {x,y};
+ }
+ return null;
+}
 export function showTip(el){if(el.dataset.card)return showCard(el);if(ctip)ctip.classList.remove('on');const c=contentOf(el);if(!c||!c.text){return false}
  const t=ensure();const sl=el.matches('.relic,.potion,.shopicon')&&el.querySelector('.slot');const rl=el.dataset.relic&&RELICS[el.dataset.relic];
  t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b${c.kind?` class="${c.kind}"`:''}>${c.title}</b>`:''}<span>${c.text}</span>`;if(el.matches('.relic-more'))t.innerHTML=`<div class="relic-collection"><h2>Relics</h2>${relicCollectionHTML()}</div>`;t.classList.toggle('meter-tip',!!el.closest('.dais'));t.classList.toggle('item',!!sl);t.classList.toggle('stat',!!c.kind);if(c.kind)decorateKeywords(t);t.classList.add('on');anchor=el;shownAt=Date.now();
@@ -48,7 +64,7 @@ export function showTip(el){if(el.dataset.card)return showCard(el);if(ctip)ctip.
  if(document.querySelector('.combat')){let best=null;
   for(const width of meter?[150,130,170,200,230,260]:[null]){if(width)t.style.maxWidth=width+'px';const tr=t.getBoundingClientRect(),sp=pickSpot(tr.width,tr.height,r,el,!!c.kind||meter);if(!best||sp.s<best.s){best={...sp,width};if(sp.s===0)break}}
   if(meter)t.style.maxWidth=best.width+'px';x=best.x;y=best.y;
- }else{const tr=t.getBoundingClientRect();x=Math.max(6,Math.min(innerWidth-tr.width-6,r.left+r.width/2-tr.width/2));y=r.top-tr.height-8;if(y<6)y=Math.min(innerHeight-tr.height-6,r.bottom+8)}
+ }else{const tr=t.getBoundingClientRect(),side=meter?null:besideChoice(el,tr);if(side){x=side.x;y=side.y}else{x=Math.max(6,Math.min(innerWidth-tr.width-6,r.left+r.width/2-tr.width/2));y=r.top-tr.height-8;if(y<6)y=Math.min(innerHeight-tr.height-6,r.bottom+8)}}
  t.style.left=x+'px';t.style.top=y+'px';clearTimeout(timer);timer=el.closest('.dais')?0:setTimeout(hideTip,6500);return true}
 // ---------------- input ----------------
 const LP=450;let lp=null,eat=false,holdEl=null; // holdEl: status icon being held; its tooltip closes on release

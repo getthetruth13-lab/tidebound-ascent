@@ -5,8 +5,6 @@
 :root{--frame-full:url(../art/v2/ui/frame/frame-full9.webp);--frame-slim:url(../art/v2/ui/frame/frame-slim9.webp);--plate:url(../art/v2/ui/frame/plate3.webp);
  --dia-full-top:url(../art/v2/ui/frame/frame-full-diamond-top.webp);--dia-full-bot:url(../art/v2/ui/frame/frame-full-diamond-bot.webp);
  --dia-slim-top:url(../art/v2/ui/frame/frame-slim-diamond-top.webp);--dia-slim-bot:url(../art/v2/ui/frame/frame-slim-diamond-bot.webp);
- /* side roots (Task 49B): seamless vertical tiles drawn by the frame's ::after along the left/right iron band */
- --fr-side-l:url(../art/v2/ui/frame/side-roots-l.webp);--fr-side-r:url(../art/v2/ui/frame/side-roots-r.webp);
  --win-iron:#0e1519;--win-verd:#3fb8a4;--win-edge:#5b6a68;
  --iron-tex:linear-gradient(rgba(12,19,23,.94),rgba(8,13,16,.97)),url(../art/v2/textures/parchment-dark.webp) center/300px;
  --bronze-1:#c79a55;--bronze-2:#8a6434;--bronze-3:#4c3519;--engrave:#1b1209}
@@ -23,21 +21,12 @@
  padding:calc(40px*var(--s)) calc(80px*var(--s));filter:drop-shadow(0 4px 9px #000c)}
 /* positioned so the pseudo-elements anchor to the frame (zero specificity: existing fixed/absolute rules win) */
 :where(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child,.toast){position:relative}
-/* diamonds (top + bottom centre) in ::before, side-root hook in ::after; both sit over the border band */
+/* diamonds (top + bottom centre) in ::before sit over the border band */
 :is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child)::before,:is(.tip,.toast):not(#x)::before,#kwtip::before{
  content:"";position:absolute;pointer-events:none;z-index:3;inset:calc(-150px*var(--s));
  background:var(--dia-full-top) top center/calc(300px*var(--s)) calc(150px*var(--s)) no-repeat,var(--dia-full-bot) bottom center/calc(300px*var(--s)) calc(150px*var(--s)) no-repeat}
-:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child)::after,:is(.tip,.toast):not(#x)::after,#kwtip::after{
- content:"";position:absolute;pointer-events:none;z-index:2;inset:0;
- /* roots live in the side padding strip (inside the border: scrollable boxes clip at the padding edge) and only between the corner pairs.
-    A short window leaves no content box, so nothing is drawn. */
- box-sizing:border-box;padding:calc(330px*var(--s)) 0;
- background:var(--fr-side-l) calc(-8px*var(--s)) 0/calc(104px*var(--s)) calc(776px*var(--s)) repeat-y,var(--fr-side-r) right calc(-8px*var(--s)) top 0/calc(104px*var(--s)) calc(776px*var(--s)) repeat-y;
- background-origin:content-box;background-clip:content-box;
- -webkit-mask:linear-gradient(transparent,#000 calc(100px*var(--s)),#000 calc(100% - 100px*var(--s)),transparent);mask:linear-gradient(transparent,#000 calc(100px*var(--s)),#000 calc(100% - 100px*var(--s)),transparent)}
 .fr-slim:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child)::before,:is(.tip,.toast):not(#x)::before,#kwtip::before{inset:calc(-60px*var(--s));
  background:var(--dia-slim-top) top center/calc(220px*var(--s)) calc(110px*var(--s)) no-repeat}
-.fr-slim:is(.ov .box,.pop,.msgp,.potpop,.relpop,.tb-frame,.tb-hero,.insp .ikw,.panel.win,.win,.panel,.lp-sum,.endr>div:first-child)::after,:is(.tip,.toast):not(#x)::after,#kwtip::after{inset:calc(-60px*var(--s));background:none}
 .ov .box{width:fit-content;min-width:min(300px,88vw);max-width:min(94vw,780px);max-height:calc(100dvh - 34px);margin:0 auto}
 .ov .box.tilebox,.ov .box.chartbox{max-width:min(96vw,880px);background:none;box-shadow:none;border-width:calc(150px*var(--s));border-color:transparent;
  border-image:var(--frame-full) 430 560 fill/calc(430px*var(--s)) calc(560px*var(--s))/0 round;padding:calc(70px*var(--s)) calc(120px*var(--s))}
@@ -108,3 +97,104 @@
  .tb-frame.tb-opt .settings label,.ov .box .settings label{min-height:38px}
  .ov .box.tilebox,.ov .box.chartbox{--s:.15;padding-top:calc(50px*var(--s));padding-bottom:calc(50px*var(--s))}
 }
+
+/* ===== Task 57: themed Options controls (toggle switches, segmented choices, engraved sliders); no native widgets ===== */
+.settings.sx{display:grid!important;grid-template-columns:1fr 1fr;gap:0 26px;max-height:100%;overflow-y:auto;overscroll-behavior:contain;padding:0 2px 4px;scrollbar-width:thin}
+.settings.sx .sx-row{display:flex!important;align-items:center;justify-content:space-between!important;gap:10px;min-height:42px;border-bottom:1px solid #8a744033;cursor:pointer}
+.settings.sx .sx-t{font:500 15px/1.15 var(--serif);color:var(--cream)}
+.sx-sw{-webkit-appearance:none;appearance:none;position:relative;flex:none;width:50px!important;height:26px!important;margin:0;border-radius:13px;border:1px solid #8a7440;background:linear-gradient(#06080c,#10141b);box-shadow:inset 0 2px 4px #000c;cursor:pointer;transition:background calc(.15s*var(--us,1))}
+.sx-sw::before{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8d8266,#4a4333);box-shadow:0 1px 3px #000;transition:transform calc(.15s*var(--us,1)),background calc(.15s*var(--us,1))}
+.sx-sw:checked{background:linear-gradient(#4a3510,#8a6a2a);border-color:#d9b46a}
+.sx-sw:checked::before{transform:translateX(24px);background:radial-gradient(circle at 35% 30%,#fff1c2,#d9b46a)}
+.sx-sw:disabled{opacity:.4}.sx-sw:focus-visible,.sx-rng:focus-visible,.sx-seg button:focus-visible{outline:2px solid #ffd98a;outline-offset:2px}
+.sx-seg{display:inline-flex;flex:none;border:1px solid #8a7440;border-radius:7px;overflow:hidden;background:#080b10}
+.sx-seg button{min-width:48px;min-height:34px;padding:0 9px;border:0;border-left:1px solid #8a744055;background:none;color:#b8aa86;font:600 12.5px var(--font-display);letter-spacing:.04em;cursor:pointer}
+.sx-seg button:first-child{border-left:0}
+.sx-seg button.on{background:linear-gradient(#8a6a2a,#4a3510);color:#fff1c2;text-shadow:0 1px 2px #000}
+.sx-rng{-webkit-appearance:none;appearance:none;flex:none;width:130px!important;height:26px;margin:0;background:none;cursor:pointer}
+.sx-rng::-webkit-slider-runnable-track{height:8px;border-radius:4px;border:1px solid #8a744088;background:linear-gradient(90deg,#d9b46a var(--p,50%),#06080c var(--p,50%));box-shadow:inset 0 1px 3px #000}
+.sx-rng::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;margin-top:-7px;border-radius:50%;border:1px solid #3a2a10;background:radial-gradient(circle at 35% 30%,#fff1c2,#b8923f);box-shadow:0 1px 4px #000}
+.sx-rng::-moz-range-track{height:8px;border-radius:4px;border:1px solid #8a744088;background:#06080c}
+.sx-rng::-moz-range-progress{height:8px;border-radius:4px;background:#d9b46a}
+.sx-rng::-moz-range-thumb{width:18px;height:18px;border-radius:50%;border:1px solid #3a2a10;background:radial-gradient(circle at 35% 30%,#fff1c2,#b8923f)}
+.tb-opt:has(.sx){max-height:calc(100dvh - 16px);display:flex;flex-direction:column}
+.tb-opt .sx{flex:1 1 auto;min-height:0}
+.tb-opt:has(.sx){width:min(740px,96vw)}
+.settings.sx{gap:0 22px}
+.settings.sx .sx-row{min-height:36px}
+.settings.sx .sx-t{font-size:14px}
+.sx-sw{width:44px!important;height:22px!important}.sx-sw::before{width:16px;height:16px}.sx-sw:checked::before{transform:translateX(22px)}
+.sx-seg button{min-height:28px;min-width:44px;font-size:12px;padding:0 8px}
+.sx-rng{width:120px!important;height:22px}
+.ov .box.plain:has(.sx) .muted{font-size:11px;line-height:1;margin:0}
+.settings.sx .sx-row{min-height:31px}.settings.sx .sx-t{font-size:13.5px}
+.sx-seg button{min-height:26px}.sx-rng{height:20px}.sx-sw{height:20px!important;width:40px!important}.sx-sw::before{width:14px;height:14px}.sx-sw:checked::before{transform:translateX(20px)}
+.settings.sx{overflow-y:auto;padding-bottom:0}
+
+/* ===== Task 57: end screen: icon stats, engraved (unboxed) actions ===== */
+.endstats{gap:6px 20px;max-width:26em}
+.endstats .es{gap:6px;align-items:center;font-size:15px;color:#d9b46a}
+.endstats .es .gi{width:20px;height:20px;color:#b8923f;filter:drop-shadow(0 1px 1px #000)}
+.endstats .es b{font-size:17px}
+.end .endlink{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:200px;min-height:48px;padding:0 18px;border:0;border-bottom:1px solid #d9b46a88;border-radius:0;background:none;box-shadow:none;color:#f0dcaa;font:700 17px var(--font-display);letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 3px #000,0 0 10px #d9b46a55;cursor:pointer}
+.end .endlink .gi{width:1.1em;height:1.1em}
+.end .endlink:hover,.end .endlink:focus-visible{color:#fff1c2;border-bottom-color:#ffd98a;outline:none}.end .endlink:active{transform:scale(.97)}
+.end .lp-btns{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:6px}
+.end .lp-btns .btn{flex:1 1 0;min-width:0;min-height:44px;padding:4px 6px;white-space:normal;line-height:1.1;font-size:13px;letter-spacing:.06em;border:0;border-bottom:1px solid #d9b46a88;border-radius:0;background:none;box-shadow:none;color:#f0dcaa;text-shadow:0 1px 3px #000,0 0 10px #d9b46a55}
+.end .lp-btns .btn:hover,.end .lp-btns .btn:focus-visible{color:#fff1c2;border-bottom-color:#ffd98a;background:#d9b46a14}
+.tb-frame.tb-opt .settings.sx .sx-row,.ov .box .settings.sx .sx-row{min-height:31px}
+.end .endstats{display:grid;grid-template-columns:repeat(4,auto);justify-content:center;gap:8px 22px;max-width:none}
+.end .endstats .es b{font-size:16px}
+.end .lp-sum .lp-btns{display:flex;flex-wrap:nowrap;gap:6px 14px}
+.end .lp-sum .lp-btns .btn{flex:1 1 0;min-width:0;white-space:normal;text-align:center;font-size:12.5px;letter-spacing:.04em;line-height:1.1;padding:4px 2px;overflow:hidden}
+
+/* ===== Task 57: smaller non-combat HUD; a long class name never runs into HP ===== */
+.page>.topbar{min-height:0;padding-top:2px;padding-bottom:2px;gap:6px}
+.page>.topbar .who .pt{width:32px;height:34px}
+.page>.topbar .potion{width:38px;height:38px;padding:4px}
+.page>.topbar .relic{width:30px;height:32px}
+.page>.topbar .mini{min-height:34px}
+.page>.topbar .mini .uic{width:22px;height:22px}
+.page>.topbar .stat{font-size:14px}
+.topbar .who{min-width:0;flex:0 1 auto}
+.topbar .who .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.combat>.topbar.longname .who{left:1%!important}
+.combat>.topbar.longname .who .nm{font-size:calc(var(--hud-text)*.8);letter-spacing:-.03em;white-space:nowrap}
+
+/* ===== Task 57: travel card: the ferryman quote sits in a Task 49 frame ===== */
+.travel .ferry.win{display:flex;align-items:center;gap:12px;width:max-content;max-width:min(520px,80vw);margin:14px auto 0;padding:10px 22px;box-sizing:border-box;text-align:left;--s:.11;border-width:calc(60px*var(--s))}
+.travel .ferry.win .emb{width:34px;height:34px;font-size:18px;flex:none}
+.travel .ferry.win q{font:italic 400 15px/1.25 var(--serif);color:var(--cream)}
+.page.travel .skip{bottom:8px}
+.combat>.topbar .who .nm{overflow:visible;text-overflow:clip}
+
+/* Task 57: reserve the unlock footer before sizing three illustrated choices. */
+#lamppick{height:min(360px,calc(100dvh - 24px))}
+#lamppick .tb-inner{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto}
+#lamppick .lp-offer{container-type:size;align-items:center;flex-wrap:nowrap;gap:18px}
+#lamppick .lp-offer>.lp-pick{--gw:min(150px,calc((100cqh - 28px)*5/7));flex:none}
+#lamppick .lp-offer>.tile.sp{--th:calc(100cqh - 12px);height:var(--th);width:min(210px,28vw);flex:none}
+#lamppick .lp-offer.final{flex-wrap:wrap;overflow:auto}
+#lamppick .lp-offer.final>.lp-pick{--gw:min(104px,calc((100cqh - 28px)*5/7))}
+#lamppick .tb-actions{flex-shrink:0}
+#lamppick .tb-actions .tb-btn{border:0;border-bottom:1px solid #d9b46a88;border-radius:0;background:none;box-shadow:none;color:#f0dcaa;text-shadow:0 1px 3px #000}
+/* Keep scrolling class text clear of Learn's fixed Close control. */
+.tb-learn .tb-lbody{padding-right:44px;box-sizing:border-box}
+/* ===== Task 58: Ledger engraved tabs + scrolling grid, empty Lamplight, full-width map parchment ===== */
+.lp-tabs{top:48px;gap:clamp(8px,2.4vw,26px)}
+.lp-tab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;box-shadow:none;min-height:44px;padding:2px 6px;font:700 clamp(13px,3.6vh,16px) var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:#cdbb8a;text-shadow:0 1px 3px #000,0 0 10px #000;cursor:pointer}
+.lp-tab.on{background:none;border-bottom-color:var(--class-primary,var(--gold));color:#fff3cf;text-shadow:0 0 10px var(--class-primary,#d9b46a),0 1px 3px #000}
+.lp-tab em{font-size:12px}
+.tb-ledger .lp-head{top:94px}
+.tb-ledger .lp-nxt{font-size:14px}.tb-ledger .lp-lv b{font-size:19px}
+.tb-ledger .lp-grid{top:178px;padding:8px 10px 56px;scroll-padding-bottom:56px;overscroll-behavior:contain;touch-action:pan-y}
+.tb-ledger .lp-lock b{font-size:14px}.tb-ledger .lp-lock i{font-size:13px}.tb-ledger .lp-lock .lp-hint{font-size:12.5px}
+.tb-ledger .lp-pagehead{top:96px;font-size:15px}.tb-ledger .lp-page{font-size:13.5px}.tb-ledger .lp-page h3{font-size:13.5px}
+.tb-ledger .lp-pages{top:136px;padding-bottom:40px}
+.lp-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:0;text-align:center}
+.lp-emptyart{height:min(150px,34dvh);width:auto;display:block;filter:drop-shadow(0 0 14px #d9b46a44)}
+.lp-empty .tb-none{padding:2px;font-size:19px;color:#f0dcaa}.lp-empty .lp-sub{font-size:14px}
+#lamppick .tb-inner:has(.lp-empty){display:flex;flex-direction:column;justify-content:space-between}
+.mappage .parch{max-width:none;width:calc(100% + 20px);margin:0 -10px;border-radius:0;min-height:100dvh;box-sizing:border-box}
+.mappage .parch .mapwrap{width:100%!important;max-width:760px}
+.mappage .node{min-width:48px;min-height:48px}.mappage .node.boss{min-width:64px;min-height:64px}

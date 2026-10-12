@@ -240,7 +240,7 @@
     "pitch": 1
   },
   "endTurn": {
-    "file": "bell.ogg",
+    "file": "endturn-gong-c.ogg",
     "gain": 0.85,
     "pitch": 1
   },

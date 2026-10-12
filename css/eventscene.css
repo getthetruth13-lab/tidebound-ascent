@@ -1,4 +1,4 @@
-/* Full-screen event scenes (Task 40). The painting is the whole screen; words sit on its empty side, engraved, no boxes. */
+/* Full-screen event scenes (Task 40). The painting is the whole screen; the choices (Task 56) are illustrated plates on its empty side: emblem + name + summary. */
 .page.fit-event{max-width:none;padding:0;margin:0;display:block;height:100dvh;overflow:hidden;position:relative;background:#05070b}
 .fit-event>.topbar{position:relative;z-index:6}
 .evscene{position:fixed;inset:0;z-index:1;overflow:hidden;--u:clamp(12px,3.3vh,30px);font-size:var(--u);color:#e9dcc0}
@@ -10,33 +10,33 @@
 .evfade{position:absolute;inset:0;pointer-events:none}
 .side-left .evfade{background:linear-gradient(90deg,#04060af2 0,#04060ad8 22%,#04060a99 40%,#04060a33 56%,transparent 68%),linear-gradient(#04060a88,transparent 18%,transparent 78%,#04060a99)}
 .side-right .evfade{background:linear-gradient(270deg,#04060af2 0,#04060ad8 22%,#04060a99 40%,#04060a33 56%,transparent 68%),linear-gradient(#04060a88,transparent 18%,transparent 78%,#04060a99)}
-.evtext{position:absolute;top:max(56px,9vh);bottom:max(10px,env(safe-area-inset-bottom));width:min(44vw,34em);display:flex;flex-direction:column;justify-content:center;gap:.5em;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:.3em 0}
+.evtext{position:absolute;top:max(56px,9vh);bottom:max(10px,env(safe-area-inset-bottom));width:min(47vw,36em);display:flex;flex-direction:column;justify-content:center;gap:.5em;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:.3em 0}
 .evtext::-webkit-scrollbar{display:none}
 .side-left .evtext{left:max(4vw,env(safe-area-inset-left));text-align:left}
 .side-right .evtext{right:max(4vw,env(safe-area-inset-right));text-align:left}
 .evtitle{font:700 1.7em/1.1 var(--font-display,serif);color:var(--gold,#d9b46a);letter-spacing:.05em;margin:0;text-align:left;
  text-shadow:0 2px 0 #000,0 0 .6em #000,0 0 1.1em #bd925355}
 .evdesc{font:400 .95em/1.32 var(--serif,'Crimson Pro',serif);color:#e9dcc0;margin:0 0 .35em;text-shadow:0 1px 2px #000,0 0 .7em #000}
-.evopts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.25em}
-.evo{all:unset;box-sizing:border-box;display:flex;gap:.55em;align-items:baseline;width:100%;padding:.32em .4em .32em .2em;cursor:pointer;border-radius:.2em;position:relative;
+.evopts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.3em}
+.evo{all:unset;box-sizing:border-box;display:flex;gap:.6em;align-items:center;width:100%;min-height:44px;padding:.3em .6em .3em .3em;cursor:pointer;border-radius:.35em;position:relative;
  font:600 .95em/1.25 var(--font-display,serif);letter-spacing:.02em;color:#e4d5b4;-webkit-tap-highlight-color:transparent;
- /* engraved: a dark cut above, a thin light lip below */
- text-shadow:0 -1px 0 #000,0 1px 0 #ffffff26,0 0 .5em #000;transition:color calc(.16s*var(--sp,1)),text-shadow calc(.16s*var(--sp,1)),background calc(.16s*var(--sp,1)),transform calc(.12s*var(--sp,1))}
-.evo::before{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,#d9b46a55,transparent 85%);opacity:.5}
-.side-right .evo::before{background:linear-gradient(90deg,#d9b46a55,transparent 85%)}
-.evnum{flex:none;color:var(--gold,#d9b46a);font-weight:700;min-width:1.25em;text-align:right}
-.evlab{min-width:0}
-.evname{font-weight:700;color:#f3e6c4}
-.evdash{color:#9d8f70}
-.evo .es{font:500 .93em/1.25 var(--serif,'Crimson Pro',serif);color:#cdbf9f;letter-spacing:0}
-.evo:hover,.evo:focus-visible{color:#fff;background:linear-gradient(90deg,#d9b46a2e,#d9b46a0d 70%,transparent);text-shadow:0 -1px 0 #000,0 0 .55em #ffcf75,0 0 1.3em #e9a43c99;outline:none}
+ background:linear-gradient(90deg,#0a0e16e6,#0a0e16b8);border:1px solid #d9b46a55;box-shadow:0 2px 8px #000a,inset 0 0 .8em #000a;
+ text-shadow:0 1px 2px #000;transition:color calc(.16s*var(--sp,1)),background calc(.16s*var(--sp,1)),border-color calc(.16s*var(--sp,1)),transform calc(.12s*var(--sp,1))}
+.evico{flex:none;width:2.3em;height:2.3em;--ta:1.7em}
+.evico .emb{border-radius:.3em;border-width:1px}.evico .emb::before{inset:2px;border-radius:.2em}
+.evlab{min-width:0;flex:1}
+.evname{display:block;font-weight:700;color:#f3e6c4}
+.evdash{display:none}
+.evo .es{display:block;font:500 .9em/1.22 var(--serif,'Crimson Pro',serif);color:#cdbf9f;letter-spacing:0}
+
+.evo:hover,.evo:focus-visible{color:#fff;background:linear-gradient(90deg,#3a2a0ef0,#1a1408d8);border-color:#ffcf75;box-shadow:0 0 .9em #e9a43c88,inset 0 0 .8em #000a;outline:none}
 .evo:hover .evname,.evo:focus-visible .evname{color:#fff3d1}
-.evo:hover .evnum{text-shadow:0 0 .6em #ffcf75}
-.evo:active{transform:translateX(.12em) scale(.995);background:linear-gradient(90deg,#ffcf7544,#ffcf7514 70%,transparent);text-shadow:0 0 .4em #fff,0 0 1.5em #ffb347}
-.evo.off{cursor:default;opacity:.5}.evo.off:hover{background:none;color:#e4d5b4;text-shadow:0 -1px 0 #000,0 1px 0 #ffffff26,0 0 .5em #000}
-.evo.cont{justify-content:flex-start;font-size:1.1em;letter-spacing:.12em;text-transform:uppercase;padding-left:.4em}
+.evo:active{transform:scale(.99);background:linear-gradient(90deg,#5a4012f0,#2a1e0ad8)}
+
+.evo.off{cursor:default;opacity:.5}.evo.off:hover{background:linear-gradient(90deg,#0a0e16e6,#0a0e16b8);color:#e4d5b4;border-color:#d9b46a55;box-shadow:0 2px 8px #000a,inset 0 0 .8em #000a}
+.evo.cont{justify-content:center;text-align:center;font-size:1.1em;letter-spacing:.12em;text-transform:uppercase;padding-left:.4em}
 .evo.cont .evname::after{content:' ➜';color:var(--gold,#d9b46a)}
-.evrisk{font:700 .7em/1 var(--font-display,serif);letter-spacing:.1em;text-transform:uppercase;color:#f0a24a;margin-left:.6em;padding:.2em .45em;border:1px solid #f0a24a77;border-radius:.2em;text-shadow:0 0 .6em #f0a24a66;white-space:nowrap;display:inline-block;vertical-align:.1em}
+.evrisk{display:inline-block;font:700 .7em/1 var(--font-display,serif);letter-spacing:.1em;text-transform:uppercase;color:#f0a24a;margin-left:.6em;padding:.2em .45em;border:1px solid #f0a24a77;border-radius:.2em;text-shadow:0 0 .6em #f0a24a66;white-space:nowrap;display:inline-block;vertical-align:.1em}
 .evrisk u{text-decoration:none;color:#ffd9a1;letter-spacing:.04em}
 .evwhy{display:block;font:italic 500 .8em var(--serif,serif);color:#c98a7a;margin-top:.1em;letter-spacing:0;text-transform:none}
 .hl.pos{color:#9fe0a0;text-shadow:0 0 .5em #3f8f4466,0 1px 1px #000}.hl.neg{color:#ee8c7c;text-shadow:0 0 .5em #a8321f66,0 1px 1px #000}.hl.risk{color:#f0a24a}
