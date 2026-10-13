@@ -34,4 +34,22 @@ Object.assign(kw,{
  'Full Flame':'Spends all your Energy. X is the amount spent.',
  'Artifact':'A rare card. A badge, not a card type.',
 });
+// cards-act1: the new Act 1 rule words (FULL-CARD-POOL 9.6 tooltips: fewest plain words, no worked numbers).
+Object.assign(kw,{
+ 'Echo':'A Marked card repeats free at turn end.',
+ 'Mark':'Your first Attack and Skill each turn. Tap the bell to move one.',
+ 'Spend':'Lower the Tide as a cost.',
+ 'Decamp':'Happens when this Waypoint leaves. Tap once a turn to leave.',
+ 'Advance':'Raise a Waypoint\'s Rank. Tap once a turn, free.',
+ 'Landmark':'Rank 3 Waypoint. Counts 2 for Expedition; doubles its Decamp.',
+ 'Parry X':'Blunts and reflects that enemy\'s next hit.',
+ 'Clean Answer':'A Parry that stops the whole hit.',
+ 'Rolling Break':'The second break each turn hits harder.',
+ 'Break':'A Crest or an Undertow.',
+ 'Chart X':'Look at your top cards; reorder them.',
+ 'Bearing':'Bonus if your top card is that type.',
+ 'Momentum':'Attacks build it. Fades each turn and when hit.',
+ 'Flourish':'Spend all Momentum to multiply an Attack.',
+ 'Big Moment':'Your hero\'s signature event.',
+});
 registerKeywords(kw);

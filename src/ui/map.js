@@ -1,4 +1,4 @@
-// ui/map.js — the Act map (15 rows). ? = Unknown room. The boss node shows which boss waits this run.
+// ui/map.js — the Act map (15 rows). ? = Event room (unknown). The boss node shows which boss waits this run.
 // Tidewalker Boots: with charges left, every node on the next floor is selectable (non-linked ones show a 🥾 badge).
 import {W} from '../core/state.js';
 import {EN} from '../core/registry.js';
@@ -6,7 +6,7 @@ import {uiIcon,slotHTML} from '../assets.js';
 import {reachable,bootsLeft} from '../engine/run.js';
 import {actName,ACT_NAMES,MAP_LINE} from '../data/places.js';
 export const ICON={fight:'⚔️',elite:'💀',rest:'🔥',shop:'💰',unknown:'❓',event:'❓',treasure:'💎',boss:'🔔'};
-const REV={fight:['⚔️','a Fight'],treasure:['💎','a Chest'],shop:['💰','a Merchant'],event:['📜','an Event']};
+const REV={fight:['⚔️','a Fight'],treasure:['💎','a Chest'],shop:['💰','a Merchant'],event:['📜','an Event'],rest:['🔥','a Camp']};
 // ---- the climb on parchment: terrace contours, tide line, Bell Gate; flooded and collapsed spots are seeded so every run differs (cosmetic only) ----
 const TOP=84,BOT=70;
 const rng=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
@@ -31,7 +31,9 @@ function mapDeco(run,rows,X,Y,N,H,a1){const W=400,full=N*H+30+TOP+BOT,rnd=rng((r
   if(nodes.some(([nx,ny])=>Math.abs(nx-cx)<14&&Math.abs(ny-cy)<38))continue;
   const fl=rnd()<.5;html+=`<span class="decow ${fl?'fl':'co'}" style="left:${cx.toFixed(1)}%;top:${cy.toFixed(0)}px" title="${fl?'Flooded stair':'Collapsed stair'}">${fl?flood():rubble()}</span>`;placed++}
  return {svg,html}}
-const NAME={fight:'Fight',elite:'Elite',rest:'Camp',shop:'Merchant',unknown:'Unknown (?)',treasure:'Treasure',boss:'Boss'};
+const NAME={fight:'Fight',elite:'Elite',rest:'Camp',shop:'Merchant',unknown:'? Event',treasure:'Treasure',boss:'Boss'};
+// Unknown/? rooms share the painted '?' medallion (also used for node-event).
+const nodeKey=t=>t==='unknown'?'node-unknown':'node-'+t;
 export function mapHTML(interactive){const run=W.run,rows=run.map,H=74,N=rows.length;const av=reachable();const cuts=run.cut||0,boots=interactive&&(bootsLeft()>0||cuts>0);
  const X=(n,r,i)=>n.t==='boss'?50:(n.c+.5)*22+6+(((r*7+i*13)%5)-2)*1.6, Y=r=>(N-1-r)*H+50+TOP;let svg='',nodes='',land='';const a1=(run.act||1)===1;const deco=mapDeco(run,rows,X,Y,N,H,a1);
  const bossE=EN[run.boss]||{};
@@ -42,7 +44,7 @@ export function mapHTML(interactive){const run=W.run,rows=run.map,H=74,N=rows.le
    svg+=`<path d="M${x*4} ${y} Q${mx*4} ${(y+y2)/2} ${x2*4} ${y2}" fill="none" stroke="${on?'#7c1f2c':'#4a3a22'}" stroke-width="${on?3.5:2}" stroke-dasharray="${on?'':'2 7'}" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity="${on?.9:.7}"/>`});
   land+=`<i class="ldg${n.t==='boss'?' boss':''}" style="left:${x}%;top:${y+(n.t==='boss'?22:15)}px"></i>`;
   const next=interactive&&r===run.pos.r+1;const isAv=next&&av.includes(i),bootsAv=next&&!isAv&&boots,vis=run.vis[r+':'+i];
-  const ic=n.t==='boss'?slotHTML('enemies',run.boss,'bossart',bossE.e||'🔔'):uiIcon('node-'+(n.t==='unknown'?'event':n.t),ICON[n.t],'nodeic');
+  const ic=n.t==='boss'?slotHTML('enemies',run.boss,'bossart',bossE.e||'🔔'):uiIcon(nodeKey(n.t),ICON[n.t],'nodeic');
   nodes+=`<button class="node ${n.t} ${n.t==='boss'?'boss':''} ${isAv||bootsAv?'av':''} ${bootsAv?'boots':''} ${vis?'vis':''} ${run.pos.r===r&&run.pos.i===i?'cur':''} ${r<=run.pos.r&&!vis?'dim':''}" style="left:${x}%;top:${y}px" ${isAv||bootsAv?`onclick="goNode(${r},${i})"`:''} title="${n.t==='boss'?'Boss: '+(bossE.n||''):NAME[n.t]||n.t}" data-r="${r}" data-i="${i}" data-t="${n.t}">${ic}${bootsAv?`<i class="bootb">${cuts>0?'✂️':'🥾'}</i>`:''}${n.pre&&!vis?`<i class="revb" title="Revealed: ${REV[n.pre][1]}">${REV[n.pre][0]}</i>`:''}</button>`}));
- return `<div class="parch"><h2>${interactive?'Choose your path':actName(run.act||1)}</h2><div class="mapact">${ACT_NAMES[run.act||1]?ACT_NAMES[run.act||1].n+' · '+ACT_NAMES[run.act||1].sub:''}</div><div class="maplore">${MAP_LINE}</div><div class="muted seedtag">Seed ${run.seed}</div><div class="legend">${[['fight','Fight'],['elite','Elite'],['unknown','?'],['rest','Camp'],['shop','Merchant'],['treasure','Chest']].map(([k,l])=>`<span>${uiIcon('node-'+(k==='unknown'?'event':k),ICON[k],'legic')}${l}</span>`).join('')}<span class="bossleg">${bossE.e||''} ${bossE.n||''}</span>${boots?`<span>${cuts>0?`✂️×${cuts} `:''}${bootsLeft()>0?`🥾×${bootsLeft()}`:''}</span>`:''}${rows.some(r=>r.some(n=>n.pre&&!run.vis[rows.indexOf(r)+':'+r.indexOf(n)]))?'<span><i class="revleg">🔭</i>Revealed</span>':''}</div>
+ return `<div class="parch"><h2>${interactive?'Choose your path':actName(run.act||1)}</h2><div class="mapact">${ACT_NAMES[run.act||1]?ACT_NAMES[run.act||1].n+' · '+ACT_NAMES[run.act||1].sub:''}</div><div class="maplore">${MAP_LINE}</div><div class="muted seedtag">Seed ${run.seed}</div><div class="legend">${[['fight','Fight'],['elite','Elite'],['unknown','?'],['rest','Camp'],['shop','Merchant'],['treasure','Chest']].map(([k,l])=>`<span>${uiIcon(nodeKey(k),ICON[k],'legic')}${l}</span>`).join('')}<span class="bossleg">${bossE.e||''} ${bossE.n||''}</span>${boots?`<span>${cuts>0?`✂️×${cuts} `:''}${bootsLeft()>0?`🥾×${bootsLeft()}`:''}</span>`:''}${rows.some(r=>r.some(n=>n.pre&&!run.vis[rows.indexOf(r)+':'+r.indexOf(n)]))?'<span><i class="revleg">🔭</i>Revealed</span>':''}</div>
  <div class="mapwrap${a1?' a1':''}" style="height:${N*H+30+TOP+BOT}px;width:92%">${a1?`<i class="a1art top" style="top:${Y(N-1)-32}px"></i>`:''}<span class="gate-w" style="top:${Y(N-1)-52}px">${a1?GATE_A1:GATE}</span>${deco.html}${land}<svg width="100%" height="${N*H+30+TOP+BOT}" viewBox="0 0 400 ${N*H+30+TOP+BOT}" preserveAspectRatio="none">${deco.svg}${svg}</svg>${nodes}</div></div>`}

@@ -27,11 +27,17 @@ import {SPRITES,SPRITE_BASELINE} from './data/sprites.js';
 import {ICONS} from './data/icons.js';
 // game status key -> Artist icon key (art/v2/ui/icons.json 'status'); 'rooted' is the Kelp Matriarch's passive
 const ST_ICON={block:'guard',str:'might',dex:'poise',weak:'soaked',vuln:'exposed',brittle:'brittle',bleed:'bleed',drench:'drenched',reson:'resonating',mightTmp:'temporary-might',shell:'shell',barbs:'barbs',ward:'rebuff',mending:'mending',rooted:'rooted'};
-const stIcons=()=>{const o={block:null};for(const [k,v] of Object.entries(ST_ICON))o[k]=ICONS.status[v]||null;return o};
+// Painted HUD pass (clovis/hud): repainted Bleed and Soaked icons.
+const ST_HUD={bleed:'art/v2/hud/status-bleed.webp',weak:'art/v2/hud/status-soaked.webp'};
+const stIcons=()=>{const o={block:null};for(const [k,v] of Object.entries(ST_ICON))o[k]=ST_HUD[k]||ICONS.status[v]||null;return o};
 const slotIcons=m=>Object.fromEntries(Object.entries(m).map(([k,f])=>[k,{src:f,fit:'contain'}]));
 const V='art/v2/';
 const win=(f,pos)=>({src:V+'enemies/'+f+'.webp',srcset:`${V}enemies/${f}-256.webp 256w, ${V}enemies/${f}.webp 768w`,sizes:'(max-height:500px) 140px, 260px',fit:'cover',pos:pos||'50% 45%',win:true});
 const ui=k=>V+'ui/'+k+'.webp';
+// Painted HUD pass: repainted intent icons live in art/v2/hud/ (intent-ring keeps its old art).
+const HUD_INTENTS=['attack','attack-debuff','buff','debuff','defend','drain','heal','potion','status','steal','summon','unknown'];
+// Painted fallen-remains art, trimmed to its pixels: [w,h] by sprite id (ART staging 2026-10-12; twin-eels-b and tide-leech are the picked poses).
+const FALLEN={"brine-slug":[1426,661],"coral-crab":[1141,650],"drowned-captain":[830,414],"glimmer-wisp":[860,311],"gull-thief":[1210,441],"heap":[1238,490],"kelp-lurker":[1210,483],"kelp-matriarch":[793,579],"kelp-tendril":[773,552],"knell-a":[1024,552],"knell-b":[1061,464],"leviathan-bell":[1021,570],"limpet":[1057,554],"mender":[857,397],"mirror-warden":[876,413],"novice":[717,420],"penitent":[750,579],"rust-knight":[943,503],"spore-pod":[805,641],"tenant":[976,673],"tide-leech":[1159,620],"twin-eels-a":[961,456],"twin-eels-b":[904,516]};
 export const ASSETS={
  frames:{tide:[V+'frames/frame-tidecaller@1x.webp',V+'frames/frame-tidecaller.webp'],echo:[V+'frames/frame-echo-mage@1x.webp',V+'frames/frame-echo-mage.webp'],
   carto:[V+'frames/frame-cartographer@1x.webp',V+'frames/frame-cartographer.webp'],duel:[V+'frames/frame-duelist@1x.webp',V+'frames/frame-duelist.webp']},
@@ -46,8 +52,10 @@ export const ASSETS={
   leech:win('tide-leech'),lurker:win('kelp-lurker'),tendril:win('kelp-tendril'),matriarch:win('kelp-matriarch'),
   penitent:{src:'art/v2/sprites/penitent.webp',fit:'contain',pos:'50% 60%'},mender:{src:'art/v2/sprites/mender.webp',fit:'contain',pos:'50% 60%'},heap:{src:'art/v2/sprites/heap.webp',fit:'contain',pos:'50% 60%'},limpet:{src:'art/v2/sprites/limpet.webp',fit:'contain',pos:'50% 60%'},novice:{src:'art/v2/sprites/novice.webp',fit:'contain',pos:'50% 60%'},tenant:{src:'art/v2/sprites/tenant.webp',fit:'contain',pos:'50% 60%'}},
  cards:{},
+ // Fallen-remains poses (art/v2/fallen/fallen-<spriteId>.webp, foot line = image bottom): every foe that dies leaves one. Dims in FALLEN below.
+ fallen:Object.fromEntries(Object.keys(FALLEN).map(id=>[id,V+'fallen/fallen-'+id+'.webp'])),
  // Card-art placeholders until per-card art exists: the class card painting cropped 4:3 into the frame's art window.
- cardPH:Object.fromEntries([['tide','tidecaller'],['echo','echo-mage'],['carto','cartographer'],['duel','duelist'],['curse','curse'],['status','status'],['colorless','colorless']]
+ cardPH:Object.fromEntries([['tide','tidecaller'],['echo','echo-mage'],['carto','cartographer'],['duel','duelist'],['curse','curse'],['status','status'],['colorless','colorless'],['artifact','colorless']]
   .map(([k,f])=>[k,{src:V+`cards/ph-${f}.webp`,srcset:`${V}cards/ph-${f}-384.webp 384w, ${V}cards/ph-${f}.webp 768w`,sizes:'(max-height:500px) 160px, 240px',fit:'cover'}])),
  // Battle sprites (ids in data/sprites.js, generated from art/v2/sprites/sprites.json). Enemies without a sprite file use a placeholder.
  sprites:{figures:{tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist'},
@@ -65,7 +73,7 @@ export const ASSETS={
  ui:{'intent-attack':ui('intent-attack'),'intent-attack-debuff':ui('intent-attack-debuff'),'intent-buff':ui('intent-buff'),'intent-debuff':ui('intent-debuff'),
   'intent-defend':ui('intent-defend'),'intent-unknown':ui('intent-unknown'),'energy-orb-full':ui('energy-orb-full'),'energy-orb-empty':ui('energy-orb-empty'),
   'end-turn':ui('end-turn'),'end-turn-pressed':ui('end-turn-pressed'),
-  'node-fight':ui('node-combat'),'node-elite':ui('node-elite'),'node-rest':ui('node-rest'),'node-shop':ui('node-shop'),'node-event':ui('node-event'),'node-treasure':ui('node-treasure'),'node-boss':ui('node-boss')},
+  'node-fight':ui('node-combat'),'node-elite':ui('node-elite'),'node-rest':ui('node-rest'),'node-shop':ui('node-shop'),'node-event':ui('node-unknown'),'node-unknown':ui('node-unknown'),'node-treasure':ui('node-treasure'),'node-boss':ui('node-boss')},
  textures:{parchment:V+'textures/parchment.webp','parchment-dark':V+'textures/parchment-dark.webp',stone:V+'textures/stone-panel.webp',leather:V+'textures/leather-panel.webp'}
 };
 const FIT_DEFAULT={cards:'cover',portraits:'cover',figures:'contain',enemies:'contain',ui:'contain'};
@@ -79,6 +87,8 @@ export function assetEntry(group,key){const g=ASSETS[group];let v=g&&g[key];if(!
 export function spriteCount(group,key){const id=ASSETS.sprites[group]&&ASSETS.sprites[group][key];return Array.isArray(id)?id.length:1}
 export function spriteFor(group,key,idx=0){let id=ASSETS.sprites[group]&&ASSETS.sprites[group][key];if(Array.isArray(id))id=id[idx%id.length];const m=id&&SPRITES[id];return m?{id,...m}:null}
 export {SPRITE_BASELINE};
+// Remains for a sprite (spriteFor result) or null: {id,src,w,h}. The Knell's second phase (e.ph 2) falls as the cracked Leviathan Bell.
+export function fallenFor(sp,e){let id=sp&&sp.id;if(id&&e&&e.key==='bell'&&e.ph===2)id='leviathan-bell';const d=id&&FALLEN[id];return d?{id,src:ASSETS.fallen[id],w:d[0],h:d[1]}:null}
 // An icon from a group (hud / status) with an emoji fallback when the slot is empty or the file fails.
 export function iconHTML(group,key,fallback,cls){const s=assetSrc(group,key);return s?`<img class="uic ${cls||''}" src="${s}" alt="" draggable="false" onerror="this.outerHTML='${fallback}'">`:fallback}
 export function assetSrc(group,key){const a=assetEntry(group,key);return a?a.src:''}
@@ -117,4 +127,7 @@ async function loadCombatIconArt(){try{const r=await fetch('art/v2/ui/icons.json
  for(const [k,id] of Object.entries(ST_ICON))if(j.status?.[id])ASSETS.status[k]=j.status[id];
  for(const [id,path] of Object.entries(j.intent||{}))if(path)ASSETS.ui[id]=path;
  for(const [id,path] of Object.entries(j.dais||{}))if(path)DAIS_ART[id]=path;
- }catch(e){/* Keep the existing art and bronze vector placeholders offline. */}}
+ }catch(e){/* Keep the existing art and bronze vector placeholders offline. */}
+ applyHudArt()}
+function applyHudArt(){for(const k of HUD_INTENTS)ASSETS.ui['intent-'+k]='art/v2/hud/intent-'+k+'.webp';Object.assign(ASSETS.status,ST_HUD)}
+applyHudArt();

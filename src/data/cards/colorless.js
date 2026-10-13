@@ -11,7 +11,7 @@ X('sealegs',{e:'🦵',d:'Gain {4|7} Guard. Draw 1.',fx:[['block',4,7],['draw',1]
 X('plank',{e:'🪵',d:'Gain {10|14} Guard. Sink.',fx:[['block',10,14]]});
 X('harpoon',{e:'🔱',moor:1,d:'Deal {10|14}. Moor.',fx:[['dmg',10,14]]});
 X('driftmail',{e:'📨',d:'Choose 1 of 3 random cards from your class. Add it to your hand. It costs 0 this turn.{| The chosen card is upgraded.} Sink.',p:f=>{
- const pool=Object.values(CARDS).filter(d=>d.cls===W.run.cls&&(d.r==='c'||d.r==='u'||d.r==='r')&&!(W.run.lock&&W.run.lock.cards[d.id]));const three=shuffle(pool.slice(),'combat').slice(0,3);
+ const pool=Object.values(CARDS).filter(d=>d.cls===W.run.cls&&!d.cut&&!d.stub&&(d.r==='c'||d.r==='u'||d.r==='r')&&!(W.run.lock&&W.run.lock.cards[d.id]));const three=shuffle(pool.slice(),'combat').slice(0,3);
  ask(f,'Driftwood Mail: choose a card (costs 0 this turn)',three.map(d=>({l:(d.e||'')+' '+d.n+(f.u?'+':''),f:()=>{addCard(d.id,'hand',{cost0Turn:true,up:f.u});log('📨 Driftwood Mail: '+d.n+(f.u?'+':''));floatText('p','📨 '+d.n,'')}})))}});
 X('fishnet',{e:'🕸️',d:'Apply {1|2} Soaked and {1|2} Exposed to ALL. Sink.',p:f=>{const n=f.v(1,2);alive().forEach(e=>{f.weak(n,e);f.vuln(n,e)})}});
 X('spyglass',{e:'🔭',d:'Draw {2|3}. Sink.',fx:[['draw',2,3]]});

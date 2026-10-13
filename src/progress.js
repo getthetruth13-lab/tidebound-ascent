@@ -41,7 +41,7 @@ const rarityOf=(CARDS,id)=>CARDS&&CARDS[id]?CARDS[id].r:'u';
 export function remaining(p,track,CARDS){const u=k=>new Set(p.unlocked[k]);
  if(track==='climb'){const r=u('relics'),po=u('potions');return {relics:LOCK_SHARED_RELICS.filter(x=>!r.has(x)),potions:LOCK_POTIONS.filter(x=>!po.has(x))}}
  const cls=track,uc=u('cards'),ur=u('relics'),R=LOCK_CLASS_RELICS[cls]||{};
- return {cards:(LOCK_CARDS[cls]||[]).filter(x=>!uc.has(x)),shop:R.shop&&!ur.has(R.shop)?R.shop:null,rare:R.rare&&!ur.has(R.rare)?R.rare:null}}
+ return {cards:(LOCK_CARDS[cls]||[]).filter(x=>!uc.has(x)&&!(CARDS&&CARDS[x]&&(CARDS[x].cut||CARDS[x].stub))),shop:R.shop&&!ur.has(R.shop)?R.shop:null,rare:R.rare&&!ur.has(R.rare)?R.rare:null}}
 export function offerFor(p,track,CARDS){
  const climb=track==='climb',claimed=climb?p.climbClaimed:(p.claimed[track]||0),pending=climb?climbPending(p):lampPending(p,track);if(pending<=0)return null;
  const plan=(climb?CLIMB_PLAN:LAMP_PLAN)[claimed];if(!plan)return null;const rem=remaining(p,track,CARDS);const items=[];

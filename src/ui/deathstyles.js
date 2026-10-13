@@ -20,4 +20,7 @@ export const BOSS_SOUND={bell:'deathBell',kelp:'deathBoss',water:'deathBoss'};
 export function deathStyleOf(e){const k=e&&e.key;const s=ENEMY_DEATH[k];if(s)return s;return e&&e.boss?'boss':e&&e.elite?'dissolve':'sink'}
 export function deathSoundOf(e){const s=deathStyleOf(e);if(s==='boss')return BOSS_SOUND[BOSS_VARIANT[e.key]]||'deathBoss';return DEATH_STYLES[s].sound}
 // the finale after the last foe: a beat, a light sweep, the lantern moment, then the banner (design ms)
-export const FINALE={beat:90,sweep:520,total:620,bossTotal:520};
+// B061: slower and more readable (was beat 90, sweep 520, total 620, boss 520; now total 1400, boss 1300): the banner now holds long enough to read before the rewards fly in
+export const FINALE={beat:180,sweep:700,total:1400,bossTotal:1300};
+// B061: the foe's health bar drains to zero (design ms) before the collapse begins
+export const DEATH_DRAIN=520;

@@ -1266,3 +1266,61 @@ body.kw-frame .keyword-window::before{content:none}
 @media (prefers-reduced-motion:reduce){.cursepop{animation-duration:.01s;opacity:1}}
 .keyword-window.surch span{color:#ffc9b8}
 .fl.curse{color:#d7c2ff;font-size:clamp(16px,2.6vw,22px);animation-duration:calc(1.8s*var(--ts,1))}
+
+/* ---- Task 65: one-screen merchant (StS stock/layout). Wren and her stall are the painted backdrop on the left ~45%; every item sits on the dark cave at the right.
+   Own class names (.sh1-*), so none of the older shop rules apply. Relics/potions have no box: cut-out icon on the backdrop. ---- */
+.sh1-bg{position:fixed;inset:0;z-index:0;background:#05080c url("../art/v2/shop/shop-bg.webp") 30% 50%/cover no-repeat;pointer-events:none}
+.sh1{z-index:1}
+.sh1{flex:1 1 0;min-height:0;container-type:size;position:relative;display:flex;flex-direction:column;align-items:stretch;padding:0 8px 4px 44%;gap:2px;--cw:calc(100cqw*.54 - 12px);--ik:1}
+.sh1 .sh1-title{margin:0;font:700 calc(14px*var(--ik))/1.1 var(--font-display);text-align:center;flex:none;padding:2px 0}
+.sh1-stage{flex:1 1 0;min-height:0;container-type:size}
+.sh1-in{height:100%;display:flex;flex-direction:column;justify-content:center;gap:4px;--ik:1;--gw:max(44px,min(calc((100cqw - 24px)/5),calc((100cqh - 8px - 34px)/2.8)))}
+.sh1-cards,.sh1-extra{display:flex;gap:6px;align-items:flex-start;justify-content:flex-start}
+.sh1-low{display:flex;gap:6px;align-items:flex-start;justify-content:flex-start}
+.sh1 .shopitem{flex:0 0 var(--gw);width:var(--gw);position:relative;align-items:center}
+.sh1 .shopitem .card{width:100%}
+.sh1 .price{display:inline-flex;gap:3px;align-items:center;justify-content:center;font:700 calc(12px*var(--ik)) var(--font-number,var(--font-display));color:#f3d48a;text-shadow:0 1px 2px #000,0 0 6px #000c;white-space:nowrap}
+.sh1 .price.poor{color:#e0867c}
+.sh1 .shopitem.sale .price{color:var(--status-buff)}
+.sh1 .shopitem.sale .price s{color:#c9a99c;font-weight:400}
+.sh1 .saletag{position:absolute;top:-4px;right:-5px;bottom:auto;left:auto;z-index:3;transform:rotate(8deg);font:700 9px var(--font-display);letter-spacing:.08em;color:#2a1604;background:linear-gradient(#f3d48a,#c8923c);padding:1px 5px 1px;border-radius:2px 6px 2px 6px;box-shadow:0 1px 3px #000c;pointer-events:none}
+.sh1-rp{display:flex;flex-direction:column;gap:2px;flex:none}
+.sh1-relics,.sh1-potions{display:flex;gap:2px}
+.sh1-icon{position:relative;flex:none;width:calc(62px*var(--ik));min-height:calc(46px*var(--ik));display:flex;flex-direction:column;align-items:center;gap:0;background:none;border:0;border-radius:0;box-shadow:none;padding:0 2px;color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;transition:transform .15s ease,filter .15s ease}
+.sh1-icon .slot{width:calc(26px*var(--ik));height:calc(26px*var(--ik));border-radius:0;background:none;overflow:visible;filter:drop-shadow(0 4px 3px #000c);--phs:calc(18px*var(--ik))}
+.sh1-icon .slot>img{object-fit:contain}
+.sh1-icon .slot>.ph{background:none}
+.sh1-icon .inm{font:600 calc(9.5px*var(--ik))/1.05 var(--font-body);color:#efe4c8;text-align:center;text-shadow:0 1px 2px #000,0 0 6px #000c;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.sh1-icon.right .slot{filter:drop-shadow(0 4px 3px #000c) drop-shadow(0 0 8px color-mix(in srgb,var(--rarity-rare) 55%,transparent))}
+.sh1-icon .shoptag{position:absolute;top:0;right:0;font:700 8px var(--font-display);color:var(--rarity-rare);text-shadow:0 1px 2px #000;font-style:normal;pointer-events:none}
+.sh1-icon.sold{opacity:.4;cursor:default}
+.sh1-icon:not(.sold):hover,.sh1-icon.reward-selected{transform:translateY(-3px)}
+.sh1-icon:not(.sold):hover .slot,.sh1-icon.reward-selected .slot{filter:drop-shadow(0 6px 4px #000c) drop-shadow(0 0 10px #f3d48a99)}
+.sh1-icon.reward-selected .inm{color:#f6dd9e}
+.sh1-icon.no,.sh1 .shopitem.no{animation:sh .4s}
+.sh1 .shopitem.sold .soldcard{width:var(--gw);aspect-ratio:5/7}
+.sh1-svc{flex:none;width:calc(64px*var(--ik));height:calc(var(--gw)*1.4 + 16px*var(--ik));overflow:hidden;align-self:flex-start}
+.sh1-svc .tile.sp{--th:calc(var(--gw)*1.4 - 46px*var(--ik));width:100%;min-width:0;min-height:44px}
+.sh1-foot{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:8px;min-height:44px}
+.sh1-tip{flex:1 1 0;min-width:0;font:calc(13px*var(--ik))/1.15 var(--font-body);color:#d9ccb0;text-shadow:0 1px 2px #000,0 0 6px #000c;text-align:right;overflow:hidden;max-height:36px}
+.sh1-tip b{color:#f6dd9e}.sh1-tip .tipgold{color:#f3d48a;white-space:nowrap}.sh1-tip .tipgold.poor{color:#e0867c}
+.sh1 .sh1-foot .pkbtn{flex:none;min-height:44px;min-width:76px;padding-top:0;padding-bottom:0}
+.sh1-foot .pkbtn:disabled{opacity:.5}
+/* entrance: the painted scene shows first, then the stock pops in one by one (tap anywhere skips) */
+@keyframes sh1pop{from{opacity:0;transform:translateY(14px) scale(.9)}to{opacity:1;transform:none}}
+.sh1.fresh .sh1-it,.sh1.fresh .sh1-foot,.sh1.fresh .sh1-title{animation:sh1pop calc(.55s*var(--sp,1)) calc((.9s + var(--i,0)*.14s)*var(--sp,1)) cubic-bezier(.2,.8,.2,1) both}
+.sh1.fresh .sh1-foot,.sh1.fresh .sh1-title{--i:0;animation-delay:calc(.2s*var(--sp,1))}
+.sh1.fresh .sh1-foot{animation-delay:calc(2.4s*var(--sp,1))}
+.sh1-svc .tile .tname{font-size:calc(10px*var(--ik))!important;letter-spacing:.02em}.sh1-svc .tile .tsum{font-size:calc(11px*var(--ik))!important}
+@media(min-height:560px){.sh1-in{--ik:1.5}}
+@media(min-height:860px){.sh1-in{--ik:2.2}}
+@media(min-height:560px){.sh1{--ik:1.5}}
+@media(min-height:860px){.sh1{--ik:2.2}}
+.sh1 .sh1-foot .pkbtn{min-height:calc(44px*var(--ik));font-size:calc(14px*var(--ik))}
+/* Win heal (ECON.winHeal): painted +N heal digits rise from the hero bar in the victory scene; the bar glows green briefly. */
+.hpbar.healglow{position:relative;animation:healglow 1.4s ease-out .3s}
+@keyframes healglow{0%,100%{filter:none}25%{filter:drop-shadow(0 0 6px #5fd38a) drop-shadow(0 0 12px #5fd38a88) brightness(1.25)}}
+.healpop{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);pointer-events:none;z-index:3;opacity:0;animation:healpop 1.6s ease-out .3s forwards}
+.healpop .pdig img{height:22px}
+@keyframes healpop{0%{opacity:0;transform:translate(-50%,8px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+@media (prefers-reduced-motion:reduce){.hpbar.healglow,.healpop{animation-duration:.01s!important}}

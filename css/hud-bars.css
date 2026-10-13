@@ -1,0 +1,50 @@
+/* Painted health bars (clovis/hud, Option A). Generated from art/v2/hud/slices.json by tools/hud (see build-hud-art.py).
+   The .hpbar box IS the painted channel; the rail art is drawn around it, so the bar keeps today's footprint.
+   --hb = channel height. Guard shield appears only when Guard > 0; otherwise the small circle cap. */
+.hpbar.pb{--hb:16px;background:none;box-shadow:none;padding:0;border-radius:2px;overflow:visible}
+.combat .plate .hpbar.pb{--hb:calc(14*var(--hud-unit));height:var(--hb)}
+.hpbar.pb::before,.hpbar.pb::after{display:none}
+.hpbar.pb .hpin{inset:0;border-radius:2px;background:linear-gradient(#160a0a,#2a1012);box-shadow:inset 0 2px 3px #000c}
+.hpbar.pb .hpin>i:not(.gh){background:linear-gradient(#eb4a3c,#b02a22 50%,#7d1416)}
+.hpbar.pb .hpin>i:not(.gh)::after{height:22%;background:linear-gradient(#ffa08c99,transparent)}
+.hpbar.pb.blk{box-shadow:none}.hpbar.pb.blk .steel{opacity:.28}
+.pb-rail{position:absolute;pointer-events:none;z-index:1;border-style:solid;border-color:transparent;box-sizing:border-box}
+.hpbar.pb .hpnum{z-index:3;font-family:var(--font-number);letter-spacing:.01em;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 1px #000}
+.pb-cap{position:absolute;right:calc(var(--hb)*-1.1);top:50%;height:calc(var(--hb)*2.1);width:auto;transform:translateY(-50%);z-index:2;pointer-events:none;filter:drop-shadow(0 1px 2px #000)}
+.pb-circ{position:absolute;left:calc(var(--hb)*-.45);top:50%;width:calc(var(--hb)*.85);height:calc(var(--hb)*.85);transform:translateY(-50%);z-index:4;pointer-events:none}
+.hpbar.pb .hpblk{color:transparent;filter:drop-shadow(0 1px 2px #000)}
+.hpbar.pb .hpblk .guard-art:has(.pb-shield) .sti{visibility:hidden}
+.hpbar.pb .hpblk b{font-family:var(--font-number);font-weight:800;color:#fff;text-shadow:0 0 2px #000,0 0 3px #000,0 1px 1px #000}
+.pb-horn{position:absolute;bottom:calc(100% - var(--hb)*.2);height:calc(var(--hb)*1.7);width:auto;z-index:0;pointer-events:none}.pb-horn.l{left:12%}.pb-horn.r{right:4%;transform:scaleX(-1)}
+.pb-skull{position:absolute;left:50%;bottom:calc(100% + var(--hb)*.05);height:calc(var(--hb)*1.25);width:auto;transform:translateX(-50%);z-index:2;pointer-events:none}
+.hpbar.pb.low{animation:pblow 1s ease-in-out infinite}@keyframes pblow{50%{filter:drop-shadow(0 0 4px #ff3a2a)}}
+.reduce-motion .hpbar.pb.low{animation:none}
+.pb-tide .pb-rail{left:calc(var(--hb)*-1.8272);right:calc(var(--hb)*-1.8395);top:calc(var(--hb)*-0.8765);bottom:calc(var(--hb)*-0.8025);border-width:0 calc(var(--hb)*2.4074);border-image:url(../art/v2/hud/tide-rail.webp) 0 195 fill/0 calc(var(--hb)*2.4074) stretch}
+.pb-echo .pb-rail{left:calc(var(--hb)*-0.8525);right:calc(var(--hb)*-0.8525);top:calc(var(--hb)*-0.9508);bottom:calc(var(--hb)*-1.0164);border-width:0 calc(var(--hb)*2.6557);border-image:url(../art/v2/hud/echo-rail.webp) 0 162 fill/0 calc(var(--hb)*2.6557) stretch}
+.pb-duel .pb-rail{left:calc(var(--hb)*-2.3448);right:calc(var(--hb)*-2.3276);top:calc(var(--hb)*-0.8448);bottom:calc(var(--hb)*-0.8448);border-width:0 calc(var(--hb)*2.4138);border-image:url(../art/v2/hud/duel-rail.webp) 0 140 fill/0 calc(var(--hb)*2.4138) stretch}
+.pb-carto .pb-rail{left:calc(var(--hb)*-0.8254);right:calc(var(--hb)*-0.8413);top:calc(var(--hb)*-0.7619);bottom:calc(var(--hb)*-0.7778);border-width:0 calc(var(--hb)*2.2857);border-image:url(../art/v2/hud/carto-rail.webp) 0 144 fill/0 calc(var(--hb)*2.2857) stretch}
+.pb-normal .pb-rail{left:calc(var(--hb)*-0.7333);right:calc(var(--hb)*-0.7167);top:calc(var(--hb)*-0.6833);bottom:calc(var(--hb)*-0.7500);border-width:0 calc(var(--hb)*2.1833);border-image:url(../art/v2/hud/normal-rail.webp) 0 131 fill/0 calc(var(--hb)*2.1833) stretch}
+.pb-elite .pb-rail{left:calc(var(--hb)*-0.8254);right:calc(var(--hb)*-0.8413);top:calc(var(--hb)*-0.7619);bottom:calc(var(--hb)*-0.7778);border-width:0 calc(var(--hb)*2.2857);border-image:url(../art/v2/hud/elite-rail.webp) 0 144 fill/0 calc(var(--hb)*2.2857) stretch}
+.pb-boss .pb-rail{left:calc(var(--hb)*-2.0179);right:calc(var(--hb)*-2.0357);top:calc(var(--hb)*-1.1250);bottom:calc(var(--hb)*-0.7500);border-width:0 calc(var(--hb)*2.5714);border-image:url(../art/v2/hud/boss-rail.webp) 0 144 fill/0 calc(var(--hb)*2.5714) stretch}
+/* Outcome preview on the painted bars (EFFECTS.md C16): lighter-red chunk pulsing, painted digits, skull for lethal, Guard crack. */
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#combat-preview .outcome-chunk{top:0;bottom:0;background:#ff826e;border-right:0;box-shadow:0 0 4px #ff826e;animation:ocpulse 1s ease-in-out infinite}
+@keyframes ocpulse{0%,100%{opacity:.6}50%{opacity:1}}
+#combat-preview .outcome-heal{position:absolute;top:0;bottom:0;background:#9be28c;opacity:.75;animation:ocpulse 1s ease-in-out infinite}
+#combat-preview .outcome-dmg{position:absolute;bottom:calc(100% + 2px);translate:-50% 0;animation:ocbob 1s ease-in-out infinite;filter:drop-shadow(0 1px 1px #000)}
+@keyframes ocbob{50%{transform:translateY(-3px)}}
+.pdig{display:inline-flex;align-items:flex-end;vertical-align:middle}.pdig img{height:15px;width:auto;margin:0 -1px}
+#combat-preview .guard-preview .pdig img{height:12px}
+#combat-preview .outcome-skull{position:absolute;bottom:calc(100% + 1px);height:20px;width:auto;translate:-50% 0;animation:ocskull 1s ease-in-out infinite;filter:drop-shadow(0 0 3px #ff3a2a)}
+@keyframes ocskull{50%{transform:scale(1.08)}}
+#combat-preview .outcome.lethal .outcome-label{display:none}
+#combat-preview .outcome-crack{position:absolute;left:-14px;top:50%;width:22px;height:24px;margin-top:-12px;background:linear-gradient(115deg,transparent 46%,#fff 47% 52%,transparent 53%),linear-gradient(60deg,transparent 48%,#cfe6ff 49% 52%,transparent 53%);animation:ocpulse .8s ease-in-out infinite;z-index:6}
+#combat-preview .outcome-crack.broken{background:linear-gradient(115deg,transparent 40%,#fff 41% 45%,transparent 46%),linear-gradient(60deg,transparent 45%,#fff 46% 50%,transparent 51%),linear-gradient(170deg,transparent 52%,#cfe6ff 53% 56%,transparent 57%)}
+/* boss name plate riding the gilded bar */
+.pb-plate{position:absolute;left:50%;bottom:calc(100% + var(--hb)*.15);translate:-50% 0;height:calc(var(--hb)*1.9);min-width:100%;display:flex;align-items:center;justify-content:center;padding:0 calc(var(--hb)*2.4);background:url(../art/v2/hud/boss-plate.webp) center/100% 100% no-repeat;z-index:2;pointer-events:none;white-space:nowrap}
+.pb-plate b{font:700 calc(var(--hb)*.7)/1 var(--font-display,serif);letter-spacing:.08em;color:#ffe28c;text-shadow:0 0 2px #000,0 1px 1px #000;text-transform:uppercase}
+.bd .relic-ready .uic{filter:drop-shadow(0 0 3px #ffd270)}
+/* Morning fix: the painted Guard shield was drawn at 14px with a 14px number on top, so only the number showed.
+   Shield is now bigger than the number and sits on the bar's left end; number shrinks to fit inside it. */
+.combat .hpbar.pb .hpblk{width:calc(60*var(--hud-unit));height:calc(68*var(--hud-unit));left:calc(-40*var(--hud-unit));margin-top:calc(-34*var(--hud-unit))}
+.combat .hpbar.pb .hpblk b{font-size:calc(30*var(--hud-unit));margin-top:calc(-4*var(--hud-unit))}

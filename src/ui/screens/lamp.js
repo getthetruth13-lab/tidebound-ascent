@@ -22,7 +22,7 @@ const TRACK_LEVELS=t=>t==='climb'?CLIMB_XP.length:LAMP_XP.length;
 // ---------- small tiles ----------
 const TYPE_N={A:'Attack',S:'Skill',P:'Vigil',W:'Waypoint'};
 export function itemTile(kind,id,o={}){
- if(kind==='card'){const d=CARDS[id];return `<div class="lp-pick${o.on?' on':''}${o.click?' live':''}"><div class="lp-cardwrap${o.on?' on':''}">${cardHTML({id,uid:-500-(o.i||0),up:false},{click:o.click})}</div><span class="tcap r-${d.r}">${RARN[d.r]} · ${TYPE_N[d.t]||''}</span></div>`}
+ if(kind==='card'){const d=CARDS[id];return `<button class="lp-pick${o.on?' on':''}${o.click?' live':''}" data-card="${id}" ${o.click?`onclick="${o.click}"`:''}><span class="lp-cardwrap${o.on?' on':''}">${cardHTML({id,uid:-500-(o.i||0),up:false},{})}</span><span class="tcap r-${d.r}">${RARN[d.r]} · ${TYPE_N[d.t]||''}</span></button>`}
  const d=kind==='relic'?RELICS[id]:POTIONS[id];if(!d)return '';
  const tag=kind==='relic'?(d.tierName||'Relic')+(d.cls?' · '+CLASSES[d.cls].n:''):RARN[d.rarity]+' potion'+(d.cls?' · '+CLASSES[d.cls].n:'');
  return (kind==='relic'?relicTile:potionTile)(id,{click:o.click,cls:'lp-tile'+(o.click?'':' static'),tag,on:o.on})}
@@ -72,7 +72,7 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
   <div class="lp-mid">${trackHTML(tab,b.lvl)}<div class="lp-prog">${barHTML(xp,table)}<span class="lp-nxt">${b.max?'Fully lit · '+xp+' Lamplight':`${b.into} / ${b.span} to level ${b.lvl+1}: <b>${nx.label}</b>`}</span></div></div>
   ${pend?`<button class="tb-btn pri sm lp-claim" id="ledgerclaim" onclick="openLampPick('${tab}',null);W.S.from='ledger';W.S.tab='${tab}'">Choose unlock${pend>1?' ('+pend+')':''}</button>`:''}</div>`;
  let tiles='';
- if(!climb){const ids=(ACT1_CARDS[tab]||[]).filter(id=>CARDS[id]).sort((a,c)=>'scur'.indexOf(CARDS[a].r)-'scur'.indexOf(CARDS[c].r)||CARDS[a].n.localeCompare(CARDS[c].n));
+ if(!climb){const ids=(ACT1_CARDS[tab]||[]).filter(id=>CARDS[id]&&!CARDS[id].stub).sort((a,c)=>'scur'.indexOf(CARDS[a].r)-'scur'.indexOf(CARDS[c].r)||CARDS[a].n.localeCompare(CARDS[c].n));
   tiles=ids.map((id,i)=>{const d=CARDS[id];if(!lock.cards[id])return `<div class="lp-cardwrap">${cardHTML({id,uid:-700-i,up:false},{})}</div>`;
    const lv=firstLevel(tab,'card',id,CARDS);return lockTile(d.r,TYPE_N[d.t],on.has(id)?'On offer: choose it now':`A lantern waits. Lamp ${lv}+`,on.has(id)?d.n:null)}).join('');
   const R=LOCK_CLASS_RELICS[tab];tiles+=[R.shop,R.rare].map(id=>lock.relics[id]?lockItem('relic',id,on.has(id)?'On offer: choose it now':`A lantern waits. Lamp ${firstLevel(tab,'relic',id,CARDS)}`,on.has(id)):itemTile('relic',id)).join('')}

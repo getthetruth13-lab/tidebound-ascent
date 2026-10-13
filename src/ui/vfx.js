@@ -118,9 +118,10 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
  const src=[...app.querySelectorAll('*')],dst=[...o.querySelectorAll('*')],scr=[];
  // v0.6.2: ids are stripped from the clone, so #app/#relicbar/... rules stop matching and the top bar re-laid out (potions/relics jumped up,
  // bar looked gone) on the first faded frame. Freeze the top bar subtree with its live computed styles so it stays pixel-identical.
- const frozen=new Set(app.querySelectorAll('.topbar,.topbar *'));
+ // morning: same for the combat controls styled by id (orb, hero plate, piles, End): without this they flew to the top-left / lost their size for the first second of the victory scene.
+ const frozen=new Set(app.querySelectorAll('.topbar,.topbar *,'+['dais','hplate','orb','hpability','hplogbtn','flourishbtn','drawpile','exhpile','discpile','endbtn'].map(i=>`#${i},#${i} *`).join(',')));
  if(src.length===dst.length)for(let i=0;i<src.length;i++){const a=src[i],b=dst[i];
-  if(frozen.has(a)){const cs=getComputedStyle(a);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+';'}b.style.cssText=t+'transition:none;animation:none;pointer-events:none'}
+  if(frozen.has(a)){const cs=getComputedStyle(a);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}b.style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important'}
   if(a.scrollTop||a.scrollLeft)scr.push([b,a.scrollTop,a.scrollLeft]);
   if(getComputedStyle(a).position==='sticky'){const r=a.getBoundingClientRect();const cs=getComputedStyle(a),ph=document.createElement('div');ph.setAttribute('aria-hidden','true');ph.style.cssText=`height:${r.height}px;margin:${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft};flex:none;visibility:hidden`;b.before(ph); // v0.6.2: a spacer keeps the bar's room so the screen under it does not jump up
    Object.assign(b.style,{position:'fixed',top:r.top+'px',left:r.left+'px',width:r.width+'px',height:r.height+'px',margin:'0',zIndex:'5'})} // sticky top bar: the clone does not scroll, so pin it where it was on screen

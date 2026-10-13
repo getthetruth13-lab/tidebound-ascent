@@ -58,6 +58,8 @@ const bandOf=(act,f)=>ENV.bands.find(b=>b.act===act&&f>=b.floors[0]&&f<=b.floors
 const bandEnv=(act,f)=>{const b=bandOf(act,f);return b?b.env:'a1_shore'};
 const allL=()=>document.querySelectorAll('#env .envL,#env-front .envL');
 let forced=null;
+// B061: the reward tiles sit on the battle scene itself (hero + remains), so its background keeps the battle look with only a light dim
+const victoryView=S=>!!(S&&S.screen==='reward'&&S.scene&&S.cardsOpen==null&&S.swap==null);
 export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=W.run;
  if(!run||s==='title')return {id:'a1_shore',grade:'title',dim:.55};
  if(s==='travel')return {id:'tr_start',grade:'normal',dim:.15};
@@ -66,6 +68,7 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
  if(s==='combat'&&W.cb){if(!W.cb.envKey){const boss=W.cb.ens.find(e=>e.boss);
    W.cb.envKey=W.cb.kind==='boss'&&boss?{id:ENV.bossLair[boss.key]||bandEnv(act,15),grade:'boss'}:{id:bandEnv(act,floor),grade:W.cb.kind==='elite'?'elite':'normal'}}
   return last=W.cb.envKey}
+ if(victoryView(W.S)&&last)return last; // the very same background as the fight; the reward scene dims itself
  if(s==='event'||s==='reward'||s==='pick'||s==='msg'||s==='potpick')return {...(last||{id:bandEnv(act,floor),grade:'normal'}),dim:.55};
  if(s==='end')return {...(last||{id:bandEnv(act,floor)}),grade:'boss',dim:.5};
  const room={event:'event',shop:'shop',rest:'rest',chest:'treasure'}[s];
@@ -74,8 +77,8 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
 // Called after every render(): touches the DOM only when the key changes.
 export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&W.S.view||'');if(scr!==lastScr){lastScr=scr;quiet(500);if(adaptive!=='full'&&lastP75<=panelMs()*1.25)govTo(adaptive==='off'?'reduced':'full')} // next screen: one step back up if the last stretch ran smooth
  startLoop();const k=envKeyFor();const sig=`${k.id}|${k.band||''}|${k.grade}|${k.dim||0}|${quality()}`;anchor();
- overlayOpen=!!document.querySelector('#app .ov');document.body.classList.toggle('env-combat',!!(W.S&&W.S.screen==='combat'));
- document.body.classList.toggle('scene-choice',['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks');
+ overlayOpen=!!document.querySelector('#app .ov');document.body.classList.toggle('env-combat',!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))));
+ document.body.classList.toggle('scene-choice',!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'));
  if(sig===cur)return;const prev=cur;cur=sig;
  const e0=ENV.envs[k.id]||ENV.envs.a1_shore||{};const e=k.id==='map_a1'?mapEnv(e0,k.band):e0;const g=ENV.grades[k.grade]||{tint_add:0,vig_add:0};
  const changedEnv=root.dataset.env!==k.id;

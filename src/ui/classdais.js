@@ -4,6 +4,7 @@
 // data-info popup (hover / tap / long-press). All motion is CSS; the objects are SVG / CSS stand-ins until painted pieces exist
 // (art/v2/ui/icons.json 'dais' ids dais-tide / dais-echo / dais-carto / dais-duel draw over the stand-in with no code change).
 // Drag previews: showMeterPreview(result) paints gold dashed "ghosts" of where the dragged card will leave the meter.
+import {canDecamp} from '../engine/combat.js';
 import {CARDS} from '../core/registry.js';
 import {W} from '../core/state.js';
 import {cname,desc} from '../engine/cards.js';
@@ -75,7 +76,7 @@ function echo(cb){const cap=CORE.echo.bonus_cap;
   const tip=ci?`${cname(ci)} Echoes at end of turn${pv?': about '+pv.total+(pv.kind==='dmg'?' damage':' Guard'):''}. +1 per card played after, max +${cap}.`
    :idx===1?'Tap to Mark your next card. It Echoes at end of turn.':'Mark a second card.';
   const tag=markable&&idx===(cb.mark?2:1)?'button':'div';const first=idx===1;
-  const a=`<${tag} class="bellbtn${ci?' ring':' empty'}${cb.armMark&&markable&&tag==='button'?' arm':''}" ${tag==='button'?`${first?'id="markbtn"':'id="markbtn2"'} onclick="armMark()"`:''} data-idx="${idx}" data-info="${esc(tip+`${cb.armMark?' Armed.':''} No Mark: last card Echoes at ${CORE.echo.unmarked_fallback*100}%.`)}">
+  const a=`<${tag} class="bellbtn${ci?' ring':' empty'}${cb.armMark&&markable&&tag==='button'?' arm':''}" ${tag==='button'?`${first?'id="markbtn"':'id="markbtn2"'} onclick="armMark()"`:''} data-idx="${idx}" data-info="${esc(tip+`${cb.armMark?' Armed.':''} First Attack and Skill are Marked; tap to move one.`)}">
    <span class="rings">${rings(ci?markBonus(after):0)}</span>${BELL}</${tag}>`;
   const ch=ci?`<div class="charm" data-info="${esc(tip)}">${mini(ci)}<b>${cname(ci)}</b></div><div class="ptot">${pv?`${pv.kind==='dmg'?'⚔':'🛡'} ${pv.n}${rep}${pl.mult>1?' ×2':''}`:''}<em class="pvt"></em></div>`:'';
   return `<div class="bellcol${ci?' marked':''}">${a}<b class="echo-read">${ci&&pv?pv.total:0}</b><span class="meter-label">${ci?'End turn Echo':cb.armMark&&tag==='button'?'Armed: next card':tag==='button'?'Marks next card':'Echo'}</span>${ch}</div>`};
@@ -92,7 +93,7 @@ function carto(cb){const pk=cb.mode&&cb.mode.k==='slot',lim=mod('advances',{},1)
   if(!w){s+=`<div class="wp empty" style="--wi:${i}" data-i="${i}" data-info="Empty Waypoint slot."><i class="pinn"></i><span class="wpn">Unmarked</span></div>`;continue}
   const r=w.rank||0,adv=canAdv&&r<CORE.carto.rank_max,land=r>=CORE.carto.rank_max;
   const tip='Rank '+r+' / '+CORE.carto.rank_max+'. '+cname(w)+': '+plain(desc(w))+(adv?' — tap to Advance (+1 Rank; damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':'');
-  s+=`<button class="wp full${pk?' pick':''}${adv?' adv':''}${land?' land':''}${anim(w.trigT,T(900))?' trig':''}" style="--wi:${i};${anim(w.trigT,T(900))||''}" data-i="${i}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" data-info="${esc(tip)}">${CAIRN(r)}<span class="wpn cref" data-card="${w.id}">${cname(w)}</span><span class="map-rank">${r}</span><span class="map-act">${pk?'Replace':''}</span><span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span></button>`}
+  s+=`<button class="wp full${pk?' pick':''}${adv?' adv':''}${land?' land':''}${anim(w.trigT,T(900))?' trig':''}" style="--wi:${i};${anim(w.trigT,T(900))||''}" data-i="${i}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" data-info="${esc(tip)}">${CAIRN(r)}<span class="wpn cref" data-card="${w.id}">${cname(w)}</span><span class="map-rank">${r}</span><span class="map-act">${pk?'Replace':''}</span><span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span></button>${!pk&&canDecamp()?`<button class="tbtn decamp" data-decamp="${i}" onclick="decampWp(${i})" data-info="${esc('Decamp '+cname(w)+': it leaves and fires its Decamp line. Once a turn.')}">⛺</button>`:''}`}
  const nd=mod('drawCount',{},4);const nx=cb.draw.slice(0,3).map((ci,i)=>`<span class="nx cref ${i<nd?'next':''}" data-card="${ci.id}">${cname(ci)}</span>`).join('')||'<span class="muted">reshuffle</span>';
  const left=Math.max(0,lim-cb.advUsed);const hint=`${left} Advance${left===1?'':'s'} left`;
  return frame('carto','Chart',`<div class="chart" data-slots="${cb.nslots}" data-info="${esc(`Advances left: ${left}. Tap a Waypoint for +1 Rank.`)}"><svg class="map-ink" viewBox="0 0 672 312" aria-hidden="true"><path pathLength="1" d="M217 138 Q275 145 332 141 T453 139"/></svg><i class="stub"></i><svg class="rope" viewBox="0 0 20 100" preserveAspectRatio="none" aria-hidden="true"><path d="M10 2C2 14 18 22 10 34S2 54 10 66 18 86 10 98"/></svg><div class="wps">${s}</div></div>
@@ -103,7 +104,7 @@ function duel(cb){const D=CORE.duel,max=mod('momMax',{},D.mom_max),fmin=flourish
  for(let i=max-1;i>=0;i--)n+=`<i class="${i<cb.mom?'on':''}${i+1===fmin?' mark':''}"></i>`;
  const can=cb.mom>=fmin&&!cb.busy,mult=flourishMult(cb.mom),fr=Math.max(0,cb.mom-D.decay);
  const st=cb.armFlourish?'armed':cb.mom>=fmin?'hot':cb.mom>0?'lit':'cold';
- const tip=`Momentum ${cb.mom}/${max}. Flourish at ${fmin}+ for ×${mult}${cb.armFlourish?' (armed)':''}. Parry ${cb.parry}.`;
+ const tip=`Momentum ${cb.mom}/${max}. Flourish at ${fmin}+ for ×${mult}${cb.armFlourish?' (armed)':''}. Parry ${cb.parry+Object.values(cb.parries||{}).reduce((a,b)=>a+b,0)}.`;
  return frame('duel','Rapier',`<div class="rap" style="--m:${cb.mom};--mx:${max};--fr:${fr}">
   <button class="wick st-${st}${cb.armFlourish?' on':''}" id="flourishbtn" ${can?'':'disabled'} onclick="armFlourish()" data-info="${esc(tip)}">${FLAME}</button><i class="wick-pv"></i>
   <b class="rap-x${can?' can':''}">${cb.armFlourish?'×'+mult:''}</b><em class="rap-pvn pvt"></em>
@@ -143,17 +144,18 @@ export function daisHTML(){const cb=W.cb,c=W.run.cls;let value=0,tip='',actions=
   if(cb.banks)actions+=btn('relbank','','',cb.busy,'releaseBank()',`Release ${cb.banks} Banked Crests.`,`×${cb.banks}`);
  }else if(c==='echo'){
   const plan=echoPlan(true),pv=plan&&echoPreview(plan);value=pv?.total||0;
-  tip=`Echo: ${value} at end of turn. No Mark: last card Echoes at ${CORE.echo.unmarked_fallback*100}%.${cb.armMark?' Armed.':''}`;
+  tip=`Echo: ${value} at end of turn. First Attack and Skill are Marked; tap to move one.${cb.armMark?' Armed.':''}`;
   if(canMark())actions+=btn(cb.mark?'markbtn2':'markbtn','',cb.armMark,false,'armMark()',tip,cb.armMark?'✓':'+');
  }else if(c==='duel'){
   value=cb.mom;const D=CORE.duel,max=mod('momMax',{},D.mom_max),mult=flourishMult(cb.mom);
-  tip=`Momentum ${cb.mom}/${max}. Flourish at ${flourishMin()}+ for ×${mult}${cb.armFlourish?' (armed)':''}. Parry ${cb.parry}.`;
+  tip=`Momentum ${cb.mom}/${max}. Flourish at ${flourishMin()}+ for ×${mult}${cb.armFlourish?' (armed)':''}. Parry ${cb.parry+Object.values(cb.parries||{}).reduce((a,b)=>a+b,0)}.`;
   actions+=btn('flourishbtn','',cb.armFlourish,cb.mom<flourishMin()||cb.busy,'armFlourish()',tip,cb.armFlourish?'×'+mult:'×');
  }else if(c==='carto'){
   const pk=cb.mode?.k==='slot',lim=mod('advances',{},1),canAdv=!pk&&cb.advUsed<lim&&!cb.busy&&!cb.mode;
   value=cb.slots.reduce((n,w)=>n+(w?.rank||0),0);
   tip=`Advances left: ${Math.max(0,lim-cb.advUsed)}. Tap a Waypoint for +1 Rank.`;
   actions=cb.slots.map((w,i)=>w?`<button class="tbtn" data-slot="${i}" data-info="${esc(cname(w)+': '+plain(desc(w))+'. Rank '+(w.rank||0))}" onclick="${pk?`modeAct('slot',${i})`:canAdv&&(w.rank||0)<CORE.carto.rank_max?`advance(${i})`:''}">${w.rank||0}</button>`:'').join('');
+  if(canDecamp())actions+=cb.slots.map((w,i)=>w?`<button class="tbtn decamp" data-decamp="${i}" onclick="decampWp(${i})" data-info="${esc('Decamp '+cname(w)+': it leaves and fires its Decamp line. Once a turn.')}">⛺</button>`:'').join('');
  }
  return `<aside class="dais compact-meter dais-${c}" id="dais" data-cls="${c}" aria-label="${c} mechanic"><span data-info="${esc(tip)}" tabindex="0">${value}</span>${actions}</aside>`;
 }

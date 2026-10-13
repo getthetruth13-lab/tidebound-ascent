@@ -51,7 +51,7 @@ const STATUS={
  barbs:T('Barbs','buff','Barbs X','Lasts all combat.'),
  ward:T('Rebuff','buff','Rebuff X','Drops 1 per debuff blocked.'),
  mending:T('Mending','buff','Mending X','Lasts all combat.'),
- parry:T('Parry','buff',null,'The first enemy hit next turn loses X damage. Reflects half.'),
+ parry:T('Parry','buff',null,'Its next hit loses X damage. Half is reflected.'),
  mightTmp:T('Temporary Might','buff',null,'Ends after its next turn.'),
  rooted:T('Rooted','buff',null,'Lasts all combat.'),
  // State that lives outside st (cb.*, queued effects, Powers, armed relics): badges built by playerStates().
@@ -121,6 +121,7 @@ export function statusText(k,v,who,extraText){const d=STATUS[k];if(!d)return '';
 const plain=t=>String(t||'').replace(/<[^>]+>/g,'').replace(/\{([^|}]*)\|([^}]*)\}/g,'$1');
 // Listener ids registered through thisTurn()/forCombat() (cards and potions) with the rule shown on their badge.
 export const LISTENER_INFO={
+ countedbreaths:['Counted Breaths','Your next Flourish this turn needs 1 less Momentum.'],
  coastward:['Coastal Ward','Whenever a Tideturn happens this turn, gain Guard.'],
  ovation:['Standing Ovation','Your next Attacks this turn are free Flourishes.'],
  bleededge:['Red Edge','Your next Attack this turn also applies Bleed.'],
@@ -141,10 +142,10 @@ export const LISTENER_INFO={
  waystation:['Waystation','At the start of your next turn, Advance another random Waypoint.'],
  resvial:['Resonance Vial','Your Echo happens extra times this turn.'],
  abyssaloil:['Abyssal Oil','Gain 1 Energy at the start of each of your next turns.']};
-const INTERNAL_LISTENERS=new Set(['afterPlay']); // plumbing that finishes a card's own text, not a separate effect
+const INTERNAL_LISTENERS=new Set(['afterPlay','chartClamp']); // plumbing that finishes a card's own text, not a separate effect
 // Everything the player has pending or armed that is NOT in cb.p.st: [{k,v,n?,t?}] (k = STATUS key; n / t override name / rule text).
 export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
- const add=(k,v,n,t)=>{if(v)out.push({k,v,n,t})};
+ const add=(k,v,n,t,ico)=>{if(v)out.push({k,v,n,t,ico})};
  if(cb.keepMom)add('keepMom',1);
  add('nextDraw',cb.nextDraw||0);
  let ne=cb.pendingE||0,nm=0;for(const q of cb.nextTurnQ||[]){const m=q&&q.meta;if(m){ne+=m.energy||0;nm+=m.mom||0}}
@@ -158,22 +159,27 @@ export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
  if(W.run.cls==='echo'&&cb.extraMarks)add('armed',cb.extraMarks,'Second Mark','You may Mark a second card this turn.');
  for(const p of cb.powers||[]){const d=CARDS[p.id];if(d)add('power',p.n||1,d.n,plain(d.d))}
  for(const l of cb.fx||[]){if(l.dead||!l.id||INTERNAL_LISTENERS.has(l.id))continue;const i=LISTENER_INFO[l.id];add('queued',1,i?i[0]:l.id,i?i[1]:'A card or potion effect is waiting to happen.')}
- for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.ready&&d.ready(r))add('armed',1,d.n,d.d?plain(d.d):'Ready.')}
+ for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.ready&&d.ready(r))add('armed',1,d.n,d.d?plain(d.d):'Ready.',assetSrc('relics',r.id))} // clovis/hud: the relic's own painted icon, not the vector up-arrow
  return out}
 export function statusRowHTML(st,extra,who='p',limit=6){const p=[],all=[];
- const entry=(k,v,name,kind,txt,x)=>{const nm=name+(v<0?' (negative)':'');
+ const entry=(k,v,name,kind,txt,x,ico)=>{const nm=name+(v<0?' (negative)':'');
   all.push({nm:name+(Math.abs(v)>1||x==null?' '+Math.abs(v):''),kind,html:txt});
-  p.push(`<span class="bd st-${k} ${kind}" tabindex="0" role="button" aria-label="${esc(name)} ${v}" data-kw="${esc(name)}" data-skind="${kind}" data-sinfo="${esc(txt)}" data-sname="${esc(nm)}">${iconOf(k)}<b>${x==null?Math.abs(v):(v>1?v:'')}</b></span>`)};
+  p.push(`<span class="bd st-${k} ${kind}" tabindex="0" role="button" aria-label="${esc(name)} ${v}" data-kw="${esc(name)}" data-skind="${kind}" data-sinfo="${esc(txt)}" data-sname="${esc(nm)}">${ico?`<span class="status-art relic-ready"><img class="uic" src="${ico}" alt="" draggable="false"></span>`:iconOf(k)}<b>${x==null?Math.abs(v):(v>1?v:'')}</b></span>`)};
  for(const k of ORDER){let v=st&&st[k];if(!v||!STATUS[k])continue;const d=STATUS[k];
   const bad=d.kind==='debuff'||((k==='str'||k==='dex'||k==='mightTmp')&&v<0);
   entry(k,v,d.n,bad?'debuff':'buff',statusText(k,v,who))}
  for(const x of extra||[]){const d=STATUS[x.k];if(!d)continue;
-  entry(x.k,x.v,x.n||d.n,d.kind==='debuff'?'debuff':'buff',statusText(x.k,x.v,'p',x.t),1)}
+  entry(x.k,x.v,x.n||d.n,d.kind==='debuff'?'debuff':'buff',statusText(x.k,x.v,'p',x.t),1,x.ico)}
  // One row: beyond MAXB icons the rest fold into a "+N" chip whose tooltip lists every hidden status with its numbers and duration.
  const MAXB=Math.max(1,limit);if(p.length>MAXB){const hid=all.slice(MAXB-1);
   const list=hid.map(h=>`<span class="sx lst"><b class="${h.kind}">${esc(h.nm)}</b> ${h.html.replace(/<span class="sx">[^]*?<\/span>/,'').replace(/<span class="sx[^"]*">/g,'<span class="li">')}</span>`).join('');
   p.splice(MAXB-1,p.length,`<span class="bd st-more" tabindex="0" role="button" aria-label="${hid.length} more statuses" data-kw="More" data-skind="more" data-sname="${hid.length} more statuses" data-sinfo="${esc(list)}"><span class="status-art more-chip">+${hid.length}</span></span>`)}
  return `<div class="badges">${p.join('')}</div>`}
 // HP bar: bronze frame, blood fill, a ghost chunk for damage, a pale steel overlay while Guard is up, and the Guard shield on its left end.
-export function barHTML(h,m,blk,sh,who){const pc=Math.max(0,Math.min(1,h/m)),low=pc<=.3;
- return `<div class="hpbar${blk?' blk':''}${low?' low':''}"${who!=null?` data-who="${who}" data-hp="${Math.max(0,h)}" data-max="${m}" data-blk="${blk||0}"`:''}><span class="hpin"><i class="gh" style="transform:scaleX(${pc})"></i><i style="transform:scaleX(${pc})"></i><em class="steel"></em></span><span class="hpnum">${Math.max(0,h)}<small>/${m}</small></span>${blk?`<span class="hpblk${sh?' shim':''}" ${sh?`style="${sh}"`:''} tabindex="0" role="button" aria-label="Guard ${blk}" data-kw="Guard" data-skind="buff" data-sinfo="${esc(`<span class="sx">Guard soaks up damage before your HP.</span><span class="sx now">Absorbs the next ${blk} damage.</span><span class="sx dur">Cleared at the start of its owner's next turn, unless an effect keeps it.</span>`)}"><span class="guard-art">${GUARD_SVG}${assetSrc('status','block')?`<img class="uic" src="${assetSrc('status','block')}" alt="" draggable="false" onerror="this.remove()">`:''}</span><b>${blk}</b></span>`:''}</div>`}
+// Painted bar tier (clovis/hud): the hero's class, or normal / elite / boss for enemies (art/v2/hud/<tier>-rail etc.).
+export function barTier(who){if(who==='p')return W.run?.cls||'normal';const e=typeof who==='string'&&W.cb?W.cb.ens.find(x=>'e'+x.uid===who):null;return e?(e.boss?'boss':e.elite?'elite':'normal'):'normal'}
+const HUD='art/v2/hud/';
+const barDeco=(t,blk,nm)=>{const hero=!/^(normal|elite|boss)$/.test(t);
+ return `<span class="pb-rail" aria-hidden="true"></span>${hero?`<img class="pb-cap" src="${HUD}${t}-cap.webp" alt="" draggable="false" aria-hidden="true">`:''}${t==='boss'&&nm?`<span class="pb-plate" aria-hidden="true"><b>${esc(nm)}</b></span>`:''}${t==='elite'?`<img class="pb-horn l" src="${HUD}elite-horn.webp" alt="" aria-hidden="true"><img class="pb-horn r" src="${HUD}elite-horn.webp" alt="" aria-hidden="true"><img class="pb-skull" src="${HUD}elite-skull.webp" alt="" aria-hidden="true">`:''}${blk?'':`<img class="pb-circ" src="${HUD}${t}-endcap-circle.png" alt="" aria-hidden="true">`}`};
+export function barHTML(h,m,blk,sh,who,tier){const pc=Math.max(0,Math.min(1,h/m)),low=pc<=.3;const t=tier||(who!=null?barTier(who):'normal');
+ return `<div class="hpbar pb pb-${t}${blk?' blk':''}${low?' low':''}"${who!=null?` data-who="${who}" data-hp="${Math.max(0,h)}" data-max="${m}" data-blk="${blk||0}"`:''}><span class="hpin"><i class="gh" style="transform:scaleX(${pc})"></i><i style="transform:scaleX(${pc})"></i><em class="steel"></em></span><span class="hpnum">${Math.max(0,h)}<small>/${m}</small></span>${blk?`<span class="hpblk${sh?' shim':''}" ${sh?`style="${sh}"`:''} tabindex="0" role="button" aria-label="Guard ${blk}" data-kw="Guard" data-skind="buff" data-sinfo="${esc(`<span class="sx">Guard soaks up damage before your HP.</span><span class="sx now">Absorbs the next ${blk} damage.</span><span class="sx dur">Cleared at the start of its owner's next turn, unless an effect keeps it.</span>`)}"><span class="guard-art">${GUARD_SVG}<img class="uic pb-shield" src="${HUD}${t}-shield@2x.png" alt="" draggable="false" onerror="this.remove()"></span><b>${blk}</b></span>`:''}${barDeco(t,blk,t==='boss'?W.cb?.ens.find(x=>'e'+x.uid===who)?.n:'')}</div>`}

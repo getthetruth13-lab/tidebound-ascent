@@ -6,7 +6,7 @@
 import {registerRelic,RELICS,CARDS} from '../core/registry.js';
 import {W,pick} from '../core/state.js';
 import {DATA} from './generated/data-v2.js';
-import {addCard,addSt,alive,choose,dmgEnemy,drawCards,flash,gainBlock,gainEnergy,gainMom,heal,log,callout,curTgt} from '../engine/combat.js';
+import {addCard,addSt,alive,choose,dmgEnemy,drawCards,flash,gainBlock,gainEnergy,bonusEnergy,gainMom,heal,log,callout,curTgt} from '../engine/combat.js';
 import {gainGold,gainCurse,openPick,pickPotions,gainMaxHp,addPotionSlot,revealRows} from '../engine/run.js';
 const TIER={Starter:'s',Common:'c',Uncommon:'u',Rare:'r',Boss:'b',Shop:'shop',Event:'e'};
 export const RELIC_ICON={moonshell:'🐚',tuningfork:'🎐',sextant:'🧭',glove:'🧤',barnaclecharm:'🦪',kelpwrap:'🌿',coral:'🪸',whaletooth:'🦷',biscuit:'🍪',oysterpurse:'👛',starfish:'⭐',bandolier:'🎽',foghorn:'📯',galleypot:'🍲',
@@ -18,7 +18,7 @@ export const RELIC_ICON={moonshell:'🐚',tuningfork:'🎐',sextant:'🧭',glove
 const B={
  // ---- starters ----
  moonshell:{ready:r=>W.run.cls==='tide'&&!!r.c&&!r.c.e,on:{combatStart(r){r.c={};if(W.run.cls!=='tide')return;W.cb.startQ.push(()=>choose('🐚 Moon Shell: choose the starting Tide',[3,5,7].map(v=>({l:(v>5?'🌕 ':v<5?'🌑 ':'🌗 ')+'Tide '+v,tile:v>5?'choice-tide-high':v<5?'choice-tide-low':'choice-tide-mid',sum:v>5?'Start near High Tide.':v<5?'Start near Low Tide.':'Start balanced.',f:()=>{W.cb.tide=v;log('🐚 Moon Shell: the Tide starts at '+v)}}))))},
-  crest(r){if(!r.c.e){r.c.e=1;gainEnergy(1);flash(r);log('🐚 Moon Shell: +1 Energy')}},undertow(r){if(!r.c.e){r.c.e=1;gainEnergy(1);flash(r);log('🐚 Moon Shell: +1 Energy')}}}},
+  crest(r){if(!r.c.e){r.c.e=1;bonusEnergy(1,'tide');flash(r);log('🐚 Moon Shell: +1 Energy')}},undertow(r){if(!r.c.e){r.c.e=1;gainEnergy(1);flash(r);log('🐚 Moon Shell: +1 Energy')}}}},
  tuningfork:{ready:r=>!!r.c&&!r.c.used,on:{combatStart(r){r.c={};W.cb.nextDraw+=1},echo(r){if(r.c&&!r.c.ward){r.c.ward=1;gainBlock(4);flash(r)}}},mod:{echoPlan(r,ctx,p){if(ctx.slot===2||r.c&&r.c.used||p.mult>1)return p;if(!ctx.preview){r.c.used=1;flash(r)}return {...p,mult:2,fork:1}}}},
  sextant:{}, // engine: startCombat offers the choice of 3 starting Waypoints (upgraded, Rank 1)
  glove:{ready:r=>!!r.c&&!r.c.used,on:{combatStart(r){r.c={}},parry(r){if(r.c.used)return;r.c.used=1;flash(r);{const q=()=>{gainMom(2);log('🧤 Dueling Glove: +2 Momentum')};q.meta={mom:2};W.cb.nextTurnQ.push(q)}}}},

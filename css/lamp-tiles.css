@@ -1,0 +1,12 @@
+/* Task 57B: Lamplight unlock picks as large illustrated tiles (3 across, each >= 240 CSS px wide). Hold / hover opens full info via kwtip. */
+#lamppick .lp-offer:not(.final){margin:0 -34px;padding:0;gap:6px;justify-content:center;overflow:visible}
+#lamppick .lp-offer:not(.final)>.lp-pick,#lamppick .lp-offer:not(.final)>.tile.sp{width:240px;flex:none;box-sizing:border-box}
+#lamppick .lp-offer:not(.final)>.tile.sp{--th:calc(100cqh - 4px);height:var(--th)}
+#lamppick .lp-pick{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:100%;padding:0;border:0;border-radius:14px;cursor:default;color:inherit;font:inherit;
+ background:radial-gradient(ellipse at 50% 42%,#d9b46a2e,#d9b46a0d 55%,transparent 78%),linear-gradient(#0d1016aa,#0a0d12cc);box-shadow:inset 0 0 0 1px #d9b46a40,inset 0 0 22px #000a}
+#lamppick .lp-pick.live{cursor:pointer}
+#lamppick .lp-pick.live:hover,#lamppick .lp-pick.live:focus-visible{box-shadow:inset 0 0 0 1px #d9b46acc,0 0 16px #d9b46a66;outline:0}
+#lamppick .lp-pick .lp-cardwrap{display:block;pointer-events:none}
+#lamppick .lp-pick .tcap{pointer-events:none}
+#lamppick .lp-offer.got:not(.final)>.lp-pick{--gw:min(150px,calc((100cqh - 28px)*5/7))}
+#lamppick .lp-offer.final>.lp-pick{width:150px;flex:none}#lamppick .lp-offer.final .tcap{font-size:10px;letter-spacing:0}

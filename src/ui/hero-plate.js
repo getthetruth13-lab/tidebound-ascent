@@ -6,20 +6,23 @@ import {W} from '../core/state.js';
 import {heroHook} from './herohooks.js';
 import {observeEvents} from '../core/bus.js';
 import {statusInfo} from './combatant.js';
+import {orbHTML,ORB_TITLE,playableCount} from './hud-panel.js';
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 // A rim arc on a pathLength=100 circle, starting at the top and running clockwise: segment [a,b] in percent.
-const seg=(a,b,cls)=>b>a?`<circle class="${cls}" cx="50" cy="50" r="44" pathLength="100" stroke-dasharray="${(b-a).toFixed(2)} ${(100-(b-a)).toFixed(2)}" stroke-dashoffset="${(-a).toFixed(2)}"/>`:'';
+// (HP rim removed in clovis/hud.)
+const _seg=(a,b,cls)=>b>a?`<circle class="${cls}" cx="50" cy="50" r="44" pathLength="100" stroke-dasharray="${(b-a).toFixed(2)} ${(100-(b-a)).toFixed(2)}" stroke-dashoffset="${(-a).toFixed(2)}"/>`:'';
 export function heroPlateHTML({incoming=0}={}){const cb=W.cb,run=W.run;if(!cb||!run)return '';
  syncHitLog();
- const cls=run.cls,hp=Math.max(0,run.hp),max=Math.max(1,run.max);const pct=Math.min(100,hp/max*100);
- const hit=Math.max(0,Math.min(hp,incoming-(cb.p.block||0)));const after=Math.max(0,(hp-hit)/max*100);
+ // clovis/hud (Spencer 10-12): health is NOT shown here. It lives only on the painted bar under the hero sprite.
+ // The plate is now the painted class orb: the ring is the class ability meter, the glass shows the Energy number.
+ const cls=run.cls,hp=Math.max(0,run.hp);
+ const hit=Math.max(0,Math.min(hp,incoming-(cb.p.block||0)));
  const ab=(heroHook(cls).ability||(()=>null))(cb)||{html:'',info:''};
  const extra=heroHook(cls).info?heroHook(cls).info(cb):'';
- const info=`Health ${hp}/${max}.${hit>0?` Next enemy turn: about ${hit} damage gets through if nothing changes.`:''} Energy ${cb.energy}/${cb.maxE}. ${ab.info||''} ${extra}`.replace(/\s+/g,' ').trim();
- return `<div class="hplate hp-${cls}${hit>=hp&&hp>0?' lethal':''}" id="hplate" data-info="${esc(info)}" data-sname="Hero plate" role="group" aria-label="Health, ability and Energy">
- <svg class="hp-rim" viewBox="0 0 100 100" aria-hidden="true"><circle class="hp-track" cx="50" cy="50" r="44" pathLength="100"/>${seg(0,pct,'hp-fill')}${seg(after,pct,'hp-notch')}</svg>
- <div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy. Cards cost the number in their corner. Refills each turn."><span>${cb.energy}</span></div>
- <div class="hp-ability" id="hpability" data-info="${esc(info)}">${ab.html||''}</div>
+ const info=`Energy ${cb.energy}. ${ab.info||''} ${extra}`.replace(/\s+/g,' ').trim();
+ return `<div class="hplate hp-${cls} hud-b${hit>=hp&&hp>0?' lethal':''}" id="hplate" data-sname="Hero plate" data-incoming="${hit}"${!cb.busy&&!cb.mode&&!playableCount(cb)?' data-done=""':''} role="group" aria-label="Energy and ${esc(ORB_TITLE[cls]||'ability')}">
+ ${orbHTML(cb,cls)}
+ <div class="hp-ability" id="hpability" hidden data-info="${esc(info)}"></div>
  <button class="hp-logbtn" id="hplogbtn" type="button" aria-label="Combat log" data-info="Combat log: every hit, block and status of this fight." onclick="toggleHitLog()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h11a2 2 0 012 2v13a3 3 0 01-3 3H8a3 3 0 01-3-3V5a2 2 0 011-2zm3 5h7M9 12h7M9 16h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
  ${logOpen?hitLogHTML():''}</div>`}
 

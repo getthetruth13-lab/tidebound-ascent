@@ -8,7 +8,7 @@ import {settings} from '../save.js';
 import {CARDS} from '../core/registry.js';
 import {observeEvents} from '../core/bus.js';
 import {playSound,duckMusic} from '../audio.js';
-import {deathStyleOf,DEATH_STYLES,BOSS_VARIANT,FINALE} from './deathstyles.js';
+import {deathStyleOf,DEATH_STYLES,BOSS_VARIANT,FINALE,DEATH_DRAIN} from './deathstyles.js';
 import {alive} from '../engine/combat.js';
 import {T,U,EB,HIT_WEIGHT} from '../core/timing.js';
 import {cardHTML} from './render.js';
@@ -45,7 +45,7 @@ function ghost(selector,kind,opts={}){const source=selector&&$(selector);if(!sou
  const fig=source.querySelector('.fig'),r=(fig||source).getBoundingClientRect();
  const el=document.createElement('div');el.className=opts.bare?kind:`action-ghost ${kind}`;el.setAttribute('aria-hidden','true');
  Object.assign(el.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
- if(fig){el.appendChild(fig.cloneNode(true));el.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));el.querySelectorAll('.fig').forEach(n=>{n.className='fig';n.style.animation='none'})}
+ if(fig){el.appendChild(fig.cloneNode(true));el.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));el.querySelectorAll('.fig').forEach(n=>{n.className='fig';n.style.animation='none'});el.querySelectorAll('img').forEach(i=>{i.decoding='sync';i.loading='eager'})}
  document.body.appendChild(el);const ms=opts.life||T(580);el.addEventListener('animationend',e=>{if(e.target===el&&!opts.keep)el.remove()});setTimeout(()=>el.remove(),ms);
  return {el,r}}
 function effect(selector,kind,col){const source=selector&&$(selector);if(!source)return;
@@ -80,9 +80,21 @@ const PUFF={
 function deathFade(e){const sel=enemy(e),el=sel&&$(sel);if(!el)return;const g=ghost(sel,'death-fade',{life:T(500),keep:true,bare:true});if(!g)return;
  el.classList.add('gone');const done=()=>g.el.remove();
  if(!g.el.animate)return done();g.el.animate([{opacity:1},{opacity:0}],{duration:T(350),easing:'ease-out',fill:'forwards'}).finished.then(done,done)}
+const lead0=(lead,drain)=>(lead-drain)/T(1);
+// The dying foe's name plate + health bar: a body-level copy whose bar drains smoothly to zero at the impact, then fades as the figure collapses
+function drainBar(el,start,drain,TT){if(!el.animate)return;
+ const wrap=document.createElement('div');wrap.className='combat victory-wrap ghostwrap';wrap.setAttribute('aria-hidden','true');wrap.innerHTML='<div class="scene"><div class="foes"></div></div>';
+ const c=el.cloneNode(true);c.removeAttribute('id');c.removeAttribute('onclick');c.className=c.className.replace(/\bgone\b/,'')+' plate-only';c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));c.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
+ wrap.querySelector('.foes').appendChild(c);wrap.style.zIndex=34;document.body.appendChild(wrap);
+ const gone=()=>wrap.remove();setTimeout(gone,TT+400);
+ const fills=[...c.querySelectorAll('.hpin>i')],num=c.querySelector('.hpnum'),from=+((c.querySelector('.hpbar')||{}).dataset||{}).hp||0;
+ fills.forEach((f,i)=>{const cur=f.style.transform||'scaleX(1)';f.style.transformOrigin='0 50%';f.animate([{transform:cur},{transform:'scaleX(0)'}],{duration:drain||1,delay:start+(i===0?Math.round(drain*.25):0),easing:'ease-in',fill:'both'})});
+ if(num&&from>0&&drain){const t0=performance.now()+start,tick=()=>{if(!wrap.isConnected)return;const k=Math.max(0,Math.min(1,(performance.now()-t0)/drain));num.firstChild.textContent=Math.round(from*(1-k));if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
+ wrap.animate([{opacity:1},{opacity:1,offset:Math.min(.98,(start+drain+T(120))/TT)},{opacity:0}],{duration:TT,easing:'linear',fill:'forwards'}).finished.then(gone,gone)}
 function death(e,lead){const sel=enemy(e);const el=sel&&$(sel);if(!el)return;
  const style=deathStyleOf(e),def=DEATH_STYLES[style],boss=style==='boss',variant=boss?(BOSS_VARIANT[e.key]||'water'):style;
- lead=T(lead);const D=T(def.ms),TT=lead+D;
+ const drain=motionOn()?T(DEATH_DRAIN):0;lead=T(lead)+drain;const D=T(def.ms),TT=lead+D; // the bar drains first (drainBar), the collapse starts after it
+ drainBar(el,T(lead0(lead,drain)),drain,TT);
  const g=ghost(sel,'death-sink',{life:TT+240,keep:true});if(!g)return;
  el.classList.add('gone');
  const last=alive().length===0;
@@ -92,10 +104,11 @@ function death(e,lead){const sel=enemy(e);const el=sel&&$(sel);if(!el)return;
  let frames;
  const flash=(b,s)=>({filter:`brightness(${b})`,opacity:1,transform:`scale(${s})`});
  if(style==='dissolve')frames=[F(0,{...calm,transform:'none'}),F(L,{...calm,transform:'none'}),F(L+.0001,flash(2.4,1.05)),F(o(.1),flash(1.3,1.02),'ease-in'),
+  F(o(.17),{filter:'brightness(1.2)',opacity:1,transform:'translateX(-5%) rotate(-3deg)'}),F(o(.25),{filter:'brightness(1.1)',opacity:1,transform:'translateX(4%) rotate(2deg)'}),F(o(.32),{filter:'brightness(1)',opacity:1,transform:'translateX(-2%) rotate(-1deg) scale(1.02)'}), // stagger before the collapse
   F(o(.42),{filter:'brightness(.7) saturate(.5)',opacity:.95,transform:'translateY(10%) scale(1.05,.7)'},'ease-in'),
   F(1,{filter:'brightness(.35) saturate(.3) blur(4px)',opacity:0,transform:'translateY(26%) scale(1.25,.12)'})];
  else if(style==='sink')frames=[F(0,{...calm,transform:'none',translate:'0 0',rotate:'0deg'}),F(L,{...calm,transform:'none',translate:'0 0',rotate:'0deg'}),F(L+.0001,{...flash(1.9,1.04),translate:'0 0',rotate:'0deg'}),
-  F(o(.12),{filter:'brightness(1.1)',opacity:1,transform:'none',translate:'0 0',rotate:'-5deg'},'ease-in'),
+  F(o(.06),{filter:'brightness(1.2)',opacity:1,transform:'none',translate:'-3% 0',rotate:'-4deg'}),F(o(.12),{filter:'brightness(1.1)',opacity:1,transform:'none',translate:'2% 0',rotate:'3deg'}),F(o(.18),{filter:'brightness(1.1)',opacity:1,transform:'none',translate:'-1% 0',rotate:'-6deg'},'ease-in'), // stagger, then topple
   F(o(.4),{filter:'brightness(.85)',opacity:1,transform:'none',translate:'4% 0',rotate:'84deg'},'ease-out'),
   F(o(.52),{filter:'brightness(.85)',opacity:1,transform:'none',translate:'4% 0',rotate:'80deg'},'ease-in'),
   F(1,{filter:'brightness(.4) saturate(.5) hue-rotate(-14deg)',opacity:0,transform:'none',translate:'10% 55%',rotate:'88deg'})];
@@ -144,6 +157,7 @@ function runFinale({boss,kind,name,hero}){if(!finaleOn||document.hidden)return;f
  const end=Math.max(T(400),finalEnd-performance.now()),life=end+T(450);
  const anim=(el,frames,o)=>{if(!el.animate)return;const a=el.animate(frames,{fill:'both',...o});a.finished.then(()=>{},()=>{});return a};
  vignette('gold',.4,Math.min(700,FINALE.total));
+ const dim=part('finale-dim');anim(dim,[{opacity:0},{opacity:.55,offset:.3},{opacity:.55,offset:.9},{opacity:.55}],{duration:Math.max(T(700),end+T(300)),easing:'ease-out'}); // the background dims a little; the reward scene picks the same dim up
  const sweep=part('finale-sweep');anim(sweep,[{transform:'translateX(-60%) skewX(-18deg)',opacity:0},{opacity:1,offset:.3},{transform:'translateX(160%) skewX(-18deg)',opacity:0}],{duration:T(FINALE.sweep),easing:'ease-in-out'});
  if(hero){const r=hero.r,x=r.left+r.width/2,y=r.top+r.height*.45;
   const glow=part('finale-glow');Object.assign(glow.style,{left:x+'px',top:y+'px',width:r.height*1.7+'px',height:r.height*1.7+'px'});
@@ -151,7 +165,7 @@ function runFinale({boss,kind,name,hero}){if(!finaleOn||document.hidden)return;f
   hero.el.style.opacity='';anim(hero.el,[{opacity:0,filter:'brightness(1)',transform:'none'},{opacity:1,filter:'brightness(1.7) drop-shadow(0 0 10px #f1c85a)',transform:'translateY(-5px) scale(1.04)',offset:.3},{opacity:1,filter:'brightness(1.25) drop-shadow(0 0 6px #f1c85a)',transform:'translateY(-3px) scale(1.02)'}],{duration:Math.max(T(600),end*.8),easing:'ease-out'});
   emit('flare',x,y,COL.gold,18);emit('heal',x,y+r.height*.4,r.width);ring(x,y,COL.gold,r.height*1.6,600);ring(x,y,COL.salt,r.height,420)}
  setTimeout(()=>{if(!finaleOn)return;const b=part('finale-banner',`<b>Victory</b>${kind==='boss'||kind==='elite'?`<small>${name} is silenced</small>`:''}`);
-  anim(b,[{opacity:0,transform:'translate(-50%,-50%) scale(.82)',letterSpacing:'14px'},{opacity:1,transform:'translate(-50%,-50%) scale(1)',letterSpacing:'6px',offset:.28},{opacity:1,transform:'translate(-50%,-50%) scale(1.03)',offset:.78},{opacity:0,transform:'translate(-50%,-50%) scale(1.06)'}],{duration:Math.max(T(500),end-T(boss?160:200)+T(120))})},T(boss?160:200));
+  anim(b,[{opacity:0,transform:'translate(-50%,-28%) scale(.82)',letterSpacing:'14px'},{opacity:1,transform:'translate(-50%,-50%) scale(1)',letterSpacing:'6px',offset:.3},{opacity:1,transform:'translate(-50%,-52%) scale(1.03)',offset:.84},{opacity:0,transform:'translate(-50%,-62%) scale(1.06)'}],{duration:Math.max(T(500),end-T(boss?160:200)+T(120))})},T(boss?160:200));
  setTimeout(()=>{if(finaleOn)finaleCleanup()},life+T(300))}
 export const deathHold=()=>Math.max(0,finalEnd-performance.now());
 // Combo beats are presentation only: never delay input or combat resolution.
@@ -376,9 +390,34 @@ function flipReveal(delay){const ws=$$('.rewgrid .rcw');ws.forEach((w,i)=>{const
   const beam=document.createElement('div');beam.className='rarebeam';beam.style.left=r.x+'px';beam.style.top=r.y+'px';document.body.appendChild(beam);
   beam.animate([{opacity:.95,transform:'scale(.3)'},{opacity:0,transform:'scale(2.6)'}],{duration:U(620),easing:'ease-out'}).finished.then(()=>beam.remove(),()=>beam.remove());
   setTimeout(()=>card.classList.remove('foiling'),U(900))})})}
+// B061 reward tiles: each one flies from the fallen foes to its usual spot, one after another (design ms, see ANIMATION-TIMINGS.md)
+const TILE_FLY={ms:760,gap:640,lift:20};
+function flyInTiles(hold){const tiles=$$('.rewtiles .tile');if(!tiles.length)return;
+ const rem=$$('.victory-wrap .remains').map(rectOf),ox=rem.length?rem.reduce((a,r)=>a+r.x,0)/rem.length:innerWidth*.72,oy=rem.length?rem.reduce((a,r)=>a+r.y,0)/rem.length:innerHeight*.55;
+ const ban=$('.reward-banner');ban&&ban.animate&&ban.animate([{opacity:0,translate:'0 10px'},{opacity:1,translate:'0 0'}],{duration:U(520),delay:U(hold),easing:'ease-out',fill:'backwards'});
+ const sub=$('#pksub');sub&&sub.animate&&sub.animate([{opacity:0},{opacity:1}],{duration:U(500),delay:U(hold+TILE_FLY.gap),easing:'ease-out',fill:'backwards'});
+ tiles.forEach((el,i)=>{if(!el.animate)return;const r=rectOf(el),dx=ox-r.x,dy=oy-r.y,t0=hold+260+i*TILE_FLY.gap;
+  el.animate([{translate:`${dx}px ${dy}px`,scale:'.25',rotate:`${i%2?9:-9}deg`,opacity:0},{translate:`${dx*.35}px ${dy*.35-TILE_FLY.lift*3}px`,scale:'.7',rotate:`${i%2?-4:4}deg`,opacity:1,offset:.45},
+   {translate:`0 -${TILE_FLY.lift}px`,scale:'1.07',rotate:'0deg',opacity:1,offset:.82},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],{duration:U(TILE_FLY.ms),delay:U(t0),easing:'cubic-bezier(.3,.7,.35,1)',fill:'backwards'});
+  laterU(t0+TILE_FLY.ms*.8,()=>{playSound('flip');ring(r.x,r.y,COL.gold,r.w?Math.min(r.w,160):90,380)})})}
+// Proceed: the hero turns toward the path and walks off to the right in a step-and-bob, the tiles and prompt fade; then the map (design ms)
+export const HERO_WALK={turn:260,walk:2300,steps:7,bob:7};
+let walking=false;
+function heroWalkOff(done){const hero=$('.victory-wrap .hero');if(!hero||!hero.animate||walking)return false;walking=true;
+ const r=hero.getBoundingClientRect(),fig=hero.querySelector('.fig'),dist=innerWidth-r.left+40,W0=U(HERO_WALK.turn),W1=U(HERO_WALK.walk),tot=W0+W1;
+ $$('.rewtiles .tile,#pksub,.reward-banner,.bossvic,.pk-foot').forEach(el=>el.animate&&el.animate([{opacity:1},{opacity:0}],{duration:U(420),easing:'ease-in',fill:'forwards'}));
+ hero.querySelector('.plate')?.animate([{opacity:1},{opacity:0}],{duration:U(300),fill:'forwards'});
+ const k=W0/tot;
+ hero.animate([{translate:'0 0',scale:'1',offset:0},{translate:'0 0',scale:'.8 1',offset:k*.5},{translate:'0 0',scale:'1',offset:k},{translate:`${dist}px 0`,scale:'1',offset:1}],{duration:tot,easing:'linear',fill:'forwards'}).finished.then(()=>{walking=false;done()},()=>{walking=false;done()});
+ // the walk's x-motion eases in on its own layer (the bob is on .fig so the two never fight over one property)
+ if(fig&&fig.animate){const b=[{translate:'0 0',rotate:'0deg',offset:0},{translate:'0 0',rotate:'0deg',offset:k}];
+  for(let i=0;i<HERO_WALK.steps*2;i++)b.push({translate:`0 ${i%2?0:-HERO_WALK.bob}px`,rotate:`${i%2?0:(i%4?-1.6:1.6)}deg`,offset:k+(1-k)*(i+1)/(HERO_WALK.steps*2),easing:'ease-in-out'});
+  fig.animate(b,{duration:tot,fill:'forwards'})}
+ return true}
 function syncScreens(){if(!motionOn())return;const S=W.S,s=S.screen;
  const key=(s==='reward'?'r'+(S.cardsOpen!=null?'c'+S.cardsOpen:S.swap!=null?'s':'rows'):s==='chest'?'x'+(S.opened?'o':'c'):(s==='title'&&S.view==='lamp'&&S.got)?'lamp':'');
  if(!key||(revealed===S&&revealKey===key))return;revealed=S;revealKey=key;const hold=holdReal();
+ if(key==='rrows'&&S.scene){if(!S.flown){S.flown=true;flyInTiles(hold)}return} // B061: victory view, tiles fly in one at a time (only the first time; coming back from the card pick shows them at rest)
  if(key==='rrows')reveal('.reward-banner',[0,-8,'.82'],420,0,hold);
  if(key==='rrows'||key==='xo'){reveal('.rewtiles .tile',[0,26,'.9'],340,95,hold+40);
   if(key==='xo'){const c=$('.chestwrap');if(c){const r=rectOf(c);laterU(hold+10,()=>{emit('burst',r.x,r.y,COL.gold,22);ring(r.x,r.y,COL.gold,140,520);vignette('gold',.4,520)});
@@ -395,7 +434,12 @@ addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.clos
    const trail=()=>{if(!g.isConnected)return;const q=g.getBoundingClientRect();emit('trail',q.left+q.width/2,q.top+q.height/2,COL.gold);raf=requestAnimationFrame(trail)};raf=requestAnimationFrame(trail);
    const end=()=>{cancelAnimationFrame(raf);g.remove();ring(b.x,b.y,COL.gold,54,360);emit('burst',b.x,b.y,COL.gold,10);deck.animate([{transform:'scale(1)'},{transform:'scale(1.3)',offset:.4},{transform:'scale(1)'}],{duration:U(320)})};
    g.animate([{transform:'none',opacity:1},{transform:`translate(${dx*.3}px,${dy*.3-30}px) scale(.8) rotate(-6deg)`,opacity:1,offset:.4},{transform:`translate(${dx}px,${dy}px) scale(.18)`,opacity:.6}],{duration:U(520),easing:'cubic-bezier(.4,0,.5,1)'}).finished.then(end,end)}return}
+ const go=t.closest('#proceed,#leaveyes');
+ if(go&&W.S.screen==='reward'&&W.S.scene&&W.S.cardsOpen==null&&W.S.swap==null&&/rewDone/.test(go.getAttribute('onclick')||'')&&!walking){
+  const ov=$('#app .ov');if(ov)ov.style.display='none';
+  if(heroWalkOff(()=>window.rewDone())){ev.stopImmediatePropagation();ev.preventDefault();return}}
  const tile=t.closest('.rewtiles .tile:not(.done)');
+ if(tile&&tile.closest('.pk-rewards.vic')&&!tile.classList.contains('k-cards'))rewardGhost(tile);
  if(tile){const k=tile.classList.contains('k-gold')?'gold':tile.classList.contains('k-potion')?'potion':tile.classList.contains('k-relic')?'relic':'';
   const art=tile.querySelector('.tart')||tile;
   if(k==='gold'){const dst=$('.topbar .stat.gold');if(dst){const from=W.run.gold;const html=tile.querySelector('.tart').innerHTML;flyIcon(art,dst,{html,col:COL.gold});
@@ -414,6 +458,11 @@ addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.clos
   m.animate([{transform:'translate(-50%,-50%) translate(0,0)'},{transform:`translate(-50%,-50%) translate(${dx*.5}px,${dy*.5-8}px)`,offset:.5},{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px)`}],{duration:U(480),easing:'ease-in-out'}).finished.then(end,end);
   holdFor(U(480))}
 },true);
+// A collected reward's frame lifts away (its art flies to the HUD separately); the live slot is hidden by CSS so the other tiles stay put
+function rewardGhost(tile){const r=tile.getBoundingClientRect(),g=tile.cloneNode(true);g.removeAttribute('onclick');g.removeAttribute('id');g.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));g.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
+ g.classList.add('reward-ghost');g.setAttribute('aria-hidden','true');Object.assign(g.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
+ const art=g.querySelector('.tart');if(art)art.style.visibility='hidden';document.body.appendChild(g);
+ const rm=()=>g.remove();if(!g.animate)return rm();g.animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateY(-26px) scale(.86)'}],{duration:U(460),easing:'ease-in'}).finished.then(rm,rm)}
 function countUp(sel,from,to){if(from===to)return;const t0=performance.now(),dur=U(420);const tick=()=>{const el=$(sel);if(!el)return;const k=Math.min(1,(performance.now()-t0)/dur);const v=Math.round(from+(to-from)*k);
  const tn=[...el.childNodes].reverse().find(n=>n.nodeType===3);if(tn)tn.textContent=' '+v;if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
 // ---------- screen change: old screen lingers and fades (called by render()) ----------

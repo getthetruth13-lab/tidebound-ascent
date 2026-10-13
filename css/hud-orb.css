@@ -1,0 +1,117 @@
+/* Painted class energy orb (clovis/hud, HERO-HUD-BRIEF 6, 9.1, 10b, 11). Layout B: the ring is the class ability meter, the glass shows Energy.
+   Health is not shown here (Spencer 10-12). Every effect is transform/opacity only; Reduce Motion keeps glows, drops motion. */
+.hplate.hud-b::before{display:none}
+.hplate.hud-b .hp-ability{display:none}
+.combat .hplate.hud-b #orb.horb{--sz:calc(250*var(--hud-unit,1px));width:var(--sz);height:var(--sz);left:50%;top:50%;translate:-50% -50%;background:none!important;border:0;box-shadow:none;border-radius:50%;padding:0;font-size:0;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;overflow:visible;z-index:2}
+#orb.horb::before,#orb.horb::after{display:none}
+#orb.horb>img,#orb.horb>i{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}
+#orb.horb .ho-art{filter:drop-shadow(0 calc(3*var(--hud-unit,1px)) calc(6*var(--hud-unit,1px)) #000)}
+#orb.horb .ho-glow{border-radius:50%;inset:auto;left:calc(50% - var(--sr)/2);top:calc(50% - var(--sr)/2);width:var(--sr);height:var(--sr);background:radial-gradient(circle,rgb(var(--c)) 0,rgba(var(--c),.7) 35%,rgba(var(--c),0) 72%);mix-blend-mode:screen;opacity:calc(.35 + .6*var(--ef))}
+#orb.horb.empty .ho-glow{background:radial-gradient(circle,#6e6e73 0,#6e6e7300 70%);opacity:.3}
+#orb.horb .ho-ring{background:radial-gradient(circle,rgba(var(--c),.35) 38%,rgb(var(--c)) 47%,rgba(255,255,255,.85) 50%,rgb(var(--c)) 53%,rgba(var(--c),.45) 60%);-webkit-mask:var(--ring) center/100% 100% no-repeat,conic-gradient(#000 var(--lit),transparent 0);-webkit-mask-composite:source-in;mask:var(--ring) center/100% 100% no-repeat,conic-gradient(#000 var(--lit),transparent 0);mask-composite:intersect;opacity:.88;filter:drop-shadow(0 0 2px rgba(var(--c),.9))}
+#orb.horb .ho-ringpv{background:rgba(var(--c),.6);-webkit-mask:var(--ring) center/100% 100% no-repeat,conic-gradient(transparent var(--lit),#000 var(--lit) var(--ghost,0deg),transparent 0);-webkit-mask-composite:source-in;mask:var(--ring) center/100% 100% no-repeat,conic-gradient(transparent var(--lit),#000 var(--lit) var(--ghost,0deg),transparent 0);mask-composite:intersect;opacity:0}
+#orb.horb.ghost .ho-ringpv{animation:hoghost 1.4s ease-in-out infinite}@keyframes hoghost{0%,100%{opacity:.4}50%{opacity:.75}}
+#orb.horb>span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;font:800 calc(54*var(--hud-unit,1px))/1 var(--font-number);color:#fbf3e2;-webkit-text-stroke:calc(2.2*var(--hud-unit,1px)) #120c08;paint-order:stroke fill;text-shadow:0 calc(2*var(--hud-unit,1px)) calc(4*var(--hud-unit,1px)) #000;pointer-events:none}
+#orb.horb.empty>span{color:#a9a9ae}
+/* ready (manual heroes): slow hero-colour pulse on ring and rim + a chevron under the orb */
+#orb.horb .ho-chev{inset:auto;left:50%;bottom:calc(-6*var(--hud-unit,1px));width:calc(22*var(--hud-unit,1px));height:calc(12*var(--hud-unit,1px));translate:-50% 0;background:rgb(var(--c));clip-path:polygon(0 0,100% 0,50% 100%);opacity:0;filter:drop-shadow(0 0 3px rgb(var(--c)))}
+#orb.horb.ready .ho-chev{opacity:.95;animation:hochev 1.6s ease-in-out infinite}@keyframes hochev{50%{transform:translateY(calc(3*var(--hud-unit,1px)))}}
+#orb.horb.ready .ho-art{animation:horeadyglow 1.6s ease-in-out infinite}@keyframes horeadyglow{0%,100%{filter:drop-shadow(0 0 calc(4*var(--hud-unit,1px)) rgba(var(--c),.6)) drop-shadow(0 3px 6px #000)}50%{filter:drop-shadow(0 0 calc(14*var(--hud-unit,1px)) rgba(var(--c),1)) drop-shadow(0 3px 6px #000)}}
+#orb.horb.ready .ho-ring{animation:horing 1.6s ease-in-out infinite}@keyframes horing{0%,100%{opacity:.65}50%{opacity:1}}
+#orb.horb.armed .ho-ring{opacity:1;filter:brightness(1.5)}#orb.horb.armed .ho-chev{transform:scaleY(-1);animation:none;opacity:1}
+#orb.horb.armed .ho-art{filter:drop-shadow(0 0 calc(16*var(--hud-unit,1px)) rgb(var(--c))) drop-shadow(0 3px 6px #000)}
+#orb.horb.manual:not(.ready):not(.armed) .ho-ring{opacity:.55}
+/* anticipation: one step from a trigger */
+#orb.horb.strain .ho-glow{animation:hostrain .9s ease-in-out infinite}@keyframes hostrain{50%{transform:scale(1.08);opacity:1}}
+#orb.horb.strain .ho-art{animation:hotremble .9s ease-in-out infinite}@keyframes hotremble{25%{transform:translateX(calc(.8*var(--hud-unit,1px)))}75%{transform:translateX(calc(-.8*var(--hud-unit,1px)))}}
+#orb.horb.ready.strain .ho-art{animation:horeadyglow 1.6s ease-in-out infinite,hotremble .9s ease-in-out infinite}
+/* event effects (300-500 ms small; 1 s trigger). Good = rises, bright; bad = sinks, grey. */
+#orb.horb.fx-spend .ho-glow{animation:hospend .35s ease-out var(--d-spend,0ms) both}@keyframes hospend{0%{transform:scale(1.15);filter:brightness(1.6)}100%{transform:scale(1)}}
+#orb.horb.fx-spend>span{animation:hodip .35s ease-out var(--d-spend,0ms) both}@keyframes hodip{0%{transform:translateY(calc(4*var(--hud-unit,1px))) scale(.9)}100%{transform:none}}
+#orb.horb.fx-refill .ho-glow,#orb.horb.fx-gain .ho-glow{animation:horefill .4s ease-out var(--d-refill,var(--d-gain,0ms)) both}@keyframes horefill{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
+#orb.horb.fx-refill>span,#orb.horb.fx-gain>span{animation:hopop .4s cubic-bezier(.2,1.6,.4,1) var(--d-refill,var(--d-gain,0ms)) both}@keyframes hopop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+#orb.horb.fx-segup .ho-ring{animation:hoseg .35s ease-out var(--d-segup,0ms) both}@keyframes hoseg{0%{filter:brightness(2.4);opacity:1}100%{filter:brightness(1.1)}}
+#orb.horb.fx-segdn .ho-ring{animation:hosegdn .35s ease-in var(--d-segdn,0ms) both}@keyframes hosegdn{0%{filter:grayscale(1) brightness(.6)}100%{filter:none}}
+#orb.horb.fx-fizzle{animation:hofizz .3s linear var(--d-fizzle,0ms) both}@keyframes hofizz{20%{transform:translateX(calc(-3*var(--hud-unit,1px)))}40%{transform:translateX(calc(3*var(--hud-unit,1px)))}60%{transform:translateX(calc(-2*var(--hud-unit,1px)))}}
+#orb.horb.fx-fizzle .ho-art{filter:grayscale(.8) brightness(.7)}
+#orb.horb.fx-fire .ho-glow{animation:hofire 1s ease-out var(--d-fire,0ms) both}@keyframes hofire{0%{transform:scale(1);opacity:1}30%{transform:scale(1.9);opacity:1}100%{transform:scale(1);opacity:calc(.35 + .6*var(--ef))}}
+#orb.horb.fx-readyIn .ho-art{animation:horeadyin .5s ease-out var(--d-readyIn,0ms) both}@keyframes horeadyin{0%{transform:scale(1.08)}100%{transform:none}}
+#orb.horb.maxed .ho-ring{filter:brightness(1.4) drop-shadow(0 0 4px rgb(var(--c)))}
+/* first-time hint float-up */
+#orb.horb .ho-hint{position:absolute;left:94%;top:40%;white-space:nowrap;z-index:6;padding:calc(8*var(--hud-unit,1px)) calc(18*var(--hud-unit,1px));border-style:solid;border-color:transparent;border-width:calc(60px*.07);border-image:var(--frame-slim) 200 220 fill/calc(200px*.07) calc(220px*.07)/0 round;font:700 calc(24*var(--hud-unit,1px))/1 var(--font-display,serif);letter-spacing:.06em;color:#f3d48a;text-shadow:0 -1px 0 #fff3c4aa,0 1px 0 #3a2410,0 2px 2px #000,0 0 6px rgba(var(--c),.6);pointer-events:none;animation:hohint 2.6s ease-out var(--d-hint,0ms) both}
+@keyframes hohint{0%{opacity:0;transform:translateY(8px)}12%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+/* Cartographer armed: Waypoint chips fan out above the orb */
+#orb.horb .ho-chips{position:absolute;left:30%;bottom:92%;display:flex;gap:calc(8*var(--hud-unit,1px));z-index:7;pointer-events:auto}
+.ho-chip{min-width:48px;min-height:44px;padding:calc(6*var(--hud-unit,1px)) calc(12*var(--hud-unit,1px));border-style:solid;border-width:calc(150px*.06);border-image:var(--frame-slim) 200 220 fill/calc(200px*.06) calc(220px*.06)/0 round;background:none;color:#f0e6cc;font:700 calc(24*var(--hud-unit,1px))/1.1 var(--font-display,serif);text-shadow:0 1px 2px #000;display:flex;flex-direction:column;align-items:center;animation:hochip .3s ease-out both}
+.ho-chip small{font:600 calc(19*var(--hud-unit,1px))/1 var(--font-number);color:rgb(255,200,110)}.ho-chip[disabled]{opacity:.5}
+@keyframes hochip{0%{opacity:0;transform:translateY(10px) scale(.9)}100%{opacity:1;transform:none}}
+.reduce-motion #orb.horb *,.reduce-motion #orb.horb{animation-duration:0s!important;animation-iteration-count:1!important}
+@media(prefers-reduced-motion:reduce){#orb.horb *,#orb.horb{animation-duration:0s!important;animation-iteration-count:1!important}}
+/* the compact class readout over the orb is replaced by the ring + tap (v0.6.2.1 known issue); the Tide gauge stays */
+.combat:has(.hplate.hud-b.hp-echo,.hplate.hud-b.hp-carto,.hplate.hud-b.hp-duel) .dais.compact-meter{display:none}
+/* lethal warning: the hero's painted bar throbs red */
+.combat:has(.hplate.lethal) .hero .hpbar.pb{animation:pblethal 1s ease-in-out infinite}@keyframes pblethal{50%{filter:drop-shadow(0 0 5px #ff2a1a) drop-shadow(0 0 2px #ff2a1a)}}
+#orb.horb.ho-tide{--c:80,230,215;--sr:36.13%;--ring:url(../art/v2/hud/ring-tide.png)}
+#orb.horb.ho-echo{--c:190,150,255;--sr:25.00%;--ring:url(../art/v2/hud/ring-echo.png)}
+#orb.horb.ho-carto{--c:255,200,110;--sr:40.04%;--ring:url(../art/v2/hud/ring-carto.png)}
+#orb.horb.ho-duel{--c:255,110,40;--sr:38.09%;--ring:url(../art/v2/hud/ring-duel.png)}
+/* Hold panel (brief 6.1, approved panel3): Imagine class plate + the game's frame-full9 9-slice + live text. Never over the hand. */
+#orbpanel.hpanel{position:fixed;z-index:60;--s:.085;width:min(380px,52vw);max-height:calc(100dvh - 8px);box-sizing:border-box;pointer-events:none;
+ border-style:solid;border-color:transparent;border-width:calc(150px*var(--s));border-image:var(--frame-full) 430 560 /calc(430px*var(--s)) calc(560px*var(--s))/0 round;
+ background:linear-gradient(#060a0d99,#060a0dcc),var(--plate) center/cover;background-clip:padding-box;filter:drop-shadow(0 6px 14px #000d);color:#f0e6cc;animation:hpnin .18s ease-out both}
+#orbpanel.hpanel::before{content:"";position:absolute;pointer-events:none;inset:calc(-150px*var(--s));background:var(--dia-full-top) top center/calc(300px*var(--s)) calc(150px*var(--s)) no-repeat,var(--dia-full-bot) bottom center/calc(300px*var(--s)) calc(150px*var(--s)) no-repeat}
+@keyframes hpnin{0%{opacity:0;transform:translateY(6px) scale(.97)}100%{opacity:1;transform:none}}
+#orbpanel .hpn-in{padding:4px 10px 6px;font:500 12px/1.25 var(--font-body,'Crimson Pro',serif);text-shadow:0 1px 2px #000,0 0 3px #000}
+#orbpanel .hpn-ptr{position:absolute;left:calc(-150px*var(--s) - 10px);top:var(--py,70%);width:12px;height:18px;margin-top:-9px;background:#2a2017;clip-path:polygon(100% 0,0 50%,100% 100%);filter:drop-shadow(0 0 1px #8a6434)}
+#orbpanel header{display:flex;gap:8px;align-items:center;margin-bottom:2px}#orbpanel header img{width:38px;height:38px;flex:none;filter:drop-shadow(0 1px 2px #000)}
+#orbpanel h3{margin:0;font:700 17px/1 var(--font-display,serif);letter-spacing:.06em;color:rgb(var(--c))}
+#orbpanel p{margin:1px 0 2px}#orbpanel p.b{font-weight:700}#orbpanel p.can{font-weight:700;color:#ffda8c;padding-left:14px;position:relative}
+#orbpanel p.can::before{content:"";position:absolute;left:1px;top:.35em;width:8px;height:8px;background:rgb(var(--c));transform:rotate(45deg);box-shadow:0 0 0 1px #000}
+#orbpanel h4{display:flex;align-items:center;gap:6px;margin:5px 0 2px;font:700 10px/1 var(--font-display,serif);letter-spacing:.12em;color:#d9b46a}
+#orbpanel h4::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#d9b46acc,transparent);box-shadow:0 1px 0 #000}
+#orbpanel .hpn-well{border:1px solid #8a6434;border-radius:6px;background:#04060899;box-shadow:inset 0 0 0 1px #000a;padding:6px 8px}
+.hpn-tidevis{--t:5;font-size:9px}.hpn-staff{position:relative;height:16px;border:2px solid #789682;border-radius:9px;background:#142226;margin:12px 6px 0}
+.hpn-water{position:absolute;left:0;top:0;bottom:0;width:calc(var(--t)*10%);border-radius:7px;background:linear-gradient(#5fe0d2,#1f8c8c)}
+.hpn-float{position:absolute;left:calc(var(--t)*10%);top:-11px;width:12px;height:10px;margin-left:-6px;background:#e1be6e;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.hpn-arrow{position:absolute;left:calc(var(--t)*10% + 8px);top:-10px;width:16px;height:8px;background:#ffe696;clip-path:polygon(0 35%,65% 35%,65% 0,100% 50%,65% 100%,65% 65%,0 65%)}.hpn-arrow.dn{transform:scaleX(-1);left:calc(var(--t)*10% - 24px)}
+.hpn-ticks{position:relative;height:13px;margin:0 6px}.hpn-ticks i{position:absolute;left:calc(var(--i)*10%);top:0;width:1px;height:4px;background:#aab4a0}.hpn-ticks b{position:absolute;top:4px;left:-6px;width:12px;text-align:center;font:700 9px/1 var(--font-number);color:#c8c0b2}.hpn-ticks i.on b{color:#fff}
+.hpn-ends{display:flex;justify-content:space-between;font:700 10px/1 var(--font-body,serif)}.hpn-ends .lo{color:#78aaff}.hpn-ends .hi{color:rgb(95,220,210)}
+.hpn-cards{display:flex;gap:6px;align-items:center;justify-content:center}
+.hpn-card{position:relative;width:96px;height:62px;border:2px solid #786c5a;border-radius:5px;overflow:hidden;background:#111}.hpn-card img{width:100%;height:100%;object-fit:cover;display:block}.hpn-noart{display:block;width:100%;height:100%;background:#2a241c}
+.hpn-card b{position:absolute;left:0;right:0;bottom:0;padding:1px 3px 9px;background:#0a0a0cd9;font:700 9px/1.1 var(--font-body,serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hpn-card em{position:absolute;right:2px;top:2px;padding:1px 3px;border-radius:3px;font:700 7px/1 var(--font-display,serif);font-style:normal;background:rgb(var(--c));color:#1e1432}.hpn-card em.gold{background:#f0c350;color:#28190a}
+.hpn-card.mk{border-color:rgb(var(--c))}.hpn-card.land{border-color:#f0c350;box-shadow:0 0 6px #f0c35088}.hpn-card.empty{display:flex;align-items:center;justify-content:center;border-style:dashed;color:#c8c0b2;font-size:10px;background:#0006}
+.hpn-rank{position:absolute;left:3px;bottom:2px;display:flex;gap:2px}.hpn-rank i{width:6px;height:6px;border-radius:50%;background:#46403a}.hpn-rank i.on{background:rgb(var(--c))}
+.hpn-pips{display:flex;gap:4px;margin-left:6px}.hpn-pips i{width:11px;height:11px;border-radius:50%;background:#3c3842;border:1px solid #c8bedc}.hpn-pips i.on{background:rgb(var(--c))}
+.hpn-flames{display:flex;gap:8px;align-items:center;justify-content:center}.hpn-flames i{position:relative;width:24px;height:24px;border-radius:50%;background:#28201c;border:2px solid #968c82}
+.hpn-flames i.on::before{content:"";position:absolute;inset:2px 4px 3px;background:radial-gradient(circle at 50% 70%,#ffeb96,#ff963c 55%,#ff963c00 70%);clip-path:polygon(50% 0,90% 55%,75% 100%,25% 100%,10% 55%)}
+.hpn-flames b{position:absolute;top:100%;left:0;right:0;text-align:center;font:700 8px/1.3 var(--font-number);color:#c8c0b2}.hpn-flames i.on b{color:#fff}
+.hpn-mult{margin-left:6px;padding:3px 8px;border:2px solid #ffbe6e;border-radius:6px;background:#6e1e18;font:800 15px/1 var(--font-number);color:#ffebbe}.hpn-mult.off{filter:grayscale(1);opacity:.55}
+.hpn-tide{--c:80,230,215}
+.hpn-echo{--c:190,150,255}
+.hpn-carto{--c:255,200,110}
+.hpn-duel{--c:255,110,40}
+.combat:has(.hplate.hud-b.hp-tide) .dais.compact-meter{bottom:31dvh}
+#orbpanel.hpanel.fit{transform:scale(var(--fit));animation:none}
+/* C3: End Turn pulses once you are out of plays (starts 600 ms after the last play) */
+.combat:has(.hplate[data-done]) #endbtn{animation:endpulse 1.2s ease-in-out .6s infinite}
+@keyframes endpulse{0%,100%{filter:drop-shadow(0 0 0 #ffd27000)}50%{filter:drop-shadow(0 0 8px #ffd270) brightness(1.12)}}
+/* C8: End Turn with Energy left and a playable card: the orb flashes amber twice */
+#orb.horb.fx-unspent .ho-glow{animation:hounspent .3s ease-in-out 2}@keyframes hounspent{50%{background:radial-gradient(circle,#ffc040 0,#ffc04000 72%);opacity:1;transform:scale(1.25)}}
+.reduce-motion .combat:has(.hplate[data-done]) #endbtn{animation:none;filter:drop-shadow(0 0 6px #ffd270)}
+/* C2 unaffordable */
+.hand .card.fx-noafford{animation:noafford .3s linear}@keyframes noafford{20%{translate:-4px 0}40%{translate:4px 0}60%{translate:-3px 0}80%{translate:2px 0}}
+.hand .card.fx-noafford .cost,.hand .card.fx-noafford [class*=cost]{box-shadow:0 0 0 2px #ff3a2a,0 0 8px #ff3a2a;border-radius:50%}
+#orb.horb.fx-poor .ho-glow{animation:hopoor .2s ease-in-out}@keyframes hopoor{50%{background:radial-gradient(circle,#ff3a2a 0,#ff3a2a00 72%);opacity:1}}
+/* C7 intent change */
+.intent.fx-ichange{animation:ichange .4s ease-out var(--d-ich,0ms) both}.intent.fx-idown{--ic:#7dff8a}.intent.fx-iup{--ic:#ff5a4a}
+@keyframes ichange{0%{transform:scale(1.35);filter:drop-shadow(0 0 6px var(--ic)) drop-shadow(0 2px 2px #000)}100%{transform:none}}
+.reduce-motion .hand .card.fx-noafford,.reduce-motion .intent.fx-ichange{animation:none}
+/* cause trails + payoff travel */
+.hud-streak{position:fixed;z-index:900;pointer-events:none;transform-origin:0 50%;border-radius:4px;background:linear-gradient(90deg,transparent,var(--c) 40%,#fff 90%,var(--c));box-shadow:0 0 6px var(--c)}
+.hud-streak.wave{border-radius:50%;filter:blur(.5px)}.hud-streak.slash{background:linear-gradient(90deg,transparent,var(--c) 30%,#fff7d0 95%)}
+.hud-burst{position:fixed;z-index:900;pointer-events:none;border-radius:50%;background:radial-gradient(circle,#fff 0,var(--c) 30%,transparent 70%)}
+.hud-burst.ring{background:none;border:3px solid var(--c);box-shadow:0 0 10px var(--c),inset 0 0 10px var(--c)}
+
+.hud-fxc{position:fixed;left:0;top:0;z-index:900;pointer-events:none}
+.hud-mark{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none}

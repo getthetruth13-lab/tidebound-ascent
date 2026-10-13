@@ -1494,5 +1494,649 @@
    768,
    576
   ]
+ },
+ "drawback": {
+  "art": "art/v2/cards/drawback.webp",
+  "thumb": "art/v2/cards/drawback-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hammer": {
+  "art": "art/v2/cards/hammer.webp",
+  "thumb": "art/v2/cards/hammer-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "coastward": {
+  "art": "art/v2/cards/coastward.webp",
+  "thumb": "art/v2/cards/coastward-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "readwater": {
+  "art": "art/v2/cards/readwater.webp",
+  "thumb": "art/v2/cards/readwater-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "floodgate": {
+  "art": "art/v2/cards/floodgate.webp",
+  "thumb": "art/v2/cards/floodgate-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "turnarrow": {
+  "art": "art/v2/cards/turnarrow.webp",
+  "thumb": "art/v2/cards/turnarrow-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "castadrift": {
+  "art": "art/v2/cards/castadrift.webp",
+  "thumb": "art/v2/cards/castadrift-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "salttears": {
+  "art": "art/v2/cards/salttears.webp",
+  "thumb": "art/v2/cards/salttears-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "pressure": {
+  "art": "art/v2/cards/pressure.webp",
+  "thumb": "art/v2/cards/pressure-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "heldbreath": {
+  "art": "art/v2/cards/heldbreath.webp",
+  "thumb": "art/v2/cards/heldbreath-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "springrush": {
+  "art": "art/v2/cards/springrush.webp",
+  "thumb": "art/v2/cards/springrush-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "wreckerstide": {
+  "art": "art/v2/cards/wreckerstide.webp",
+  "thumb": "art/v2/cards/wreckerstide-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "abyssalcalm": {
+  "art": "art/v2/cards/abyssalcalm.webp",
+  "thumb": "art/v2/cards/abyssalcalm-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lanternbelow": {
+  "art": "art/v2/cards/lanternbelow.webp",
+  "thumb": "art/v2/cards/lanternbelow-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sharp": {
+  "art": "art/v2/cards/sharp.webp",
+  "thumb": "art/v2/cards/sharp-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "flat": {
+  "art": "art/v2/cards/flat.webp",
+  "thumb": "art/v2/cards/flat-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lampglass": {
+  "art": "art/v2/cards/lampglass.webp",
+  "thumb": "art/v2/cards/lampglass-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hallrest": {
+  "art": "art/v2/cards/hallrest.webp",
+  "thumb": "art/v2/cards/hallrest-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "arpeggio": {
+  "art": "art/v2/cards/arpeggio.webp",
+  "thumb": "art/v2/cards/arpeggio-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lownote": {
+  "art": "art/v2/cards/lownote.webp",
+  "thumb": "art/v2/cards/lownote-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "discordant": {
+  "art": "art/v2/cards/discordant.webp",
+  "thumb": "art/v2/cards/discordant-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "retune": {
+  "art": "art/v2/cards/retune.webp",
+  "thumb": "art/v2/cards/retune-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tollingward": {
+  "art": "art/v2/cards/tollingward.webp",
+  "thumb": "art/v2/cards/tollingward-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "silence": {
+  "art": "art/v2/cards/silence.webp",
+  "thumb": "art/v2/cards/silence-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "salvagechime": {
+  "art": "art/v2/cards/salvagechime.webp",
+  "thumb": "art/v2/cards/salvagechime-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "recall": {
+  "art": "art/v2/cards/recall.webp",
+  "thumb": "art/v2/cards/recall-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "beatfreq": {
+  "art": "art/v2/cards/beatfreq.webp",
+  "thumb": "art/v2/cards/beatfreq-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "crackedclapper": {
+  "art": "art/v2/cards/crackedclapper.webp",
+  "thumb": "art/v2/cards/crackedclapper-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "fullbelfry": {
+  "art": "art/v2/cards/fullbelfry.webp",
+  "thumb": "art/v2/cards/fullbelfry-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "massedvoices": {
+  "art": "art/v2/cards/massedvoices.webp",
+  "thumb": "art/v2/cards/massedvoices-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "livingsong": {
+  "art": "art/v2/cards/livingsong.webp",
+  "thumb": "art/v2/cards/livingsong-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "eternal": {
+  "art": "art/v2/cards/eternal.webp",
+  "thumb": "art/v2/cards/eternal-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "forkroad": {
+  "art": "art/v2/cards/forkroad.webp",
+  "thumb": "art/v2/cards/forkroad-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "raisecairn": {
+  "art": "art/v2/cards/raisecairn.webp",
+  "thumb": "art/v2/cards/raisecairn-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "gtraverse": {
+  "art": "art/v2/cards/gtraverse.webp",
+  "thumb": "art/v2/cards/gtraverse-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "pilotseye": {
+  "art": "art/v2/cards/pilotseye.webp",
+  "thumb": "art/v2/cards/pilotseye-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "clearbrush": {
+  "art": "art/v2/cards/clearbrush.webp",
+  "thumb": "art/v2/cards/clearbrush-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "foreknow": {
+  "art": "art/v2/cards/foreknow.webp",
+  "thumb": "art/v2/cards/foreknow-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "burn": {
+  "art": "art/v2/cards/burn.webp",
+  "thumb": "art/v2/cards/burn-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "charge": {
+  "art": "art/v2/cards/charge.webp",
+  "thumb": "art/v2/cards/charge-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "millwheel": {
+  "art": "art/v2/cards/millwheel.webp",
+  "thumb": "art/v2/cards/millwheel-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "grand": {
+  "art": "art/v2/cards/grand.webp",
+  "thumb": "art/v2/cards/grand-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "patientroad": {
+  "art": "art/v2/cards/patientroad.webp",
+  "thumb": "art/v2/cards/patientroad-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rekindle": {
+  "art": "art/v2/cards/rekindle.webp",
+  "thumb": "art/v2/cards/rekindle-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "scorchmap": {
+  "art": "art/v2/cards/scorchmap.webp",
+  "thumb": "art/v2/cards/scorchmap-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lightfeet": {
+  "art": "art/v2/cards/lightfeet.webp",
+  "thumb": "art/v2/cards/lightfeet-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bloodletter": {
+  "art": "art/v2/cards/bloodletter.webp",
+  "thumb": "art/v2/cards/bloodletter-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "advance": {
+  "art": "art/v2/cards/advance.webp",
+  "thumb": "art/v2/cards/advance-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "bitteranswer": {
+  "art": "art/v2/cards/bitteranswer.webp",
+  "thumb": "art/v2/cards/bitteranswer-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "countedbreaths": {
+  "art": "art/v2/cards/countedbreaths.webp",
+  "thumb": "art/v2/cards/countedbreaths-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "disengage": {
+  "art": "art/v2/cards/disengage.webp",
+  "thumb": "art/v2/cards/disengage-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "spite": {
+  "art": "art/v2/cards/spite.webp",
+  "thumb": "art/v2/cards/spite-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "crimsonfl": {
+  "art": "art/v2/cards/crimsonfl.webp",
+  "thumb": "art/v2/cards/crimsonfl-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "rashflourish": {
+  "art": "art/v2/cards/rashflourish.webp",
+  "thumb": "art/v2/cards/rashflourish-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "mirrorguard": {
+  "art": "art/v2/cards/mirrorguard.webp",
+  "thumb": "art/v2/cards/mirrorguard-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "twinanswer": {
+  "art": "art/v2/cards/twinanswer.webp",
+  "thumb": "art/v2/cards/twinanswer-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "wallsteel": {
+  "art": "art/v2/cards/wallsteel.webp",
+  "thumb": "art/v2/cards/wallsteel-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "trimwick": {
+  "art": "art/v2/cards/trimwick.webp",
+  "thumb": "art/v2/cards/trimwick-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "duelsend": {
+  "art": "art/v2/cards/duelsend.webp",
+  "thumb": "art/v2/cards/duelsend-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "grudge": {
+  "art": "art/v2/cards/grudge.webp",
+  "thumb": "art/v2/cards/grudge-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "matador": {
+  "art": "art/v2/cards/matador.webp",
+  "thumb": "art/v2/cards/matador-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "ledgerleaf": {
+  "art": "art/v2/cards/ledgerleaf.webp",
+  "thumb": "art/v2/cards/ledgerleaf-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "sealingwax": {
+  "art": "art/v2/cards/sealingwax.webp",
+  "thumb": "art/v2/cards/sealingwax-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "driftnet": {
+  "art": "art/v2/cards/driftnet.webp",
+  "thumb": "art/v2/cards/driftnet-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "ferrycoin": {
+  "art": "art/v2/cards/ferrycoin.webp",
+  "thumb": "art/v2/cards/ferrycoin-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "ampoule": {
+  "art": "art/v2/cards/ampoule.webp",
+  "thumb": "art/v2/cards/ampoule-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "salvagehook": {
+  "art": "art/v2/cards/salvagehook.webp",
+  "thumb": "art/v2/cards/salvagehook-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "barnacledplate": {
+  "art": "art/v2/cards/barnacledplate.webp",
+  "thumb": "art/v2/cards/barnacledplate-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "watchwhistle": {
+  "art": "art/v2/cards/watchwhistle.webp",
+  "thumb": "art/v2/cards/watchwhistle-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "smokedglass": {
+  "art": "art/v2/cards/smokedglass.webp",
+  "thumb": "art/v2/cards/smokedglass-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "midden": {
+  "art": "art/v2/cards/midden.webp",
+  "thumb": "art/v2/cards/midden-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "manyfaced": {
+  "art": "art/v2/cards/manyfaced.webp",
+  "thumb": "art/v2/cards/manyfaced-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "tallystick": {
+  "art": "art/v2/cards/tallystick.webp",
+  "thumb": "art/v2/cards/tallystick-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "tollingcup": {
+  "art": "art/v2/cards/tollingcup.webp",
+  "thumb": "art/v2/cards/tollingcup-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "bastionbar": {
+  "art": "art/v2/cards/bastionbar.webp",
+  "thumb": "art/v2/cards/bastionbar-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "lifebuoy": {
+  "art": "art/v2/cards/lifebuoy.webp",
+  "thumb": "art/v2/cards/lifebuoy-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
+ },
+ "needle": {
+  "art": "art/v2/cards/needle.webp",
+  "thumb": "art/v2/cards/needle-256.webp",
+  "size": [
+   768,
+   576
+  ],
+  "ph": true
  }
 }
