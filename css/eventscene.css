@@ -1,6 +1,6 @@
 /* Full-screen event scenes (Task 40). The painting is the whole screen; the choices (Task 56) are illustrated plates on its empty side: emblem + name + summary. */
 .page.fit-event{max-width:none;padding:0;margin:0;display:block;height:100dvh;overflow:hidden;position:relative;background:#05070b}
-.fit-event>.topbar{position:relative;z-index:6}
+
 .evscene{position:fixed;inset:0;z-index:1;overflow:hidden;--u:clamp(12px,3.3vh,30px);font-size:var(--u);color:#e9dcc0}
 .evbg{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,#1b2430,#05070b)}
 .evbg img{position:absolute;top:0;height:100%;width:calc(100% * var(--z));left:calc(-100% * (var(--z) - 1) * var(--fx));object-fit:cover;object-position:50% var(--fy);

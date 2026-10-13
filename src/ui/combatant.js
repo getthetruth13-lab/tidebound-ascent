@@ -39,34 +39,34 @@ const ICON={
 };
 const T=(n,kind,kw,dur,rule)=>({n,kind,kw,dur,rule});
 const STATUS={
- str:T('Might','buff','Might','Stays until the end of combat.'),
- dex:T('Poise','buff','Poise','Stays until the end of combat.'),
- weak:T('Soaked','debuff','Soaked','Falls by 1 after its turn (player: at the start of the enemy phase).'),
- vuln:T('Exposed','debuff','Exposed','Falls by 1 after its turn (player: at the start of the enemy phase).'),
- brittle:T('Brittle','debuff','Brittle','Falls by 1 after its turn (player: at the start of the enemy phase).'),
- bleed:T('Bleed','debuff','Bleed X','Falls by 1 each time the target is hit by an Attack.'),
- drench:T('Drenched','debuff','Drenched X','Falls by 1 at the end of its owner\'s turn.'),
- reson:T('Resonating','debuff','Resonating X','Falls by 1 at the end of its owner\'s turn.'),
- shell:T('Shell','buff','Shell X','Stays until the end of combat.'),
- barbs:T('Barbs','buff','Barbs X','Stays until the end of combat.'),
- ward:T('Rebuff','buff','Rebuff X','Each debuff it blocks uses up 1 stack.'),
- mending:T('Mending','buff','Mending X','Stays until the end of combat.'),
- parry:T('Parry','buff',null,'Blocks the first enemy Attack this turn and reflects half. Lasts until the end of the enemy turn.'),
- mightTmp:T('Temporary Might','buff',null,'Removed at the end of its next turn.'),
- rooted:T('Rooted','buff',null,'Passive: stays throughout combat.'),
+ str:T('Might','buff','Might','Lasts all combat.'),
+ dex:T('Poise','buff','Poise','Lasts all combat.'),
+ weak:T('Soaked','debuff','Soaked','Drops 1 per turn.'),
+ vuln:T('Exposed','debuff','Exposed','Drops 1 per turn.'),
+ brittle:T('Brittle','debuff','Brittle','Drops 1 per turn.'),
+ bleed:T('Bleed','debuff','Bleed X','Drops 1 per Attack hit.'),
+ drench:T('Drenched','debuff','Drenched X','Drops 1 per turn.'),
+ reson:T('Resonating','debuff','Resonating X','Drops 1 per turn.'),
+ shell:T('Shell','buff','Shell X','Lasts all combat.'),
+ barbs:T('Barbs','buff','Barbs X','Lasts all combat.'),
+ ward:T('Rebuff','buff','Rebuff X','Drops 1 per debuff blocked.'),
+ mending:T('Mending','buff','Mending X','Lasts all combat.'),
+ parry:T('Parry','buff',null,'The first enemy hit next turn loses X damage. Reflects half.'),
+ mightTmp:T('Temporary Might','buff',null,'Ends after its next turn.'),
+ rooted:T('Rooted','buff',null,'Lasts all combat.'),
  // State that lives outside st (cb.*, queued effects, Powers, armed relics): badges built by playerStates().
- keepMom:T('Momentum Held','buff',null,'Until the end of this turn.','Your Momentum does not fade at the end of this turn.'),
- nextDraw:T('Draw Next Turn','buff',null,'Used at the start of your next turn.','Draw this many extra cards at the start of your next turn.'),
- nextEnergy:T('Energy Next Turn','buff',null,'Used at the start of your next turn.','Gain this much Energy at the start of your next turn.'),
- nextMom:T('Momentum Next Turn','buff',null,'Used at the start of your next turn.','Gain this much Momentum at the start of your next turn.'),
- drained:T('Drained','debuff',null,'Used at the start of your next turn.','You start your next turn with this much less Energy.'),
- moonlock:T('Moonlock','buff',null,'Used at the start of your next turn.','The Tide will not drift at the start of your next turn.'),
+ keepMom:T('Momentum Held','buff',null,'Until the end of this turn.','Momentum won\'t drop this turn.'),
+ nextDraw:T('Draw Next Turn','buff',null,'Next turn.','Draw this many extra cards next turn.'),
+ nextEnergy:T('Energy Next Turn','buff',null,'Next turn.','Gain this much Energy next turn.'),
+ nextMom:T('Momentum Next Turn','buff',null,'Next turn.','Gain this much Momentum next turn.'),
+ drained:T('Drained','debuff',null,'Next turn.','This much less Energy next turn.'),
+ moonlock:T('Moonlock','buff',null,'Next turn.','The Tide won\'t drift next turn.'),
  mimic:T('Mimic Ink','buff',null,'Until you play a card.','Your next card is played twice.'),
  cairn:T('Cairn Rank','buff',null,'Until a Waypoint is placed.','The next Waypoint you place starts at this Rank.'),
- retort:T('Retort Ready','buff',null,'Until the end of this turn.','An enemy attack was parried: Retort cards deal their bonus this turn.'),
- chartQ:T('Chart Next Turn','buff',null,'Used at the start of your next turn.','Chart this many cards at the start of your next turn.'),
- banks:T('Banked Crest','buff',null,'Until released.','Release the Bank to deal 1½ × Crest damage to ALL enemies for each stack.'),
- power:T('Power','buff',null,'Stays until the end of combat.',''),
+ retort:T('Retort Ready','buff',null,'Until the end of this turn.','Retort bonuses are active this turn.'),
+ chartQ:T('Chart Next Turn','buff',null,'Next turn.','Chart this many cards next turn.'),
+ banks:T('Banked Crest','buff',null,'Until released.','Release: 1½× Crest damage to ALL enemies per stack.'),
+ power:T('Power','buff',null,'Lasts all combat.',''),
  armed:T('Ready','buff',null,'Until used (once per combat).',''),
  queued:T('Active','buff',null,'Until it is used or the turn ends.','')
 };
@@ -94,25 +94,25 @@ function describe(k,v,who){const cb=W.cb,P=who==='p',e=P?null:who,n=Math.abs(v),
  const held=e&&e.hold&&e.hold[k]?1:0;
  const gone=P?`Wears off by 1 at the start of each enemy turn.`:`Fades by 1 after each of its turns: gone after ${turns(n+held,'turn')}.`;
  switch(k){
- case 'str':return P?{line:`Raises the damage of your Attacks.`,now:`Your Attacks deal ${n} ${more} damage.`,dur:'Until the end of combat.'}
-  :{line:'Raises the damage of its Attacks.',now:`Its Attacks deal ${n} ${more} damage.`,dur:'Until the end of combat.'};
- case 'dex':return {line:'Changes the Guard your cards give.',now:`Cards give ${n} ${v>0?'more':'less'} Guard.`,dur:'Until the end of combat.'};
- case 'weak':{if(P)return {line:'Soaked weakens your Attacks.',now:`Your Attacks deal 25% less damage (a 10-damage Attack deals 7).`,dur:`Your next ${turns(n,'turn')}; it wears off by 1 at the start of each enemy turn.`};
-  const a=enemyAtk(e,'weak');return {line:'Soaked weakens its Attacks.',now:a&&a.cur!==a.alt?`Its next Attack deals ${a.cur} instead of ${a.alt}.`:'Its Attacks deal 25% less damage.',dur:gone}}
- case 'vuln':{if(P){const i=incoming();return {line:'Exposed makes enemy Attacks hit you harder.',now:i&&i.with!==i.without?`Incoming Attacks deal ${i.with} instead of ${i.without}.`:'Enemy Attacks deal 50% more damage to you.',dur:n===1?'Until the start of the next enemy turn.':`Wears off by 1 at the start of each enemy turn: ${turns(n-1,'more enemy turn')} of hits after this one.`}}
-  return {line:'Exposed makes it take extra damage.',now:'It takes 50% more damage from your hits (a 6-damage hit deals 9).',dur:gone}}
- case 'brittle':return P?{line:'Brittle weakens the Guard your cards give.',now:`Guard from your cards is reduced by 25% (an 8-Guard card gives 6).`,dur:`Your next ${turns(n,'turn')}; it wears off by 1 at the start of each enemy turn.`}
-  :{line:'Brittle only reduces Guard gained from cards, so it does nothing to an enemy.',now:'No effect on this enemy.',dur:gone};
- case 'bleed':{const b=Math.ceil(n);return {line:'Bleed hurts each time it is struck by an Attack.',now:`Your next Attack makes it lose ${b} HP (ignores Guard), then Bleed drops to ${n-1}.`,dur:'Loses 1 each time an Attack hits it. Max 20.'}}
- case 'drench':return {line:'Drenched hurts it whenever the Tide turns, Crests or Undertows.',now:`It loses ${n} HP each time (ignores Guard).`,dur:`Loses 1 at the end of its turn: ${turns(n+held,'turn')} left. Max 12.`};
- case 'reson':return {line:'Resonating makes Echo hits land harder.',now:`Your Echoes deal ${n} more damage to it.`,dur:`Loses 1 at the end of its turn: ${turns(n+held,'turn')} left. Max 12.`};
- case 'shell':return {line:'Shell gives it Guard every turn.',now:`It gains ${n} Guard at the end of its turn.`,dur:'Until the end of combat.'};
- case 'barbs':return {line:'Barbs punish Attacks.',now:`You take ${n} damage each time you Attack it (your Guard absorbs it first).`,dur:'Until the end of combat.'};
- case 'ward':return {line:'Rebuff turns aside debuffs.',now:`Blocks its next ${turns(n,'debuff')}.`,dur:'Each debuff blocked uses up 1 stack.'};
- case 'mending':{const h=e?Math.min(n,Math.max(0,e.max-e.hp)):n;return {line:'Mending heals it every turn.',now:`It heals ${n} HP at the end of its turn${e&&h<n?(h?` (${h} right now)`:' (already at full HP)'):''}.`,dur:'Until the end of combat.'}}
- case 'parry':{const back=Math.floor(n*(CORE.duel.parry_back_frac||.5));return {line:'Parry stops the first enemy Attack.',now:`The first Attack against you loses ${n} damage and ${back} is reflected to the attacker.`,dur:'Until the first Attack hits you, or the start of your next turn.'}}
- case 'mightTmp':return {line:'A short-lived change to its Attacks.',now:`Its Attacks deal ${n} ${more} damage.`,dur:'Until the end of its next turn.'};
- case 'rooted':{const t=W.cb?W.cb.ens.filter(x=>x.key==='tendril'&&x.hp>0&&!x.fled).length:0;return {line:'Rooted gives her Guard from her Tendrils.',now:`She gains ${3*t} Guard at the end of her turn (3 per living Tendril; ${t} alive).`,dur:'Passive: lasts the whole combat.'}}
+ case 'str':return P?{line:`Changes your Attack damage.`,now:`Your Attacks deal ${n} ${more} damage.`,dur:'Lasts all combat.'}
+  :{line:'Changes its Attack damage.',now:`Its Attacks deal ${n} ${more} damage.`,dur:'Lasts all combat.'};
+ case 'dex':return {line:'Changes Guard from your cards.',now:`Cards give ${n} ${v>0?'more':'less'} Guard.`,dur:'Lasts all combat.'};
+ case 'weak':{if(P)return {line:'Your Attacks deal 25% less damage.',now:'',dur:`${turns(n,'turn')} left.`};
+  const a=enemyAtk(e,'weak');return {line:'Its Attacks deal 25% less damage.',now:a&&a.cur!==a.alt?`Its next Attack deals ${a.cur} instead of ${a.alt}.`:'',dur:gone}}
+ case 'vuln':{if(P){const i=incoming();return {line:'You take 50% more damage.',now:i&&i.with!==i.without?`Incoming Attacks deal ${i.with} instead of ${i.without}.`:'',dur:`${turns(n,'turn')} left.`}}
+  return {line:'Takes 50% more damage.',now:'',dur:gone}}
+ case 'brittle':return P?{line:'Gain 25% less Guard from cards.',now:'',dur:`${turns(n,'turn')} left.`}
+  :{line:'Only affects your Guard.',now:'No effect on this enemy.',dur:gone};
+ case 'bleed':{const b=Math.ceil(n);return {line:'Loses HP when your Attack hits it, ignoring Guard.',now:`Next hit: loses ${b} HP.`,dur:'Drops 1 per hit. Max 20.'}}
+ case 'drench':return {line:'Loses HP when the Tide turns, Crests or Undertows.',now:`Loses ${n} HP each time.`,dur:`${turns(n+held,'turn')} left. Max 12.`};
+ case 'reson':return {line:'Takes more damage from Echoed Attacks.',now:`+${n} damage.`,dur:`${turns(n+held,'turn')} left. Max 12.`};
+ case 'shell':return {line:'Gains Guard every turn.',now:`Gains ${n} Guard at the end of its turn.`,dur:'Lasts all combat.'};
+ case 'barbs':return {line:'Hurts you when you Attack it.',now:`You take ${n} damage per hit.`,dur:'Lasts all combat.'};
+ case 'ward':return {line:'Blocks debuffs.',now:`Blocks its next ${turns(n,'debuff')}.`,dur:'Each debuff blocked uses up 1 stack.'};
+ case 'mending':{const h=e?Math.min(n,Math.max(0,e.max-e.hp)):n;return {line:'Heals every turn.',now:`Heals ${n} HP at the end of its turn${e&&h<n?(h?` (${h} right now)`:' (already at full HP)'):''}.`,dur:'Lasts all combat.'}}
+ case 'parry':{const back=Math.floor(n*(CORE.duel.parry_back_frac||.5));return {line:'Softens the first enemy hit.',now:`It loses ${n} damage; the attacker takes ${back}.`,dur:'Until hit, or your next turn.'}}
+ case 'mightTmp':return {line:'Temporary change to its Attack damage.',now:`Its Attacks deal ${n} ${more} damage.`,dur:'Until the end of its next turn.'};
+ case 'rooted':{const t=W.cb?W.cb.ens.filter(x=>x.key==='tendril'&&x.hp>0&&!x.fled).length:0;return {line:'Gains 3 Guard per living Tendril each turn.',now:`${3*t} Guard (${t} alive).`,dur:'Lasts all combat.'}}
  }return null}
 export function statusText(k,v,who,extraText){const d=STATUS[k];if(!d)return '';
  const x=describe(k,v,who||'p');

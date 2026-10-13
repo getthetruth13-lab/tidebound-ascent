@@ -24,7 +24,6 @@
 html,body{background:var(--ui-bg-0);color:var(--ui-text);font:14px/1.35 var(--font-body);overflow-x:clip;font-variant-numeric:lining-nums}
 button{font:inherit;color:inherit}
 b{font-weight:700}
-.page>.topbar{position:sticky;top:0;border-radius:0 0 10px 10px}
 .page{max-width:980px;margin:0 auto;padding:0 max(10px,env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));min-height:100vh}
 .page.title{padding-top:8px}
 .clsgrid{display:grid;grid-template-columns:1fr;gap:0 10px}
@@ -308,7 +307,7 @@ body.env-on .page{background:transparent}
  :root{--cw:128px;--zoom:1.45;--gy:166px}
  .topbar{min-height:48px}
  .combat{display:block}
- .combat>.topbar{position:absolute;left:0;right:0;top:0;background:linear-gradient(#0b0e14ee,#0b0e14aa 75%,#0b0e1400);border:0}
+ :is(.combat,.runhud)>.topbar{position:absolute;left:0;right:0;top:0;background:linear-gradient(#0b0e14ee,#0b0e14aa 75%,#0b0e1400);border:0}
  .combat .subbar{position:absolute;top:50px;left:max(8px,env(safe-area-inset-left));max-width:44%;background:#0b0e14b8;border:1px solid #36405a80;border-radius:10px;min-height:28px;padding:2px 8px;z-index:6}
  .combat .classbar{font-size:12px;gap:6px}
  .combat .gauge{min-width:120px}.combat .gauge i{height:11px}
@@ -946,9 +945,9 @@ body.combat-motion .combat #endbtn:active:not(:disabled){transform:translateY(2p
 .combat .namelong .plate .nm .nmfl{display:block;font:italic 500 10.5px/13px var(--font-body);color:#cfc3a3;margin-top:2px}
 /* ===== Minimal StS-style battle HUD (Oct 10): no top/bottom bars or shade, small icons on the scene, low hand, StS control spots ===== */
 @media (orientation:landscape){
- .combat>.topbar{background:none!important;box-shadow:none!important;border:0!important;min-height:40px}
- .combat>.topbar::after,.combat>.topbar::before{display:none!important}
- .combat>.topbar .stat,.combat>.topbar .mini,.combat>.topbar button{text-shadow:0 1px 2px #000,0 0 6px #000}
+ :is(.combat,.runhud)>.topbar{background:none!important;box-shadow:none!important;border:0!important;min-height:40px}
+ :is(.combat,.runhud)>.topbar::after,:is(.combat,.runhud)>.topbar::before{display:none!important}
+ :is(.combat,.runhud)>.topbar .stat,:is(.combat,.runhud)>.topbar .mini,:is(.combat,.runhud)>.topbar button{text-shadow:0 1px 2px #000,0 0 6px #000}
  body.env-combat #env-front{opacity:.45!important}
  body.env-combat #env .envstack{top:auto!important;bottom:0!important}
  .combat .dais{background:none!important;border:0!important;box-shadow:none!important;width:96px;top:44px;padding:2px;transform-origin:0 0;transform:scale(.86)}
@@ -1079,10 +1078,10 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .card .card-print .name{font-size:var(--nf,11cqw);text-shadow:0 .6px .7px #000c,0 -.25px .35px #fff3}
 .card .card-print .text>span{overflow-wrap:normal}
 @media(orientation:landscape){
- .combat{--edge:18px}
- .combat>.topbar{top:calc(8px + env(safe-area-inset-top));left:calc(var(--edge) + env(safe-area-inset-left));right:calc(var(--edge) + env(safe-area-inset-right));width:calc((100% - 36px - env(safe-area-inset-left) - env(safe-area-inset-right))/1);transform:scale(1);transform-origin:top left;padding:0}
- .combat .relics{flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
- .combat .relic{flex:none}
+ .combat,.runhud{--edge:18px}
+ :is(.combat,.runhud)>.topbar{top:calc(8px + env(safe-area-inset-top));left:calc(var(--edge) + env(safe-area-inset-left));right:calc(var(--edge) + env(safe-area-inset-right));width:calc((100% - 36px - env(safe-area-inset-left) - env(safe-area-inset-right))/1);transform:scale(1);transform-origin:top left;padding:0}
+ :is(.combat,:where(.runhud>.topbar.sts)) .relics{flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+ :is(.combat,:where(.runhud>.topbar.sts)) .relic{flex:none}
  .combat .subbar{top:calc(8px + 50px*1 + env(safe-area-inset-top));transform:scale(1);transform-origin:top left}
  .combat .dais{top:calc(8px + 44px*1 + env(safe-area-inset-top));transform:scale(calc(.86*1))}
  .combat .hand{left:calc(160px*1 + env(safe-area-inset-left));right:calc(190px*1 + env(safe-area-inset-right));--hcw:min(calc(40vh*5/7*1),calc(15vw*1))}
@@ -1111,12 +1110,12 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .ov.inspect.held-hand .inspect-keywords{pointer-events:auto;touch-action:pan-y;overscroll-behavior:contain}
 
 /* Task 38: open combat HUD, with a bounded relic rail and one corner baseline. */
-.combat #relicbar{background:none!important;border:0!important;border-image:none!important;box-shadow:none!important;padding:0;margin:0;overflow:visible;gap:0;align-self:center;flex:1 1 0;display:grid;grid-template-columns:repeat(var(--relic-columns,1),minmax(0,1fr));grid-auto-rows:48px;height:48px;align-content:start}
-.combat .topbar .sp{display:none}
-.combat #relicbar .relic{width:100%;height:48px;padding:6px;flex:0 0 48px;background:none;border:0;box-shadow:none}
-.combat #relicbar .relic::before{display:none}
-.combat #relicbar .relic[hidden]{display:none}
-.combat #relicbar .slot{width:36px;height:36px;margin:auto;background:none;border:0;border-image:none;box-shadow:none}
+:is(.combat,:where(.runhud>.topbar.sts)) #relicbar{background:none!important;border:0!important;border-image:none!important;box-shadow:none!important;padding:0;margin:0;overflow:visible;gap:0;align-self:center;flex:1 1 0;display:grid;grid-template-columns:repeat(var(--relic-columns,1),minmax(0,1fr));grid-auto-rows:48px;height:48px;align-content:start}
+:is(.combat,.runhud) .topbar .sp{display:none}
+:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic{width:100%;height:48px;padding:6px;flex:0 0 48px;background:none;border:0;box-shadow:none}
+:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic::before{display:none}
+:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic[hidden]{display:none}
+:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .slot{width:36px;height:36px;margin:auto;background:none;border:0;border-image:none;box-shadow:none}
 .relic-more,.relic-close{font:700 16px var(--font-number);color:#e8d5a2;background:none;border:0;cursor:pointer;text-shadow:0 1px 3px #000}
 .relic-collection{max-height:calc(100dvh - 96px);overflow:auto;padding:12px 18px;scrollbar-width:thin}
 .relic-collection .itemhead{margin:8px 0;align-items:center;gap:10px}
@@ -1126,7 +1125,7 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .combat #detail,.combat .tbtn,.combat .pile,.combat .endbtn,.combat .dais .tg3-plate,.combat .dais .plq,.combat .status-art.more-chip{background:none!important;border:0!important;border-image:none!important;outline:0;box-shadow:none!important;border-radius:0;text-shadow:0 1px 2px #000,0 0 5px #000}
 .combat #detail::before,.combat #detail::after,.combat .tg3-plate::after,.combat .plq::before{display:none}
 .combat .pile:hover,.combat .endbtn:hover,.combat .tbtn:hover{filter:brightness(1.3)}
-.combat .pile:focus-visible,.combat .endbtn:focus-visible,.combat .tbtn:focus-visible,.combat .relic:focus-visible{outline:1px solid #e8d5a2;outline-offset:2px}
+.combat .pile:focus-visible,.combat .endbtn:focus-visible,.combat .tbtn:focus-visible,:is(.combat,:where(.runhud>.topbar.sts)) .relic:focus-visible{outline:1px solid #e8d5a2;outline-offset:2px}
 @media(orientation:landscape){
  .combat .dais.obj.dais-tide.has-art{left:calc(10px + env(safe-area-inset-left));height:min(280.5px,calc(.85*(100dvh - 118px - 50px*1 - env(safe-area-inset-top) - env(safe-area-inset-bottom))/1))}
  .combat .dais-tide.has-art .tg3-plate{left:0;width:42px}
@@ -1155,16 +1154,16 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 
 /* Task 41: measured 2340×1080 battle baseline, scaled by height and UI size. */
 @media(orientation:landscape){
- .combat{--unit:calc(100dvh / 1080);--hud-unit:calc(var(--unit)*1);--hud-icon:calc(40*var(--hud-unit));--hud-text:calc(30*var(--hud-unit));--hud-gap:calc(8*var(--hud-unit));--edge:calc(20*var(--hud-unit));--relic-cell:calc(63*var(--hud-unit))}
- .combat>.topbar{position:absolute;inset:0 0 auto;width:100%;height:calc(78*var(--hud-unit));transform:none;padding:0;background:linear-gradient(#15212bd9,#18242bc4,#18242b00);border:0;box-shadow:none;display:block;font-size:var(--hud-text)}
- .combat .topbar>.who,.combat .topbar>.stat,.combat .topbar>.mini,.combat #potions{position:absolute;top:calc(40*var(--hud-unit));transform:translateY(-50%);padding:0;background:none;border:0;box-shadow:none;min-height:0;white-space:nowrap}
- .combat .who{left:2.56%;width:calc(170*var(--hud-unit))}.combat .who>.slot{display:none}.combat .who .nm{font-size:var(--hud-text);line-height:1}.combat .who small{display:block;font:calc(20*var(--hud-unit))/1 var(--font-body)}
- .combat .topbar .hp{left:12.18%}.combat .topbar .gold{left:20.51%}.combat .topbar .floor{left:45.3%}
- .combat .topbar .uic{width:var(--hud-icon);height:var(--hud-icon)}
- .combat #potions{left:27.35%;display:flex;gap:calc(48*var(--hud-unit))}.combat .potion,.combat .potion .slot{width:var(--hud-icon);height:var(--hud-icon);min-width:0;padding:0}
- .combat #lampbtn{left:53%;font-size:var(--hud-text)}.combat #mapbtn{left:90.17%}.combat #deckbtn{left:92.73%}.combat #setbtn{left:96.36%}.combat .topbar .mini{font-size:calc(20*var(--hud-unit))}.combat .topbar .mini .uic{width:calc(50*var(--hud-unit));height:calc(50*var(--hud-unit))}
- .combat #relicbar{position:absolute;left:var(--edge);top:calc(88*var(--hud-unit));width:calc(59% - var(--edge));height:calc(55*var(--hud-unit));display:flex;flex-wrap:nowrap;gap:var(--hud-gap);overflow:hidden;align-items:center}
- .combat #relicbar .relic{width:calc(55*var(--hud-unit));height:calc(55*var(--hud-unit));flex:0 0 calc(55*var(--hud-unit));padding:0}.combat #relicbar .slot{width:100%;height:100%}.combat .relic-more{font-size:var(--hud-text)}
+ .combat,.runhud{--unit:calc(100dvh / 1080);--hud-unit:calc(var(--unit)*1);--hud-icon:calc(40*var(--hud-unit));--hud-text:calc(30*var(--hud-unit));--hud-gap:calc(8*var(--hud-unit));--edge:calc(20*var(--hud-unit));--relic-cell:calc(63*var(--hud-unit))}
+ :is(.combat,.runhud)>.topbar{position:absolute;inset:0 0 auto;width:100%;height:calc(78*var(--hud-unit));transform:none;padding:0;background:linear-gradient(#15212bd9,#18242bc4,#18242b00);border:0;box-shadow:none;display:block;font-size:var(--hud-text)}
+ :is(.combat,.runhud) .topbar>.who,:is(.combat,.runhud) .topbar>.stat,:is(.combat,.runhud) .topbar>.mini,:is(.combat,:where(.runhud>.topbar.sts)) #potions{position:absolute;top:calc(40*var(--hud-unit));transform:translateY(-50%);padding:0;background:none;border:0;box-shadow:none;min-height:0;white-space:nowrap}
+ :is(.combat,:where(.runhud>.topbar.sts)) .who{left:2.56%;width:calc(170*var(--hud-unit))}:is(.combat,:where(.runhud>.topbar.sts)) .who>.slot{display:none}:is(.combat,:where(.runhud>.topbar.sts)) .who .nm{font-size:var(--hud-text);line-height:1}:is(.combat,:where(.runhud>.topbar.sts)) .who small{display:block;font:calc(20*var(--hud-unit))/1 var(--font-body)}
+ :is(.combat,.runhud) .topbar .hp{left:12.18%}:is(.combat,.runhud) .topbar .gold{left:20.51%}:is(.combat,.runhud) .topbar .floor{left:45.3%}
+ :is(.combat,.runhud) .topbar .uic{width:var(--hud-icon);height:var(--hud-icon)}
+ :is(.combat,:where(.runhud>.topbar.sts)) #potions{left:27.35%;display:flex;gap:calc(48*var(--hud-unit))}:is(.combat,:where(.runhud>.topbar.sts)) .potion,:is(.combat,:where(.runhud>.topbar.sts)) .potion .slot{width:var(--hud-icon);height:var(--hud-icon);min-width:0;padding:0}
+ :is(.combat,:where(.runhud>.topbar.sts)) #lampbtn{left:53%;font-size:var(--hud-text)}:is(.combat,:where(.runhud>.topbar.sts)) #mapbtn{left:90.17%}:is(.combat,:where(.runhud>.topbar.sts)) #deckbtn{left:92.73%}:is(.combat,:where(.runhud>.topbar.sts)) #setbtn{left:96.36%}:is(.combat,.runhud) .topbar .mini{font-size:calc(20*var(--hud-unit))}:is(.combat,.runhud) .topbar .mini .uic{width:calc(50*var(--hud-unit));height:calc(50*var(--hud-unit))}
+ :is(.combat,:where(.runhud>.topbar.sts)) #relicbar{position:absolute;left:var(--edge);top:calc(88*var(--hud-unit));width:calc(59% - var(--edge));height:calc(55*var(--hud-unit));display:flex;flex-wrap:nowrap;gap:var(--hud-gap);overflow:hidden;align-items:center}
+ :is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic{width:calc(55*var(--hud-unit));height:calc(55*var(--hud-unit));flex:0 0 calc(55*var(--hud-unit));padding:0}:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .slot{width:100%;height:100%}:is(.combat,:where(.runhud>.topbar.sts)) .relic-more{font-size:var(--hud-text)}
  .combat #orb{left:calc(10.043% - 60*var(--hud-unit));bottom:calc(18.519dvh - 60*var(--hud-unit));width:calc(120*var(--hud-unit));height:calc(120*var(--hud-unit));transform:none;font-size:var(--hud-text)}
  .combat .ctl .pile{width:calc(70*var(--hud-unit));height:calc(70*var(--hud-unit));min-height:0;min-width:0;padding:0;font-size:calc(24*var(--hud-unit));display:block}.combat .ctl .pile .uic{display:block;width:100%;height:100%}
  .combat #drawpile{left:calc(2.137% - 35*var(--hud-unit));bottom:calc(8.333dvh - 35*var(--hud-unit));transform:none}.combat #discpile{right:calc(2.35% - 35*var(--hud-unit));bottom:calc(8.333dvh - 35*var(--hud-unit));transform:none}
@@ -1177,18 +1176,18 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
  .combat .plate .stw{top:calc(38*var(--hud-unit));max-width:none}.combat .stw .badges{flex-wrap:nowrap;gap:var(--hud-gap);zoom:1}.combat .status-art{width:calc(35*var(--hud-unit));height:calc(35*var(--hud-unit))}.combat .hpblk{width:var(--hud-icon);height:var(--hud-icon);left:calc(-20*var(--hud-unit));margin-top:calc(-20*var(--hud-unit))}
  .combat .intentw .intent{height:calc(50*var(--hud-unit));min-height:0;font-size:var(--hud-text)}.combat .intentw .intent .uic{width:var(--hud-icon);height:var(--hud-icon)}.combat .intentw .intent span{font-size:var(--hud-text)}
 }
-@media(orientation:landscape){.combat>.topbar,.combat #endbtn{min-height:0}}
-@media(orientation:landscape){.combat .who .nm,.combat .topbar .stat.floor{display:block}.combat .topbar .stat{font-size:var(--hud-text)}.combat .potion.empty{background-size:contain}.combat .potion::before{display:none}}
+@media(orientation:landscape){:is(.combat,.runhud)>.topbar,.combat #endbtn{min-height:0}}
+@media(orientation:landscape){:is(.combat,:where(.runhud>.topbar.sts)) .who .nm,:is(.combat,.runhud) .topbar .stat.floor{display:block}:is(.combat,.runhud) .topbar .stat{font-size:var(--hud-text)}:is(.combat,:where(.runhud>.topbar.sts)) .potion.empty{background-size:contain}:is(.combat,:where(.runhud>.topbar.sts)) .potion::before{display:none}}
 @media(orientation:landscape){
- .combat .topbar .potions{gap:calc(48*var(--hud-unit))}
- .combat .topbar .potion,.combat .topbar .potion .slot{width:var(--hud-icon);height:var(--hud-icon);padding:0}
- .combat .topbar .potion.empty::before{display:block;inset:0;opacity:.3}
+ :is(.combat,.runhud) .topbar .potions{gap:calc(48*var(--hud-unit))}
+ :is(.combat,.runhud) .topbar .potion,:is(.combat,.runhud) .topbar .potion .slot{width:var(--hud-icon);height:var(--hud-icon);padding:0}
+ :is(.combat,.runhud) .topbar .potion.empty::before{display:block;inset:0;opacity:.3}
  .combat .ctl .pile{position:absolute}.combat .ctl .pile .uic{width:100%;height:100%}
 }
-@media(orientation:landscape){.combat .topbar>.mini{min-width:0;width:calc(50*var(--hud-unit));height:calc(50*var(--hud-unit));display:flex;align-items:center;justify-content:center;gap:0}.combat .topbar>#lampbtn{width:auto}.combat .topbar>#deckbtn{font-size:calc(20*var(--hud-unit));overflow:visible}}
+@media(orientation:landscape){:is(.combat,.runhud) .topbar>.mini{min-width:0;width:calc(50*var(--hud-unit));height:calc(50*var(--hud-unit));display:flex;align-items:center;justify-content:center;gap:0}:is(.combat,.runhud) .topbar>#lampbtn{width:auto}:is(.combat,.runhud) .topbar>#deckbtn{font-size:calc(20*var(--hud-unit));overflow:visible}}
 
 @media(orientation:landscape){.combat .plate .stw .badges{flex-wrap:nowrap!important;zoom:1}.combat .plate .stw .bd .status-art{width:calc(35*var(--hud-unit));height:calc(35*var(--hud-unit))}.combat .plate .stw .bd b{font-size:calc(24*var(--hud-unit))}}
-@media(orientation:landscape){.combat .pile-count{position:absolute;right:calc(-8*var(--hud-unit));bottom:calc(-8*var(--hud-unit));font-size:calc(24*var(--hud-unit));line-height:1;text-shadow:0 1px 3px #000}.combat .deck-count{position:absolute;right:calc(-8*var(--hud-unit));bottom:calc(-10*var(--hud-unit));line-height:1}}
+@media(orientation:landscape){.combat .pile-count{position:absolute;right:calc(-8*var(--hud-unit));bottom:calc(-8*var(--hud-unit));font-size:calc(24*var(--hud-unit));line-height:1;text-shadow:0 1px 3px #000}:is(.combat,:where(.runhud>.topbar.sts)) .deck-count{position:absolute;right:calc(-8*var(--hud-unit));bottom:calc(-10*var(--hud-unit));line-height:1}}
 
 /* Task 42: readable stacks under icons, stable floor HUD and clear boss callouts. */
 .combat .plate .stw .bd .status-art,.combat .plate .status-art{width:20px!important;height:20px!important}
@@ -1217,4 +1216,53 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 body.reduce-motion .combat #endbtn{transition:none}
 body.reduce-motion .combat #endbtn:active:not(:disabled){transform:none}
 @media(prefers-reduced-motion:reduce){body.combat-motion .combat #endbtn{transition:none}body.combat-motion .combat #endbtn:active:not(:disabled){transform:none}}
+
+/* ===== CLAUDE_TASK_60 (B-057): the battle top bar is the ONE bar on every run screen =====
+   Non-combat run screens (.page.runhud) reuse the combat bar rules above via :is(.combat,.runhud). The bar is pinned to the
+   viewport like in battle, and the page reserves the bar (78) + relic row (88..143) so content never sits under the relics. */
+@media(orientation:landscape){
+ .runhud>.topbar.sts{position:fixed;inset:0 0 auto;width:100%;z-index:30;border-radius:0}
+ .page.page.runhud:not(.fit-event){padding-top:calc(150*var(--hud-unit));box-sizing:border-box}
+ .page.runhud.fit{height:100dvh}
+ .runhud>.topbar.sts #relicbar .relic,.runhud>.topbar.sts #relicbar .slot{background:none;border:0;box-shadow:none;border-radius:0}
+ .runhud>.topbar.sts #relicbar .relic::before{display:none}
+ /* the reserved relic band costs the shop ~50px of height: tighten its header and icon tiles so both shelves fit without scrolling */
+ .page.runhud.fit-shop .pk-shop>.etitle{font-size:20px;margin-top:0;line-height:1.1}
+ .page.runhud.fit-shop .pk-shop .pk-sub .wrenline{font-size:13px}
+ .page.runhud.fit-shop .pk-shop .shopicon{min-height:60px;padding-top:2px;padding-bottom:2px}
+ .page.runhud.fit-shop .pk-shop .shopicon .slot{width:30px;height:30px}
+ .page.runhud.fit-shop .pk-shop .shopicon .inm{font-size:11px;white-space:nowrap}
+ /* the map is bright parchment, not a dark battle scene: a soft dusk scrim behind the bar + relic row keeps the same bar readable */
+ .page.mappage.runhud::before{content:'';position:fixed;inset:0 0 auto;height:calc(150*var(--hud-unit));background:linear-gradient(#0b0e14e6,#0b0e14b0 55%,#0b0e1400);z-index:29;pointer-events:none}
+}
+/* clovis-intents: "+1" surcharge badge on the cost gem (Barnacled), a small painted coral-red seal at the gem's lower right. */
+.card .costplus{position:absolute;z-index:2;left:calc(12% + 2.5cqw);top:calc(8.286% + 2cqw);min-width:8.5cqw;height:8.5cqw;padding:0 1cqw;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+ font:800 max(9px,5.6cqw)/1 var(--font-number);font-style:normal;color:#fff3e6;border-radius:999px;
+ background:radial-gradient(circle at 35% 30%,#ff9a7c,#b4332a 55%,#5a1410);border:.5cqw solid #f1c27d;box-shadow:0 1px 2px #000c,inset 0 1px 1px #fff6;text-shadow:0 1px 1px #000}
+/* clovis-intents: intent icons for each side effect (debuffs use the status art) */
+.intent .intent-part.deb b{color:#e4d4ff}
+/* v0.6.2 interim hero hint: the coach pill, lower and self-fading */
+.coach.hero-hint{top:19%;pointer-events:none;border-color:#d9b46acc;background:linear-gradient(180deg,#151a22f2,#0b0e14f2);animation:hero-hint 5.2s ease-out both}
+@keyframes hero-hint{0%{opacity:0;translate:0 -6px}7%,82%{opacity:1;translate:0 0}100%{opacity:0;translate:0 0}}
+@media (prefers-reduced-motion:reduce){.coach.hero-hint{animation:hero-hint 5.2s steps(1,end) both}}
+
+/* ----- keyword windows beside a held / inspected card (Spencer 2026-10-12: the flat dark box looked bad) -----
+   Default (A, "float"): no box; the words sit on a soft feathered shadow with a light text-shadow so they read on any art.
+   Flag B: add class "kw-frame" to <body> to use the studio's slim iron window frame at a small scale instead. */
+.keyword-window{position:relative;isolation:isolate;background:none;padding:5px 12px;color:#f3ecd8;font:13px/1.2 var(--font-body);
+ text-shadow:0 0 2px #000,0 1px 3px #000,0 0 9px #000d}
+.keyword-window::before{content:"";position:absolute;z-index:-1;inset:0;border-radius:40%;pointer-events:none;
+ background:radial-gradient(closest-side,rgba(3,7,9,.94) 0,rgba(3,7,9,.9) 62%,rgba(3,7,9,.55) 84%,rgba(3,7,9,0) 100%);filter:blur(4px)}
+.keyword-window b{color:#ecd08f;font:700 11.5px var(--font-display);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px}
+body.kw-frame .keyword-window{--s:.07;isolation:auto;text-shadow:0 1px 2px #000;padding:2px 6px;border-style:solid;border-color:transparent;border-width:calc(60px*var(--s));
+ border-image:var(--frame-slim) 200 220 fill/calc(200px*var(--s)) calc(220px*var(--s))/0 round;filter:drop-shadow(0 3px 6px #000b)}
+body.kw-frame .keyword-window::before{content:none}
 .topbar .who .nm small{margin-left:.45em}
+/* clovis-intents: a curse firing from the hand (Dread) lifts out of the hand, glows, fades. */
+.cursepops{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:none;z-index:37}
+.cursepop{width:clamp(70px,13vw,110px);animation:cursepop calc(1.6s*var(--ts,1)) ease-out forwards;opacity:0}
+.cursepop .card{position:relative;width:100%;box-shadow:0 0 18px #9b6cff,0 0 4px #000}
+@keyframes cursepop{0%{opacity:0;translate:0 40px;scale:.8}18%{opacity:1;translate:0 0;scale:1.08}30%{scale:1}75%{opacity:1}100%{opacity:0;translate:0 -18px}}
+@media (prefers-reduced-motion:reduce){.cursepop{animation-duration:.01s;opacity:1}}
+.keyword-window.surch span{color:#ffc9b8}
+.fl.curse{color:#d7c2ff;font-size:clamp(16px,2.6vw,22px);animation-duration:calc(1.8s*var(--ts,1))}

@@ -4,7 +4,7 @@ import {W} from '../core/state.js';
 import {settings} from '../save.js';
 import {needsTarget} from '../engine/cards.js';
 import {alive,canPlay,playCard} from '../engine/combat.js';
-import {layoutHand,render,openInspect,closeInspect} from './render.js';
+import {layoutHand,render,openInspect,closeInspect,inspecting} from './render.js';
 // ================= pointer / touch input: tap-to-select, drag-to-play =================
 export let drag=null;
 export function enemyAt(x,y){for(const el of document.elementsFromPoint(x,y)){const en=el.closest&&el.closest('.en');if(en)return +en.dataset.en}return null}
@@ -15,8 +15,11 @@ function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))r
 export const cancelLongPress=()=>{if(lp){clearTimeout(lp.t);lp=null}clearTimeout(hh);hh=0};
 let hh=0,holdTouch=false;
 // Held zoom uses the actual finger position; render's side rails keep edge cards on screen.
-function handSide(point){return point.x>=innerWidth/2?'left':'right'}
-function inspectNow(el,touch,point){const side=touch?handSide(point):null;clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
+// Held-preview side is decided ONCE per hold from the card's slot in the hand: the centre card and everything right of it
+// preview on the LEFT, cards left of centre preview on the RIGHT. Outside the hand, fall back to the press point.
+function handSide(el,point){const cs=el&&el.closest?.('.hand')?[...el.closest('.hand').querySelectorAll('.card')]:[],i=cs.indexOf(el);
+ if(i>=0)return i>=Math.floor(cs.length/2)?'left':'right';return point.x>=innerWidth/2?'left':'right'}
+function inspectNow(el,touch,point){const side=touch?handSide(el,point):null;clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
 document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest&&ev.target.closest('.card');if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected)any=peek;if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,true,{x:ev.clientX,y:ev.clientY})},LONGPRESS_MS)}},true);
@@ -34,11 +37,13 @@ document.addEventListener('touchmove',ev=>{if(!holdTouch){kwScroll.clear();retur
 const kwEnd=ev=>{for(const t of ev.changedTouches)kwScroll.delete(t.identifier)};document.addEventListener('touchend',kwEnd,true);document.addEventListener('touchcancel',kwEnd,true);
 // Desktop hover-hold: resting the mouse on a card (1.5 s in the hand, 0.9 s elsewhere) enlarges it, like right-click.
 document.addEventListener('pointerover',ev=>{if(ev.pointerType!=='mouse')return;clearTimeout(hh);hh=0;const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('#inspect,#cardtip,.cslot.lift')||ev.buttons)return;
- const hand=!!c.closest('.hand');hh=setTimeout(()=>{hh=0;if(!c.isConnected||!c.matches(':hover')||drag||(hand&&(c.classList.contains('sel')||c.classList.contains('drag')))||(W.cb&&W.cb.busy&&hand))return;inspectNow(c,false)},hand?1500:900)},true);
+ const hand=!!c.closest('.hand');hh=setTimeout(()=>{hh=0;if(holdTouch||inspecting||!c.isConnected||!c.matches(':hover')||drag||(hand&&(c.classList.contains('sel')||c.classList.contains('drag')))||(W.cb&&W.cb.busy&&hand))return;inspectNow(c,false)},hand?1500:900)},true);
 document.addEventListener('pointerdown',()=>{clearTimeout(hh);hh=0},true);
 document.addEventListener('pointerout',ev=>{if(ev.pointerType==='mouse'&&(!ev.relatedTarget||!ev.relatedTarget.closest||ev.relatedTarget.closest('.card')!==ev.target.closest('.card'))){clearTimeout(hh);hh=0}},true);
 document.addEventListener('click',ev=>{if(eatClick){eatClick=false;ev.stopPropagation();ev.preventDefault()}},true);
-document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
+// Android Chrome fires its own long-press 'contextmenu' while a card is already held; it used to reopen the preview
+// with no point/side, which snapped the held preview to the screen centre. While a hold is open, just swallow it.
+document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(holdTouch||lp||ev.pointerType==='touch'||ev.sourceCapabilities?.firesTouchEvents){ev.preventDefault();return}if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
 document.addEventListener('pointerdown',ev=>{const hit=ev.target.closest&&ev.target.closest('.hand .card');const c=ev.pointerType==='mouse'&&hit&&peek?.isConnected?peek:hit;if(!c||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;
  if(ev.button!=null&&ev.button>0)return;
  // A second finger (multi-touch) supersedes the first press instead of leaving its card lifted.

@@ -1,11 +1,12 @@
 import {showOutcome,clearOutcome} from './outcome.js';
 import {intentIcon} from './intent-icons.js';
+import {intentParts,intentSentence} from './intent-fx.js';
 import {daisHTML} from './classdais.js';
 import {placeDetail} from './place.js';
 // ui/render.js — all screens as HTML strings. Inline handlers call the globals main.js exposes.
 // Player-facing terminology follows design-v2 §0.3 (Guard, Might, Soaked, Exposed, Sink).
 import {barHTML,statusRowHTML,playerStates} from './combatant.js';
-import {CARD_ART,assetEntry,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE} from '../assets.js';
+import {CARD_ART,assetEntry,assetSrc,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE} from '../assets.js';
 import {syncAudio} from '../audio.js';
 import {syncEnv,envFxSettingLabel} from './env.js';
 import {FEET,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
@@ -15,7 +16,7 @@ import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
 import {loadProfile,saveProfile} from '../progress.js';
 import {W} from '../core/state.js';
 import {T,SPEEDS,SPEED_LABEL,setAnimSpeedValue} from '../core/timing.js';
-import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,baseCost} from '../engine/cards.js';
+import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,baseCost,costSurcharge} from '../engine/cards.js';
 import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
 import {campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
@@ -53,26 +54,30 @@ function setNo(id){if(!setIdx){setIdx={};Object.keys(CARDS).forEach((k,i)=>setId
 export function isNewCard(id){try{return !loadProfile().seen.card[id]&&!(W.run&&W.run.deck.some(c=>c.id===id))}catch(_){return false}}
 export function markCardsSeen(ids){try{const p=loadProfile();for(const id of ids)p.seen.card[id]=1;saveProfile(p)}catch(_){}}
 export function cardBackHTML(){return `<div class="cardback"><svg class="cbem" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="#cfd8e6" stroke-width="1" opacity=".7"/><path d="M20 6v18M16 24h8M17 12h6M5 28c4-4 7-4 10 0s6 4 10 0 7-4 10 0" fill="none" stroke="#f2c14e" stroke-width="1.6" stroke-linecap="round"/><path d="M13 34h14" stroke="#cfd8e6" stroke-width="1.4" stroke-linecap="round"/></svg></div>`}
+// Cost gem. A named surcharge (Barnacled) keeps the normal number and adds a painted "+1" badge that says why when held/hovered.
+function costGem(ci,d,c,base){if(d.unplay)return '<span class="cost"></span>';if(d.c==='X')return '<span class="cost">X</span>';
+ const sc=costSurcharge(ci),n=sc.reduce((a,x)=>a+x.n,0),shown=c-n,why=sc.map(x=>x.why).join(' ');
+ return `<span class="cost${shown<base?' cheap':shown>base?' dear':''}${n?' surch':''}">${shown}</span>${n?`<i class="costplus" data-kw="Cost" data-sname="+${n} cost" data-sinfo="${esc(why)}" title="${esc(why)}" aria-label="${esc(why)}">+${n}</i>`:''}`}
 export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const base=baseCost(ci);
  const up=isUp(ci);
  const cls=['card','t'+d.t,'r-'+d.r,'theme-'+(TH[d.cls]||''),o.sel?'sel':'',o.can===false?'unp':'',d.curse?'curse':'',d.cls==='status'?'status':'',o.mark?'markable':'',o.flourish?'flourishable':'',ci.open?'opening':'',d.unplay?'nocost':''].filter(Boolean).join(' ');
  return `<div class="${cls}" ${o.click?`onclick="${o.click}"`:''} data-id="${ci.id}" data-uid="${ci.uid}" data-up="${up?1:0}"${o.i!=null?` data-i="${o.i}"`:''}>
  <i class="cfr"></i>${cardArtHTML(ci.id,d,!!(o.sel||o.full))}
- <div class="card-print"><span class="cost${c<base?' cheap':c>base?' dear':''}">${d.unplay?'':(d.c==='X'?'X':c)}</span><span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.r!=='x'?`<span class="rarity ${d.r==='s'?'c':d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}</div><i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}</div>`}
+ <div class="card-print">${costGem(ci,d,c,base)}<span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.r!=='x'?`<span class="rarity ${d.r==='s'?'c':d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}</div><i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}</div>`}
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
-export function topBar(){const K=CLASSES[W.run.cls];return `<div class="topbar theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act I</small></span></span>
+export function topBar(){const K=CLASSES[W.run.cls];return `<div class="topbar sts theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act I</small></span></span>
  <span class="stat hp" style="color:var(--status-damage)">${iconHTML('hud','heart','❤️')} ${Math.max(0,W.run.hp)}/${W.run.max}</span><span class="stat gold" style="color:var(--rarity-rare)">${iconHTML('hud','gold','💰')} ${W.run.gold}</span><span class="stat floor">${iconHTML('hud','floor','🏔️')} ${W.run.floor}/15</span>${potionSlots()}${relicBar()}<span class="sp"></span>
  ${W.run.lamp?`<button class="mini" id="lampbtn" onclick="openOv('tasks')" title="Lantern Tasks">${LANTERN_SVG} ${lampBtnLabel()}</button>`:''}<button class="mini" id="deckbtn" onclick="openOv('deck')" title="Deck">${iconHTML('hud','deck','🂠')} <span class="deck-count">${W.run.deck.length}</span></button><button class="mini" id="mapbtn" onclick="openOv('map')" title="Map">${iconHTML('hud','map','🗺️')}</button><button class="mini" id="setbtn" onclick="openOv('settings')" title="Settings">${iconHTML('hud','settings','⚙️')}</button></div>${toastsHTML()}`}
 export function potionSlots(){const ps=W.run.potions;return `<span class="potions" id="potions">${ps.map((id,i)=>{const p=id&&POTIONS[id];
- return `<button class="potion${p?'':' empty'}${W.S.potion===i?' on':''}" data-potion="${i}" ${p?`style="--pcol:${p.col}"`:''} title="${p?esc(p.n+': '+p.d):'Empty potion slot: potions you find wait here.'}" onclick="potionTap(${i})">${p?slotHTML('potions',id,'',p.e):''}</button>`}).join('')}</span>`}
+ return `<button class="potion${p?'':' empty'}${W.S.potion===i?' on':''}" data-potion="${i}" ${p?`style="--pcol:${p.col}"`:''} title="${p?esc(p.n+': '+p.d):'Empty potion slot.'}" onclick="potionTap(${i})">${p?slotHTML('potions',id,'',p.e):''}</button>`}).join('')}</span>`}
 export function relicBar(){const rs=W.run.relics;const now=Date.now();return `<div class="relics" id="relicbar">${rs.map(r=>{const d=RELICS[r.id];if(!d)return'';const fl=r.flashT&&now-r.flashT<900;
  const cnt=r.id==='starfish'||r.id==='boots'?r.n:'';return `<button class="relic${fl?' flash':''}${r.used?' used':''}" title="${esc(d.n+': '+d.d)}" data-relic="${r.id}" onclick="relicTap('${r.id}')">${slotHTML('relics',r.id,'',d.e)}${cnt!==''?`<i class="cnt">${cnt}</i>`:''}</button>`}).join('')}${(W.run.charms||[]).map(c=>`<button class="relic charm" title="${esc(CHARMS[c].n+': '+CHARMS[c].d)}" onclick="relicTap('charm:${c}')">${slotHTML('relics','charm:'+c,'',CHARMS[c].e)}</button>`).join('')}<button class="relic relic-more" hidden onclick="relicTap('__all')" aria-label="Show all relics" data-info="Hold to see all relics">+0</button></div>`}
 export function relicCollectionHTML(){return [...W.run.relics.map(r=>({id:r.id,d:RELICS[r.id]})),...(W.run.charms||[]).map(id=>({id:'charm:'+id,d:CHARMS[id]}))].filter(x=>x.d).map(({id,d})=>`<div class="itemhead">${slotHTML('relics',id,'itemart',d.e)}<div><b>${d.n}</b><div>${d.d}</div></div></div>`).join('')}
 let relicRail=null;
 const relicResize=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>fitRelics()):null;
-function fitRelics(){const bar=document.getElementById('relicbar');if(!bar||!bar.closest('.combat'))return;if(relicRail!==bar){relicResize?.disconnect();relicRail=bar;relicResize?.observe(bar)}const more=bar.querySelector('.relic-more'),icons=[...bar.querySelectorAll('.relic:not(.relic-more)')];
+function fitRelics(){const bar=document.getElementById('relicbar');if(!bar||!bar.closest('.combat,.runhud'))return;if(relicRail!==bar){relicResize?.disconnect();relicRail=bar;relicResize?.observe(bar)}const more=bar.querySelector('.relic-more'),icons=[...bar.querySelectorAll('.relic:not(.relic-more)')];
  // One row; CSS owns the shared icon and gap scale.
  const style=getComputedStyle(bar),cell=(icons[0]?.getBoundingClientRect().width||20)+parseFloat(style.columnGap);
  const capacity=Math.max(1,Math.floor(bar.clientWidth/cell));
@@ -96,66 +101,50 @@ export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(
 export function badges(block,blkT,st,extra,who){const n=alive().length;const limit=who&&typeof who==='object'&&n>1?Math.max(1,Math.min(2,Math.floor((innerWidth*(.98-1720/2340)/(n-.5)+1)/23))):6;return statusRowHTML(st,extra,who,limit)}
 // Floating numbers (R12): size scales with the amount (22-40 px), stacked numbers fan out, Guard uses its icon, and a number waits for the swing to connect (x.d).
 const FLN=/^([+-]?)(\d+)/;
-export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x.who===who&&now-x.t<T(950)+(x.d||0));
+export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x.who===who&&now-x.t<T(x.cls==='curse'?1800:950)+(x.d||0));
  return list.map((x,i)=>{const m=FLN.exec(String(x.txt).replace(/^Parry /,'')),n=m?+m[2]:0,big=(x.cls===''||x.cls==='bleed'||x.cls==='drench')&&n>=15;
   const fs=Math.round(Math.max(22,Math.min(40,22+n*.7))),ox=((i%3)-1)*20,oy=-(i%2)*14;
   const txt=String(x.txt).replace('🛡',iconHTML('status','block','🛡️')).replace('❤','').replace('⚡','⚡');
   return `<div class="fl ${x.cls}${big?' big':''}" style="--fs:${fs}px;--ox:${ox}px;--oy:${oy}px;animation-delay:${x.d||0?(x.d-(now-x.t)):-(now-x.t)}ms">${txt}</div>`}).join('')}
 // ---------------- intents ----------------
 export function intentHTML(e){const m=intentOf(e),p=[];
- const add=(k,n,cl='oth')=>p.push(`<span class="intent-part ${cl}">${intentIcon(k)}<b>${n}</b></span>`);
- if(m.a)add('attack',`${eAtk(e,m.a)}${m.h>1?'×'+m.h:''}`,'atk');
- if(m.b)add('guard',m.b,'def');
- if(m.s||m.grow)add('buff','+'+(m.s||m.grow),'buf');
- for(const [k,nm] of [['w','Soaked'],['v','Exposed'],['brittle','Brittle']])if(m[k])add('debuff',m[k],'deb');
- if(m.heal)add('heal',m.heal,'buf');
- if(m.healAlly)add('heal',m.healAlly,'buf');
- if(m.status)add('status',m.status.n,'deb');
- if(m.summon)add('summon',m.n>1?'×'+m.n:'');
- if(m.steal)add('steal',m.steal);
- if(m.ring)add('ring',m.ring);
- if(m.stealPotion)add('potion','');
- if(m.drainE)add('drain','−'+m.drainE);
- if(m.charge&&m.warn)add('unknown',`⏳ ${eAtk(e,m.warn.a)}${m.warn.h>1?'×'+m.warn.h:''}`,'atk');
- if(!p.length)add('unknown','…');
- return `<div class="intent${m.mirror?' mirror':''}${m.charge?' charge':''}" tabindex="0" role="button" aria-label="${esc(intentText(e))}" data-kw="Intent" data-sname="${esc(m.lbl||'Enemy intent')}" data-sinfo="${esc(intentText(e))}">${p.join('')}</div>`}
+ // Every effect of the move gets its own icon (intent-fx.js); debuffs show the status's own art (Soaked drop, Exposed eye…), not a generic arrow.
+ const add=(x)=>{const ic=x.st?intentIcon('debuff',assetSrc('status',x.st),x.st):intentIcon(x.icon);p.push(`<span class="intent-part ${x.cls}" data-fx="${x.k}">${ic}<b>${x.n}</b></span>`)};
+ for(const x of intentParts(e,m)){add(x);if(x.k==='warn')for(const y of x.extra)add({...y,k:'warn-'+y.k})}
+ if(!p.length)p.push(`<span class="intent-part oth" data-fx="none">${intentIcon('unknown')}<b>…</b></span>`);
+ return `<div class="intent${m.mirror?' mirror':''}${m.charge?' charge':''}" tabindex="0" role="button" aria-label="${esc(intentText(e))}" data-kw="Intent" data-sname="${esc(m.lbl||'Enemy intent')}" data-sinfo="${esc(m.lbl?intentText(e).replace(m.lbl+': ',''):intentText(e))}">${p.join('')}</div>`}
 export function intentText(e){const m=intentOf(e);const p=[];if(m.lbl)p.push(m.lbl+':');
- if(m.mirror)p.push('(copies the type of the last card you play this turn: Attack → attack 18, Skill → 14 Guard, Power → +2 Might; play nothing and it attacks for 18)');
- if(m.charge&&m.warn)p.push(`Winds up: next turn it attacks for ${eAtk(e,m.warn.a)}${m.warn.h>1?' × '+m.warn.h:''}${m.b?'; gains '+m.b+' Guard now':''}. Prepare Guard, or break it first`);else if(m.none)p.push('Does nothing');
- if(m.a)p.push(`Attack for ${eAtk(e,m.a)}${m.h>1?' × '+m.h:''}`+(m.boom?' then dies':''));if(m.b)p.push(`Gain ${m.b} Guard`);if(m.s)p.push(`Gain ${m.s} Might`);
- if(m.grow)p.push(`All Tendrils gain ${m.grow} Might; summons a Tendril if fewer than 2`);if(m.w)p.push(`Apply ${m.w} Soaked`);if(m.v)p.push(`Apply ${m.v} Exposed`);if(m.brittle)p.push(`Apply ${m.brittle} Brittle`);
- if(m.heal)p.push(`Heal ${m.heal}`);if(m.healAlly){const t=alive().find(x=>x.uid===m.tgt);p.push(`Heal ${t?t.n:'itself'} for ${t?m.healAlly:5}`)}if(m.status)p.push(`Add ${m.status.n} ${CARDS[m.status.id].n} to your ${m.status.pile==='disc'?'discard pile':m.status.pile==='hand'?'hand':'draw pile'}`);
- if(m.summon)p.push(`Summon ${m.n||1} ${EN[m.summon].n}${m.max?' (up to '+m.max+' alive)':''}`);if(m.steal)p.push(`Steal ${m.steal} gold and flee`);if(m.ring)p.push(`Add ${m.ring} Ringing to your discard pile`);
- if(m.stealPotion)p.push('Steal a potion');if(m.drainE)p.push(`You lose ${m.drainE} Energy next turn`);
+ if(m.mirror)p.push('(copies your last card type this turn: Attack → attack 18, Skill → 14 Guard, Power → +2 Might; none → attack 18)');
+ p.push(intentSentence(e,m));
  if(e.passive)p.push(`· Passive ${e.passive.n}: ${e.passive.text}`);return p.join(' ')}
 // ---------------- class bars (v2.1 rules, all actions non-blocking) ----------------
 export function classBar(){const c=W.run.cls,cb=W.cb;
  if(c==='tide'){const T=CORE.tide;let g='';for(let i=0;i<=10;i++)g+=`<i class="${i<=cb.tide?'on':''} ${i>=T.high?'hi':i<=T.low?'lo':''} ${i===cb.tide?'cur':''}"></i>`;
   const st=cb.tide>=T.high?'<b class="hi">HIGH</b>':cb.tide<=T.low?'<b class="lo">LOW</b>':'<b>Mid</b>';
   const cr=mod('crest',{preview:true},{dmg:T.crest_dmg,resetTo:5}),un=mod('undertow',{preview:true},{guard:T.undertow_blk,draw:T.undertow_draw,resetTo:5});
-  const arrow=cb.holdDrift?'<span class="arrow" title="Moonlock: the Tide will not drift at the start of your next turn">🔒</span>':cb.tideDir>0?'<span class="arrow up" title="Drift: the Tide rises 1 at the start of your turn">⬆</span>':cb.tideDir<0?'<span class="arrow dn" title="Drift: the Tide falls 1 at the start of your turn">⬇</span>':'<span class="arrow" title="No drift yet">•</span>';
-  let btn='';if(hasRelic('tidetable')&&!cb.tideBtnUsed)btn+=`<button class="tbtn" id="tideup" onclick="tideAct('up')" title="Tide Table: Surge 1 (free, once per turn)">+1</button><button class="tbtn" id="tidedn" onclick="tideAct('down')" title="Tide Table: Recede 1 (free, once per turn)">−1</button>`;
-  if(hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir)btn+=`<button class="tbtn" id="tideflip" onclick="tideAct('flip')" title="Helmsman's Wheel: flip the drift arrow">☸️</button>`;
-  if(cb.banks&&!cb.busy)btn+=`<button class="tbtn rel" id="relbank" onclick="releaseBank()" title="Release the Bank: ${cb.banks} Banked Crest${cb.banks>1?'s':''}, 1½ x Crest damage to ALL each">🏦 Release ×${cb.banks}</button>`;else if(cb.banks)btn+=`<span class="chip">🏦 ×${cb.banks}</span>`;
+  const arrow=cb.holdDrift?'<span class="arrow" title="Moonlock: no drift next turn">🔒</span>':cb.tideDir>0?'<span class="arrow up" title="Drift: +1 next turn">⬆</span>':cb.tideDir<0?'<span class="arrow dn" title="Drift: −1 next turn">⬇</span>':'<span class="arrow" title="No drift yet">•</span>';
+  let btn='';if(hasRelic('tidetable')&&!cb.tideBtnUsed)btn+=`<button class="tbtn" id="tideup" onclick="tideAct('up')" title="Surge 1. Free, once per turn.">+1</button><button class="tbtn" id="tidedn" onclick="tideAct('down')" title="Recede 1. Free, once per turn.">−1</button>`;
+  if(hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir)btn+=`<button class="tbtn" id="tideflip" onclick="tideAct('flip')" title="Flip the drift.">☸️</button>`;
+  if(cb.banks&&!cb.busy)btn+=`<button class="tbtn rel" id="relbank" onclick="releaseBank()" title="Release the Bank: ${cb.banks} Banked Crest${cb.banks>1?'s':''}, 1½× Crest damage to ALL each">🏦 Release ×${cb.banks}</button>`;else if(cb.banks)btn+=`<span class="chip">🏦 ×${cb.banks}</span>`;
   return `<span class="tst">${st} <b class="tnum">${cb.tide}</b>${arrow}</span><div class="gauge${anim(cb.crestT,T(700))?' crest':''}${anim(cb.undertowT,T(700))?' under':''}" title="10 = Crest (${cr.dmg} to ALL) · 0 = Undertow (${un.guard} Guard, draw ${un.draw}) · High ${T.high}+ · Low ${T.low}−">${g}</div>${btn}`}
  if(c==='echo'){const plan=echoPlan(true);let t;
   // Live Echo preview: each Marked card shows what its Echo would do right now (updates as you play cards after it).
   const mchip=(ci,k,after)=>{const pl=echoPlan(true,k);const pv=pl&&echoPreview(pl);const rep=pl&&pl.repeats>1?'×'+pl.repeats:'';
-   return `<span class="chip marked" title="${esc(cname(ci)+' will Echo at the end of your turn'+(pv?': about '+pv.total+(pv.kind==='dmg'?' damage':' Guard')+' in total':'')+'. +1 per card played after it (max +'+CORE.echo.bonus_cap+').')}">🔔 ${CARDS[ci.id].e} ${cname(ci)} +${markBonus(after)}${pv?` <b class="pv">→ ${pv.n}${pv.kind==='dmg'?'⚔':'🛡'}${rep}${pl.mult>1?' ×2':''}</b>`:''}${pl&&pl.scale<1?' ½':''}</span>`};
+   return `<span class="chip marked" title="${esc(cname(ci)+' Echoes at end of turn'+(pv?': about '+pv.total+(pv.kind==='dmg'?' damage':' Guard'):'')+'. +1 per card played after, max +'+CORE.echo.bonus_cap+'.')}">🔔 ${CARDS[ci.id].e} ${cname(ci)} +${markBonus(after)}${pv?` <b class="pv">→ ${pv.n}${pv.kind==='dmg'?'⚔':'🛡'}${rep}${pl.mult>1?' ×2':''}</b>`:''}${pl&&pl.scale<1?' ½':''}</span>`};
   const second=cb.mark&&canMark();
-  const mk=(cb.mark?mchip(cb.mark,1,cb.afterMark):'')+(cb.mark2?mchip(cb.mark2,2,cb.after2):'')+(canMark()?`<button class="tbtn mark${cb.armMark?' on':''}" id="markbtn" onclick="armMark()" title="Mark the next card you play: it Echoes at the end of your turn (+1 per card played after it, max +${CORE.echo.bonus_cap})">🔔 ${cb.armMark?'Marking…':second?'Mark 2nd':'Mark'}</button>`:'');
+  const mk=(cb.mark?mchip(cb.mark,1,cb.afterMark):'')+(cb.mark2?mchip(cb.mark2,2,cb.after2):'')+(canMark()?`<button class="tbtn mark${cb.armMark?' on':''}" id="markbtn" onclick="armMark()" title="Mark your next card. It Echoes at end of turn.">🔔 ${cb.armMark?'Marking…':second?'Mark 2nd':'Mark'}</button>`:'');
   if(!cb.mark&&plan){const d=CARDS[plan.card.id];t=`🔊 <span class="chip next">${d.e} ${cname(plan.card)}${plan.half?' '+fbLabel():''}</span>`}
   else if(!cb.mark)t='<span class="muted">No Echo yet</span>';else t='';
   return mk+' '+t}
  if(c==='carto'){let s='';const pk=cb.mode&&cb.mode.k==='slot';const lim=mod('advances',{},1);const canAdv=!pk&&cb.advUsed<lim&&!cb.busy&&!cb.mode;
   for(let i=0;i<cb.nslots;i++){const w=cb.slots[i];const r=w?(w.rank||0):0;const pips=w?`<span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span>`:'';
    const adv=w&&canAdv&&r<CORE.carto.rank_max;
-   s+=w?`<button class="wp full${pk?' pick':''}${adv?' adv':''}${r>=CORE.carto.rank_max?' land':''}${anim(w.trigT,T(600))?' trig':''}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" title="${esc(cname(w)+': '+desc(w).replace(/<[^>]+>/g,'')+(adv?' — tap to Advance (+1 Rank; damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':''))}">${CARDS[w.id].e}<span class="wpn">${cname(w)}</span>${pips}</button>`:`<div class="wp">·</div>`}
+   s+=w?`<button class="wp full${pk?' pick':''}${adv?' adv':''}${r>=CORE.carto.rank_max?' land':''}${anim(w.trigT,T(600))?' trig':''}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" title="${esc(cname(w)+': '+desc(w).replace(/<[^>]+>/g,'')+(adv?'. Tap for +1 Rank.':''))}">${CARDS[w.id].e}<span class="wpn">${cname(w)}</span>${pips}</button>`:`<div class="wp">·</div>`}
   const nd=mod('drawCount',{},4);const nx=cb.draw.slice(0,3).map((ci,i)=>`<span class="chip ${i<nd?'next':''}">${CARDS[ci.id].e} ${cname(ci)}</span>`).join('')||'<span class="muted">reshuffle</span>';
   return `<div class="wps">${s}</div><span class="advhint">${canAdv&&cb.slots.length?'⛰️ Tap a Waypoint to Advance':cb.advUsed?'⛰️ Advanced':''}</span><span class="nexts">🗺️ ${nx}</span>`}
  if(c==='duel'){const D=CORE.duel;const max=mod('momMax',{},D.mom_max);let p='';for(let i=0;i<max;i++)p+=`<i class="${i<cb.mom?'on':''}"></i>`;
   const can=cb.mom>=flourishMin();const mult=flourishMult(cb.mom);
-  const fb=`<button class="tbtn flo${cb.armFlourish?' on':''}" id="flourishbtn" ${can?'':'disabled'} onclick="armFlourish()" title="Flourish: your next Attack spends all Momentum and deals ×(1 + ½ per Momentum)">⚔️ ${can?(cb.armFlourish?'FLOURISH ×'+mult:'Flourish ×'+mult):'Flourish ('+flourishMin()+'+)'}</button>`;
+  const fb=`<button class="tbtn flo${cb.armFlourish?' on':''}" id="flourishbtn" ${can?'':'disabled'} onclick="armFlourish()" title="Flourish: next Attack spends all Momentum for extra damage.">⚔️ ${can?(cb.armFlourish?'FLOURISH ×'+mult:'Flourish ×'+mult):'Flourish ('+flourishMin()+'+)'}</button>`;
   return `<span>Momentum</span><span class="pips mom">${p}</span>${fb}${cb.parry?`<span class="chip parry">🤺 Parry ${cb.parry}</span>`:''}${cb.keepMom?'<span class="chip">🏃 keeps</span>':''}`}}
 // ---------------- combat ----------------
 // ---------------- battle figures (Art Director spec) ----------------
@@ -194,22 +183,29 @@ function coachHTML(){const cb=W.cb;if(settings.coach===false||cb.kind!=='fight'|
  else if(cb.turn<2){ico='⏳';t='Out of Energy? Press <b>End Turn</b>.'}
  else{ico='✨';t='New turn: Energy and cards are back. Win the fight to earn a card.'}
  return `<div class="coach" role="status"><span class="co-ico">${ico}</span><span>${t}</span><button class="co-x" aria-label="Hide hints" onclick="setCoach(false)">${glyph('cross')}</button></div>`}
+// v0.6.2 interim hero hint (Cartographer 4-card opening hand). Same pill as the coach; fades by itself.
+const HINT_MS=5200;
+function hintHTML(){const h=W.cb.hint;if(!h)return '';const age=Date.now()-h.t;if(age>=HINT_MS)return '';
+ return `<div class="coach hero-hint" role="status" style="animation-delay:-${age}ms"><span class="co-ico">${h.ico}</span><span>${h.txt}</span></div>`}
 const BEAT_MS={intro:3000,phase:2600};
 function bossBeatHTML(){const b=W.cb.beat;if(!b)return '';const age=Date.now()-b.t;if(age>=(BEAT_MS[b.kind]||2600))return '';
  const epi=b.kind==='intro'?(ENEMY_FLAVOUR[W.cb.bossKey]||'').split('. ')[0].replace(/\.$/,'')+'.':'';
  return `<div class="bossbeat combat-bossbeat bb-${b.kind}" aria-live="polite" style="animation-delay:-${age}ms"><i class="bb-rule"></i><h2>${b.title}</h2>${epi.length>2?`<div class="bb-epi">${epi}</div>`:''}<p>${b.sub}</p><i class="bb-rule"></i></div>`}
-function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<T(1300));return c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:''}
+// A curse that fires from your hand at end of turn (Dread) lifts out of the hand and glows, then fades (T(1600) at the current pace).
+function cursePopsHTML(){const now=Date.now(),cb=W.cb;const c=(cb.cursePops||[]).filter(x=>now-x.t<T(1600));cb.cursePops=c;if(!c.length)return '';
+ return `<div class="cursepops">${c.map((x,i)=>`<div class="cursepop" style="--i:${i};animation-delay:-${now-x.t}ms">${cardHTML({id:x.id,uid:-800-i,up:false})}</div>`).join('')}</div>`}
+function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<T(1300));return cursePopsHTML()+(c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:'')}
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
 export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
  h+=daisHTML();
  const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
- h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}`;
+ h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}${hintHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,T(560));if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
  h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&d.t!=='P'&&(!d.faint||hasRelic('hollowreed'))&&!d.unplay})}).join('')}</div>
- <div class="ctl"><div><div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy"><span>${cb.energy}/${cb.maxE}</span></div><button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
- <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk (removed for this combat)">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>END</button></div></div></div>`;
+ <div class="ctl"><div><div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy. Cards cost the number in their corner. Refills each turn."><span>${cb.energy}/${cb.maxE}</span></div><button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile.">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
+ <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>END</button></div></div></div>`;
  const m=cb.mode;
  if(m&&m.k==='choice')h+=`<div class="ov battle"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
  if(m&&m.k==='slot')h+=`<div class="ov battle"><div class="box tilebox" id="slotbox">${titleHTML(m.title)}<div class="tiles chtiles slottiles" style="--n:${cb.slots.length}">${cb.slots.map((w,i)=>`<div class="tcard opt slotpick">${cardHTML(w,{click:`modeAct('slot',${i})`})}<span class="tcap">${w.rank?'Rank '+w.rank:'Rank 0'}${w.temp?' · starting':''}</span></div>`).join('')}</div></div></div>`;
@@ -335,7 +331,7 @@ function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();const co
  const icon=(it,sh,i,group,def)=>`<button class="shopicon${it.sold?' sold':''}${it.right?' right':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="buy('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}">${slotHTML(group,it.id,'',def.e)}<span class="inm">${def.n}</span><span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':coin+' '+it.price}</span>${it.right?'<i class="shoptag">SHOP</i>':''}</button>`;
  const grp=(lbl,items,cls)=>`<div class="shgrp ${cls}"><div class="shlbl">${lbl}</div><div class="shrow">${items}</div></div>`;
  return topBar()+`<div class="shop-wren" aria-hidden="true">${emblemHTML('shop-wren','','wren')}</div>`+pkScreen({cls:'pk-shop',title:"Wren's Driftwood Bazaar",sub:`<em class="wrenline" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE)}">${wrenLine(bellCount(W.run.seed),currentTier())}</em>`,
-  body:`<div class="shop-main"><div class="shelf cards" id="cardshelf" style="--gw:max(${SHOP_MIN_CARD}px,calc((100cqh - 34px - 100px - 22px)*5/7))">${grp('Cards',S.cards.map((it,i)=>card(it,'cards',i)).join(''),'g-cards')}${grp('More class cards',S.colorless.map((it,i)=>card(it,'colorless',i)).join(''),'g-cards')}</div>
+  body:`<div class="shop-main"><div class="shelf cards" id="cardshelf" style="--gw:max(${SHOP_MIN_CARD}px,calc((100cqh - 34px - 100px - 22px)*5/7))">${grp('Cards',S.cards.map((it,i)=>card(it,'cards',i)).join(''),'g-cards')}${S.colorless.length?`<div class="shgrp g-cards g-more"><div class="shrow">${S.colorless.map((it,i)=>card(it,'colorless',i)).join('')}</div></div>`:''}</div>
    <div class="shelfrow"><div class="shelf relics">${grp('Relics',S.relics.map((it,i)=>icon(it,'relics',i,'relics',RELICS[it.id])).join(''),'g-icons')}</div><div class="shelf potions">${grp('Potions',S.potions.map((it,i)=>icon(it,'potions',i,'potions',POTIONS[it.id])).join(''),'g-icons')}</div></div></div>
    <div class="shop-side">${tileHTML({eid:'scrub',id:'opt-remove',emoji:'✂️',name:'Scrub a card',sum:`${coin} ${sp}${S.scrubbed?' (used)':''}`,info:'Scrub a card: pay to remove one card from your deck for good.',click:'shopRemove()',disabled:S.scrubbed||g<sp,cls:'svc-tile'})}</div>`,
   left:pkBtn('Select a card to buy','confirmShopCard()',{id:'buyselected',dis:1}),right:pkBtn('Leave','goMap()',{pri:1,id:'leaveshop',icon:'arrowright'})})}
@@ -411,13 +407,13 @@ export function render(){if(W.previewing||W.replaying)return;if(drag||(W.chartDr
  if(inspecting&&(inspectContext.screen!==s||inspectContext.run!==W.run||inspectContext.cb!==W.cb||inspectContext.ov!==W.S.ov))inspecting=null;
  if(s==='title')h=titleScr();
  else if(s==='travel')h=travelScr();
- else if(s==='map')h=`<div class="page mappage">`+topBar()+mapHTML(true)+'</div>';
+ else if(s==='map')h=`<div class="page mappage runhud">`+topBar()+mapHTML(true)+'</div>';
  else if(s==='combat'&&W.cb)h=combatScr();
- else{const fit=['reward','shop','pick','chest','rest','event','potpick','msg'].includes(s);h=`<div class="page ${fit?'fit fit-'+s:''}">`;
+ else{const fit=['reward','shop','pick','chest','rest','event','potpick','msg'].includes(s);const hud=!!W.run&&s!=='travel';h=`<div class="page ${fit?'fit fit-'+s:''}${hud?' runhud':''}">`;
   if(s==='reward')h+=rewardScr();else if(s==='chest')h+=chestScr();else if(s==='shop')h+=shopScr();else if(s==='rest')h+=restScr();else if(s==='event')h+=eventScr();
   else if(s==='pick')h+=pickScr();else if(s==='potpick')h+=potPickScr();
   else if(s==='msg')h+=topBar()+`<div class="panel msgp"><h2>${W.S.title}</h2><p>${W.S.text}</p></div><div class="actions"><button class="btn pri" id="msgok" onclick="continueMessage()">Continue</button></div>`;
-  else if(s==='end')h+=endScr();
+  else if(s==='end')h+=(hud?topBar():'')+endScr();
   h+='</div>'}
  if(W.run&&s!=='title'&&s!=='end')h+=popHTML();
  if(W.S.ov==='map'&&W.run){h+=`<div class="ov" id="ovl" onclick="if(event.target===this){W.S.ov=null;render()}"><div class="box mapbox">${mapHTML(false)}<button class="btn full" onclick="W.S.ov=null;render()">Close map</button></div></div>`}
@@ -516,6 +512,7 @@ if(typeof window!=='undefined'){let resizeFrame;window.addEventListener('resize'
 export let inspecting=null;
 let inspectContext=null;
 export function openInspect(ci,point=null,side=null){
+ if(inspecting&&inspectContext?.side&&!side&&document.querySelector('#inspect.held-hand'))return; // a held preview keeps its side for the whole hold
  inspecting=ci;inspectContext={screen:W.S.screen,run:W.run,cb:W.cb,ov:W.S.ov,point,side};render()
 }
 function placeHeldInspect(){
@@ -524,20 +521,23 @@ function placeHeldInspect(){
  const side=inspectContext?.side;panel.closest('#inspect')?.classList.toggle('held-hand',!!side);
  if(side){const rail=panel.querySelector('.inspect-keywords');const kw=rail?rail.getBoundingClientRect().width+6:0;const m=Math.max(12,innerWidth*.04);
   panel.style.left=(side==='left'?m:innerWidth-r.width-m)+'px';panel.style.top=Math.max(8,Math.min(innerHeight-r.height-8,(innerHeight-r.height)/2-innerHeight*.06))+'px';
-  if(rail){rail.style.left=side==='left'?'calc(100% + 3px)':(-kw)+'px';rail.style.maxHeight=(innerHeight-16)+'px';rail.style.top='0px'}return}
+  if(rail){rail.style.left=side==='left'?'calc(100% + 3px)':(-kw)+'px';const top=Math.max(panel.getBoundingClientRect().top,topBarBottom());rail.style.maxHeight=Math.max(60,innerHeight-8-top)+'px';rail.style.top=(top-panel.getBoundingClientRect().top)+'px'}return}
  if(!point){panel.style.left=(innerWidth-r.width)/2+'px';panel.style.top=(innerHeight-r.height)/2+'px';placeInspectKeywords(panel);return}
  let x=point.x-r.width/2,y=point.y-r.height-gap;
  if(y<8){x=point.x+gap+r.width<=innerWidth-8?point.x+gap:point.x-r.width-gap;y=(innerHeight-r.height)/2}
  panel.style.left=Math.max(8,Math.min(innerWidth-r.width-8,x))+'px';
  panel.style.top=Math.max(8,Math.min(innerHeight-r.height-8,y))+'px';placeInspectKeywords(panel)
 }
+// v0.6.2: keyword windows never sit over the shared top bar; returns the y they must stay below (8px if no bar is visible).
+export function topBarBottom(){let b=8;for(const t of document.querySelectorAll('.topbar')){const r=t.getBoundingClientRect();if(r.height>0&&r.bottom>0&&r.top<innerHeight*.4&&getComputedStyle(t).visibility!=='hidden')b=Math.max(b,r.bottom+4)}return b}
 export function placeInspectKeywords(panel){const rail=panel.querySelector('.inspect-keywords');if(!rail)return;const r=panel.getBoundingClientRect(),w=rail.getBoundingClientRect().width;
  // Glossary rail sits beside the card (right if it fits, else left) and is clamped fully on screen; it scrolls inside its own max height.
  const right=r.right+w+4<=innerWidth||r.left-w-3<0;let x=right?r.width+3:-w-3;const abs=r.left+x;if(abs<4)x+=4-abs;else if(abs+w>innerWidth-4)x-=abs+w-(innerWidth-4);
- rail.style.left=x+'px';rail.style.maxHeight=(innerHeight-16)+'px';rail.style.overflowY='auto';rail.style.touchAction='pan-y';
- const h=Math.min(rail.scrollHeight,innerHeight-16);rail.style.top=Math.max(8-r.top,Math.min(0,innerHeight-8-h-r.top))+'px'}
+ const tb=topBarBottom(),room=Math.max(60,innerHeight-8-tb);rail.style.left=x+'px';rail.style.maxHeight=room+'px';rail.style.overflowY='auto';rail.style.touchAction='pan-y';
+ const h=Math.min(rail.scrollHeight,room);rail.style.top=Math.max(tb-r.top,Math.min(0,innerHeight-8-h-r.top))+'px'}
 export function closeInspect(){inspecting=null;render()}
-export function inspectKeywordsHTML(ci){return kwList(ci).map(k=>`<div class="keyword-window"><b>${k.replace(/ X$/,'')}</b><span>${shortText(k.replace(/ X$/,''))||KW[k]}</span></div>`).join('')}
+export function inspectKeywordsHTML(ci){const sc=W.cb&&W.cb.hand.includes(ci)?costSurcharge(ci):[];
+ return sc.map(x=>`<div class="keyword-window surch"><span>${x.why}</span></div>`).join('')+kwList(ci).map(k=>`<div class="keyword-window"><b>${k.replace(/ X$/,'')}</b><span>${shortText(k.replace(/ X$/,''))||KW[k]}</span></div>`).join('')}
 export function inspectHTML(){const ci=inspecting,d=CARDS[ci.id];if(!d)return'';
  return `<div class="ov inspect" id="inspect" onclick="closeInspect()"><div class="insp">${cardHTML(ci,{full:true})}<div class="inspect-keywords">${inspectKeywordsHTML(ci)}</div><div class="ikw"><b>${cname(ci)}</b> <span class="muted">${TYPEN[d.t]} · ${RARN[d.r]||''}</span><div>${desc(ci)}</div><div class="kws">${kwFor(ci)}</div>${d.flavour?`<div class="flav">${d.flavour}</div>`:''}<div class="muted">Tap anywhere to close</div></div></div></div>`}
 

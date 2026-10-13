@@ -309,7 +309,7 @@
 
 /* ===== Claude 12: one carved-rail top bar. No boxes or circles: icons sit directly on a fading dark gradient with a thin bronze rail. ===== */
 .topbar{position:relative;gap:10px;border:0;border-radius:0;box-shadow:none;background:linear-gradient(#070a0fee,#0a0d14b8 70%,#0a0d1400)}
-.combat>.topbar,.page>.topbar{border:0}
+:is(.combat,.runhud)>.topbar{border:0}
 .topbar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;pointer-events:none;background:linear-gradient(90deg,transparent,#7a5a2c 8%,#e0bd78 30%,#8a6434 55%,#d9b46a 80%,transparent);box-shadow:0 1px 0 #05070b,0 0 8px #d9b46a33;opacity:.85}
 .topbar .who .pt{width:40px;height:44px;border:0;border-radius:0;overflow:visible;background:none;filter:drop-shadow(0 0 5px var(--class-primary)) drop-shadow(0 1px 2px #000)}
 .topbar .who .pt .slot,.topbar .who .pt img{border-radius:0;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 48%,#000 58%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 48%,#000 58%,transparent 100%)}
@@ -333,9 +333,11 @@
  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 32'%3E%3Cpath d='M9 2h6M10 2v7L4 24.5C3 27.5 5 30 8 30h8c3 0 5-2.500 4-5.500L14 9V2' fill='none' stroke='%23000' stroke-width='1.600' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M7 20h10' stroke='%23000' stroke-width='1.200' stroke-dasharray='1 2'/%3E%3C/svg%3E") center/contain no-repeat}
 /* relics: bare icons with a soft rarity glow */
 .topbar .relic{width:36px;height:38px;border:0;border-radius:6px;background:none;box-shadow:none;--rg:var(--rarity-rare)}
-.topbar .relic .slot{border-radius:0;filter:drop-shadow(0 0 5px color-mix(in srgb,var(--rg) 70%,transparent)) drop-shadow(0 1px 1px #000)}
+.topbar .relic .slot{border-radius:0;filter:drop-shadow(0 1px 1px #000)}
 .topbar .relic.charm{--rg:var(--rarity-uncommon)}
-.topbar .relic.flash{box-shadow:none;animation:relflash calc(.9s*var(--us,1)) ease-out}.topbar .relic.flash .slot{filter:drop-shadow(0 0 12px var(--status-energy)) drop-shadow(0 0 4px #fff)}
+.topbar .relic.flash{box-shadow:none;animation:relflash calc(.9s*var(--us,1)) ease-out}/* glow only while the flash plays, then nothing: a lingering .flash class (no re-render) used to leave the clipped glow as a dark box behind the icon */
+.topbar .relic.flash .slot{animation:relglow calc(.9s*var(--us,1)) ease-out both}
+@keyframes relglow{0%{filter:drop-shadow(0 0 3px var(--status-energy)) drop-shadow(0 0 2px #fff)}100%{filter:none}}
 .topbar .relic .cnt{background:none;border:0;color:#ffe9a8;text-shadow:0 1px 2px #000,0 0 4px #000;right:-2px;bottom:-3px}
 .topbar .relic .slot>.ph{background:none}
 .topbar .relics{padding:2px 2px}
@@ -488,6 +490,12 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 .tl-sea img{object-position:50% 56%}
 .tl-tower{right:5%;bottom:5%;height:82%;aspect-ratio:300/900;animation:tl-par 9s ease-in-out infinite alternate}
 .tl-tower img{position:relative;z-index:1;object-fit:contain;object-position:bottom;filter:brightness(.78) saturate(.85)}
+/* v0.6.2: lighthouse beam back, flicker-free: one pre-blurred image (art/v2/title/layers/beam.webp, soft cone baked in), no mask, no blend mode,
+   no filter; only transform + opacity animate, so it stays on its own compositor layer and never repaints. */
+.tl-beam{position:absolute;display:block;z-index:0;left:50%;top:29%;width:520%;height:80%;pointer-events:none;background:url(../art/v2/title/layers/beam.webp) 0 0/100% 100% no-repeat;transform-origin:0 50%;transform:translateY(-50%) rotate(128deg);opacity:0;will-change:transform;animation:tl-beam 12s ease-in-out infinite}
+@keyframes tl-beam{0%{transform:translateY(-50%) rotate(128deg);opacity:0}18%{opacity:1}50%{transform:translateY(-50%) rotate(155deg)}82%{opacity:1}100%{transform:translateY(-50%) rotate(128deg);opacity:0}}
+.reduce-motion .tl-beam{animation:none;opacity:.8;transform:translateY(-50%) rotate(145deg)}
+@media (prefers-reduced-motion:reduce){.tl-beam{animation:none;opacity:.8;transform:translateY(-50%) rotate(145deg)}}
 .tl-lamp{position:absolute;display:block;z-index:2;left:50%;top:29%;width:34%;aspect-ratio:1;border-radius:50%;background:radial-gradient(#fff6d8,#ffc85a99 22%,#ffb34733 45%,transparent 70%);transform:translate(-50%,-50%);will-change:opacity,transform;animation:tl-glow 2.6s ease-in-out infinite alternate}
 .tl-steps{left:-3%;right:-3%;bottom:0;height:13%;-webkit-mask-image:linear-gradient(transparent,#000 40%);mask-image:linear-gradient(transparent,#000 40%);animation:tl-par2 9s ease-in-out infinite alternate}
 .tl-ghost{left:74%;bottom:7%;width:3.6%;aspect-ratio:2/3;-webkit-mask-image:radial-gradient(closest-side,#000 55%,transparent);mask-image:radial-gradient(closest-side,#000 55%,transparent);animation:tl-float 5s ease-in-out infinite alternate}

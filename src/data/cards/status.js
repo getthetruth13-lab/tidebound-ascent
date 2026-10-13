@@ -2,7 +2,7 @@
 import {W} from '../../core/state.js';
 import {card} from './loader.js';
 import {CARDS} from '../../core/registry.js';
-import {addSt,loseHp,log} from '../../engine/combat.js';
+import {addSt,loseHp,log,floatText} from '../../engine/combat.js';
 import {pick} from '../../core/state.js';
 const S=(id,o)=>card('status',id,Object.assign({x:1},o));
 S('ringing',{e:'🔔',p:f=>{}});
@@ -16,7 +16,7 @@ K('barnacled',{e:'🦪',mod:{cost(inst,ctx,v){return W.cb&&W.cb.stat.playedTurn=
 K('brinerot',{e:'🦠',endInHand:f=>{loseHp(2);log('🦠 Brine Rot: −2 HP')}});
 K('seasick',{e:'🤢',onDrawSelf:(f,ci)=>{const o=W.cb.hand.filter(c=>c!==ci);if(o.length){const c=pick(o,'combat');W.cb.hand.splice(W.cb.hand.indexOf(c),1);W.cb.disc.push(c);log('🤢 Seasick: discarded '+CARDS[c.id].n)}}});
 K('anchorchain',{e:'⛓️',moor:1});
-K('dread',{e:'😨',endInHand:f=>{addSt(W.cb.p,'weak',1);log('😨 Dread: +1 Soaked')}});
+K('dread',{e:'😨',endInHand:(f,ci)=>{addSt(W.cb.p,'weak',1);log('😨 Dread: +1 Soaked');floatText('p','Dread: +1 Soaked','curse');(W.cb.cursePops=W.cb.cursePops||[]).push({id:'dread',uid:ci&&ci.uid,t:Date.now()})}});
 K('leakyhull',{e:'🕳️',endInHand:f=>{addSt(W.cb.p,'brittle',1);log('🕳️ Leaky Hull: +1 Brittle')}});
 K('sirenwhisper',{e:'🧜',mod:{canPlay(inst,ctx,v){return v&&W.cb.stat.playedTurn<4}}});
 K('wreckghost',{e:'👻',onDrawSelf:f=>{if(W.cb.energy>0){W.cb.energy--;log('👻 Wreck Ghost: −1 Energy')}}});

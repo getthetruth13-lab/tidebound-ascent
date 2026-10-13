@@ -15,6 +15,6 @@ export const INTENT_ICONS={
  drain:['intent-drain','M13 2L4 14h7l-1 8 10-13h-7z']
 };
 for(const [slot] of Object.values(INTENT_ICONS))if(!(slot in ASSETS.ui))ASSETS.ui[slot]=null;
-export function intentIcon(k){const [slot,path]=INTENT_ICONS[k]||INTENT_ICONS.unknown;
+export function intentIcon(k,img,tag){const [slot,path]=INTENT_ICONS[k]||INTENT_ICONS.unknown;
  const metal='intent-metal-'+k;const svg=`<svg class="intent-svg" viewBox="0 0 24 26" aria-hidden="true"><defs><linearGradient id="${metal}" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff0bb"/><stop offset=".3" stop-color="#bd9855"/><stop offset=".55" stop-color="#63431f"/><stop offset=".8" stop-color="#bd9855"/><stop offset="1" stop-color="#48301a"/></linearGradient></defs><path d="${path}" fill="url(#${metal})" stroke="#edcc8d" stroke-width="1.25" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#392719" stroke-width=".35" transform="translate(.5 .5)"/></svg>`;
- const src=assetSrc('ui',slot);return `<i class="intent-art" data-icon="${k}">${svg}${src?`<img class="uic" src="${src}" alt="" draggable="false" onerror="this.remove()">`:''}</i>`}
+ const src=img||assetSrc('ui',slot);return `<i class="intent-art" data-icon="${tag||k}">${svg}${src?`<img class="uic" src="${src}" alt="" draggable="false" onerror="this.remove()">`:''}</i>`}

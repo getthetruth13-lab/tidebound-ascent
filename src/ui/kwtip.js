@@ -8,23 +8,19 @@ import {relicFlavour} from '../data/lore.js';
 const EXTRA={ // statuses and terms the glossary spreads across other entries
  Landmark:'A Waypoint at Rank 3. Landmarks count twice for Expedition cards.',
  Rooted:'At the end of each of her turns, she gains 3 Guard per living Tendril.'};
-let names=null,re=null;
-const clean=k=>k.replace(/\s+X$/,'');
-function build(){const m=new Map();
- for(const [k,v] of Object.entries(KW)){if(/[()]/.test(k))continue;const n=clean(k);if(n.length>=3&&typeof v==='string')m.set(n,v)}
- for(const [k,v] of Object.entries(EXTRA))if(v)m.set(k,v);
- names=m;const list=[...m.keys()].sort((a,b)=>b.length-a.length).map(s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
- re=new RegExp('\\b('+list.join('|')+')(?:s|es|ed|ing)?\\b','g')}
+import {buildMatcher} from './kwmatch.js';
+let names=null,re=null,canon=null;
+function build(){({names,re,canon}=buildMatcher(KW,EXTRA))}
 export const keywordNames=()=>{if(!names)build();return [...names.keys()]};
 // 1-2 short sentences of the glossary entry: popups stay small.
 export function shortText(term){if(!names)build();const t=names.get(term)||'';const s=t.split(/(?<=[.!?])\s+/);let out=s[0]||'';
  if(s[1]&&(out+' '+s[1]).length<=190)out+=' '+s[1];return out}
-export const TEXT='.card .text,.tip .desc,.tip .kws,.ikw,.pop,.rrow .rd,.evtxt p,.evdesc,.evo .es,.msgp p,.tb-mech p,.tb-rule,.tb-lbody p,.tb-lbody li,.tb-rel,.tb-cols p,.tb-lore p,.tsum,.tcap,#kwtip .sx,.log div,.toast,.lp-hint,.lp-task b,.lp-tsk,.lp-lines td:first-child,.lp-story,.lp-nxt';
+export const TEXT='.card .text,.tip .desc,.tip .kws,.ikw,.pop,.rrow .rd,.evtxt p,.evdesc,.evo .es,.msgp p,.tb-mech p,.tb-rule,.tb-lbody p,.tb-lbody li,.tb-rel,.tb-cols p,.tb-lore p,.tsum,.tcap,#kwtip .sx,.log div,.toast,.lp-hint,.lp-task b,.lp-tsk,.lp-lines td:first-child,.lp-story,.lp-nxt,#kwtip > span,#kwtip .itip span';
 export function decorateKeywords(root=document){if(!root.querySelectorAll)return;if(!names)build();
  for(const box of root.querySelectorAll(TEXT)){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);const hits=[];
-  for(let n=w.nextNode();n;n=w.nextNode()){const p=n.parentElement;if(!p||p.closest('.kw,.cref,.tb-btn')||p.closest('button:not(.rrow)'))continue;if(n.nodeValue.length>=3&&re.test(n.nodeValue))hits.push(n);re.lastIndex=0}
+  for(let n=w.nextNode();n;n=w.nextNode()){const p=n.parentElement;if(!p||p.closest('.kw,.cref,.tb-btn,.flav')||p.closest('button:not(.rrow)'))continue;if(n.nodeValue.length>=3&&re.test(n.nodeValue))hits.push(n);re.lastIndex=0}
   for(const n of hits){const txt=n.nodeValue,f=document.createDocumentFragment();let last=0;re.lastIndex=0;
-   for(let m;(m=re.exec(txt));){if(m.index>last)f.append(txt.slice(last,m.index));const s=document.createElement('span');s.className='kw';s.dataset.kw=m[1];s.textContent=m[0];f.append(s);last=m.index+m[0].length}
+   for(let m;(m=re.exec(txt));){if(m.index>last)f.append(txt.slice(last,m.index));const s=document.createElement('span');s.className='kw';s.dataset.kw=canon(m);s.textContent=m[0];f.append(s);last=m.index+m[0].length}
    if(last<txt.length)f.append(txt.slice(last));re.lastIndex=0;n.replaceWith(f)}}
  // Native title bubbles are replaced by the themed popup (hover on desktop, long-press on shop items).
  for(const el of root.querySelectorAll('.shopicon[title],.relic[title],.potion[title]')){el.dataset.info=el.getAttribute('title');el.removeAttribute('title')}
@@ -59,7 +55,7 @@ function besideChoice(el,tr){
 }
 export function showTip(el){if(el.dataset.card)return showCard(el);if(ctip)ctip.classList.remove('on');const c=contentOf(el);if(!c||!c.text){return false}
  const t=ensure();const sl=el.matches('.relic,.potion,.shopicon')&&el.querySelector('.slot');const rl=el.dataset.relic&&RELICS[el.dataset.relic];
- t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b${c.kind?` class="${c.kind}"`:''}>${c.title}</b>`:''}<span>${c.text}</span>`;if(el.matches('.relic-more'))t.innerHTML=`<div class="relic-collection"><h2>Relics</h2>${relicCollectionHTML()}</div>`;t.classList.toggle('meter-tip',!!el.closest('.dais'));t.classList.toggle('item',!!sl);t.classList.toggle('stat',!!c.kind);if(c.kind)decorateKeywords(t);t.classList.add('on');anchor=el;shownAt=Date.now();
+ t.innerHTML=sl?`<div class="itip"><div class="itipart">${sl.outerHTML.replace('class="slot','class="slot itemart')}</div><div>${c.title?`<b>${c.title}</b>`:''}<span>${c.text}</span>${rl&&rl.flavour?`<em class="flav">${relicFlavour(rl.id,rl.flavour)}</em>`:''}</div></div>`:`${c.title?`<b${c.kind?` class="${c.kind}"`:''}>${c.title}</b>`:''}<span>${c.text}</span>`;if(el.matches('.relic-more'))t.innerHTML=`<div class="relic-collection"><h2>Relics</h2>${relicCollectionHTML()}</div>`;decorateKeywords(t);t.classList.toggle('meter-tip',!!el.closest('.dais'));t.classList.toggle('item',!!sl);t.classList.toggle('stat',!!c.kind);if(c.kind)decorateKeywords(t);t.classList.add('on');anchor=el;shownAt=Date.now();
  const meter=!!el.closest('.dais');t.style.maxWidth=meter?'150px':'';const r=el.getBoundingClientRect();let x,y;
  if(document.querySelector('.combat')){let best=null;
   for(const width of meter?[150,130,170,200,230,260]:[null]){if(width)t.style.maxWidth=width+'px';const tr=t.getBoundingClientRect(),sp=pickSpot(tr.width,tr.height,r,el,!!c.kind||meter);if(!best||sp.s<best.s){best={...sp,width};if(sp.s===0)break}}

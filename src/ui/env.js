@@ -81,7 +81,8 @@ export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&
  const changedEnv=root.dataset.env!==k.id;
  root.dataset.env=k.id;root.dataset.grade=k.grade;if(k.band)root.dataset.band=k.band;else delete root.dataset.band;if(root.dataset.q!==quality())root.dataset.q=front.dataset.q=quality();
  // transitions (visual only)
- if(prev&&changedEnv){const kind=k.grade==='boss'?'iris':(k.grade==='normal'||k.grade==='elite')&&W.S.screen==='combat'?'wipe':'fade';playTransition(kind,k.grade==='elite'?'#7a2e4a':(e.pal&&e.pal[2])||'#0b1a20')}
+ // v0.6.2: normal/elite fights no longer run the teal tide wipe; the screen crossfade is the whole transition (the flat panel swept across the battle).
+ if(prev&&changedEnv){const kind=k.grade==='boss'?'iris':(k.grade==='normal'||k.grade==='elite')&&W.S.screen==='combat'?'':'fade';if(kind)playTransition(kind,k.grade==='elite'?'#7a2e4a':(e.pal&&e.pal[2])||'#0b1a20')}
  root.querySelector('.envfb').style.background=e.bg||'';
  // painted layers: each layer is the full rect space (3600x1440); every shipped file sits at its rect (trimmed mid / fg-l / fg-r)
  const sp=e.space||[3600,1440];root.classList.toggle('has-art',!!e.art);

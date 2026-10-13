@@ -19,7 +19,7 @@ const canWind=(e,from,gap)=>e.t>=from&&e.t-(e.lastCharge==null?-99:e.lastCharge)
 function pk(e,opts){const h=e.hist||(e.hist=[]);const ok=o=>o.w>0&&!(h.length>=(o.rep||2)&&h.slice(-(o.rep||2)).every(l=>l===o.m.lbl));
  let c=opts.filter(ok);if(!c.length)c=opts.filter(o=>o.w>0);if(!c.length)c=opts.slice(0,1);
  let r=R(c.reduce((a,o)=>a+o.w,0),cs),o=c[0];for(const x of c){if(r<x.w){o=x;break}r-=x.w}
- let m={...o.m};if(o.wind){e.queued={...o.wind};e.lastCharge=e.t;m={...m,none:1,charge:1,warn:{a:o.wind.a,h:o.wind.h||1}}}
+ let m={...o.m};if(o.wind){e.queued={...o.wind};e.lastCharge=e.t;m={...m,none:1,charge:1,warn:{...o.wind,h:o.wind.h||1}}}
  h.push(m.lbl);if(h.length>6)h.shift();e.pk=e.hp;return m}
 // A queued wind-up move always lands the turn after its "Charging…" intent.
 const AI=f=>e=>{if(e.queued){const m=e.queued;e.queued=null;(e.hist||(e.hist=[])).push(m.lbl);e.pk=e.hp;return m}return f(e)};

@@ -14,7 +14,7 @@
 .pk-sub .gi{width:1em;height:1em}
 /* ---- the shared pick layout ---- */
 .page.fit{max-width:none;padding:0 var(--sf-x) 0;height:100dvh;overflow:hidden;gap:0}
-.page.fit>.topbar{flex:none;margin:0 calc(var(--sf-x)*-1)}
+
 .page.fit-event{padding:0}
 .pk{flex:1 1 0;min-height:0;display:flex;flex-direction:column;position:relative;z-index:1}
 .pk-body{flex:1 1 0;min-height:0;container-type:size;display:flex;align-items:center;justify-content:center;gap:14px;padding:8px 0 4px;position:relative}
@@ -110,7 +110,7 @@
 .pk-chest.open .pk-body .chestwrap .emb.big{width:min(240px,34cqw);max-height:calc(100cqh - 16px)}
 .pk-chest.open .pk-body .tiles .tile.sp{width:min(calc((100cqw - 300px - 14px*var(--n))/var(--n)),200px)}
 .pk>.etitle{margin-top:9px}
-.page.fit-event>.topbar{margin:0}
+
 /* ---- plaques out: options, load, deck, settings, travel quote, chips are engraved text on a dark scrim ---- */
 /* Task 47: options / load / deck / settings windows use the shared frame (window.css) like every other window */
 .tb-opt .tb-actions,.tb-load .tb-actions{display:flex;justify-content:flex-end;margin-top:6px}
@@ -151,3 +151,33 @@
 .tb-mi.off,.tb-mi:disabled{opacity:.38;filter:grayscale(.8) brightness(.8)}
 /* Task 48: build number, bottom-right corner of the main menu (StS shows its version in a menu corner). */
 .tm-ver{position:absolute;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(6px + env(safe-area-inset-bottom,0px));font:500 11px/1 'Crimson Pro',serif;letter-spacing:.06em;color:#c7ccd4;opacity:.5;pointer-events:none;text-shadow:0 0 4px #000,0 0 8px #000;z-index:3}
+/* ---- shop relic/potion offers: no box, icon sits on the shop background (Spencer 2026-10-12). Keep this no-box style. ---- */
+.pk-shop .shopicon{background:none;border:0;border-radius:0;box-shadow:none;padding:4px 2px;outline:none;-webkit-tap-highlight-color:transparent;transition:transform .15s ease,filter .15s ease}
+.pk-shop .shopicon .slot{width:46px;height:46px;border-radius:0;background:none;overflow:visible;filter:drop-shadow(0 4px 3px #000c)}
+.pk-shop .shopicon .slot>img{object-fit:contain;object-position:center}
+.pk-shop .shopicon .slot>.ph{background:none}
+.pk-shop .shopicon .slot::after{content:"";position:absolute;left:12%;right:12%;bottom:-5px;height:8px;border-radius:50%;background:radial-gradient(ellipse at center,#000a,transparent 70%);z-index:-1}
+.pk-shop .shopicon .inm,.pk-shop .shopicon .price{text-shadow:0 1px 2px #000,0 0 6px #000c}
+.pk-shop .shopicon .inm{color:#efe4c8}
+.pk-shop .shopicon.right .slot{filter:drop-shadow(0 4px 3px #000c) drop-shadow(0 0 8px color-mix(in srgb,var(--rarity-rare) 55%,transparent))}
+.pk-shop .shopicon:not(.sold):hover,.pk-shop .shopicon:not(.sold):focus-visible{transform:translateY(-3px)}
+.pk-shop .shopicon:not(.sold):hover .slot,.pk-shop .shopicon:not(.sold):focus-visible .slot{filter:drop-shadow(0 6px 4px #000c) drop-shadow(0 0 10px #f3d48a99)}
+.pk-shop .shopicon:not(.sold):active{transform:translateY(-1px) scale(.97)}
+/* "More class cards" heading removed: colourless cards continue the same row at the same spacing */
+.pk-shop .shelf.cards .g-more{padding-top:calc(12px + 3px + 1px + 2px + 2px)} /* label line + padding + border + margin + gap */
+/* ---- shop sizing v2 (Spencer 2026-10-12): on the phone layout (<=500px CSS high) the 7 cards sit in ONE row, ~18% bigger than
+   after-shop.png (60px -> 71px, less only where the width can't fit 7), relics/potions ~15% smaller. Title, quote, Scrub, footer unchanged. ---- */
+@media (max-height:500px){
+ .page.fit-shop .pk-shop #cardshelf{--gw:clamp(56px,calc((100vw - 204px - 36px)/7),71px)!important;mask-image:none;-webkit-mask-image:none;padding-right:0;overflow-x:hidden}
+ .page.fit-shop .pk-shop #cardshelf .shrow{gap:6px}
+ .page.fit-shop .pk-shop #cardshelf{gap:6px}
+ .page.fit-shop .pk-shop .shopicon,.page.runhud.fit-shop .pk-shop .shopicon{min-width:78px;min-height:54px;padding-top:1px;padding-bottom:1px}
+ .page.fit-shop .pk-shop .shopicon .slot,.page.runhud.fit-shop .pk-shop .shopicon .slot{width:26px;height:26px}
+ .page.fit-shop .pk-shop .shopicon .inm,.page.runhud.fit-shop .pk-shop .shopicon .inm{font-size:9.5px}
+ .page.fit-shop .pk-shop .shopicon .price{font-size:12px}
+}
+@media (max-height:500px) and (max-width:720px){
+ .page.fit-shop .pk-shop .shopicon,.page.runhud.fit-shop .pk-shop .shopicon{min-width:68px}
+ .page.fit-shop .pk-shop .shelf.relics,.page.fit-shop .pk-shop .shelf.potions{gap:6px}
+ .page.fit-shop .pk-shop .shelfrow{gap:12px}
+}

@@ -149,24 +149,17 @@
 .end .lp-sum .lp-btns .btn{flex:1 1 0;min-width:0;white-space:normal;text-align:center;font-size:12.5px;letter-spacing:.04em;line-height:1.1;padding:4px 2px;overflow:hidden}
 
 /* ===== Task 57: smaller non-combat HUD; a long class name never runs into HP ===== */
-.page>.topbar{min-height:0;padding-top:2px;padding-bottom:2px;gap:6px}
-.page>.topbar .who .pt{width:32px;height:34px}
-.page>.topbar .potion{width:38px;height:38px;padding:4px}
-.page>.topbar .relic{width:30px;height:32px}
-.page>.topbar .mini{min-height:34px}
-.page>.topbar .mini .uic{width:22px;height:22px}
-.page>.topbar .stat{font-size:14px}
 .topbar .who{min-width:0;flex:0 1 auto}
 .topbar .who .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.combat>.topbar.longname .who{left:1%!important}
-.combat>.topbar.longname .who .nm{font-size:calc(var(--hud-text)*.8);letter-spacing:-.03em;white-space:nowrap}
+:is(.combat,.runhud)>.topbar.longname .who{left:1%!important}
+:is(.combat,.runhud)>.topbar.longname .who .nm{font-size:calc(var(--hud-text)*.8);letter-spacing:-.03em;white-space:nowrap}
 
 /* ===== Task 57: travel card: the ferryman quote sits in a Task 49 frame ===== */
 .travel .ferry.win{display:flex;align-items:center;gap:12px;width:max-content;max-width:min(520px,80vw);margin:14px auto 0;padding:10px 22px;box-sizing:border-box;text-align:left;--s:.11;border-width:calc(60px*var(--s))}
 .travel .ferry.win .emb{width:34px;height:34px;font-size:18px;flex:none}
 .travel .ferry.win q{font:italic 400 15px/1.25 var(--serif);color:var(--cream)}
 .page.travel .skip{bottom:8px}
-.combat>.topbar .who .nm{overflow:visible;text-overflow:clip}
+:is(.combat,.runhud)>.topbar .who .nm{overflow:visible;text-overflow:clip}
 
 /* Task 57: reserve the unlock footer before sizing three illustrated choices. */
 #lamppick{height:min(360px,calc(100dvh - 24px))}

@@ -10,7 +10,7 @@ export const HEROES={
    'The moonshell at your belt still hums in time with the waves.',
    'You climb to make the sea answer to you again.'],
   plain:'A tide meter runs from 0 to 10. From your second turn it drifts after you draw. Surge and Recede cards push it. Reach 10 for a Crest that hits every enemy; reach 0 for an Undertow that gives Guard and a card.',
-  tips:['Look at the arrow before you play: after you draw next turn, the Tide drifts that way.','High Tide and Low Tide unlock extra text on many cards. Pick a side before you commit.']},
+  tips:['Check the arrow: the Tide drifts that way next turn.','Many cards get bonuses at High or Low Tide. Pick a side.']},
  echo:{epithet:'Hearer of the Last Note',
   blurb:'A combo caster whose best card of the turn sings a second time, stronger when another card follows it.',
   lore:['Forty leagues inland, a single bronze note rolled across the barley and would not fade.',
@@ -18,7 +18,7 @@ export const HEROES={
    'You have followed the echo ever since, and it grows louder with every step toward the sea.',
    'Strike a note and the world strikes it back, a little stronger.'],
   plain:'Once per turn, tap the bell to Mark a non-Faint Attack or Skill before playing it. At the end of your turn it repeats for free, with a damage and Guard bonus capped at +1 after another card. Resound text only happens on the Echo.',
-  tips:['Mark a strong Attack or Guard card early, then play another card to reach the +1 Echo bonus.','If you forget to Mark, your last non-Faint Attack or Skill still Echoes at quarter strength.']},
+  tips:['Mark a strong card early, then play another for +1.','No Mark? Your last card still Echoes at quarter strength.']},
  carto:{epithet:'Charter of the Unmapped Coast',
   blurb:'A planner who sees the whole deck, lays Waypoints that work every turn, and burns the road behind them.',
   lore:['Every chart of this coast ends at the same blank margin.',
@@ -26,7 +26,7 @@ export const HEROES={
    'Your road is drawn in advance and walked in blood. If it burns behind you, so much the better.',
    'Maps do not forgive, but they do remember.'],
   plain:'Your draw pile is face up, so you always know what comes next. You draw four cards per turn. Waypoints sit in three slots and trigger at the start of your turn. Once per turn, Advance one to raise its Rank; Rank 3 is a Landmark.',
-  tips:['Fill your slots early: a Waypoint normally first triggers at the start of your next turn; Fast Waypoints also trigger when placed.','Expedition cards grow with each Waypoint in play, and Landmarks count twice.']},
+  tips:['Fill slots early. Waypoints first trigger next turn.','Expedition grows per Waypoint. Landmarks count twice.']},
  duel:{epithet:'Oathblade of the Last Keeper',
   blurb:'A tempo fighter who builds Momentum with every strike, cashes it in with a Flourish, and bleeds the survivors.',
   lore:['The Last Keeper\'s blade came down to your order with a single oath: Light it.',
@@ -34,7 +34,7 @@ export const HEROES={
    'You have not lost a duel since. You have lost much else.',
    'Every foe is a lesson in tempo, and every parry a promise kept.'],
   plain:'Attacks build Momentum, which carries between turns and fades by 1 at the end of your turn. With enough, tap the glowing blade to Flourish: spend it all for a much bigger hit. Parry reduces the first blow and reflects half the Parry.',
-  tips:['Flourish spends all your Momentum: ×2 at 2 Momentum, up to ×3.5 at 5.','Apply Bleed before attacking: it ignores Guard, triggers once per Attack per enemy, then falls by 1.']}};
+  tips:['Flourish: ×2 at 2 Momentum, up to ×3.5 at 5.','Bleed first. It ignores Guard and drops 1 per Attack.']}};
 // Character select v2 lore window (CHARSEL-IDEAS idea 8). Spoiler-safe: S0/S1 only per design/lore/LORE-BIBLE.md (no later-act hints).
 // tags: three "how it plays" icons, one word each. Icon ids map to inline SVGs in select.js (CS_ICON).
 export const CHARSEL={

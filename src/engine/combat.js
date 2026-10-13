@@ -221,7 +221,9 @@ export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;
  if(W.run.cls==='carto')cb.slots.slice().forEach(w=>{for(let k=0;k<mod('wpTriggers',{wp:w},1);k++)trigWp(w)});
  if(!W.cb||!alive().length)return after();
  const n=mod('drawCount',{},(W.run.cls==='carto'?4:5))+(ts.draw||0)+cb.wpDraw+cb.nextDraw;cb.wpDraw=0;cb.nextDraw=0;
- const drawn=()=>{if(!W.cb)return;drawCards(n);if(cb.pendingE){gainEnergy(cb.pendingE);cb.pendingE=0}fire('afterDraw',{turn:cb.turn});drift();after()};
+ // v0.6.2 interim: say why the Cartographer opens with 4 cards (once per run), and pop the Tuning Fork's turn-1 bonus card.
+ const fork=cb.turn===1&&hasRelic('tuningfork'),cartoHint=cb.turn===1&&W.run.cls==='carto'&&n===4&&!W.run.cartoHint;
+ const drawn=()=>{if(!W.cb)return;drawCards(n);if(fork){const pop=()=>{if(W.cb!==cb)return;flash(relic('tuningfork'));callout('+1 card · Tuning Fork','relic');render()};if(window.FAST)pop();else setTimeout(pop,T(780))}if(cartoHint){W.run.cartoHint=1;cb.hint={t:Date.now(),ico:'🗺️',txt:'<b>4 cards</b> is by design: the Cartographer plans ahead and draws more from <b>Waypoints</b>.'}}if(cb.pendingE){gainEnergy(cb.pendingE);cb.pendingE=0}fire('afterDraw',{turn:cb.turn});drift();after()};
  if(cb.chartQ){const k=cb.chartQ;cb.chartQ=0;chart(k,drawn);render()}else drawn()}
 // Tidecaller Drift (v2.1): from turn 2, the Tide moves `drift` in the direction of its last move. After the Guard reset and draw.
 function drift(){const cb=W.cb;if(W.run.cls!=='tide'||cb.turn<2||!cb.tideDir)return;
@@ -319,7 +321,10 @@ function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  if(W.run.cls==='duel'&&!cb.keepMom&&!mod('keepMomentum',{},false))cb.mom=Math.max(0,cb.mom-DU.decay);cb.keepMom=false;
  cb.fx=cb.fx.filter(l=>l.combat||(l.turns&&--l.turns>0));
  cb.busy=true;cb.banner={txt:'Enemy Turn',t:Date.now(),en:1};render();
- if(window.FAST)enemyPhase();else setTimeout(enemyPhase,T(280))}
+ // A curse that fired in hand (Dread) pops over the hand first; hold the enemy turn so its notice can be read.
+ const popT=(cb.cursePops||[]).some(x=>Date.now()-x.t<200)?CURSE_POP:0;
+ if(window.FAST)enemyPhase();else setTimeout(enemyPhase,T(ENEMY_PRE+popT))}
+export const CURSE_POP=900;
 export function eAtk(e,a){let d=a+(e.st.str||0)+(e.st.mightTmp||0);if(e.st.weak)d=Math.floor(d*.75);if(W.cb.p.st.vuln)d=Math.floor(d*1.5);return Math.max(0,d)}
 export function intentOf(e){const t=EN[e.key];const m=t.intent?t.intent(e):e.next;return mod('intentDisplay',{enemy:e},m)||{none:1}}
 // Enemy Attack on the player: Parry first (reduce the first Attack, reflect half, once per turn), then Guard, then HP.
@@ -347,7 +352,10 @@ export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=inten
  if(m.fx)m.fx(e)}
 function endOfEnemyTurn(e){const t=EN[e.key];if(t.passive&&t.passive.endTurn)t.passive.endTurn(e);
  if(e.st.shell)e.block+=e.st.shell;if(e.st.mending&&e.hp>0){const h=Math.min(e.st.mending,e.max-e.hp);e.hp+=h;if(h)floatText(e.uid,'+'+h,'h')}}
-const TELEGRAPH=250; // ms the acting enemy crouches and flashes before it strikes (skipped when FAST)
+// v0.6.2 pacing (Spencer: enemy turns ~2x as long; G7-TIMING.md recommends ~550/450/520 ms after scale). Base ms, scaled by T(); all skipped when FAST.
+const ENEMY_PRE=480;  // 'Enemy Turn' banner before the first enemy acts (was 280)
+const TELEGRAPH=430;  // ms the acting enemy crouches and flashes before it strikes (was 250)
+const ENEMY_GAP=450;  // pause after an enemy acts so its hit and the hero recoil read before the next one (was 260)
 export function enemyPhase(){const cb=W.cb;if(!cb)return;
  // Start of the enemy turn: the player's Soaked / Exposed / Brittle wear off by 1.
  tick(cb.p.st);
@@ -360,7 +368,7 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;
   if(e.hp>0&&!e.fled){if(e.keepNext)e.keepNext=false;else e.next=EN[e.key].ai(e)}
   if(W.run.hp<=0&&!cheatDeath())return lose();
   if(!alive().length)return finish();
-  if(window.FAST)return step();render();setTimeout(step,T(260))};
+  if(window.FAST)return step();render();setTimeout(step,T(ENEMY_GAP))};
  const finish=()=>{if(!W.cb)return;cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
  step()}
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
