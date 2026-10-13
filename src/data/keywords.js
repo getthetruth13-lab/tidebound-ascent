@@ -28,6 +28,10 @@ Object.assign(kw,{
  'Resonating X':'Your Echoed Attacks deal X more damage to it. Drops 1 per turn. Max 12.',
  'Bank':'Stores a Crest instead of firing it, up to 3. Release deals 1½× Crest damage each.',
  'Reveal':'Shows what a ? room holds.',
- 'Power':'Stays in play until combat ends.',
+ 'Vigil':'A card type. Once played, it stays in play for the rest of the fight, like a lamp left burning through the night.',
+ 'Flotsam':'Junk added during a fight. It clogs your hand.',
+ 'Burden':'A curse that stays in your deck.',
+ 'Full Flame':'Spends all your Energy. X is the amount spent.',
+ 'Artifact':'A rare card. A badge, not a card type.',
 });
 registerKeywords(kw);

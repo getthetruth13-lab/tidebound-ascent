@@ -20,7 +20,7 @@ const asy=h=>h.replace(/<img (?![^>]*decoding=)/g,'<img decoding="async" ');
 const TRACK_NAME=t=>t==='climb'?'Stair Climb':CLASSES[t].n+' Lamp';
 const TRACK_LEVELS=t=>t==='climb'?CLIMB_XP.length:LAMP_XP.length;
 // ---------- small tiles ----------
-const TYPE_N={A:'Attack',S:'Skill',P:'Power',W:'Waypoint'};
+const TYPE_N={A:'Attack',S:'Skill',P:'Vigil',W:'Waypoint'};
 export function itemTile(kind,id,o={}){
  if(kind==='card'){const d=CARDS[id];return `<div class="lp-pick${o.on?' on':''}${o.click?' live':''}"><div class="lp-cardwrap${o.on?' on':''}">${cardHTML({id,uid:-500-(o.i||0),up:false},{click:o.click})}</div><span class="tcap r-${d.r}">${RARN[d.r]} · ${TYPE_N[d.t]||''}</span></div>`}
  const d=kind==='relic'?RELICS[id]:POTIONS[id];if(!d)return '';

@@ -1,9 +1,11 @@
 // engine/cards.js
-import {CARDS,KW} from '../core/registry.js';
+import {CARDS,KW,TYPEN} from '../core/registry.js';
 import {mod} from '../core/bus.js';
 import {buildMatcher} from '../ui/kwmatch.js';
 let KM=null;
 import {W,nextId} from '../core/state.js';
+// Type display names (ids stay P/C/T): the redesign vocabulary, FUN-REDESIGN 5.0.
+TYPEN.P='Vigil';TYPEN.C='Burden';TYPEN.T='Flotsam';
 // ================= card helpers =================
 export function mk(id,up,o){return Object.assign({id,uid:nextId(),up:!!up},o||{})}
 export const isUp=ci=>!!(ci.up||ci.tmpUp);

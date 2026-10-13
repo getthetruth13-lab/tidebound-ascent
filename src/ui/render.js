@@ -15,7 +15,10 @@ import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/regis
 import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
 import {loadProfile,saveProfile} from '../progress.js';
 import {W} from '../core/state.js';
-import {T,SPEEDS,SPEED_LABEL,setAnimSpeedValue} from '../core/timing.js';
+import {T,SPEEDS,SPEED_LABEL,setAnimSpeedValue,setEnemyPace,enemyPace} from '../core/timing.js';
+import {heroPlateHTML} from './hero-plate.js';
+import {heroHook} from './herohooks.js';
+export {toggleHitLog} from './hero-plate.js';
 import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,baseCost,costSurcharge} from '../engine/cards.js';
 import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
@@ -107,14 +110,18 @@ export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x
   const txt=String(x.txt).replace('🛡',iconHTML('status','block','🛡️')).replace('❤','').replace('⚡','⚡');
   return `<div class="fl ${x.cls}${big?' big':''}" style="--fs:${fs}px;--ox:${ox}px;--oy:${oy}px;animation-delay:${x.d||0?(x.d-(now-x.t)):-(now-x.t)}ms">${txt}</div>`}).join('')}
 // ---------------- intents ----------------
-export function intentHTML(e){const m=intentOf(e),p=[];
+export function intentHTML(e){const m=intentOf(e),p=[];const tick=heroHook(W.run.cls).intentTick?.(W.cb,e)||'';const tickClass=['on','short'].includes(tick)?tick:'';
  // Every effect of the move gets its own icon (intent-fx.js); debuffs show the status's own art (Soaked drop, Exposed eye…), not a generic arrow.
- const add=(x)=>{const ic=x.st?intentIcon('debuff',assetSrc('status',x.st),x.st):intentIcon(x.icon);p.push(`<span class="intent-part ${x.cls}" data-fx="${x.k}">${ic}<b>${x.n}</b></span>`)};
+ // Task 67 (FUN-REDESIGN 9.5/9.6): the attack shows the ONE-hit number (never a multi-hit total), a small hit count beside it, and a tick slot
+ // (hidden until the Duelist step wires Clean Answer: it lights green at 9 / 9 and shows grey short of it).
+ const add=(x)=>{const ic=x.st?intentIcon('debuff',assetSrc('status',x.st),x.st):intentIcon(x.icon);
+  const num=x.k==='a'?`<b>${eAtk(e,m.a)}</b>${m.h>1?`<small class="ihits">×${m.h}</small>`:''}<i class="itick ${tickClass}" aria-hidden="true"></i>`:`<b>${x.n}</b>`;
+  p.push(`<span class="intent-part ${x.cls}" data-fx="${x.k}">${ic}${num}</span>`)};
  for(const x of intentParts(e,m)){add(x);if(x.k==='warn')for(const y of x.extra)add({...y,k:'warn-'+y.k})}
  if(!p.length)p.push(`<span class="intent-part oth" data-fx="none">${intentIcon('unknown')}<b>…</b></span>`);
  return `<div class="intent${m.mirror?' mirror':''}${m.charge?' charge':''}" tabindex="0" role="button" aria-label="${esc(intentText(e))}" data-kw="Intent" data-sname="${esc(m.lbl||'Enemy intent')}" data-sinfo="${esc(m.lbl?intentText(e).replace(m.lbl+': ',''):intentText(e))}">${p.join('')}</div>`}
 export function intentText(e){const m=intentOf(e);const p=[];if(m.lbl)p.push(m.lbl+':');
- if(m.mirror)p.push('(copies your last card type this turn: Attack → attack 18, Skill → 14 Guard, Power → +2 Might; none → attack 18)');
+ if(m.mirror)p.push('(copies your last card type this turn: Attack → attack 18, Skill → 14 Guard, Vigil → +2 Might; none → attack 18)');
  p.push(intentSentence(e,m));
  if(e.passive)p.push(`· Passive ${e.passive.n}: ${e.passive.text}`);return p.join(' ')}
 // ---------------- class bars (v2.1 rules, all actions non-blocking) ----------------
@@ -152,8 +159,10 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
 export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*FEET),top:vw>vh?56:40,heroTop:40}}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
-function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const sc=figureScale(role==='boss');let H=Math.round(Math.min(sc*(role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(role==='hero'?g.heroTop:g.top+32)));
- if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*sp.h/sp.w));
+// v0.6.2.1 (Spencer): every battle figure 15% taller; top = feet - H keeps the ground anchor fixed. Head-room and width clamps still apply.
+export const FIG_SCALE=1.15;
+function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const sc=figureScale(role==='boss')*FIG_SCALE;let H=Math.round(Math.min(sc*(role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(role==='hero'?g.heroTop:g.top+32)));
+ if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*FIG_SCALE*sp.h/sp.w)); // sprites may grow into the cell gap; HP bars/intents keep the cell width (--bw)
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
  const top=g.feet-H-hov,L=Math.max(4,Math.min(g.vw-W-4,x-Math.round(W*(g.multi?.5:ax)))),fx0=Math.round(W*(g.multi?.5:ax));const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.min(g.vh*260/1080,g.multi?g.enemyMaxWidth:Infinity));
  const shW=Math.round(W*.7*(role==='boss'?1.3:1)*(hov?.55:1));const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px${role!=='hero'&&sp.facing==='right'?';scale:-1 1':''}" onerror="assetFail(this)">`:''}</div>`;
@@ -196,7 +205,8 @@ function cursePopsHTML(){const now=Date.now(),cb=W.cb;const c=(cb.cursePops||[])
  return `<div class="cursepops">${c.map((x,i)=>`<div class="cursepop" style="--i:${i};animation-delay:-${now-x.t}ms">${cardHTML({id:x.id,uid:-800-i,up:false})}</div>`).join('')}</div>`}
 function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<T(1300));return cursePopsHTML()+(c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:'')}
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
-export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
+export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==enemyPace())setEnemyPace(settings.enemyPace);
+ const incoming=cb.ens.filter(e=>e.hp>0&&!e.fled).reduce((a,e)=>{const m=intentOf(e);return a+(m.a?eAtk(e,m.a)*(m.h||1):0)},0);let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
  h+=daisHTML();
  const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>e.hp>0&&!e.fled);
  h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>enemyHTML(e,i,k,live.length,g)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}${hintHTML()}`;
@@ -204,7 +214,7 @@ export function combatScr(){const cb=W.cb;let h=`<div class="combat theme-${TH[W
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,T(560));if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
  h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&d.t!=='P'&&(!d.faint||hasRelic('hollowreed'))&&!d.unplay})}).join('')}</div>
- <div class="ctl"><div><div class="orb ${cb.energy?'':'empty'}" id="orb" title="Energy. Cards cost the number in their corner. Refills each turn."><span>${cb.energy}/${cb.maxE}</span></div><button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile.">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
+ <div class="ctl"><div>${heroPlateHTML({incoming})}<button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile.">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
  <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>END</button></div></div></div>`;
  const m=cb.mode;
  if(m&&m.k==='choice')h+=`<div class="ov battle"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
@@ -272,6 +282,7 @@ const sxSeg=(id,label,vals,cur,fn)=>`<div class="sx-row"><span class="sx-t">${la
 const sxRange=(id,label,key,val)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-rng" id="${id}" aria-label="${label} volume" type="range" min="0" max="1" step="0.01" value="${val}" style="--p:${Math.round(val*100)}%" oninput="this.style.setProperty('--p',this.value*100+'%');setAudioSetting('${key}',this.value)"></label>`;
 export function settingsHTML(){return `<div class="settings sx">
  ${sxSeg('setanimspeed','Animation speed',Object.keys(SPEEDS).map(v=>[v,SPEED_LABEL[v]]),settings.animSpeed||'normal','setAnimSpeed')}
+ ${sxSeg('setenemypace','Enemy turns',[['measured','Measured'],['classic','Fast']],settings.enemyPace||'measured','setEnemyPaceMode')}
  ${sxSeg('setenvfx','Effects',['full','reduced','off'].map(v=>[v,envFxSettingLabel(v)]),settings.envFx,'setEnvFx')}
  ${sxRange('setmusic','Music','musicVolume',settings.musicVolume)}${sxRange('setsfx','SFX','sfxVolume',settings.sfxVolume)}
  ${sxSw('setfast','Fast animations',settings.fastAnim,'setFast')}${sxSw('setmute','Mute audio',settings.audioMuted,'setMute')}
@@ -286,6 +297,7 @@ export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
 export function setCharselParallax(on){settings.charselParallax=!!on;saveSettings()}
 export function setHandHaptic(on){settings.handHaptic=!!on;saveSettings()}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
+export function setEnemyPaceMode(v){settings.enemyPace=v==='classic'?'classic':'measured';setEnemyPace(settings.enemyPace);saveSettings()}
 export function setAnimSpeed(v){settings.animSpeed=SPEEDS[v]?v:'normal';setAnimSpeedValue(settings.animSpeed);saveSettings()}
 export function setEnvFx(v){settings.envFx=v;saveSettings();render()}
 // Act I title card (design-v2 §W.5, art/v2/bg/_src/tc-a1-spec.json): the painted plate (frame + emblem, 60% of the screen width, centred) fades in
@@ -319,7 +331,9 @@ function rewardScr(){const S=W.S,title=stripEmoji(S.title||'');
   return topBar()+pkScreen({cls:'pk-swap',title:'Potion belt full',sub:`Swap <b>${p.n}</b> for a potion you hold, or leave it behind.`,
    body:tilesRow([...W.run.potions.map((id,s)=>potionTile(id,{click:`potionSwap(${s})`,tag:'Replace',cls:'swap'})),tileHTML({id:'opt-remove',emoji:'🗑️',name:`Discard ${p.n}`,sum:'Leave it behind.',click:'potionSwap(-1)',cls:'k-discard',tid:'discardnew'})],'swaptiles')})}
  return topBar()+boss+pkScreen({cls:'pk-rewards'+(boss?' hasboss':''),title:`<span class="reward-banner">${title}</span>`,sub:S.kind==='boss'?'':'Take what you want. Anything left behind is lost.',body:tilesRow(S.rows.map((r,i)=>rowHTML(r,i,'claimRow')),'rewtiles'),
-  right:pkBtn(S.kind==='boss'?'Finish the act':'Proceed','rewDone()',{pri:1,id:'proceed',icon:'arrowright'})})}
+  right:pkBtn(S.kind==='boss'?'Finish the act':'Proceed','rewDone()',{pri:1,id:'proceed',icon:'arrowright'}),after:S.leaveConfirm?leaveDialog():''})}
+// v0.6.2.1: skipping every reward asks first (iron .ov .box panel, same as the card-skip question). B061 reuses this.
+export const leaveDialog=()=>`<div class="ov" role="dialog" aria-modal="true" aria-labelledby="leavequestion"><div class="box card-skip-box leave-box"><h2 id="leavequestion">Leave without taking anything?</h2><div class="actions"><button class="btn pri" id="leaveyes" onclick="rewLeaveAnswer(true)">Yes</button><button class="btn" id="leaveno" onclick="rewLeaveAnswer(false)">Go back</button></div></div></div>`;
 const cardSelSub=n=>n?`<b>${n}</b> selected. Press Continue to add it, or tap another.`:`Tap a card to select it, then press Continue. <span class="muted">Hold a card to read it.</span>`;
 function chestScr(){const S=W.S,t=stripEmoji(S.name);
  if(!S.opened)return topBar()+pkScreen({cls:'pk-chest',title:t,sub:'Something glints inside.',body:`<div class="chestwrap"><button class="chest ${S.chest}" id="openchest" onclick="openChestLid()">${emblemHTML('chest-closed','🧰','big')}<span class="muted">Tap to open</span></button></div>`,right:pkBtn('Leave it','goMap()')});
@@ -328,7 +342,7 @@ function chestScr(){const S=W.S,t=stripEmoji(S.name);
 const SHOP_MIN_CARD=60; // px: shop cards never shrink below this width (row scrolls sideways, page scrolls down instead)
 function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();const coin=glyph('coin');
  const card=(it,sh,i)=>`<div data-shop-card="${sh}:${i}" class="shopitem${it.sold?' sold':''}${it.sale?' sale':''}${anim(it.noT,400)?' no':''}">${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`selectShopCard('${sh}',${i})`,can:g>=it.price})}<span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':(it.sale?'<s>'+Math.round(it.base)+'</s> ':'')+coin+' '+it.price}</span>${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
- const icon=(it,sh,i,group,def)=>`<button class="shopicon${it.sold?' sold':''}${it.right?' right':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="buy('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}">${slotHTML(group,it.id,'',def.e)}<span class="inm">${def.n}</span><span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':coin+' '+it.price}</span>${it.right?'<i class="shoptag">SHOP</i>':''}</button>`;
+ const icon=(it,sh,i,group,def)=>`<button class="shopicon${it.sold?' sold':''}${it.right?' right':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="buy('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}">${slotHTML(group,it.id,'',def.e)}<span class="inm">${def.n}</span><span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':coin+' '+it.price}</span></button>`;
  const grp=(lbl,items,cls)=>`<div class="shgrp ${cls}"><div class="shlbl">${lbl}</div><div class="shrow">${items}</div></div>`;
  return topBar()+`<div class="shop-wren" aria-hidden="true">${emblemHTML('shop-wren','','wren')}</div>`+pkScreen({cls:'pk-shop',title:"Wren's Driftwood Bazaar",sub:`<em class="wrenline" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE)}">${wrenLine(bellCount(W.run.seed),currentTier())}</em>`,
   body:`<div class="shop-main"><div class="shelf cards" id="cardshelf" style="--gw:max(${SHOP_MIN_CARD}px,calc((100cqh - 34px - 100px - 22px)*5/7))">${grp('Cards',S.cards.map((it,i)=>card(it,'cards',i)).join(''),'g-cards')}${S.colorless.length?`<div class="shgrp g-cards g-more"><div class="shrow">${S.colorless.map((it,i)=>card(it,'colorless',i)).join('')}</div></div>`:''}</div>

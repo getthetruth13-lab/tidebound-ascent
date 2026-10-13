@@ -1,0 +1,37 @@
+/* Hero plate (Task 67, FUN-REDESIGN 9.1): health rim + ability readout + Energy orb in one engraved piece, centred on the Energy orb
+   (centre about 235,880 at 2340x1080). Sizes in --hud-unit (1 unit = 1080px design). Placeholder art: SVG rim until painted plates exist. */
+.hplate{position:absolute;left:calc(10.043% - 82*var(--hud-unit,1px));bottom:calc(18.519dvh - 82*var(--hud-unit,1px));width:calc(164*var(--hud-unit,1px));height:calc(164*var(--hud-unit,1px));pointer-events:none;z-index:1;color:#ecd9aa}
+.hplate .hp-rim{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible;filter:drop-shadow(0 2px 3px #000)}
+.hplate .hp-rim circle{fill:none;stroke-width:6;stroke-linecap:butt}
+.hplate .hp-track{stroke:#16120d;stroke-opacity:.85}
+.hplate .hp-fill{stroke:#b3392e}
+.hplate .hp-notch{stroke:#2a0b09;stroke-width:6.5}
+.hplate.lethal .hp-notch{stroke:#000}
+
+.hplate .hp-ability{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:calc(2*var(--hud-unit,1px));display:flex;align-items:baseline;gap:calc(6*var(--hud-unit,1px));font-size:calc(26*var(--hud-unit,1px));text-shadow:0 1px 2px #000,0 0 5px #000;white-space:nowrap;pointer-events:auto}
+.hplate .hp-ability .hp-n{font:700 calc(40*var(--hud-unit,1px))/1 var(--font-display,serif);color:#f6dc9a}
+.hplate .hp-ability .hp-fc{font-size:calc(24*var(--hud-unit,1px));opacity:.8;letter-spacing:.04em}
+.hplate .hp-ability .hp-arr{font-style:normal;color:#8fd0d8}
+.hplate[data-info]{pointer-events:none}
+.hplate .hp-logbtn{position:absolute;left:-48px;top:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;padding:0;border:0;background:none;color:#c9a45a;pointer-events:auto;opacity:.8}
+.hplate .hp-logbtn svg{width:22px;height:22px;filter:drop-shadow(0 1px 2px #000)}
+.hplate .hp-log{position:absolute;left:0;bottom:calc(100% + 6*var(--hud-unit,1px));width:calc(420*var(--hud-unit,1px));max-height:calc(300*var(--hud-unit,1px));overflow-y:auto;pointer-events:auto;padding:calc(10*var(--hud-unit,1px)) calc(14*var(--hud-unit,1px));background:linear-gradient(#1b1710f2,#120f0af2);border:1px solid #6a4a1c;border-radius:6px;font-size:calc(22*var(--hud-unit,1px));line-height:1.25;z-index:30;overscroll-behavior:contain}
+.hp-log .hp-log-h{display:block;font:600 calc(22*var(--hud-unit,1px))/1.2 var(--font-display,serif);color:#f6dc9a;margin-bottom:4px}
+.hp-log .hl.turn{color:#c9a45a;border-top:1px solid #6a4a1c66;margin-top:3px;padding-top:2px}
+.hp-log .hl.hurt{color:#e58a7a}.hp-log .hl.blk{color:#8fb8e8}.hp-log .hl.st{color:#a8d49a}
+/* intent banner: one-hit number, small count, tick slot */
+.intent-part .ihits{font-size:.62em;margin-left:.15em;opacity:.85;align-self:flex-end}
+.intent-part .itick{display:none;width:.7em;height:.7em;margin-left:.2em;border-radius:50%;background:#4fbf6a;box-shadow:0 0 6px #4fbf6a}
+.intent-part .itick.on{display:inline-block}.intent-part .itick.short{display:inline-block;background:#7d7d7d;box-shadow:none}
+
+
+/* Engraved placeholder ties the rim and ability inset together; painted art can replace it. */
+.hplate::before{content:"";position:absolute;left:45%;top:22%;width:calc(190*var(--hud-unit,1px));height:56%;border:1px solid #98743d;border-radius:0 16px 16px 0;background:linear-gradient(100deg,#19150de6,#302718e6 60%,#100d09e6);box-shadow:inset 0 1px 2px #eedc9838,0 2px 5px #000;z-index:-1}
+
+.combat .hplate #orb{left:50%;top:50%;bottom:auto;translate:-50% -50%;transform:none;z-index:1;pointer-events:auto}
+
+.intent-part .itick::after{content:"";display:block;width:.35em;height:.2em;border:solid #f0ffe9;border-width:0 0 2px 2px;transform:rotate(-45deg);margin:.16em auto}
+.intent-part .itick.short::after{border-color:#ccc}
+
+/* v0.6.2.1: no empty engraved inset when a hero has no plate readout (Tidecaller: the Tide gauge shows it). */
+.hplate:has(.hp-ability:empty)::before{display:none}

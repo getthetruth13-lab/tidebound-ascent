@@ -66,7 +66,7 @@ const STATUS={
  retort:T('Retort Ready','buff',null,'Until the end of this turn.','Retort bonuses are active this turn.'),
  chartQ:T('Chart Next Turn','buff',null,'Next turn.','Chart this many cards next turn.'),
  banks:T('Banked Crest','buff',null,'Until released.','Release: 1½× Crest damage to ALL enemies per stack.'),
- power:T('Power','buff',null,'Lasts all combat.',''),
+ power:T('Vigil','buff',null,'Lasts all combat.',''),
  armed:T('Ready','buff',null,'Until used (once per combat).',''),
  queued:T('Active','buff',null,'Until it is used or the turn ends.','')
 };

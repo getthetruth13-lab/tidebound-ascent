@@ -194,7 +194,9 @@ export function rewSkipAnswer(yes,dont=false){return savedAction('rewSkipAnswer'
 export function rewConfirmCards(confirm=settings.confirmCardSkip!==false){return savedAction('rewConfirmCards',[confirm],()=>rewConfirmCardsImpl(confirm))}
 // full potion slots: swap the new potion for one you hold, or discard it
 function potionSwapImpl(slot){const S=W.S;const row=S.rows&&S.rows[S.swap];if(!row)return;if(slot>=0){W.run.potions[slot]=row.id}row.done=true;S.swap=null;render()}
-function rewDoneImpl(){const S=W.S;if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}
+// v0.6.2.1: Proceed with nothing taken asks "Leave without taking anything?" first (not during save replays).
+export const tookNothing=S=>!!(S&&S.rows&&S.rows.length)&&!S.rows.some(r=>r.done&&!(r.k==='cards'&&r.skipped));
+function rewDoneImpl(confirm=true){const S=W.S;if(confirm&&!W.replaying&&tookNothing(S)){S.leaveConfirm=true;render();return}S.leaveConfirm=false;if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}
 // ================= relics =================
 export const campfireRelic=id=>!!(RELICS[id]&&RELICS[id].campfire);
 export function relicCandidates(tier){const run=W.run;const nCamp=run.relics.filter(r=>campfireRelic(r.id)).length;
@@ -322,6 +324,7 @@ export function rewSkipCards(confirm=settings.confirmCardSkip!==false){return sa
 export function potionSwap(...args){return savedAction('potionSwap',args,()=>potionSwapImpl(...args))}
 
 export function rewDone(...args){return savedAction('rewDone',args,()=>rewDoneImpl(...args))}
+export function rewLeaveAnswer(yes){return savedAction('rewLeaveAnswer',[yes],()=>{if(!W.S.leaveConfirm)return;if(yes)rewDoneImpl(false);else{W.S.leaveConfirm=false;render()}})}
 
 export function discardPotion(...args){return savedAction('discardPotion',args,()=>discardPotionImpl(...args))}
 

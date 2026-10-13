@@ -12,7 +12,7 @@ import {BOSS_OPEN,bellCount} from '../data/lore.js';
 import {combatRewards,gainCard,goMap,endRun} from './run.js';
 import {flyCard} from '../ui/fx.js';
 import {impactDelay} from '../ui/vfx.js';
-import {T} from '../core/timing.js';
+import {T,EB} from '../core/timing.js';
 import {render} from '../ui/render.js';
 export const CORE=DATA.v21.sim.core;
 const DU=CORE.duel,TI=CORE.tide,EC=CORE.echo,CA=CORE.carto;
@@ -323,7 +323,7 @@ function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  cb.busy=true;cb.banner={txt:'Enemy Turn',t:Date.now(),en:1};render();
  // A curse that fired in hand (Dread) pops over the hand first; hold the enemy turn so its notice can be read.
  const popT=(cb.cursePops||[]).some(x=>Date.now()-x.t<200)?CURSE_POP:0;
- if(window.FAST)enemyPhase();else setTimeout(enemyPhase,T(ENEMY_PRE+popT))}
+ if(window.FAST)enemyPhase();else setTimeout(enemyPhase,T(EB().pause+popT))}
 export const CURSE_POP=900;
 export function eAtk(e,a){let d=a+(e.st.str||0)+(e.st.mightTmp||0);if(e.st.weak)d=Math.floor(d*.75);if(W.cb.p.st.vuln)d=Math.floor(d*1.5);return Math.max(0,d)}
 export function intentOf(e){const t=EN[e.key];const m=t.intent?t.intent(e):e.next;return mod('intentDisplay',{enemy:e},m)||{none:1}}
@@ -352,10 +352,7 @@ export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=inten
  if(m.fx)m.fx(e)}
 function endOfEnemyTurn(e){const t=EN[e.key];if(t.passive&&t.passive.endTurn)t.passive.endTurn(e);
  if(e.st.shell)e.block+=e.st.shell;if(e.st.mending&&e.hp>0){const h=Math.min(e.st.mending,e.max-e.hp);e.hp+=h;if(h)floatText(e.uid,'+'+h,'h')}}
-// v0.6.2 pacing (Spencer: enemy turns ~2x as long; G7-TIMING.md recommends ~550/450/520 ms after scale). Base ms, scaled by T(); all skipped when FAST.
-const ENEMY_PRE=480;  // 'Enemy Turn' banner before the first enemy acts (was 280)
-const TELEGRAPH=430;  // ms the acting enemy crouches and flashes before it strikes (was 250)
-const ENEMY_GAP=450;  // pause after an enemy acts so its hit and the hero recoil read before the next one (was 260)
+// Enemy beats (telegraph crouch, gap between enemies, pause after End Turn) come from the ENEMY_BEATS table in core/timing.js (skipped when FAST).
 export function enemyPhase(){const cb=W.cb;if(!cb)return;
  // Start of the enemy turn: the player's Soaked / Exposed / Brittle wear off by 1.
  tick(cb.p.st);
@@ -363,12 +360,12 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;
  const step=()=>{if(!W.cb||W.cb!==cb)return;
   while(k<list.length&&(list[k].hp<=0||list[k].fled))k++;
   if(k>=list.length)return finish();
-  const e=list[k++];cb.tele=e;if(!window.FAST&&!telegraphed.has(e)){telegraphed.add(e);k--;fire('enemyTelegraph',{enemy:e});render();return setTimeout(step,T(TELEGRAPH))}
+  const e=list[k++];cb.tele=e;if(!window.FAST&&!telegraphed.has(e)){telegraphed.add(e);k--;fire('enemyTelegraph',{enemy:e});render();return setTimeout(step,T(EB().tele))}
   if(!(e.passive&&e.passive.keepGuard))e.block=0;act(e);if(!W.cb)return;cb.acting=null;e.t++;if(e.hp>0)endOfEnemyTurn(e);tick(e.st,e.hold);e.hold=null;delete e.st.mightTmp;
   if(e.hp>0&&!e.fled){if(e.keepNext)e.keepNext=false;else e.next=EN[e.key].ai(e)}
   if(W.run.hp<=0&&!cheatDeath())return lose();
   if(!alive().length)return finish();
-  if(window.FAST)return step();render();setTimeout(step,T(ENEMY_GAP))};
+  if(window.FAST)return step();render();setTimeout(step,T(EB().gap))};
  const finish=()=>{if(!W.cb)return;cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
  step()}
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
