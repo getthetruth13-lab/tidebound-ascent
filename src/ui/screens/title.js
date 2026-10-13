@@ -73,7 +73,7 @@ export function titleScr(){const v=W.S.view||'main';
 // Title backdrop flag: true = layered moving scene (v0.6.1.1); false = the old still menu-plate.webp. One-line revert.
 export const TITLE_LAYERED=true;
 const L='art/v2/title/layers/';
-function layeredStage(){return `<div class="tv-stage tl-stage" aria-hidden="true"><div class="tl-sky tl-drift"><img src="${L}sky.webp" alt="" draggable="false"></div><div class="tl-sea"><img src="${L}sea.webp" alt="" draggable="false"></div><i class="tl-shimmer"></i><div class="tl-tower"><i class="tl-beam"></i><img src="${L}lighthouse.webp" alt="" draggable="false"><i class="tl-lamp"></i></div><div class="tl-steps"><img src="${L}steps.webp" alt="" draggable="false"></div><i class="tl-ghost"><img src="${L}ghost.webp" alt="" draggable="false"></i><i class="tl-rain"></i><i class="tl-vig"></i></div>`}
+function layeredStage(){return `<div class="tv-stage tl-stage" aria-hidden="true"><div class="tl-sky tl-drift"><img src="${L}sky.webp" alt="" draggable="false"></div><div class="tl-sea"><img src="${L}sea.webp" alt="" draggable="false"></div><div class="tl-tower"><img src="${L}lighthouse.webp" alt="" draggable="false"><i class="tl-lamp"></i></div><div class="tl-steps"><img src="${L}steps.webp" alt="" draggable="false"></div><i class="tl-ghost"><img src="${L}ghost-a.webp" alt="" draggable="false"></i><i class="tl-rain"></i><i class="tl-vig"></i></div>`}
 export function menuPress(el,act){if(el.classList.contains('tm-hit'))return;el.classList.add('tm-hit');
  const go=()=>{try{(new Function(act))()}catch(e){console.error(e)}};dip(go)}
 // Tap from title: the cut-out title/emblem starts exactly where the big one sits in the video (cover, 50% 42%) and glides up to its small slot.

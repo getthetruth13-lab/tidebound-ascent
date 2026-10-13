@@ -19,7 +19,7 @@ export const GLOSSARY={
 "Drift": "At the start of each of your turns after the first, the Tide moves 1 in the direction of its arrow (its last move). Ride it into a Crest or Undertow, or push against it.",
 "Tideturn": "Happens when the Tide moves in the opposite direction from its last move (Surge after a Recede, or Recede after a Surge). The meter shows an arrow for the last direction. A Crest or Undertow reset doesn't count as a move.",
 "Echo": "Once per turn, you may Mark a non-Faint card as you play it (tap the bell on the card). At the end of your turn, the Marked card repeats its effect for free, at its original target if it's still alive (otherwise a random enemy). It gets +1 damage and Guard per card you play after Marking it (max +1). If you Mark nothing, your last card Echoes at quarter strength (v2.2). Echo cap: at most 4 Echo repeats per turn from all sources.",
-"Resound": "Bonus text that applies only when this card is being Echoed.",
+"Resound": "An extra effect that only happens when the Echo Mage's Echo replays this card at the end of your turn. Playing it normally doesn't trigger it.",
 "Faint": "This card can't be Marked or Echoed.",
 "Sustain X": "Each time this card Echoes, its damage and Guard numbers go up by X for the rest of this combat.",
 "Note": "A 0-cost Attack: deal 2 to a random enemy. Sink, Faint.",

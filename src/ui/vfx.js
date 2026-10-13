@@ -110,9 +110,22 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
  const scrollOffset=scrollY,height=app.scrollHeight;
  if(xf){xf.remove();xf=null}
  const o=app.cloneNode(true);o.removeAttribute('id');o.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));o.classList.add('xfade');o.setAttribute('aria-hidden','true');
- o.style.cssText=`position:fixed;left:0;right:0;top:${-scrollOffset}px;height:${height}px;z-index:55;pointer-events:none;overflow:hidden;visibility:visible`;
+ o.style.cssText=`position:fixed;left:0;right:0;top:${-scrollOffset}px;height:${height}px;z-index:9000;pointer-events:none;overflow:hidden;visibility:visible`;
  o.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
- document.body.appendChild(o);xf=o;
+ // v0.6.1.3: the clone must look identical to the live frame on its first paint. Cloned <img> decode async (a blank frame), cloned <canvas> are empty,
+ // and cloned CSS animations restart from 0% (sprites/meters jump). Decode images sync, copy canvas pixels, freeze each animation at its current time.
+ o.querySelectorAll('img').forEach(i=>{i.decoding='sync';i.loading='eager'});
+ const src=[...app.querySelectorAll('*')],dst=[...o.querySelectorAll('*')],scr=[];
+ if(src.length===dst.length)for(let i=0;i<src.length;i++){const a=src[i],b=dst[i];
+  if(a.scrollTop||a.scrollLeft)scr.push([b,a.scrollTop,a.scrollLeft]);
+  if(getComputedStyle(a).position==='sticky'){const r=a.getBoundingClientRect();Object.assign(b.style,{position:'fixed',top:r.top+'px',left:r.left+'px',width:r.width+'px',height:r.height+'px',margin:'0'})} // sticky top bar: the clone does not scroll, so pin it where it was on screen
+  if(a.tagName==='CANVAS'&&a.width&&a.height){try{b.width=a.width;b.height=a.height;b.getContext('2d').drawImage(a,0,0)}catch(_){}}
+  const an=a.getAnimations?a.getAnimations().filter(x=>x.animationName):[];if(an.length){b.style.animationDelay=an.map(x=>-(x.currentTime||0)+'ms').join(',');b.style.animationPlayState='paused'}}
+ // the battle/scene foreground (#env-front) sits above #app and changes the instant the screen swaps; carry a frozen copy so the old screen keeps its exact look
+ const ef=document.getElementById('env-front');if(ef&&getComputedStyle(ef).display!=='none'){const fc=ef.cloneNode(true);fc.setAttribute('aria-hidden','true');fc.dataset.xf='1';
+  const es=[ef,...ef.querySelectorAll('*')],ds=[fc,...fc.querySelectorAll('*')];es.forEach((e,i)=>{const c=getComputedStyle(e);if(ds[i]){ds[i].style.opacity=c.opacity;ds[i].style.transition='none';ds[i].style.animation='none';if(e.style.transform)ds[i].style.transform=c.transform}});
+  fc.style.opacity=getComputedStyle(ef).opacity;o.appendChild(fc)}
+ document.body.appendChild(o);xf=o;for(const [b,t,l] of scr){b.scrollTop=t;b.scrollLeft=l} // inner scrollers (map) keep their scroll position
  const fin=()=>{o.remove();if(xf===o)xf=null};
  const k=hold/(hold+ms)||0,f=gray?'grayscale(1) brightness(.55)':'none';
  o.animate([{opacity:1,filter:'none',offset:0},{opacity:1,filter:f,offset:k},{opacity:0,filter:f,offset:1}],{duration:hold+ms,easing:'ease-out'}).finished.then(fin,fin)}

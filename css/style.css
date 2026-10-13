@@ -1217,3 +1217,4 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 body.reduce-motion .combat #endbtn{transition:none}
 body.reduce-motion .combat #endbtn:active:not(:disabled){transform:none}
 @media(prefers-reduced-motion:reduce){body.combat-motion .combat #endbtn{transition:none}body.combat-motion .combat #endbtn:active:not(:disabled){transform:none}}
+.topbar .who .nm small{margin-left:.45em}

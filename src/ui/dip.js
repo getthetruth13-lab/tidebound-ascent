@@ -6,4 +6,7 @@ export function dip(fn){if(window.FAST||typeof document==='undefined'||inside){f
  const rm=document.body.classList.contains('reduce-motion'),tOut=rm?40:U(140),tIn=rm?60:U(180);
  let o=document.getElementById('tbdip');if(!o){o=document.createElement('div');o.id='tbdip';document.body.appendChild(o)}
  busy=1;t0=now;o.style.transition=`opacity ${tOut}ms ease-in`;o.getBoundingClientRect();o.style.opacity='1';
- setTimeout(()=>{inside=1;try{fn()}finally{inside=0;requestAnimationFrame(()=>{o.style.transition=`opacity ${tIn}ms ease-out`;o.style.opacity='0';setTimeout(()=>{busy=0},tIn)})}},tOut)}
+ setTimeout(()=>{inside=1;try{fn()}finally{inside=0;ready().then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{o.style.transition=`opacity ${tIn}ms ease-out`;o.style.opacity='0';setTimeout(()=>{busy=0},tIn)})))}},tOut)}
+// v0.6.1.3: fade back in only once the new screen's images (art, window frames) are decoded, so nothing pops in half-loaded during the fade. Capped at 300 ms.
+function ready(){const imgs=[...document.querySelectorAll('#app img')].filter(i=>!i.complete||!i.naturalWidth);
+ const d=imgs.map(i=>i.decode?i.decode().catch(()=>{}):Promise.resolve());return Promise.race([Promise.all(d),new Promise(r=>setTimeout(r,300))])}
