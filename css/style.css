@@ -531,34 +531,12 @@ body.env-on .page{background:transparent}
 #envwipe.fade{background:#05070b;opacity:0}
 .bandtoast{position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:66;pointer-events:none;font:700 15px var(--font-display);letter-spacing:.12em;color:var(--ui-parchment);background:linear-gradient(90deg,transparent,#0b0e14dd 20%,#0b0e14dd 80%,transparent);padding:6px 40px;animation:band 1.6s ease-out forwards}
 @keyframes band{0%{opacity:0;transform:translate(-50%,-6px)}15%,75%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
-.efx{position:absolute;pointer-events:none;display:block;opacity:var(--a)}
-.efx.fog{left:-30%;width:160%;height:28%;top:calc(38% + var(--i)*13%);background:radial-gradient(ellipse 50% 50% at 50% 50%,var(--c),color-mix(in srgb,var(--c) 40%,transparent) 35%,transparent 72%);animation:fogx calc(120s / var(--spd)) linear infinite alternate;animation-delay:calc(var(--i)*-17s)}
-@keyframes fogx{from{transform:translateX(-12%)}to{transform:translateX(12%)}}
-.efx.shafts{top:-10%;height:85%;width:9%;left:calc(12% + var(--i)*22%);background:radial-gradient(ellipse 50% 100% at 50% 0,var(--c),color-mix(in srgb,var(--c) 45%,transparent) 45%,transparent 100%);transform-origin:50% 0;transform:rotate(14deg);animation:shaft var(--per) ease-in-out infinite alternate;animation-delay:calc(var(--i)*-2.3s)}
-@keyframes shaft{from{transform:rotate(calc(14deg - var(--sway)));opacity:calc(var(--a)*.6)}to{transform:rotate(calc(14deg + var(--sway)));opacity:var(--a)}}
-.efx.caustics{inset:55% 0 0 0;background:repeating-radial-gradient(ellipse 40px 18px at 30% 60%,transparent 0 10px,var(--c) 12px,transparent 15px);animation:caus 9s ease-in-out infinite alternate}
-@keyframes caus{to{transform:translate(20px,4px) scale(1.06)}}
-.efx.ripples{width:46px;height:10px;border:1px solid var(--c);border-radius:50%;left:calc(mod(var(--i)*37, 92)*1% + 4%);top:calc(72% + mod(var(--i)*7, 22)*1%);animation:ripple 2.4s ease-out infinite;animation-delay:calc(var(--i)*-.71s);opacity:0}
-@keyframes ripple{0%{transform:scale(.2);opacity:var(--a)}100%{transform:scale(1.6);opacity:0}}
-.efx.flicker{left:calc(10% + var(--i)*30%);top:20%;width:30%;height:50%;background:radial-gradient(circle,var(--c),transparent 65%);animation:flick calc(1s / var(--hz)) steps(6) infinite;animation-delay:calc(var(--i)*-.37s)}
 @keyframes flick{0%,100%{opacity:var(--a)}30%{opacity:calc(var(--a)*.6)}55%{opacity:calc(var(--a)*.9)}80%{opacity:calc(var(--a)*.7)}}
-.efx.rings{left:50%;top:40%;width:60vh;height:60vh;margin:-30vh;border:2px solid var(--c);border-radius:50%;animation:rings 3s ease-out infinite;animation-delay:calc(var(--i)*-1.5s);opacity:0}
-@keyframes rings{0%{transform:scale(.2);opacity:var(--a)}100%{transform:scale(1.8);opacity:0}}
-.efx.sweep{inset:0;background:conic-gradient(from 0deg at 50% 0%,transparent 0 40%,var(--c) 48%,transparent 56%);animation:sweep 6s linear infinite}
-@keyframes sweep{to{transform:rotate(360deg)}}
-.efx.lightning{inset:0;background:var(--c);opacity:0;animation:light 11s steps(1) infinite}
-@keyframes light{0%,96.9%{opacity:0}97%{opacity:.33}97.6%{opacity:0}98.2%{opacity:.2}98.8%,100%{opacity:0}}
-.efx.aurora{inset:0 0 50% 0;background:linear-gradient(100deg,transparent,var(--c),transparent 70%);-webkit-mask-image:linear-gradient(transparent,#000 40%,transparent);mask-image:linear-gradient(transparent,#000 40%,transparent);animation:fogx 18s ease-in-out infinite alternate}
-.efx.corona{left:40%;top:10%;width:30%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--c),transparent 65%);animation:flick 4s ease-in-out infinite}
-.efx.wavecrash{left:0;right:0;bottom:22%;height:20%;background:linear-gradient(transparent,var(--c));opacity:0;animation:crash 7s ease-out infinite}
-@keyframes crash{0%,85%{opacity:0;transform:translateY(20%)}90%{opacity:var(--a);transform:none}100%{opacity:0}}
-.envfx-back.still .efx{animation:none!important}
 /* load governor (env.js govTo): fades effects by opacity only; nothing is rebuilt, data-q never changes */
 #env .envfx-back{transition:opacity .5s}
 #env.gov-reduced .envfx-back{opacity:.5}
 #env.gov-off .envfx-back{opacity:0}
-#env.gov-off .envfx-back .efx{animation-play-state:paused}
-@media (prefers-reduced-motion:reduce){#env .envL,#env-front .envL{animation:none!important}.efx{animation:none!important}.efx.lightning,.efx.rings,.efx.ripples,.efx.wavecrash{display:none}.co,.toast,.bandtoast,.tcard{animation-duration:.01s!important}.co{opacity:1}}
+@media (prefers-reduced-motion:reduce){#env .envL,#env-front .envL{animation:none!important}.co,.toast,.bandtoast,.tcard{animation-duration:.01s!important}.co{opacity:1}}
 @media (orientation:landscape) and (max-height:500px){
  .en .slot:not(.win){height:84px;aspect-ratio:auto}
  .en.boss .slot:not(.win){height:92px}
@@ -799,7 +777,6 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
  .combat .shadow::before{content:'';position:absolute;left:22%;right:22%;top:calc(50% - 1.5px);height:3px;border-radius:50%;background:#000;filter:blur(1px)}
  .combat .shadow.float{opacity:.4;translate:6% 3px}
  .combat .scene.pick-dim{filter:brightness(.75)}
- body.env-combat .efx.ripples{display:none}
  .stage-air{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
  .stage-air.front{z-index:2}
  .stage-mist{position:absolute;left:10%;right:8%;top:43%;height:12%;background:radial-gradient(ellipse,color-mix(in srgb,var(--stage-air) 20%,transparent),transparent 70%);opacity:var(--stage-haze);animation:stage-mist 17s ease-in-out infinite alternate}
@@ -1140,8 +1117,8 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .upgrade-change{color:#b7f3ac!important;filter:brightness(1.3)}
 .inspect-keywords{position:absolute;display:flex;flex-direction:column;gap:4px;width:clamp(100px,20vw,160px);overflow:auto;pointer-events:none}
 .keyword-window{width:fit-content;max-width:100%;padding:4px 6px;background:rgba(9,16,20,.94);color:#ece4cf;font:13px/1.2 var(--font-body);text-shadow:0 1px 2px #000}
-.keyword-window b,.keyword-window span{display:block}
-.keyword-window b{color:#dcc087}
+.keyword-window>b,.keyword-window>span{display:block}
+.keyword-window>b{color:#dcc087}
 
 .shopitem[data-shop-card]{transition:translate 180ms ease,box-shadow 180ms ease;outline:2px solid transparent}.shopitem.reward-selected{translate:0 -7px;outline-color:#dcc087;box-shadow:0 0 9px #e4c78f}
 
@@ -1253,7 +1230,7 @@ body.reduce-motion .combat #endbtn:active:not(:disabled){transform:none}
  text-shadow:0 0 2px #000,0 1px 3px #000,0 0 9px #000d}
 .keyword-window::before{content:"";position:absolute;z-index:-1;inset:0;border-radius:40%;pointer-events:none;
  background:radial-gradient(closest-side,rgba(3,7,9,.94) 0,rgba(3,7,9,.9) 62%,rgba(3,7,9,.55) 84%,rgba(3,7,9,0) 100%);filter:blur(4px)}
-.keyword-window b{color:#ecd08f;font:700 11.5px var(--font-display);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px}
+.keyword-window>b{color:#ecd08f;font:700 11.5px var(--font-display);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px}
 body.kw-frame .keyword-window{--s:.07;isolation:auto;text-shadow:0 1px 2px #000;padding:2px 6px;border-style:solid;border-color:transparent;border-width:calc(60px*var(--s));
  border-image:var(--frame-slim) 200 220 fill/calc(200px*var(--s)) calc(220px*var(--s))/0 round;filter:drop-shadow(0 3px 6px #000b)}
 body.kw-frame .keyword-window::before{content:none}
@@ -1324,3 +1301,7 @@ body.kw-frame .keyword-window::before{content:none}
 .healpop .pdig img{height:22px}
 @keyframes healpop{0%{opacity:0;transform:translate(-50%,8px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
 @media (prefers-reduced-motion:reduce){.hpbar.healglow,.healpop{animation-duration:.01s!important}}
+/* Card-reference pop-up: the named card rendered small at the top of the inspector rail. */
+.inspect-keywords .cref-card{padding:4px;display:flex;justify-content:center}
+.inspect-keywords .cref-card{width:100%}
+.inspect-keywords .cref-card .card{--gw:min(132px,calc(100% - 4px));width:132px;max-width:100%;flex:none;pointer-events:none;box-shadow:0 0 0 2px #58d6c0aa,0 0 14px #58d6c044}

@@ -4,7 +4,7 @@
 import {card,redef} from '../loader.js';
 import {W} from '../../../core/state.js';
 import {mod} from '../../../core/bus.js';
-import {alive,hit,loseHpEnemy,dmgEnemy,gainMom,callParry,intentOf,eAtk,isJunk,sinkCard} from '../../../engine/combat.js';
+import {alive,hit,loseHpEnemy,dmgEnemy,gainMom,callParry,intentOf,eAtk,isJunk,sinkCard,bonusEnergy} from '../../../engine/combat.js';
 import {ask,afterPlay,thisTurn,forCombat,log,floatText,callout,bleed} from '../kit.js';
 const N=(id,o)=>card('duel',id,o), R=(id,o)=>redef('duel',id,o);
 // Scope a listener to the enemy phase that follows this player turn (pools are answered there).

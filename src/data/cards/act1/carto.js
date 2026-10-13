@@ -63,7 +63,7 @@ N('forkroad',{e:'🔀',d:'Choose when placed. A: at the start of your turn deal 
 N('raisecairn',{e:'🪨',d:'Sink a Flotsam or Burden from your hand and place a Cairn (Rank 1) in a free slot, or replace one. If you have none, Chart 2 instead.{| Gain 3 Guard.}',
  p:f=>{const cb=W.cb;if(f.u)f.blk(3);const junk=cb.hand.filter(isJunk);if(!junk.length){chartSafe(f,2);return}
   const go=ci=>{const i=cb.hand.indexOf(ci);if(i<0)return;cb.hand.splice(i,1);sinkCard(ci,'raisecairn');log('🪨 Raise a Cairn: '+cname(ci)+' Sunk');placeWp(mk('cairn',false,{rank:0}))};
-  if(junk.length===1)return go(junk[0]);ask(f,'Raise a Cairn: Sink which card?',junk.map(ci=>({l:(CARDS[ci.id].e||'')+' '+cname(ci),f:()=>go(ci)})))}});
+  if(junk.length===1){callout('SINK: '+cname(junk[0]),'adv');return go(junk[0])}ask(f,'Raise a Cairn: Sink which card?',junk.map(ci=>({l:(CARDS[ci.id].e||'')+' '+cname(ci),f:()=>go(ci)})))}});
 // ---------------- Uncommon ----------------
 R('landslide',{e:'⛰️',d:'Deal 8, +{2|3} for each Waypoint, to ALL. Expedition.',p:f=>f.all(8+f.v(2,3)*f.wpCount())});
 R('waystation',{e:'🚉',d:'At the start of your turn, Advance another random Waypoint. Decamp: Advance each other Waypoint once.',

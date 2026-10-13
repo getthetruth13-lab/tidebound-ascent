@@ -2,9 +2,7 @@
 //  • routing: per-floor band / boss lair / room scene / travel (envKeyFor)
 //  • 5 parallax layers (sky far mid ground fg) with image-set @2x/@3x, ground anchored to the battle floor,
 //    camera slide-in on battle entry (transform only) and idle drift on mid/fg (CSS `translate`, composited)
-//  • ambient effects: one <canvas id="envfx"> particle system (pooled, sprite atlas, ≤300 full / 150 reduced / 0 off,
-//    DPR ≤2, redraw ≤60 Hz, 30 Hz when idle, paused when hidden or an overlay is open) + CSS fog/shafts/caustics/
-//    ripples/flicker/rings/sweep/lightning in .envfx-back
+//  • ambient effects: none (code-drawn fog/particles/rings deleted 2026-10-13; painted effects to come)
 //  • lighting: tint + vignette in one overlay, rim light var, dim for rooms/map
 //  • transitions: tide wipe (map → battle; crimson edge for elites), iris (boss), crossfades (rooms), band toast —
 //    all visual only (pointer-events:none) and never delay a render or a turn
@@ -98,8 +96,7 @@ export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&
  {const ms=mapSheet();document.body.style.setProperty('--map-sheet',ms?`url("${new URL(ms,document.baseURI).href}")`:'none')} // absolute: a url() in a custom property resolves against the stylesheet (css/)
  // enemy rim light (AD): on where the backdrop swallows silhouettes (Matriarch's green hollow); strength 0..1
  document.body.style.setProperty('--env-rim-s',String(RIM_ON[k.id]||0));
- const fx=(e.fx||[]).concat(g.extra||g.fx||[]);
- if(changedEnv||curEnv!==k.id+quality()){curEnv=k.id+quality();buildCssFx(fx);buildParticles(fx);
+ if(changedEnv||curEnv!==k.id+quality()){curEnv=k.id+quality();
   if(W.S.screen==='combat'&&motionOK())slideIn()}
  // band toast on the map
  if(W.S.screen==='map'&&W.run){const b=bandOf(W.run.act||1,Math.max(1,Math.min(14,(W.run.floor||0)+1)));if(b&&lastBand&&b.band!==lastBand.band)bandToast(ENV.envs[b.env]?ENV.envs[b.env].n:b.band);lastBand=b}}
@@ -124,70 +121,22 @@ function slideIn(){cam={x:1,from:1,t0:performance.now(),dur:window.FAST?315:900}
 function applyCam(now){if(!cam.dur)return;const p=Math.min(1,(now-cam.t0)/cam.dur);cam.x=cam.from*(1-(1-Math.pow(1-p,3)));
  const vw=innerWidth;allL().forEach(el=>{const f=(ENV.layers[el.dataset.l]||{}).factor||0;el.style.transform=`translate3d(${(-cam.x*f*.03*vw).toFixed(1)}px,0,0)`});
  if(p>=1){cam.dur=0;root.classList.remove('sliding');allL().forEach(el=>{el.style.transform=''})}}
-// ---------- CSS effects ----------
-function buildCssFx(fx){const box=root.querySelector('.envfx-back');const q=quality();if(q==='off'){box.innerHTML='';return}
- let h='';fx.filter(f=>f.render==='css').forEach((f,k)=>{const n=Math.max(1,Math.round((f.n||1)*(q==='reduced'?.5:1)));const col=f.col||'#fff',a=f.a||.2;
-  for(let i=0;i<n;i++){const st=`--c:${col};--a:${a};--i:${i};--n:${n};--spd:${Math.max(2,f.spd||4)};--per:${f.period_s||9}s;--sway:${f.sway_deg||3}deg;--hz:${f.hz||.6}`;
-   if(['fog','shafts','caustics','ripples','flicker','rings','sweep','aurora','corona','wavecrash'].includes(f.t))h+=`<i class="efx ${f.t}" style="${st}"></i>`;
-   else if(f.t==='lightning'&&i===0)h+=`<i class="efx lightning" data-every="${JSON.stringify(f.every_s||[8,12])}" style="${st}"></i>`}});
- box.innerHTML=h;box.classList.toggle('still',!motionOK())}
-// ---------- canvas particles ----------
-let parts=[],emitters=[],sprites={},lastT=performance.now(),lastDraw=0,lastInput=performance.now(),overlayOpen=false,flashT=0,nextFlash=0;
+// Ambient code-drawn effects (CSS .efx + canvas particles) were deleted 2026-10-13 (Spencer): they will be redone as painted effects.
+// The #envfx canvas stays (empty) for the loop / tests; the rAF loop now only drives the camera slide-in and the load governor.
+let lastT=performance.now(),lastInput=performance.now(),overlayOpen=false;const parts=[];
 export const PARTICLE_CAP={full:300,reduced:150,off:0};
 function sizeCanvas(){if(!canvas)return;const d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(innerWidth*d);canvas.height=Math.round(innerHeight*d);canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx2.setTransform(d,0,0,d,0,0)}
-function sprite(col,size,kind){const key=col+size+kind;if(sprites[key])return sprites[key];const s=Math.max(2,Math.ceil(size*4));const c=document.createElement('canvas');c.width=c.height=s;const g=c.getContext('2d');
- const r=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);r.addColorStop(0,col);r.addColorStop(kind==='soft'?.2:.55,col);r.addColorStop(1,col+'00');g.fillStyle=r;g.fillRect(0,0,s,s);return sprites[key]=c}
-const CANVAS_TYPES=new Set(['rain','drizzle','hail','uprain','spray','spores','motes','dust','phosphor','embers','bubbles','drips','sparks','wind','birds','vortex','snowash']);
-function buildParticles(fx){parts=[];emitters=[];const q=quality();const cap=PARTICLE_CAP[q];if(!cap||!motionOK()){if(ctx2)ctx2.clearRect(0,0,canvas.width,canvas.height);return} // Effects Off: no frozen last frame
- const list=fx.filter(f=>f.render==='canvas'&&CANVAS_TYPES.has(f.t));let total=list.reduce((a,f)=>a+(f.n||0),0);const scale=Math.min(q==='reduced'?.5:1,cap/Math.max(1,total));
- const sx=innerWidth/832,sy=innerHeight/384;
- for(const f of list){const n=Math.max(1,Math.floor((f.n||0)*scale));const em={...f,n,img:sprite(f.col||'#fff',f.size||1.5,['motes','spores','dust','phosphor','bubbles','embers'].includes(f.t)?'soft':'hard'),sx,sy,burstT:0};emitters.push(em);
-  for(let i=0;i<n;i++)parts.push(spawnP(em,true))}
- parts.length=Math.min(parts.length,cap)}
-function spawnP(em,init){const w=innerWidth,h=innerHeight;const rnd=Math.random;const sp=(em.spd||10)*em.sx;const dir=(em.dir!=null?em.dir:-90)*Math.PI/180;
- const p={em,x:rnd()*w,y:rnd()*h,vx:Math.cos(dir)*sp,vy:Math.sin(dir)*sp,life:1e9,age:0,ph:rnd()*6.28,sz:(em.size||1.5)};
- switch(em.t){case 'rain':case 'drizzle':case 'hail':case 'uprain':if(!init){if(em.t==='uprain')p.y=h+5;else p.y=-5}break;
-  case 'drips':p.y=init?rnd()*h:rnd()*h*.2;p.vy=Math.abs(sp);p.vx=0;break;
-  case 'bubbles':p.y=init?rnd()*h:h+5;p.vy=-Math.abs(sp);p.vx=0;break;
-  case 'embers':p.y=init?rnd()*h:h*.7+rnd()*h*.3;p.vy=-Math.abs(sp);p.vx=(rnd()-.5)*sp*.4;p.life=3+rnd()*3;break;
-  case 'spray':p.x=w*(.1+rnd()*.8);p.y=h*.72;p.vx=(rnd()-.5)*sp*.6;p.vy=-sp*(.6+rnd()*.6);p.life=init?0:1.4;p.age=init?2:0;break;
-  case 'sparks':p.life=.3+rnd()*.5;p.x=w*(.3+rnd()*.5);p.y=h*(.3+rnd()*.3);p.vx=(rnd()-.5)*sp;p.vy=(rnd()-.5)*sp;break;
-  case 'wind':p.vx=sp;p.vy=0;p.len=(em.size||30)*em.sx;if(!init)p.x=-p.len;break;
-  case 'birds':p.y=h*(.08+rnd()*.25);p.vx=sp*(rnd()<.5?-1:1);p.vy=0;if(!init)p.x=p.vx>0?-20:w+20;break;
-  case 'vortex':p.r=40+rnd()*h*.4;p.a=rnd()*6.28;break;
-  default:p.vx=(rnd()-.5)*sp;p.vy=(rnd()-.5)*sp}
- return p}
-function step(dt,n){const w=innerWidth,h=innerHeight;const now=performance.now()/1000;
- for(const em of emitters)if(em.t==='spray'&&em.burst_every_s){em.burstT-=dt;if(em.burstT<=0){em.burstT=em.burst_every_s;let k=0;for(const p of parts)if(p.em===em&&k<em.n){Object.assign(p,spawnP(em,false));k++}}}
- for(let i=0;i<n;i++){const p=parts[i],t=p.em.t;p.age+=dt;
-  if(t==='vortex'){p.a+=dt*(p.em.spd||40)/p.r;p.x=w*.62+Math.cos(p.a)*p.r;p.y=h*.45+Math.sin(p.a)*p.r*.5;continue}
-  if(t==='spray'){p.vy+=260*p.em.sy*dt}
-  if(['spores','motes','dust','phosphor','snowash'].includes(t)){p.vx+=Math.sin(now+p.ph)*2*dt;p.vy+=Math.cos(now*.7+p.ph)*2*dt}
-  p.x+=p.vx*dt;p.y+=p.vy*dt;
-  const out=p.x<-60||p.x>w+60||p.y<-30||p.y>h+30||p.age>p.life||(t==='bubbles'&&p.y<h*.15);
-  if(out&&!(t==='spray'&&p.em.burst_every_s))parts[i]=spawnP(p.em,false);
-  if(['spores','motes','dust','phosphor','snowash'].includes(t)){if(p.x<0)p.x+=w;if(p.x>w)p.x-=w;if(p.y<0)p.y+=h;if(p.y>h)p.y-=h}}}
-function draw(n){const w=innerWidth,h=innerHeight;ctx2.clearRect(0,0,w,h);
- for(let i=0;i<n;i++){const p=parts[i],em=p.em,t=em.t;if(t==='spray'&&p.age>p.life)continue;ctx2.globalAlpha=em.a||.5;
-  if(t==='rain'||t==='drizzle'||t==='uprain'||t==='wind'){ctx2.strokeStyle=em.col;ctx2.lineWidth=em.size||1;const L=t==='wind'?p.len:Math.min(14,Math.hypot(p.vx,p.vy)*.025);const a=Math.atan2(p.vy,p.vx);ctx2.beginPath();ctx2.moveTo(p.x,p.y);ctx2.lineTo(p.x-Math.cos(a)*L,p.y-Math.sin(a)*L);ctx2.stroke();continue}
-  if(t==='birds'){ctx2.strokeStyle=em.col;ctx2.lineWidth=1.4;const s=em.size||8;const f=Math.sin(p.age*8+p.ph)*s*.3;ctx2.beginPath();ctx2.moveTo(p.x-s/2,p.y-f);ctx2.lineTo(p.x,p.y);ctx2.lineTo(p.x+s/2,p.y-f);ctx2.stroke();continue}
-  if(t==='embers'||t==='sparks')ctx2.globalAlpha=(em.a||.5)*Math.max(0,1-p.age/p.life)*(.6+.4*Math.sin(p.age*20+p.ph));
-  const s=em.img.width/(t==='bubbles'?1.6:2);ctx2.drawImage(em.img,p.x-s/2,p.y-s/2,s,s)}
- ctx2.globalAlpha=1}
 function startLoop(){if(raf||!motionOK())return;lastT=performance.now();raf=requestAnimationFrame(loop)}
 function stopLoop(){if(raf)cancelAnimationFrame(raf);raf=0;if(ctx2)ctx2.clearRect(0,0,canvas.width,canvas.height)}
 function loop(now){raf=requestAnimationFrame(loop);const dtMs=now-lastT;lastT=now;if(document.hidden)return;
  if(!motionOK()&&!cam.dur){stopLoop();return} // Effects Off / reduced motion: nothing animates, so no rAF at all
- const live=(parts.length||cam.dur)&&!overlayOpen;
+ const live=cam.dur&&!overlayOpen;
  // governor: env frames only, ignoring 500 ms after a screen / visibility change. Down only after >=3 s with p75 > 1.5x the panel interval.
  if(live&&dtMs>4&&dtMs<1000){hist[dtMs<9.7?0:dtMs<13.9?1:2]++;if(hist[0]+hist[1]+hist[2]>2000)for(let i=0;i<3;i++)hist[i]>>=1;
   if(now>=quietUntil){ts.push(now);ds.push(dtMs);while(ts.length&&now-ts[0]>3000){ts.shift();ds.shift()}
    if(now-ts[0]>=1000){lastP75=p75(ds);if(now-ts[0]>=2900&&lastP75>panelMs()*1.5&&adaptive!=='off'){govTo(adaptive==='full'?'reduced':'off')}}}}
  applyCam(now);
- if(!parts.length&&!emitters.length)return;
- if(overlayOpen||adaptive==='off')return;
- const idle=now-lastInput>30000;const minDt=idle?1000/30:1000/60;if(now-lastDraw<minDt-1)return;
- const dt=Math.min(.05,(now-(lastDraw||now))/1000);lastDraw=now;const n=adaptive==='reduced'?(parts.length+1)>>1:parts.length;step(dt,n);draw(n)}
+}
 // ---------- transitions (visual only; never block input) ----------
 function playTransition(kind,col){if(!wipe||!wipe.animate)return;const fast=(window.FAST?.35:1)*U(1);const rm=reduceMQ.matches||quality()==='off';
  wipe.className='';wipe.style.setProperty('--wc',col);

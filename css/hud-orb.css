@@ -115,3 +115,6 @@
 
 .hud-fxc{position:fixed;left:0;top:0;z-index:900;pointer-events:none}
 .hud-mark{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none}
+/* Echo: moving a mark is free. Its ready/armed state lights only the ring and bell chevron, never the Energy orb itself, so it never reads as spending Energy. */
+#orb.horb.free.ready .ho-art{animation:none}
+#orb.horb.free.armed .ho-art{filter:drop-shadow(0 3px 6px #000)}

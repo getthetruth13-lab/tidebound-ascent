@@ -22,6 +22,8 @@ export function intentParts(e,m){const p=[];if(!m)return p;
  if(m.b)p.push({k:'b',icon:'guard',n:m.b,cls:'def',txt:`gains ${m.b} Guard`});
  if(m.s)p.push({k:'s',icon:'buff',n:'+'+m.s,cls:'buf',txt:`gains ${m.s} Might`});
  if(m.grow)p.push({k:'grow',icon:'buff',n:'+'+m.grow,cls:'buf',txt:`gives every Tendril ${m.grow} Might and grows a new one if fewer than 2`});
+ if(m.allyB)p.push({k:'allyB',icon:'guard',n:'+'+m.allyB,cls:'buf',txt:`gives every ally ${m.allyB} Guard`});
+ if(m.allyS)p.push({k:'allyS',icon:'buff',n:'+'+m.allyS,cls:'buf',txt:`gives every ally ${m.allyS} Might`});
  if(m.heal)p.push({k:'heal',icon:'heal',n:m.heal,cls:'buf',txt:`heals itself for ${m.heal}`});
  if(m.healAlly){const t=alive().find(x=>x.uid===m.tgt);p.push({k:'healAlly',icon:'heal',n:t?m.healAlly:5,cls:'buf',txt:t?`heals ${t.n} for ${m.healAlly}`:'heals itself for 5'})}
  if(m.summon){const n=m.n||1;p.push({k:'summon',icon:'summon',n:n>1?'×'+n:'',cls:'oth',txt:`summons ${n} ${EN[m.summon]?EN[m.summon].n:m.summon}${m.max?' (up to '+m.max+' alive)':''}`})}

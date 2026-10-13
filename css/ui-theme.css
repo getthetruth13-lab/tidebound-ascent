@@ -181,8 +181,7 @@
 /* ===== reduced motion (settings toggle mirrors the OS preference) ===== */
 .reduce-motion .tb-fog,.reduce-motion .tb-shim,.reduce-motion .tb-ov,.reduce-motion .tb-frame,.reduce-motion .tb-hero{animation:none!important}
 .reduce-motion .tb-spr,.reduce-motion .tb-btn,.reduce-motion .tb-plate{transition:none!important}
-.reduce-motion #env .envL,.reduce-motion #env-front .envL{animation:none!important}.reduce-motion .efx{animation:none!important}
-.reduce-motion .efx.lightning,.reduce-motion .efx.rings,.reduce-motion .efx.ripples,.reduce-motion .efx.wavecrash{display:none}
+.reduce-motion #env .envL,.reduce-motion #env-front .envL{animation:none!important}
 @media (prefers-reduced-motion:reduce){.tb-fog,.tb-shim,.tb-ov,.tb-frame,.tb-hero{animation:none!important}.tb-spr,.tb-btn,.tb-plate,#kwtip{transition:none!important}}
 
 /* ===== intro cinematic (screens/intro.js) ===== */

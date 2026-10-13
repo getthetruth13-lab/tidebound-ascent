@@ -70,7 +70,7 @@ const inButton=el=>!!el.closest('button');
 document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.preventDefault();return}
  const el=find(e);const ref=el&&(el.dataset.kw||el.dataset.card);
  if(el&&el.closest('.dais')&&!el.closest('button')){hideTip();e.stopPropagation();e.preventDefault();return}
- if(el&&el.matches('.tipi,.lp-node,.nmf,.wrenline,.dais [data-info]:not(button)')){if(anchor===el&&tip.classList.contains('on'))hideTip();else showTip(el);e.stopPropagation();e.preventDefault();return}
+ if(el&&el.matches('.lp-node,.nmf,.wrenline,.dais [data-info]:not(button)')){if(anchor===el&&tip.classList.contains('on'))hideTip();else showTip(el);e.stopPropagation();e.preventDefault();return}
  if(!ref){const on=(tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on'));if(on&&!(e.target.closest&&e.target.closest('#kwtip,#cardtip')))hideTip();return}
  if(inHand(el)||inButton(el)||(el.closest('.card')&&!el.closest('#inspect,#cardtip')))return hideTip();
  const open=anchor===el&&((tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on')));if(open&&Date.now()-shownAt>400){hideTip()}else if(open){/* hover just opened it */}else showTip(el);

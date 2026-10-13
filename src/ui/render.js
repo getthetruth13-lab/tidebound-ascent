@@ -24,7 +24,7 @@ import {heroPlateHTML} from './hero-plate.js';
 import {heroHook} from './herohooks.js';
 export {toggleHitLog} from './hero-plate.js';
 import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,baseCost,costSurcharge} from '../engine/cards.js';
-import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
+import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,canTakeMove,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
 import {ECON,campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
 import {anim,syncCombatAnimations} from './fx.js';
@@ -36,7 +36,7 @@ import './screens/frame.js';
 import {titleScr} from './screens/title.js';
 import {decorateKeywords,shortText} from './kwtip.js';
 import {eventSceneHTML} from './eventscene.js';
-import {decorateCardRefs} from './cardref.js';
+import {decorateCardRefs,cardRefs} from './cardref.js';
 import {tileHTML,tilesRow,relicTile,potionTile,optionHTML,emblemHTML,splitLabel,esc as tesc} from './tiles.js';
 import {pkScreen,pkBtn} from './pk.js';
 import {glyph,stripEmoji} from './glyphs.js';
@@ -230,7 +230,7 @@ export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,T(560));if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
- h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&d.t!=='P'&&(!d.faint||hasRelic('hollowreed'))&&!d.unplay})}).join('')}</div>
+ h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&canTakeMove(ci)})}).join('')}</div>
  <div class="ctl"><div>${heroPlateHTML({incoming})}<button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile.">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
  <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>END</button></div></div></div>`;
  const m=cb.mode;
@@ -582,8 +582,11 @@ export function placeInspectKeywords(panel){const rail=panel.querySelector('.ins
  const tb=topBarBottom(),room=Math.max(60,innerHeight-8-tb);rail.style.left=x+'px';rail.style.maxHeight=room+'px';rail.style.overflowY='auto';rail.style.touchAction='pan-y';
  const h=Math.min(rail.scrollHeight,room);rail.style.top=Math.max(tb-r.top,Math.min(0,innerHeight-8-h-r.top))+'px'}
 export function closeInspect(){inspecting=null;render()}
+// Referenced cards (e.g. the Ringing that Discordant Strike adds) lead the rail as small full renders, each followed by its own keyword tips.
+function refCardsHTML(ci){return cardRefs(ci.id).map(id=>{const r={id,uid:-910,up:false};const kws=kwList(r).filter(k=>!kwList(ci).includes(k));
+ return `<div class="keyword-window cref-card" data-ref="${id}">${cardHTML(r,{full:true})}</div>`+kws.map(k=>`<div class="keyword-window"><b>${k.replace(/ X$/,'')}</b><span>${shortText(k.replace(/ X$/,''))||KW[k]}</span></div>`).join('')}).join('')}
 export function inspectKeywordsHTML(ci){const sc=W.cb&&W.cb.hand.includes(ci)?costSurcharge(ci):[];
- return sc.map(x=>`<div class="keyword-window surch"><span>${x.why}</span></div>`).join('')+kwList(ci).map(k=>`<div class="keyword-window"><b>${k.replace(/ X$/,'')}</b><span>${shortText(k.replace(/ X$/,''))||KW[k]}</span></div>`).join('')}
+ return refCardsHTML(ci)+sc.map(x=>`<div class="keyword-window surch"><span>${x.why}</span></div>`).join('')+kwList(ci).map(k=>`<div class="keyword-window"><b>${k.replace(/ X$/,'')}</b><span>${shortText(k.replace(/ X$/,''))||KW[k]}</span></div>`).join('')}
 export function inspectHTML(){const ci=inspecting,d=CARDS[ci.id];if(!d)return'';
  return `<div class="ov inspect" id="inspect" onclick="closeInspect()"><div class="insp">${cardHTML(ci,{full:true})}<div class="inspect-keywords">${inspectKeywordsHTML(ci)}</div><div class="ikw"><b>${cname(ci)}</b> <span class="muted">${TYPEN[d.t]} · ${RARN[d.r]||''}</span><div>${desc(ci)}</div><div class="kws">${kwFor(ci)}</div>${d.flavour?`<div class="flav">${d.flavour}</div>`:''}<div class="muted">Tap anywhere to close</div></div></div></div>`}
 

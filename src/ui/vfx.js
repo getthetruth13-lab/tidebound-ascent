@@ -126,15 +126,39 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
   if(getComputedStyle(a).position==='sticky'){const r=a.getBoundingClientRect();const cs=getComputedStyle(a),ph=document.createElement('div');ph.setAttribute('aria-hidden','true');ph.style.cssText=`height:${r.height}px;margin:${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft};flex:none;visibility:hidden`;b.before(ph); // v0.6.2: a spacer keeps the bar's room so the screen under it does not jump up
    Object.assign(b.style,{position:'fixed',top:r.top+'px',left:r.left+'px',width:r.width+'px',height:r.height+'px',margin:'0',zIndex:'5'})} // sticky top bar: the clone does not scroll, so pin it where it was on screen
   if(a.tagName==='CANVAS'&&a.width&&a.height){try{b.width=a.width;b.height=a.height;b.getContext('2d').drawImage(a,0,0)}catch(_){}}
-  const an=a.getAnimations?a.getAnimations().filter(x=>x.animationName):[];if(an.length){b.style.animationDelay=an.map(x=>-(x.currentTime||0)+'ms').join(',');b.style.animationPlayState='paused'}}
+  const all=a.getAnimations?a.getAnimations():[],an=all.filter(x=>x.animationName);if(an.length){b.style.animationDelay=an.map(x=>-(x.currentTime||0)+'ms').join(',');b.style.animationPlayState='paused'}
+  // flicker fix: script (WAAPI) animations and CSS transitions do not travel with cloneNode. The victory walk-off fades the tiles/banner and walks the hero
+  // off with fill:forwards, so the clone popped the old screen (hero, tiles, VICTORY) back for a frame. Bake their current values onto the clone.
+  const live=all.filter(x=>!x.animationName);if(live.length){const cs=getComputedStyle(a);for(const x of live){const ks=x.effect&&x.effect.getKeyframes?x.effect.getKeyframes():[];
+   for(const k of ks)for(const n in k)if(!['offset','easing','composite','computedOffset'].includes(n)){const css=n.replace(/[A-Z]/g,m=>'-'+m.toLowerCase());b.style.setProperty(css,cs.getPropertyValue(css),'important')}}
+   b.style.setProperty('transition','none','important')}}
  // the battle/scene foreground (#env-front) sits above #app and changes the instant the screen swaps; carry a frozen copy so the old screen keeps its exact look
  const ef=document.getElementById('env-front');if(ef&&getComputedStyle(ef).display!=='none'){const fc=ef.cloneNode(true);fc.setAttribute('aria-hidden','true');fc.dataset.xf='1';
   const es=[ef,...ef.querySelectorAll('*')],ds=[fc,...fc.querySelectorAll('*')];es.forEach((e,i)=>{const c=getComputedStyle(e);if(ds[i]){ds[i].style.opacity=c.opacity;ds[i].style.transition='none';ds[i].style.animation='none';if(e.style.transform)ds[i].style.transform=c.transform}});
   fc.style.opacity=getComputedStyle(ef).opacity;o.appendChild(fc)}
+ // flicker fix: the painted backdrop (#env) also swaps the instant the screen changes (shore -> map parchment), so a transparent old screen showed the NEW
+ // backdrop under it for the whole fade. Carry a frozen copy of the old backdrop at the bottom of the snapshot.
+ const ev=document.getElementById('env');if(ev){const ec=frozenCopy(ev);ec.style.setProperty('position','absolute','important');ec.style.setProperty('top',scrollOffset+'px','important');
+  ec.style.setProperty('height',innerHeight+'px','important');ec.style.setProperty('z-index','-1','important');o.appendChild(ec)} // last child (index-stable for snapshot/live element matching); z -1 paints it under everything
  document.body.appendChild(o);xf=o;for(const [b,t,l] of scr){b.scrollTop=t;b.scrollLeft=l} // inner scrollers (map) keep their scroll position
  const fin=()=>{o.remove();if(xf===o)xf=null};
  const k=hold/(hold+ms)||0,f=gray?'grayscale(1) brightness(.55)':'none';
- o.animate([{opacity:1,filter:'none',offset:0},{opacity:1,filter:f,offset:k},{opacity:0,filter:f,offset:1}],{duration:hold+ms,easing:'ease-out'}).finished.then(fin,fin)}
+ const anim=o.animate([{opacity:1,filter:'none',offset:0},{opacity:1,filter:f,offset:k},{opacity:0,filter:f,offset:1}],{duration:hold+ms,easing:'ease-out'});anim.finished.then(fin,fin);
+ // flicker fix: never let the old screen start fading before the new one is painted with its images decoded (cards/portraits/map nodes and the new
+ // backdrop decode async; on a phone that took longer than the hold, so blank boxes and the bare backdrop popped in mid-fade). The hold still runs;
+ // the fade waits at full opacity for readiness (cap 700ms), then starts on a fresh frame so a long decode frame never skips it ahead.
+ anim.pause();const t0=performance.now();whenPainted(app).then(()=>requestAnimationFrame(()=>{if(xf!==o||anim.playState==='finished')return;anim.currentTime=Math.min(performance.now()-t0,hold);anim.play()}))}
+function frozenCopy(src){const c=src.cloneNode(true);c.removeAttribute('id');c.setAttribute('aria-hidden','true');const s=[src,...src.querySelectorAll('*')],d=[c,...c.querySelectorAll('*')];
+ if(s.length===d.length)for(let i=0;i<s.length;i++){d[i].removeAttribute('id');const cs=getComputedStyle(s[i]);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}
+  d[i].style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important';if(s[i].tagName==='CANVAS'&&s[i].width){try{d[i].width=s[i].width;d[i].height=s[i].height;d[i].getContext('2d').drawImage(s[i],0,0)}catch(_){}}}
+ return c}
+// The incoming screen is ready when its <img>s are decoded and the new backdrop layers have finished their own decode-then-fade swap (env.js swapLayer).
+function whenPainted(app){return new Promise(r=>requestAnimationFrame(r)).then(()=>painted(app))} // crossfade runs before render() swaps #app in; look after it
+function painted(app){const cap=new Promise(r=>setTimeout(r,700));
+ const imgs=[...app.querySelectorAll('img')].filter(i=>i.getBoundingClientRect().width).map(i=>i.complete&&i.naturalWidth?Promise.resolve():(i.decode?i.decode():new Promise(r=>{i.onload=i.onerror=r})).catch(()=>{}));
+ const envReady=()=>[...document.querySelectorAll('#env [data-l],#env-front [data-l]')].every(el=>{if(!el.dataset.src)return true;const sh=el.firstChild,last=sh&&sh.lastChild;return !!last&&last.style.opacity==='1'});
+ const env=new Promise(r=>{requestAnimationFrame(function chk(){envReady()?r():requestAnimationFrame(chk)})});
+ return Promise.race([Promise.all([...imgs,env]),cap])}
 export const xfadeEl=()=>xf;
 // pause/resume tab visibility
 document.addEventListener('visibilitychange',()=>{if(document.hidden){P.length=0;fxQueue.clear()}});

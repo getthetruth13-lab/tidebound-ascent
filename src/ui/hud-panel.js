@@ -6,7 +6,7 @@
 import {W} from '../core/state.js';
 import {CARDS} from '../core/registry.js';
 import {cname,cost} from '../engine/cards.js';
-import {CORE,canMark,flourishMin,flourishMult,echoPlan} from '../engine/combat.js';
+import {CORE,canMark,flourishMin,flourishMult,echoPlan,echoPreview} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
 import {CARD_ART} from '../assets.js';
 import {playSound} from '../audio.js';
@@ -16,7 +16,7 @@ export const ORB_TITLE={tide:'Tide',echo:'Echo',carto:'Waypoints',duel:'Momentum
 // ---- meter state per hero: segments lit / total, ready (manual and usable now), strain (one step from a trigger)
 export function meterOf(cb,cls){
  if(cls==='tide'){const t=cb.tide??5;return {on:t,n:10,ready:false,strain:t===9||t===1,max:t>=10,manual:false}}
- if(cls==='echo'){const n=CORE.echo.cap||4,used=Math.min(n,cb.stat?.echoesTurn||0);return {on:used,n,ready:!cb.busy&&canMark(),strain:used===n-1,max:used>=n,manual:true}}
+ if(cls==='echo'){const on=(cb.mark?1:0)+(cb.mark2?1:0);return {on,n:2,ready:canMark(),strain:false,max:on>=2,manual:true,free:true}}
  if(cls==='carto'){const s=cb.slots||[],n=cb.nslots||3,lim=mod('advances',{},1),max=CORE.carto.rank_max;const canAdv=!cb.busy&&!cb.mode&&cb.advUsed<lim&&s.some(w=>w&&(w.rank||0)<max);
   return {on:s.filter(Boolean).length,n,ready:canAdv,strain:s.some(w=>w&&(w.rank||0)===max-1)&&canAdv,max:s.length>=n&&s.every(w=>w&&(w.rank||0)>=max),manual:true}}
  if(cls==='duel'){const n=mod('momMax',{},CORE.duel.mom_max),m=cb.mom||0;return {on:Math.min(n,m),n,ready:!cb.busy&&m>=flourishMin(),strain:m===n-1,max:m>=n,manual:true}}
@@ -46,9 +46,9 @@ function hint(cls,k){const txt=HINTS[cls]?.[k];if(!txt)return;let seen=[];try{se
 export function orbHTML(cb,cls){if(!ichQ&&typeof requestAnimationFrame!=='undefined')ichQ=requestAnimationFrame(()=>{ichQ=0;flashIntents()});const m=meterOf(cb,cls),s=fxState(cb,cls,m);if(m.ready)hint(cls,'ready');if(m.strain&&cls==='tide')hint(cls,'strain');
  const armed=armedOf(cb,cls),e=cb.energy,frac=Math.max(0,Math.min(1,e/Math.max(1,cb.maxE)));const f=fxClasses(s);
  const deg=(m.on/m.n*360).toFixed(1);
- const lab=cls==='tide'?`Tide ${m.on} of 10`:cls==='echo'?`${m.on} of ${m.n} echoes used`:cls==='carto'?`${m.on} of ${m.n} Waypoints`:`Momentum ${m.on} of ${m.n}`;
+ const lab=cls==='tide'?`Tide ${m.on} of 10`:cls==='echo'?`${m.on} of ${m.n} cards marked`:cls==='carto'?`${m.on} of ${m.n} Waypoints`:`Momentum ${m.on} of ${m.n}`;
  const h=pendingHint&&performance.now()-pendingHint.t<2600?pendingHint:null;
- return `<div class="orb horb ho-${cls}${e?'':' empty'}${m.manual?' manual':''}${m.ready?' ready':''}${armed?' armed':''}${m.strain?' strain':''}${m.max?' maxed':''}${f.c}" id="orb" role="button" tabindex="0" aria-label="Energy ${e}. ${esc(ORB_TITLE[cls])}: ${esc(lab)}. Hold for details${m.manual?', tap to use':''}." data-meter="${m.on}" data-segs="${m.n}" style="--ef:${frac.toFixed(3)};--lit:${deg}deg;${f.st}">
+ return `<div class="orb horb ho-${cls}${e?'':' empty'}${m.manual?' manual':''}${m.free?' free':''}${m.ready?' ready':''}${armed?' armed':''}${m.strain?' strain':''}${m.max?' maxed':''}${f.c}" id="orb" role="button" tabindex="0" aria-label="Energy ${e}. ${esc(ORB_TITLE[cls])}: ${esc(lab)}. Hold for details${m.manual?', tap to use':''}." data-meter="${m.on}" data-segs="${m.n}" style="--ef:${frac.toFixed(3)};--lit:${deg}deg;${f.st}">
  <i class="ho-ghost" aria-hidden="true"></i><img class="ho-art" src="${HUD}orb-${cls}.webp" alt="" draggable="false"><i class="ho-ring" aria-hidden="true"></i><i class="ho-ringpv" aria-hidden="true"></i><i class="ho-glow" aria-hidden="true"></i><img class="ho-glass" src="${HUD}orb-${cls}-glass.webp" alt="" draggable="false"><span>${e}</span>${m.manual?'<i class="ho-chev" aria-hidden="true"></i>':''}${h?`<b class="ho-hint" style="--d-hint:-${Math.round(performance.now()-h.t)}ms">${esc(h.txt)}</b>`:''}${cls==='carto'&&armed?cartoChips(cb):''}</div>`}
 function cartoChips(cb){const max=CORE.carto.rank_max;return `<div class="ho-chips">${(cb.slots||[]).map((w,i)=>w?`<button class="ho-chip${(w.rank||0)>=max?' land':''}" type="button" data-adv="${i}" ${(w.rank||0)>=max?'disabled':''}>${esc(cname(w))}<small>Rank ${w.rank||0}${(w.rank||0)<max?' → '+((w.rank||0)+1):''}</small></button>`:'').join('')}</div>`}
 // ---- hold panel (copy trimmed as panel2.py; live values)
@@ -60,10 +60,12 @@ function panelBody(cb,cls){const T=CORE.tide;let expl='',vis='',cap='',nxt='',ca
   can=[10-t<=t?`Raise the Tide ${10-t} more to reach Crest.`:`Lower the Tide ${t} more to reach Undertow.`];
   let ticks='';for(let i=0;i<=10;i++)ticks+=`<i style="--i:${i}"${i===t?' class="on"':''}><b>${i===0||i===10||i===t?i:''}</b></i>`;
   vis=`<div class="hpn-tidevis" style="--t:${t}"><div class="hpn-staff"><i class="hpn-water"></i><i class="hpn-float"></i>${dir&&!cb.holdDrift?`<i class="hpn-arrow ${dir>0?'up':'dn'}"></i>`:''}</div><div class="hpn-ticks">${ticks}</div><div class="hpn-ends"><span class="lo">▼ 0 Undertow</span><span class="hi">Crest 10 ▲</span></div></div>`}
- else if(cls==='echo'){const n=CORE.echo.cap||4,used=Math.min(n,cb.stat?.echoesTurn||0);expl='Your first Attack and first Skill each turn are marked.';
-  const ms=[1,2].map(k=>{try{return echoPlan(true,k)?.card}catch(e){return null}}).filter(Boolean);
-  cap=`${used} of ${n} replays used this turn.`;nxt='When you end your turn, marked cards play again for free.';can=['Tap the orb, then a card, to move a mark. Free.'];
-  vis=`<div class="hpn-cards">${ms.length?ms.map(ci=>`<div class="hpn-card mk">${thumb(ci)}<b>${esc(cname(ci))}</b><em>MARKED</em></div>`).join(''):'<div class="hpn-card empty"><span>Nothing marked yet</span></div>'}<div class="hpn-pips">${Array.from({length:n},(_,i)=>`<i${i<used?' class="on"':''}></i>`).join('')}</div></div>`}
+ else if(cls==='echo'){expl='Your first Attack and first Skill each turn are marked.';
+  const ms=[1,2].map(k=>{try{const p=echoPlan(true,k);return p&&{ci:p.card,pv:echoPreview(p)}}catch(e){return null}}).filter(Boolean);
+  const last=cb.stat?.echoesLast||0;cap=last&&!ms.length?`Last turn: ${last} ${last>1?'cards':'card'} replayed.`:'';
+  nxt=ms.length?`When you end your turn, ${ms.length>1?'both marked cards play':'the marked card plays'} again for free.`:'When you end your turn, marked cards play again for free.';
+  can=[canMark()?'Tap the orb, then a card, to move a mark. Free: costs no Energy.':ms.length?'No card in hand can take a mark now.':'Play an Attack or a Skill to mark it.'];
+  vis=`<div class="hpn-cards">${ms.length?ms.map(({ci,pv})=>`<div class="hpn-card mk">${thumb(ci)}<b>${esc(cname(ci))}</b><em>${pv?(pv.kind==='dmg'?`ECHO ${pv.total} DMG`:`ECHO ${pv.total} GUARD`):'MARKED'}</em></div>`).join(''):'<div class="hpn-card empty"><span>Nothing marked yet</span></div>'}</div>`}
  else if(cls==='carto'){const s=cb.slots||[],n=cb.nslots||3,max=CORE.carto.rank_max,lim=mod('advances',{},1);expl='Waypoints fire at the start of every turn.';
   const ws=s.filter(Boolean),names=ws.map(w=>CARDS[w.id]?.n||w.id);
   nxt=ws.length?`${names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names[0]} ${names.length>1?'fire':'fires'} when your next turn starts.`:'No Waypoints yet. Play one to fill a slot.';
@@ -97,7 +99,7 @@ export function orbTap(){const cb=W.cb,cls=W.run?.cls;if(!cb||!cls||W.S.screen!=
  if(cb.busy||cb.enemyTurn||performance.now()-lastLand<250)return;
  const m=meterOf(cb,cls);if(!m.manual)return;
  if(cls==='duel'){if(!cb.armFlourish&&!m.ready)return fizzle(cls,`Needs ${flourishMin()} Momentum`);playSound(cb.armFlourish?'cancel':'steel',cb.armFlourish?1:1.4);window.armFlourish?.();return}
- if(cls==='echo'){if(!canMark())return fizzle(cls,'Nothing to mark');playSound(cb.armMark?'cancel':'bell',1.3);window.armMark?.();return}
+ if(cls==='echo'){if(!cb.armMark&&!canMark())return fizzle(cls,cb.mark||cb.mark2?'No card can take a mark':'Nothing marked yet');playSound(cb.armMark?'cancel':'bell',1.3);window.armMark?.();return}
  if(cls==='carto'){if(cartoArmed===cb){cartoArmed=null;playSound('cancel');window.G?.render?.();return}if(!m.ready)return fizzle(cls,cb.advUsed?'Advance used this turn':'No Waypoint to Advance');cartoArmed=cb;playSound('flip',1.2);window.G?.render?.()}}
 function cartoAdvance(i){cartoArmed=null;const s=FX.get(W.cb);if(s)s.fx.fire=performance.now();playSound('rank',1);window.advance?.(i)}
 if(typeof document!=='undefined'){
@@ -189,6 +191,6 @@ if(typeof document!=='undefined')observeEvents((ev,c)=>{const cb=W.cb,cls=W.run?
  if(ev==='crest'){const ps=cb.ens.filter(e=>e.hp>0).map(enP).filter(Boolean);if(ps.length){crestWave(o,ps);ps.forEach((p,i)=>burst(p,{color:COL.tide,ms:420,size:70,delay:420+i*90}))}}
  else if(ev==='undertow'){const h=heroP();if(h){streak(o,h,{color:'#bfe9ff',ms:600,width:5});setTimeout(()=>burst(h,{color:'#bfe9ff',ms:500,size:110,cls:'ring'}),450)}}
  else if(ev==='flourish'){const p=enP(cb.ens[cb.tgt]||cb.ens.find(e=>e.hp>0));if(p){streak(o,p,{color:COL.duel,ms:350,width:4});bladeArc(p,350);burst(p,{color:'#ffd27a',ms:400,size:56,delay:520})}}
- else if(ev==='echo'){const p=enP(cb.markTgt)||enP(cb.ens.find(e=>e.hp>0));if(p){streak(o,p,{color:COL.echo,ms:350,width:3});[0,120,240].forEach((d,i)=>burst(p,{color:COL.echo,ms:420,size:120-i*22,cls:'ring',delay:330+d}))}}
+ else if(ev==='echo'){const s=FX.get(cb);if(s)s.fx.fire=performance.now();burst(o,{color:COL.echo,ms:450,size:o.w*1.2,cls:'ring'});const p=enP(cb.markTgt)||enP(cb.ens.find(e=>e.hp>0));if(p){streak(o,p,{color:COL.echo,ms:350,width:3});[0,120,240].forEach((d,i)=>burst(p,{color:COL.echo,ms:420,size:120-i*22,cls:'ring',delay:330+d}))}}
  else if(ev==='advance'){burst(o,{color:COL.carto,ms:450,size:o.w*1.2,cls:'ring'})}
  }catch(e){}});

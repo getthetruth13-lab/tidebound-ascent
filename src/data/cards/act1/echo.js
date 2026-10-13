@@ -50,7 +50,7 @@ N('retune',{e:'🎚️',d:'Faint. Move a Mark to a card of the same type you alr
  const types=[c.markType,c.mark2Type].filter(Boolean);const marks=[c.mark,c.mark2];
  const opts=playedThisTurn(turnStartSeq(f)).filter(ci=>ringable(ci)&&!marks.includes(ci)&&types.includes(CARDS[ci.id].t==='A'?'A':'S'));
  const done=()=>f.draw(f.v(1,2));
- if(!opts.length){log('🎚️ Retune: no other card of a Marked type played this turn');return done()}
+ if(!opts.length){log('🎚️ Retune: no other card of a Marked type played this turn');if(!f.echo)callout('Nothing to retune','echo');return done()}
  ask(f,'Retune: which card takes the Mark?',opts.map(ci=>({l:'🔔 '+(CARDS[ci.id].e||'')+' '+cname(ci),card:{id:ci.id,up:ci.up},f:()=>{moveMark(ci,ci._tgt||(ci===c.last?c.lastTgt:null));log('🎚️ Retuned: '+cname(ci)+' is Marked');callout('RETUNED: '+cname(ci),'echo');done()}})))}});
 N('tollingward',{e:'🔕',d:'Gain {6|8} Guard. <b>Resound:</b> deal damage equal to your Guard (max 15) to a random enemy.',p:f=>{f.blk(f.v(6,8));if(!f.echo)return;
  const t=randAlive();const n=Math.min(15,W.cb.p.block);if(t&&n>0){hit(t,n,f,{raw:true});callout('TOLL '+n,'echo')}}});
@@ -89,13 +89,13 @@ R('livingsong',{e:'🌱',sus:3,moor:1,d:'Moor. Deal {6|8}. Sustain 3. When it Ec
  for(const ci of [...c.hand,...c.draw,...c.disc,...c.exh])if(ci!==f.ci&&CARDS[ci.id]&&CARDS[ci.id].sus){ci.sus=(ci.sus||0)+1;k++}
  if(k){log('🌱 Living Song: '+k+' Sustain card'+(k>1?'s grow':' grows')+' by 1');floatText('p','🌱 +1 ×'+k,'')}}});
 // Solo: one chosen tine rings 3 more times (cap 4 shared; the other tine's first ring stays reserved). At most 3 more cards this turn.
-R('solo',{e:'🎸',d:'Choose one Mark: it Echoes 3 more times this turn (shares the cap of 4). You can play at most 3 more cards this turn. Faint.',p:f=>{const c=W.cb;const ci=f.ci;
+R('solo',{e:'🎸',req:()=>!!(W.cb.mark||W.cb.mark2),d:'Choose a marked card (automatic if only one): it Echoes 3 more times this turn. Needs a marked card. You can play at most 3 more cards this turn. Faint.',p:f=>{const c=W.cb;const ci=f.ci;
  const L=thisTurn({id:'solo',slot:0,played:0,mod:{
   echoPlan(inst,ctx,p){if(!inst.slot||ctx.slot!==inst.slot)return p;const other=inst.slot===1?W.cb.mark2:W.cb.mark;let r=p.repeats+3;
    if(other&&(other._seq||0)>(p.card._seq||0))r=Math.min(r,EC.cap-W.cb.stat.echoesTurn-1);return {...p,repeats:Math.max(p.repeats,r)}},
   canPlay(inst,ctx,v){return inst.played>=3?false:v}},
   on:{cardPlayed(inst,ctx){if(ctx.card!==ci)inst.played++}}});
- const set=s=>{L.slot=s;callout('SOLO: '+cname(s===1?c.mark:c.mark2)+' ×4','echo')};
+ const set=s=>{L.slot=s;const m=s===1?c.mark:c.mark2;m.soloT=Date.now();log('🎸 Solo: '+cname(m)+' rings 3 more times');callout('SOLO: '+cname(m)+' ×4','echo')};
  const opts=[c.mark&&{l:'🔔 '+cname(c.mark),card:{id:c.mark.id,up:c.mark.up},f:()=>set(1)},c.mark2&&{l:'🔔 '+cname(c.mark2),card:{id:c.mark2.id,up:c.mark2.up},f:()=>set(2)}].filter(Boolean);
  if(!opts.length){log('🎸 Solo: no Mark yet');return}if(opts.length===1)return opts[0].f();ask(f,'Solo: which Mark rings 3 more times?',opts)}});
 R('eternal',{e:'♾️',d:'At the start of your turn, return last turn\'s Echoed card from your discard pile to your hand.',power:{on:{

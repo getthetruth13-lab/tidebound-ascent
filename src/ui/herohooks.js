@@ -46,7 +46,7 @@ registerHeroHook('tide',{ability:cb=>{const f=tideForecast(cb),dir=cb.tideDir;
   info:`Tide ${cb.tide}${dir?(dir>0?', rising':', falling'):''}.${dir&&cb.turn>=1?' Next drifts, before other Tide effects: '+f.map(x=>x.ev==='hold'?'none (held)':x.ev==='crest'?'Crest':x.ev==='undertow'?'Undertow':x.ev==='bank'?'Bank':x.to).join(', then ')+'.':''}`}}});
 registerHeroHook('echo',{ability:cb=>{const r=ringPreview(cb);
  const cap=CORE.echo.cap,used=cb.stat?cb.stat.echoesTurn:0;
- return {html:`<b class="hp-n">${r.reduce((a,x)=>a+x.repeats,0)}</b><span class="hp-fc">of ${Math.max(0,cap-used)}</span>`,
+ return {html:`<b class="hp-n">${r.reduce((a,x)=>a+x.repeats,0)}</b>`,
   info:r.length?'Rings at end of turn: '+r.map(x=>`${x.name} ${x.n!=null?'about '+x.n+(x.kind==='blk'?' Guard':' to '+x.tgt):'repeats'}${x.repeats>1?' ×'+x.repeats:''}`).join('; ')+'.':'Nothing is Marked. Rings at end of turn: none.'}}});
 registerHeroHook('carto',{ability:cb=>{const s=(cb.slots||[]).filter(Boolean);
  return {html:`<b class="hp-n">${s.length}</b><span class="hp-fc">${s.map(w=>(w.rank||0)).join(' ')}</span>`,info:s.length?'Waypoints in play: '+s.map(w=>`${CARDS[w.id]?.n||w.id} (Rank ${w.rank||0})`).join(', ')+'.':'No Waypoints in play.'}}});

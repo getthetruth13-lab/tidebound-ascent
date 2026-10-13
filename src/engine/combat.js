@@ -239,7 +239,7 @@ function modeActImpl(a,i,j){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)re
 export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;
  if(cb.turn>1&&!mod('retainGuard',{},false))cb.p.block=0;
  Object.assign(cb,{parry:0,parryUsed:false,parries:{},advUsed:0,decUsed:0,breaks:0,markType:null,mark2Type:null,lastType:null,mark:null,markTgt:null,afterMark:0,armMark:false,armFlourish:false,mark2:null,markTgt2:null,after2:0,mark2Scale:1,extraMarks:0,lastNF:null,lastNFTgt:null,last:null,sel:null,insp:null,slack:false,keepMom:false,tideBtnUsed:false,wheelUsed:false});
- cb.stat.wpLeftLast=cb.stat.wpLeftTurn||0;Object.assign(cb.stat,{playedTurn:0,attacksTurn:0,tideturnsTurn:0,echoesTurn:0,bigTurn:0,wpLeftTurn:0});cb.bitter={};
+ cb.stat.wpLeftLast=cb.stat.wpLeftTurn||0;cb.stat.echoesLast=cb.stat.echoesTurn||0;Object.assign(cb.stat,{playedTurn:0,attacksTurn:0,tideturnsTurn:0,echoesTurn:0,bigTurn:0,wpLeftTurn:0});cb.bitter={};
  cb.energy=cb.maxE;if(cb.drainE){cb.energy=Math.max(0,cb.energy-cb.drainE);log(`⚡ Drained: −${cb.drainE} Energy`);cb.drainE=0}
  cb.banner={txt:'Player Turn',t:Date.now()};
  const q=cb.nextTurnQ;cb.nextTurnQ=[];q.forEach(fn=>fn());
@@ -267,16 +267,19 @@ function tapCardImpl(i){const cb=W.cb;if(cb.busy||cb.mode)return;cb.sel=i;cb.ins
 export function playSel(){}
 // UI toggles for the active class choices (applied to the next card you play)
 function armFlourishImpl(){const cb=W.cb;if(!cb||cb.busy)return;cb.armFlourish=!cb.armFlourish&&cb.mom>=flourishMin();render()}
-function armMarkImpl(){const cb=W.cb;if(!cb||cb.busy||!canMark())return;cb.armMark=!cb.armMark;render()}
+function armMarkImpl(){const cb=W.cb;if(!cb||cb.busy||(!cb.armMark&&!canMark()))return;cb.armMark=!cb.armMark;render()}
 export const flourishMin=()=>mod('flourishMin',{},DU.flourish_min);
 export const flourishMult=m=>Math.min(3.5,1+DU.flourish_per_mom*m);
 export const markBonus=(after)=>{const cb=W.cb;return Math.min(mod('markCap',{},EC.bonus_cap),mod('markPer',{},EC.bonus_per_card_after)*(after==null?cb.afterMark:after))};
 // Marks allowed per turn: 1, +1 from Second Verse / Chorus Draught (this turn) or Twin Clapper (always, but its Echo is half strength). Never more than 2.
 export const markLimit=()=>2; // Twin Tines
-export const canMark=()=>{const cb=W.cb;return !!cb&&!cb.busy}; // Twin Tines: the bell can always be armed to move a tine
+// A card in hand that could take a moved tine now: its type's tine is already on a played card, and you can afford to play it.
+// (An untaken tine goes to the next card of that type anyway, so arming only matters to MOVE a mark.) Moving is free.
+export const canTakeMove=ci=>{const cb=W.cb,d=CARDS[ci.id];const ty=d&&tineType(d);return !!ty&&(cb.markType===ty||cb.mark2Type===ty)&&!d.unplay&&(!d.faint||hasRelic('hollowreed'))&&canPlay(ci)};
+export const canMark=()=>{const cb=W.cb;return !!cb&&!cb.busy&&!cb.mode&&!!(cb.mark||cb.mark2)&&cb.hand.some(canTakeMove)};
 // playCard(i, opts): opts.flourish (Duelist) and opts.mark (Echo Mage) come from the UI; default = the armed toggles.
 function playCardImpl(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)return;if(!canPlay(ci)){cb.sel=i;return render()}const d=CARDS[ci.id];
- if(opts.flourish==null)opts.flourish=cb.armFlourish;if(opts.mark==null)opts.mark=cb.armMark;
+ if(opts.flourish==null)opts.flourish=cb.armFlourish;if(opts.mark==null)opts.mark=cb.armMark;if(opts.mark&&W.run.cls==='echo'&&!canTakeMove(ci))opts.mark=false; // same check as the highlight
  if(!W.previewing&&!W.replaying)flyCard(ci,needsTarget(ci)?curTgt():null);
  const c=cost(ci);const x=isX(ci)?cb.energy:0;cb.energy-=isX(ci)?x:c;cb.hand.splice(i,1);ci.tmp0=false;cb.sel=null;
  const tg=curTgt();Object.defineProperty(ci,'_tgt',{value:tg,writable:true,configurable:true,enumerable:false}); // non-enumerable: stays out of saves/clones
@@ -393,6 +396,7 @@ export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=inten
  if(m.a){e.atkT=Date.now();for(let h=0;h<(m.h||1);h++){if(W.run.hp<=0||e.hp<=0||!W.cb)break;enemyHitPlayer(e,eAtk(e,m.a))}fire('playerAttacked',{enemy:e})}
  if(!W.cb||e.hp<=0&&!m.boom)return;
  if(m.healAlly){let t=alive().find(x=>x.uid===m.tgt&&x!==e),n=m.healAlly;if(!t){t=e;n=5}const h=Math.min(n,t.max-t.hp);t.hp+=h;if(h)floatText(t.uid,'+'+h,'h');log(`🪡 ${e.n} stitches ${t===e?'herself':t.n} (+${h})`)}
+ if(m.allyB||m.allyS){alive().filter(x=>x!==e).forEach(x=>{if(m.allyB){x.block+=m.allyB;x.blkT=Date.now()}if(m.allyS)addSt(x,'str',m.allyS)});log(`📯 ${e.n} rallies its allies`)}
  if(m.heal){const h=Math.min(m.heal,e.max-e.hp);e.hp+=h;if(h)floatText(e.uid,'+'+h,'h')}
  if(m.w)addSt(cb.p,'weak',m.w);if(m.v)addSt(cb.p,'vuln',m.v);if(m.brittle)addSt(cb.p,'brittle',m.brittle);
  if(m.status){for(let i=0;i<m.status.n;i++)addCard(m.status.id,m.status.pile==='draw'?'drawRandom':m.status.pile||'disc');log(`🌿 ${m.status.n} ${CARDS[m.status.id].n} added to your ${m.status.pile==='draw'?'draw pile':m.status.pile==='hand'?'hand':'discard'}`)}
