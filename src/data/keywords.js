@@ -21,7 +21,7 @@ Object.assign(kw,{
  'Crest':`Tide hits 10: deal ${T.crest_dmg} damage to ALL enemies. Resets to 5.`,
  'Undertow':`Tide hits 0: gain ${T.undertow_blk} Guard, draw ${T.undertow_draw}. Resets to 5.`,
  'Mark':`Tap the bell, then play an Attack or Skill. It replays free at end of turn.`,
- 'Rank':`Ranks 1 / 2 / 3 add +${rankBonus.join(' / +')} damage. Resets when it leaves its slot.`,
+ 'Rank':`Ranks 1 / 2 / 3 add +${rankBonus.join(' / +')} damage; Guard Waypoints also gain +${K.guard_per_rank||2} Guard per Rank. Resets when it leaves its slot.`,
  'Fast Waypoint':'Also triggers once when placed.',
  'Spend':'Lower the Tide by that much to play this. Can trigger Tideturn or Undertow.',
  'Drenched X':'Loses X HP when the Tide turns, Crests or Undertows. Drops 1 per turn. Max 12.',

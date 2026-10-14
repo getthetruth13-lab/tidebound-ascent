@@ -3,7 +3,7 @@
 //   {fights,elites,boss,firsts:['enemy:slug',...],tasks:[{id,done}],settled,summary}
 import {W,hash32} from '../core/state.js';
 import {observeEvents} from '../core/bus.js';
-import {CARDS,CLASSES} from '../core/registry.js';
+import {CARDS,CLASSES,EN} from '../core/registry.js';
 import {DATA} from '../data/generated/data-v2.js';
 import {EARN,LAMP_XP,CLIMB_XP} from '../data/lamplight.js';
 import {loadProfile,saveProfile,lockedFor,barOf,lampPending,climbPending} from '../progress.js';
@@ -44,7 +44,7 @@ export function noteSeen(kind,id){const L=W.run&&W.run.lamp;if(!L||L.settled||id
  if(loadProfile().seen[kind]&&loadProfile().seen[kind][id])return;L.firsts.push(key)}
 function taskDone(task){task.done=true;const T=TASKS[task.id];try{const a=W.toasts=(W.toasts||[]).filter(t=>Date.now()-t.t<2600);a.push({txt:`🏮 Lantern Task: ${T.n} (+${EARN.task})`,cls:'relic',t:Date.now()})}catch(_){}}
 function onEvent(event,ctx){const run=W.run,L=run&&run.lamp;if(!L||L.settled)return;const cb=W.cb;
- if(event==='combatStart'){cb.lamp={hp0:run.hp,minHp:run.hp};for(const e of ctx.enemies)noteSeen('enemy',e.key)}
+ if(event==='combatStart'){cb.lamp={hp0:run.hp,minHp:run.hp};try{L.fightStartTotal=tally(run,false,loadProfile()).total}catch(_){}for(const e of ctx.enemies)noteSeen('enemy',e.key)}
  const t=cb&&cb.lamp;if(t&&run.hp<t.minHp)t.minHp=run.hp;
  if(event==='combatEnd'&&ctx.won&&!ctx.escaped){if(ctx.kind==='elite')L.elites++;else if(ctx.kind==='boss')L.boss++;else L.fights++}
  else if(event==='relicGained')noteSeen('relic',ctx.relic.id);
@@ -52,17 +52,26 @@ function onEvent(event,ctx){const run=W.run,L=run&&run.lamp;if(!L||L.settled)ret
  for(const task of L.tasks){if(task.done)continue;const h=TASKS[task.id]&&TASKS[task.id].ev[event];if(!h)continue;let ok=false;try{ok=h(ctx,t)}catch(_){}if(ok)taskDone(task)}}
 observeEvents(onEvent,{replay:true});
 // ================= settle =================
-// Called once by endRun. Adds the run's Lamplight to the class Lamp and the Stair Climb, commits first-time sightings, and keeps an itemised summary for the end screen.
-export function settleRun(run,won){if(W.previewing)return null;const L=run.lamp;if(!L||L.settled)return L&&L.summary||null;
- const p=loadProfile(),cls=run.cls;L.settled=true;
+// The run's Lamplight so far (same formula settleRun commits). Shared by settleRun and the battle-victory Lamplight bar.
+function tally(run,won,p){const L=run.lamp,cls=run.cls;
  const floors=Math.max(0,Math.min(15,run.floor||0)),tasksDone=L.tasks.filter(t=>t.done),newFirsts=L.firsts.filter(k=>{const [kind,id]=k.split(':');return !(p.seen[kind]&&p.seen[kind][id])});
  const lines=[{k:'floors',label:`Floors reached (${floors})`,pts:floors*EARN.floor},{k:'fights',label:`Fights won (${L.fights})`,pts:L.fights*EARN.fight},
-  {k:'elites',label:`Elites felled (${L.elites})`,pts:L.elites*EARN.elite},{k:'boss',label:'Tide-bell silenced',pts:L.boss*EARN.boss},{k:'win',label:'Act 1 cleared',pts:won?EARN.win:0},
+  {k:'elites',label:`Elites felled (${L.elites})`,pts:L.elites*EARN.elite},{k:'boss',label:`${(EN[run.boss]||{}).n||'The boss'} silenced`,pts:L.boss*EARN.boss},{k:'win',label:'Act 1 cleared',pts:won?EARN.win:0},
   {k:'firsts',label:`First sightings (${newFirsts.length})`,pts:newFirsts.length*EARN.first},{k:'tasks',label:`Lantern Tasks (${tasksDone.length}/${L.tasks.length})`,pts:tasksDone.length*EARN.task}].filter(l=>l.pts>0);
  let sub=lines.reduce((a,l)=>a+l.pts,0);const mults=[];
  const tm=run.tidemark||0;if(tm>0){mults.push({label:`Tidemark ${tm}`,x:1+EARN.tidemark*tm})}
  if((p.runs[cls]||0)<EARN.earlyRuns)mults.push({label:'Early climbs +50%',x:EARN.earlyBonus});
  let total=sub;for(const m of mults)total*=m.x;total=Math.round(total);
+ return {floors,tasksDone,newFirsts,lines,mults,sub,total}}
+// Battle victory: Lamplight this run so far, what the last fight added, and where that leaves the Class Lamp (not committed until the run ends).
+export function lampPreview(){const run=W.run,L=run&&run.lamp;if(!L||L.settled)return null;const p=loadProfile(),cls=run.cls;
+ const now=tally(run,false,p).total,gain=Math.max(0,now-(L.fightStartTotal||0)),xp=p.xp[cls]||0;
+ return {cls,total:now,gain,from:barOf(xp+now-gain,LAMP_XP),to:barOf(xp+now,LAMP_XP)}}
+
+// Called once by endRun. Adds the run's Lamplight to the class Lamp and the Stair Climb, commits first-time sightings, and keeps an itemised summary for the end screen.
+export function settleRun(run,won){if(W.previewing)return null;const L=run.lamp;if(!L||L.settled)return L&&L.summary||null;
+ const p=loadProfile(),cls=run.cls;L.settled=true;
+ const {floors,tasksDone,newFirsts,lines,mults,sub,total}=tally(run,won,p);
  const before={lamp:p.xp[cls]||0,climb:p.climb||0};
  p.xp[cls]=before.lamp+total;p.climb=before.climb+total;p.runs[cls]=(p.runs[cls]||0)+1;if(won)p.wins[cls]=(p.wins[cls]||0)+1;p.tasks+=tasksDone.length;
  for(const k of newFirsts){const [kind,id]=k.split(':');(p.seen[kind]||(p.seen[kind]={}))[id]=1}

@@ -1685,8 +1685,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "salvagechime": {
   "art": "art/v2/cards/salvagechime.webp",
@@ -1870,8 +1869,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "advance": {
   "art": "art/v2/cards/advance.webp",
@@ -1879,8 +1877,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "bitteranswer": {
   "art": "art/v2/cards/bitteranswer.webp",
@@ -1896,8 +1893,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "disengage": {
   "art": "art/v2/cards/disengage.webp",
@@ -1905,8 +1901,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "spite": {
   "art": "art/v2/cards/spite.webp",
@@ -1922,8 +1917,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "rashflourish": {
   "art": "art/v2/cards/rashflourish.webp",
@@ -1939,8 +1933,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "twinanswer": {
   "art": "art/v2/cards/twinanswer.webp",
@@ -1948,8 +1941,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "wallsteel": {
   "art": "art/v2/cards/wallsteel.webp",
@@ -1957,8 +1949,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "trimwick": {
   "art": "art/v2/cards/trimwick.webp",
@@ -1974,8 +1965,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "grudge": {
   "art": "art/v2/cards/grudge.webp",
@@ -1983,8 +1973,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "matador": {
   "art": "art/v2/cards/matador.webp",
@@ -1992,8 +1981,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "ledgerleaf": {
   "art": "art/v2/cards/ledgerleaf.webp",
@@ -2001,8 +1989,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "sealingwax": {
   "art": "art/v2/cards/sealingwax.webp",
@@ -2010,8 +1997,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "driftnet": {
   "art": "art/v2/cards/driftnet.webp",
@@ -2019,8 +2005,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "ferrycoin": {
   "art": "art/v2/cards/ferrycoin.webp",
@@ -2028,8 +2013,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "ampoule": {
   "art": "art/v2/cards/ampoule.webp",
@@ -2037,8 +2021,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "salvagehook": {
   "art": "art/v2/cards/salvagehook.webp",
@@ -2046,8 +2029,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "barnacledplate": {
   "art": "art/v2/cards/barnacledplate.webp",
@@ -2055,8 +2037,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "watchwhistle": {
   "art": "art/v2/cards/watchwhistle.webp",
@@ -2064,8 +2045,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "smokedglass": {
   "art": "art/v2/cards/smokedglass.webp",
@@ -2073,8 +2053,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "midden": {
   "art": "art/v2/cards/midden.webp",
@@ -2082,8 +2061,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "manyfaced": {
   "art": "art/v2/cards/manyfaced.webp",
@@ -2091,8 +2069,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "tallystick": {
   "art": "art/v2/cards/tallystick.webp",
@@ -2100,8 +2077,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "tollingcup": {
   "art": "art/v2/cards/tollingcup.webp",
@@ -2109,8 +2085,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "bastionbar": {
   "art": "art/v2/cards/bastionbar.webp",
@@ -2118,8 +2093,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "lifebuoy": {
   "art": "art/v2/cards/lifebuoy.webp",
@@ -2127,8 +2101,7 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
  },
  "needle": {
   "art": "art/v2/cards/needle.webp",
@@ -2136,7 +2109,270 @@
   "size": [
    768,
    576
-  ],
-  "ph": true
+  ]
+ },
+ "driftmail": {
+  "art": "art/v2/cards/driftmail.webp",
+  "thumb": "art/v2/cards/driftmail-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "fairwinds": {
+  "art": "art/v2/cards/fairwinds.webp",
+  "thumb": "art/v2/cards/fairwinds-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "fishnet": {
+  "art": "art/v2/cards/fishnet.webp",
+  "thumb": "art/v2/cards/fishnet-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "flotsam": {
+  "art": "art/v2/cards/flotsam.webp",
+  "thumb": "art/v2/cards/flotsam-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "gullfeather": {
+  "art": "art/v2/cards/gullfeather.webp",
+  "thumb": "art/v2/cards/gullfeather-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "gullsdue": {
+  "art": "art/v2/cards/gullsdue.webp",
+  "thumb": "art/v2/cards/gullsdue-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "harpoon": {
+  "art": "art/v2/cards/harpoon.webp",
+  "thumb": "art/v2/cards/harpoon-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "krakengrasp": {
+  "art": "art/v2/cards/krakengrasp.webp",
+  "thumb": "art/v2/cards/krakengrasp-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "note": {
+  "art": "art/v2/cards/note.webp",
+  "thumb": "art/v2/cards/note-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "orders": {
+  "art": "art/v2/cards/orders.webp",
+  "thumb": "art/v2/cards/orders-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "plank": {
+  "art": "art/v2/cards/plank.webp",
+  "thumb": "art/v2/cards/plank-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "saltrub": {
+  "art": "art/v2/cards/saltrub.webp",
+  "thumb": "art/v2/cards/saltrub-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sealegs": {
+  "art": "art/v2/cards/sealegs.webp",
+  "thumb": "art/v2/cards/sealegs-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "shanty": {
+  "art": "art/v2/cards/shanty.webp",
+  "thumb": "art/v2/cards/shanty-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "speartip": {
+  "art": "art/v2/cards/speartip.webp",
+  "thumb": "art/v2/cards/speartip-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "spyglass": {
+  "art": "art/v2/cards/spyglass.webp",
+  "thumb": "art/v2/cards/spyglass-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tidalbore": {
+  "art": "art/v2/cards/tidalbore.webp",
+  "thumb": "art/v2/cards/tidalbore-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "treasuremap": {
+  "art": "art/v2/cards/treasuremap.webp",
+  "thumb": "art/v2/cards/treasuremap-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "kelp": {
+  "art": "art/v2/cards/kelp.webp",
+  "thumb": "art/v2/cards/kelp-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "murk": {
+  "art": "art/v2/cards/murk.webp",
+  "thumb": "art/v2/cards/murk-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ringing": {
+  "art": "art/v2/cards/ringing.webp",
+  "thumb": "art/v2/cards/ringing-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "scald": {
+  "art": "art/v2/cards/scald.webp",
+  "thumb": "art/v2/cards/scald-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "static": {
+  "art": "art/v2/cards/static.webp",
+  "thumb": "art/v2/cards/static-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "anchorchain": {
+  "art": "art/v2/cards/anchorchain.webp",
+  "thumb": "art/v2/cards/anchorchain-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "barnacled": {
+  "art": "art/v2/cards/barnacled.webp",
+  "thumb": "art/v2/cards/barnacled-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brinerot": {
+  "art": "art/v2/cards/brinerot.webp",
+  "thumb": "art/v2/cards/brinerot-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "doubloon": {
+  "art": "art/v2/cards/doubloon.webp",
+  "thumb": "art/v2/cards/doubloon-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "dread": {
+  "art": "art/v2/cards/dread.webp",
+  "thumb": "art/v2/cards/dread-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "leakyhull": {
+  "art": "art/v2/cards/leakyhull.webp",
+  "thumb": "art/v2/cards/leakyhull-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "saltburn": {
+  "art": "art/v2/cards/saltburn.webp",
+  "thumb": "art/v2/cards/saltburn-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "seasick": {
+  "art": "art/v2/cards/seasick.webp",
+  "thumb": "art/v2/cards/seasick-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sirenwhisper": {
+  "art": "art/v2/cards/sirenwhisper.webp",
+  "thumb": "art/v2/cards/sirenwhisper-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "wreckghost": {
+  "art": "art/v2/cards/wreckghost.webp",
+  "thumb": "art/v2/cards/wreckghost-256.webp",
+  "size": [
+   768,
+   576
+  ]
  }
 }

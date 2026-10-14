@@ -1,5 +1,5 @@
 // ui/tiles.js: illustrated choice tiles. Every menu that offers a choice (rewards, camp, events, combat choices, potion picks,
-// Lamplight unlocks) shows large tiles side by side: art slot + name plate + one-line summary; hover / long-press / the (i) button
+// Lamplight unlocks) shows large tiles side by side: art slot + name plate + one-line summary; hover / long-press
 // shows the full explanation. Art slots come from art/v2/ui/tiles.json (stable id -> file path). While a file is missing the
 // slot draws a themed placeholder emblem, so real art drops in later without code changes (tools/make-tiles-manifest.cjs).
 import {CARDS,RELICS,POTIONS} from '../core/registry.js';
@@ -54,3 +54,11 @@ export function optionHTML(o,click,extra={}){const label=typeof o.l==='function'
   const pid=N.potion.get(nm);if(pid)return potionTile(pid,{click:dis?null:click,disabled:dis,sum:sp.sum||undefined})}
  const tv=/^choice-(tide|moonpull)/.test(o.tile||'')?/Tide (\d+)/.exec(label):null;
  return tileHTML({over:tv?miniGauge(+tv[1]):'',id:o.tile||optIconId(sp.emoji),emoji:sp.emoji||'◈',name:sp.name||label,sum:o.sum||sp.sum||(/^(leave|back|skip)/i.test(sp.name)?'Walk on.':''),info:o.info||((o.sum||sp.sum)?`${sp.name}: ${o.sum||sp.sum}`:''),click,disabled:dis,cls:'opt '+(o.cls||''),tag:o.tag})}
+// ---- fit long tile titles inside the frame (v0.6.5): wrap at word breaks, then shrink until the longest word fits ----
+export function fitTileNames(root=document){for(const el of root.querySelectorAll('.tile .tname')){if(!el.isConnected||!el.offsetWidth)continue;el.style.fontSize='';el.classList.remove('fit');
+ const tile=el.closest('.tile');const max=()=>Math.min(el.parentElement.clientWidth,tile?tile.clientWidth:1e9);
+ let fs=parseFloat(getComputedStyle(el).fontSize),n=0;const over=()=>el.scrollWidth>el.clientWidth+1||el.offsetWidth>max()+1||el.scrollHeight>fs*2.6;
+ if(!over())continue;el.classList.add('fit');while(over()&&fs>7&&n++<20){fs-=0.5;el.style.fontSize=fs+'px'}}}
+if(typeof window!=='undefined'&&typeof MutationObserver!=='undefined'){let q=0;const run=()=>{q=0;try{fitTileNames()}catch{}};
+ const go=()=>new MutationObserver(()=>{if(!q)q=requestAnimationFrame(run)}).observe(document.body,{childList:true,subtree:true});
+ if(document.body)go();else addEventListener('DOMContentLoaded',go);addEventListener('resize',()=>{if(!q)q=requestAnimationFrame(run)})}

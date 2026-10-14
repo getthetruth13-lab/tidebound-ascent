@@ -40,14 +40,14 @@ R('inches',{e:'📐',d:'Your first Attack each turn applies Bleed equal to your 
 R('tempothrust',{e:'⏱️',d:'Deal {6|8}. If this is a Flourish, return this card to your hand.',p:f=>{f.dmg(f.v(6,8));if(!f.flourish||f.echo)return;const ci=f.ci;
  afterPlay(f,()=>{const cb=W.cb;if(!cb)return;for(const pile of ['disc','exh']){const i=cb[pile].indexOf(ci);if(i>=0){if(cb.hand.length>=10)return;cb[pile].splice(i,1);cb.hand.push(ci);floatText('p','⏱️ Tempo Thrust returns','');return}}})}});
 R('coup',{e:'💀',d:'Deal {12|15}. If this is a Flourish and it kills, gain 1 Energy and draw 2.',p:f=>{const t=f.tg;f.dmg(f.v(12,15));if(f.flourish&&t&&t.hp<=0){bonusEnergy(1,'duel');f.draw(2);log('💀 Coup! +1 Energy, draw 2')}}});
-N('rashflourish',{e:'😵',d:'Gain 3 Momentum. Lose {3|2} HP.',p:f=>{f.mom(3);f.loseHp(f.v(3,2))}});
+N('rashflourish',{e:'😵',cu:0,d:'Gain 3 Momentum. Lose 3 HP.',p:f=>{f.mom(3);f.loseHp(3)}});
 // Riposte: this enemy's answer reflects min(stopped, 3 x Momentum) instead of half (half is suppressed, then the new reflect is dealt).
 R('riposte',{e:'↪️',tg:1,d:'Call a Parry of {6|8}. When it triggers, it reflects 3 for each Momentum you have (at most the damage it stopped) instead of half.',p:f=>{const t=f.tg;if(!f.parry(f.v(6,8)))return;
  nextPhase('riposte',{mod:{parryReflect(inst,ctx,v){if(!live(inst)||inst.done||ctx.enemy!==t)return v;inst.done=true;const n=Math.min(ctx.reduced,3*W.cb.mom);
    log('↪️ Riposte reflects '+n);if(n>0)callout('RIPOSTE ↩ '+n,'parry');return {abs:n}}}})}});
-R('mirrorguard',{e:'🪞',tg:1,d:'Call a Parry equal to the target\'s intended hit (max {20|25}). A Clean Answer unless the hit grows.',p:f=>{const t=f.tg;const h=t?firstHit(t):0;
- if(!h){log('🪞 Mirror Guard: the target isn\'t attacking');return}const n=Math.min(f.v(20,25),h);if(t)callParry(t,Math.floor(n*f.mult))}});
-N('twinanswer',{e:'⚔️',tg:1,d:'Call a Parry of {5|6} on each of two different enemies (one Parry of 5 if only one).',p:f=>{const t=f.tg;const n=f.v(5,6);f.parry(n,t);
+R('mirrorguard',{e:'🪞',tg:1,cu:0,d:'Call a Parry equal to the target\'s intended hit (max 20). A Clean Answer unless the hit grows.',p:f=>{const t=f.tg;const h=t?firstHit(t):0;
+ if(!h){log('🪞 Mirror Guard: the target isn\'t attacking');return}const n=Math.min(20,h);if(t)callParry(t,Math.floor(n*f.mult))}});
+N('twinanswer',{e:'⚔️',tg:1,d:'Call a Parry of {5|6} on each of two different enemies (one Parry of {5|6} if only one).',p:f=>{const t=f.tg;const n=f.v(5,6);f.parry(n,t);
  const others=alive().filter(e=>e!==t);if(!others.length)return;
  ask(f,'Twin Answer: second enemy',others.map(e=>({l:'Parry '+n+' on '+e.n,auto:others.length===1,f:()=>f.parry(n,e)})))}});
 N('wallsteel',{e:'🧱',tg:1,d:'Full Flame. Call a Parry of {6|7} for each Energy spent on one enemy, as one pool.',p:f=>{if(!f.x){log('🧱 Wall of Steel: no Energy');return}f.parry(f.v(6,7)*f.x)}});
@@ -65,7 +65,7 @@ R('nick',{e:'🩸',d:'Deal {2|3}. Apply {2|3} Bleed.',p:f=>{f.dmg(f.v(2,3));blee
 R('hamstring',{e:'🦵',d:'Deal {5|7}. Apply 1 Soaked and 2 Bleed.',p:f=>{f.dmg(f.v(5,7));f.weak(1);bleed(f.tg,2)}});
 R('bloodletter',{e:'🩸',d:'Deal {5|7} to ALL. Apply 1 Bleed to ALL (one Attack).',p:f=>{f.all(f.v(5,7));alive().forEach(e=>bleed(e,1))}});
 R('fleche',{e:'🏹',d:'Deal {7|9}. Gain 1 extra Momentum.',p:f=>{f.dmg(f.v(7,9));momAfter(f,1)}});
-R('salute',{e:'🫡',d:'Gain 1 Momentum. Your next Parry this turn is +{3|4}.',p:f=>{f.mom(1);const n=f.v(3,4);thisTurn({id:'salute',mod:{parry(inst,ctx,v){if(inst.dead)return v;inst.dead=true;return v+n}}})}});
+R('salute',{e:'🫡',d:'Gain 1 Momentum. Your next Parry this turn is +{3|4}.{| Draw 1.}',p:f=>{f.mom(1);const n=f.v(3,4);thisTurn({id:'salute',mod:{parry(inst,ctx,v){if(inst.dead)return v;inst.dead=true;return v+n}}});if(f.u)f.draw(1)}});
 R('sweep',{e:'🌙',tg:1,d:'Choose: deal {5|7} to ALL; or deal {9|11} to one enemy (one Attack).',p:f=>ask(f,'Arc Cut',[{l:'Deal '+f.v(5,7)+' to ALL',f:()=>f.all(f.v(5,7))},{l:'Deal '+f.v(9,11)+' to target',f:()=>f.dmg(f.v(9,11))}])});
 R('rend',{e:'🐾',d:'Deal 4, +{2|3} for each Bleed on the target (max +{10|12}).',p:f=>{const t=f.tg;const b=t?t.st.bleed||0:0;f.dmg(4+Math.min(f.v(10,12),f.v(2,3)*b))}});
 R('duelsend',{e:'⚰️',d:'Deal {20|25}. If this is a Flourish, also deal the target\'s Bleed (not multiplied).',p:f=>{const t=f.tg;f.dmg(f.v(20,25));

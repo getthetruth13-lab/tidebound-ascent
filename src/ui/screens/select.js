@@ -75,6 +75,10 @@ function setLore(k){const box=document.querySelector('.cs-lores');if(!box)return
 // Keep the page above its hero, clamped inside the screen (it never covers another hero: it sits in the band above all heads).
 function placeLore(n){const r=root();if(!n||!r)return;const W_=r.clientWidth,w=n.offsetWidth,x=parseFloat(n.style.getPropertyValue('--x'))*W_;
  const left=Math.max(10,Math.min(W_-w-10,x-w/2));n.style.left=left+'px';n.style.setProperty('--tx',(x-left)+'px')}
+// light() edits the live DOM directly, so the render diff (which compares template to template) can miss a change such as a newly locked hero. Re-apply the state after every render.
+export function syncSelect(){const r=root();if(!r)return;const k=W.S.hero&&CLASSES[W.S.hero]?W.S.hero:null,lk=k&&lockedK(k);
+ for(const b of r.querySelectorAll('.cs-hero')){const on=b.dataset.cls===k&&!b.classList.contains('locked');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)}
+ const bf=document.getElementById('beginfocus');if(bf)bf.setAttribute('aria-disabled',String(!k||!!lk))}
 function pulse(el,c){if(!el)return;el.classList.remove(c);void el.offsetWidth;el.classList.add(c)}
 function light(k){const r=root();if(!r)return;const prev=r.dataset.focus;r.dataset.focus=k||'';r.classList.toggle('has-sel',!!k);
  if(k){r.style.setProperty('--fx',STAGE[k].x);r.style.setProperty('--tint',STAGE[k].tint)}

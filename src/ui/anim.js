@@ -13,6 +13,7 @@ import {alive} from '../engine/combat.js';
 import {T,U,EB,HIT_WEIGHT} from '../core/timing.js';
 import {cardHTML} from './render.js';
 import {cloneCard,IMPACT_MS} from './fx.js';
+import * as PFX from './painted-fx.js';
 import {fxOn,motionOn,reducedMotion,fxQueue,emit,ring,vignette,shakeFrames,slowmo,freezeIdle,rectOf,setImpact,impactBase,crossfade,xfadeEl,flyIcon,cue,COL,CLASS_COL} from './vfx.js';
 const enabled=()=>motionOn();
 export const motionEnabled=enabled;
@@ -56,11 +57,11 @@ function effect(selector,kind,col){const source=selector&&$(selector);if(!source
 // ---------- death (Task 41): every foe has a lore style (ui/deathstyles.js). The last foe adds the battle-won finale. ----------
 //  dissolve = collapse into dark water, brine mist and salt · sink = topple, bubbles and a splash · gutter = flare, embers, smoke
 //  boss = slow-motion, shake, flash, then a long disintegrate (the Knell's bell drops and tolls)
-let finalEnd=0,finaleTimer=0,finaleEls=[],finaleOn=false;
+let finalEnd=0,finaleTimer=0,finaleEls=[],finaleOn=false,rewardAt=0;
 const keep=el=>{finaleEls.push(el);return el};
 const drop=el=>{el.remove();finaleEls=finaleEls.filter(x=>x!==el)};
 // Remove every finale element and release the held screen. Always safe to call (new fight, tap, hidden tab).
-export function finaleCleanup(){clearTimeout(finaleTimer);finaleTimer=0;finaleEls.forEach(el=>el.remove());finaleEls=[];finaleOn=false;finalEnd=0;
+export function finaleCleanup(){clearTimeout(finaleTimer);finaleTimer=0;finaleEls.forEach(el=>el.remove());finaleEls=[];finaleOn=false;finalEnd=0;rewardAt=0;
  document.body.classList.remove('battle-finale','finale-hide')}
 function skipFinale(){if(!finaleOn)return;xfadeEl()?.getAnimations().forEach(a=>{try{a.finish()}catch(_){}});holdUntil=0;finaleCleanup()}
 document.addEventListener('pointerdown',()=>{if(finaleOn&&performance.now()-finaleStart>T(350))skipFinale()},true);
@@ -143,9 +144,12 @@ function death(e,lead){const sel=enemy(e);const el=sel&&$(sel);if(!el)return;
  if(last){const t=performance.now();finaleStart=t;document.body.classList.add('battle-finale','finale-hide');
   finalEnd=Math.max(finalEnd,t+TT+T(boss?FINALE.bossTotal+200:FINALE.total));
   fxQueue.push(lead,()=>{duckMusic(1400);if(!boss)document.querySelectorAll('.scene .fig').forEach(f=>freezeIdle(f,FINALE.beat))});
-  scheduleFinale(TT-T(boss?0:160)+(boss?T(300):0),{boss,kind:W.cb?.kind,name:e.n,hero:ghost('#hero','hero-lantern',{life:TT+T(2600),keep:true})})}
+  rewardAt=boss?t+T(BOSS_REWARD_AT):0;
+  scheduleFinale(TT-T(boss?0:160)+(boss?T(300):0),{hideEnd:rewardAt,boss,kind:W.cb?.kind,name:e.n,hero:ghost('#hero','hero-lantern',{life:TT+T(2600),keep:true})})}
 }
-function scheduleFinale(delay,info){setTimeout(()=>document.body.classList.remove('finale-hide'),Math.max(0,finalEnd-performance.now()));
+// Boss kill: the reward screen shows ~0.6 s after the killing blow while the boss death and finale play on over it (sweep S2-1: it was hidden ~5 s).
+const BOSS_REWARD_AT=600;
+function scheduleFinale(delay,info){setTimeout(()=>document.body.classList.remove('finale-hide'),Math.max(0,(info.hideEnd||finalEnd)-performance.now()));
  clearTimeout(finaleTimer);finaleOn=true;if(info.hero)keep(info.hero.el);
  info.hero&&(info.hero.el.style.opacity=0);cue.victoryAt=performance.now()+delay;
  finaleTimer=setTimeout(()=>runFinale(info),delay);
@@ -167,7 +171,7 @@ function runFinale({boss,kind,name,hero}){if(!finaleOn||document.hidden)return;f
  setTimeout(()=>{if(!finaleOn)return;const b=part('finale-banner',`<b>Victory</b>${kind==='boss'||kind==='elite'?`<small>${name} is silenced</small>`:''}`);
   anim(b,[{opacity:0,transform:'translate(-50%,-28%) scale(.82)',letterSpacing:'14px'},{opacity:1,transform:'translate(-50%,-50%) scale(1)',letterSpacing:'6px',offset:.3},{opacity:1,transform:'translate(-50%,-52%) scale(1.03)',offset:.84},{opacity:0,transform:'translate(-50%,-62%) scale(1.06)'}],{duration:Math.max(T(500),end-T(boss?160:200)+T(120))})},T(boss?160:200));
  setTimeout(()=>{if(finaleOn)finaleCleanup()},life+T(300))}
-export const deathHold=()=>Math.max(0,finalEnd-performance.now());
+export const deathHold=()=>Math.max(0,(rewardAt?Math.min(rewardAt,finalEnd):finalEnd)-performance.now());
 // Combo beats are presentation only: never delay input or combat resolution.
 let lastBeat=0,phase=null,phaseTimer=null,drawTimer=0;
 function comboBeat(kind,size=1,delay=impactBase()){
@@ -209,19 +213,19 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
  if(event==='crest'||event==='undertow'){effect(hero,event);if(event==='crest')comboBeat('crest',c.dmg/10);else playSound('guard');
   if(event==='crest'){shakeNow(5);vignette('blue',.35,420)}}
  if(event==='echo'){
-  effect(hero,'rings');ghost(hero,'echo-replay');comboBeat('echo',1+c.k);
+  ghost(hero,'echo-replay');comboBeat('echo',1+c.k);
   // Recreate the actual echoed card, including its art, without interactive attributes.
   const holder=document.createElement('div');holder.innerHTML=cardHTML(c.card);const card=holder.firstElementChild;
   if(card){const g=card.cloneNode(true);g.querySelectorAll('*').forEach(n=>{for(const a of [...n.attributes])if(a.name.startsWith('on'))n.removeAttribute(a.name)});for(const a of [...g.attributes])if(a.name.startsWith('on')||a.name.startsWith('data-'))g.removeAttribute(a.name);
    g.className+=' echo-card';g.setAttribute('aria-hidden','true');document.body.appendChild(g);setTimeout(()=>g.remove(),T(550))}
  }
- if(event==='flourish'){effect(enemy(c.f.tgt)||hero,'flourish');comboBeat('flourish',c.mom/2)}
+ if(event==='flourish'){if(!enemy(c.f.tgt))effect(hero,'flourish');comboBeat('flourish',c.mom/2)}
  if(event==='parry'){effect(hero,'spark');playSound('guard');burstAt(hero,'guard',0)}
  if(event==='waypointPlaced'||event==='waypointTrigger'||event==='advance'){
-  effect(hero,event==='advance'&&(c.wp.rank||0)>=3?'landmark':'waypoint');
+  PFX.waypoint(centre(hero),event==='advance');
   if(event==='advance')comboBeat((c.wp.rank||0)>=3?'landmark':'rank',c.wp.rank,0);
  }
- if(event==='guardGained'){effect(hero,'guard','var(--status-block,#5fa3ea)');if(move)queue({k:'guard'})}
+ if(event==='guardGained'){PFX.guardPulse(centre(hero),1);if(move)queue({k:'guard'})}
  if(event==='statusApplied'){const bad=['weak','vuln','brittle','soaked','bleed','sink','drench','reson'].includes(c.key)?c.n>0:c.n<0;
   const sel=c.player?hero:enemy(c.target);
   effect(sel,'pulse',bad?'var(--status-debuff,#e48a3c)':'var(--status-buff,#5cc98a)');queue({k:'status',sel,key:c.key,bad,n:c.n})}
@@ -263,9 +267,10 @@ function shakeNow(amp){if(!enabled()||settings.screenShake===false)return;entry(
 let hpMem={},blkMem={},lastEnergy=null,lastTide=null,lastTurn=0;
 function syncGuard(bar,who){const b=+bar.dataset.blk||0,prev=blkMem[who];blkMem[who]=b;if(prev==null||prev===b)return;
  if(b>prev){const sh=bar.querySelector('.hpblk');if(sh)entry(450,el=>{const n=$(`.hpbar[data-who="${who}"] .hpblk`);if(n)play(n,[{transform:'scale(.4)',filter:'brightness(2.4)'},{transform:'scale(1.25)',offset:.6},{transform:'scale(1)',filter:'none'}],450,el,0,'cubic-bezier(.2,1.4,.4,1)')})}
- else if(prev>0&&b===0)entry(520,el=>{const bb=$(`.hpbar[data-who="${who}"]`);if(!bb)return;
+ else if(prev>0&&b===0){let shattered=false;entry(520,el=>{const bb=$(`.hpbar[data-who="${who}"]`);if(!bb)return;
+  if(!shattered){shattered=true;const isP=who==='p',f=isP?$('#hero .fig'):bb.closest('.en')?.querySelector('.fig');if(f)PFX.guardShatter(rectOf(f),isP?1:-1)}
   let g=bb.querySelector('.guardbreak');if(!g){g=document.createElement('span');g.className='guardbreak';g.innerHTML=document.querySelector('.hpblk .sti')?.outerHTML||'<svg class="sti" viewBox="0 0 24 28"><path d="M12 1.5L2.5 5v8c0 6.5 4 11 9.5 13.5C17.5 24 21.5 19.5 21.5 13V5z" fill="currentColor"/></svg>';bb.appendChild(g)}
-  const a=play(g,[{transform:'scale(1) rotate(0)',opacity:1,filter:'brightness(2)'},{transform:'scale(1.3) rotate(-8deg)',opacity:.9,offset:.3},{transform:'translate(-6px,18px) scale(.6) rotate(-30deg)',opacity:0}],520,el,0,'ease-in');if(a)a.onfinish=()=>g.remove();else g.remove()})}
+  const a=play(g,[{transform:'scale(1) rotate(0)',opacity:1,filter:'brightness(2)'},{transform:'scale(1.3) rotate(-8deg)',opacity:.9,offset:.3},{transform:'translate(-6px,18px) scale(.6) rotate(-30deg)',opacity:0}],520,el,0,'ease-in');if(a)a.onfinish=()=>g.remove();else g.remove()})}}
 function syncBars(){for(const bar of $$('.hpbar[data-who]')){const who=bar.dataset.who,hp=+bar.dataset.hp,mx=+bar.dataset.max||1,prev=hpMem[who];hpMem[who]=hp;syncGuard(bar,who);
   if(prev==null||prev===hp)continue;
   if(hp<prev){const from=Math.min(1,prev/mx),to=Math.max(0,hp/mx);
@@ -462,12 +467,13 @@ addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.clos
 function rewardGhost(tile){const r=tile.getBoundingClientRect(),g=tile.cloneNode(true);g.removeAttribute('onclick');g.removeAttribute('id');g.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));g.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
  g.classList.add('reward-ghost');g.setAttribute('aria-hidden','true');Object.assign(g.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
  const art=g.querySelector('.tart');if(art)art.style.visibility='hidden';document.body.appendChild(g);
- const rm=()=>g.remove();if(!g.animate)return rm();g.animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateY(-26px) scale(.86)'}],{duration:U(460),easing:'ease-in'}).finished.then(rm,rm)}
+ const rm=()=>g.remove();if(!g.animate)return rm();setTimeout(rm,U(460)+150); // never left behind (sweep E-08: a faded potion tile under PLAY AGAIN)
+ g.animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateY(-26px) scale(.86)'}],{duration:U(460),easing:'ease-in'}).finished.then(rm,rm)}
 function countUp(sel,from,to){if(from===to)return;const t0=performance.now(),dur=U(420);const tick=()=>{const el=$(sel);if(!el)return;const k=Math.min(1,(performance.now()-t0)/dur);const v=Math.round(from+(to-from)*k);
  const tn=[...el.childNodes].reverse().find(n=>n.nodeType===3);if(tn)tn.textContent=' '+v;if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
 // ---------- screen change: old screen lingers and fades (called by render()) ----------
 const quiet=new Set(['title']);
-export function screenChange(app,prev,next){if(!prev||prev===next||quiet.has(prev)||quiet.has(next))return;
+export function screenChange(app,prev,next){if(prev!==next)document.querySelectorAll('.reward-ghost').forEach(g=>g.remove());if(!prev||prev===next||quiet.has(prev)||quiet.has(next))return;
  if(next==='combat')finaleCleanup();const hero=W.run&&W.run.hp<=0&&prev==='combat';const hold=Math.max(prev==='combat'?deathHold():0,holdReal(),hero?U(700):0);
  if(hold)holdUntil=Math.max(holdUntil,performance.now()+hold);
  crossfade(app,{hold,ms:prev==='combat'?T(340):U(260),gray:hero})}

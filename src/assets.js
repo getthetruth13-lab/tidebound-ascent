@@ -26,7 +26,9 @@
 import {SPRITES,SPRITE_BASELINE} from './data/sprites.js';
 import {ICONS} from './data/icons.js';
 // game status key -> Artist icon key (art/v2/ui/icons.json 'status'); 'rooted' is the Kelp Matriarch's passive
-const ST_ICON={block:'guard',str:'might',dex:'poise',weak:'soaked',vuln:'exposed',brittle:'brittle',bleed:'bleed',drench:'drenched',reson:'resonating',mightTmp:'temporary-might',shell:'shell',barbs:'barbs',ward:'rebuff',mending:'mending',rooted:'rooted'};
+const ST_ICON={block:'guard',str:'might',dex:'poise',weak:'soaked',vuln:'exposed',brittle:'brittle',bleed:'bleed',drench:'drenched',reson:'resonating',mightTmp:'temporary-might',shell:'shell',barbs:'barbs',ward:'rebuff',mending:'mending',rooted:'rooted',
+ // clovis/status-icons: painted icons for every lasting effect (pending, armed, per-enemy and Vigil badges).
+ parry:'parry',keepMom:'momentum-held',nextDraw:'draw-next',drawLess:'draw-less',nextEnergy:'energy-next',nextMom:'momentum-next',drained:'drained',moonlock:'moonlock',mimic:'mimic-ink',cairn:'cairn-rank',retort:'retort-ready',chartQ:'chart-next',banks:'banked-crest',power:'vigil',queued:'active',armed:'second-mark',guardHold:'guard-held',grudge:'grudge',breath:'held-breath',crestUp:'crest-bonus'};
 // Painted HUD pass (clovis/hud): repainted Bleed and Soaked icons.
 const ST_HUD={bleed:'art/v2/hud/status-bleed.webp',weak:'art/v2/hud/status-soaked.webp'};
 const stIcons=()=>{const o={block:null};for(const [k,v] of Object.entries(ST_ICON))o[k]=ST_HUD[k]||ICONS.status[v]||null;return o};

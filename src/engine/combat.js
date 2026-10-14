@@ -51,7 +51,7 @@ export function spawn(key,o={}){const t=EN[key];const hp=rng(t.hp[0],t.hp[1],cs)
 export function countAlive(key){return alive().filter(x=>x.key===key).length}
 // ================= combat start =================
 function startCombatImpl(kind,enc,opts={}){
- W.run.deck.forEach(ci=>{ci.sus=0;ci.tmp0=false;ci.tmpUp=false;ci.rank=0});
+ W.run.deck.forEach(ci=>{ci.sus=0;ci.moor=false;ci.tmp0=false;ci.tmpUp=false;ci.rank=0});
  const cb=W.cb={kind,ens:[],tgt:0,p:{block:0,st:{}},energy:3,maxE:3,banner:null,insp:null,hand:[],draw:shuffle(W.run.deck.slice(),cs),disc:[],exh:[],log:[],vfx:[],callouts:[],fx:[],powers:[],
   stat:{playedTurn:0,playedCombat:0,attacksTurn:0,attacksCombat:0,tideturnsTurn:0,tideturnsCombat:0,crests:0,undertows:0,echoesTurn:0,echoesCombat:0,wpDestroyed:0,wpLeft:0,wpLeftTurn:0,wpLeftLast:0,lastTideDir:0,lastEchoed:null,flourishes:0,advances:0},
   turn:0,lastType:null,mode:null,busy:false,sel:null,opts:opts,startQ:[],nextTurnQ:[],pendingE:0,nextDraw:0,
@@ -65,11 +65,12 @@ function startCombatImpl(kind,enc,opts={}){
  enc.forEach(k=>spawn(k));cb.bossKey=(cb.ens.find(e=>e.boss)||{}).key||null;
  {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':cb.bossKey==='tenant'?'🏚️ ':'🪸 ')+t);const be=cb.ens.find(x=>x.boss);bossBeat('intro',EN[cb.bossKey].n,t,be)}} // lore: the boss speaks first (bible §16 items 7-9)
  const cls=W.run.cls;
+ if(cls==='carto'&&hasRelic('celestial'))cb.nslots=4; // Celestial Sextant (boss relic)
  if(cls==='duel')cb.mom=DU.start_mom;
  if(cls==='carto'&&hasRelic('sextant'))cb.startQ.push(()=>gainBlock(6)); // Brass Sextant: a steady bearing, 6 Guard as the fight opens (Task 42)
  if(cls==='carto'&&!hasRelic('trailboots')){
   const pool=['signal','cache','lookout'];
-  if(hasRelic('sextant'))cb.startQ.push(()=>choose('Brass Sextant: choose your starting Waypoint (upgraded, Rank 1)',shuffle(pool.slice(),cs).map(id=>({l:`${CARDS[id].e} ${CARDS[id].n}+`,card:{id,up:true,rank:1},cap:'Rank 1 · upgraded',f:()=>{placeStartWp(id,true,1)}}))));
+  if(hasRelic('sextant')||hasRelic('celestial'))cb.startQ.push(()=>choose((hasRelic('celestial')?'Celestial Sextant':'Brass Sextant')+': choose your starting Waypoint (upgraded, Rank 1)',shuffle(pool.slice(),cs).map(id=>({l:`${CARDS[id].e} ${CARDS[id].n}+`,card:{id,up:true,rank:1},cap:'Rank 1 · upgraded',f:()=>{placeStartWp(id,true,1)}}))));
   else placeStartWp(pick(pool,cs),false,0);
   if(hasRelic('staratlas'))placeStartWp(pick(pool,cs),false,0);
  }
@@ -103,7 +104,7 @@ export function drawCards(n){const cb=W.cb;let k=0;for(let i=0;i<n;i++){if(!W.cb
 // Add a created card (token, status, Kelp...) respecting the hand limit (overflow goes to the discard pile).
 export function addCard(id,pile='hand',o={}){const cb=W.cb;const ci=mk(id,o.up,{temp:!!o.temp,tmp0:!!o.cost0Turn});
  if(pile==='hand'&&cb.hand.length>=handLimit())pile='disc';
- if(pile==='drawRandom'){cb.draw.splice(R(cb.draw.length+1,cs),0,ci)}else if(pile==='draw')cb.draw.unshift(ci);else cb[pile].push(ci);return ci}
+ if(pile==='drawRandom'){cb.draw.splice(R(cb.draw.length+1,cs),0,ci)}else if(pile==='draw')cb.draw.unshift(ci);else cb[pile].push(ci);fire('cardAdded',{card:ci,pile});return ci}
 export function sinkCard(ci,reason){W.cb.exh.push(ci);fire('sink',{card:ci,reason:reason||'played'})}
 // ================= damage =================
 // Attack damage pipeline (§4.2 modifyDamage + design §2.1 multiplier rule):
@@ -115,11 +116,12 @@ export function hit(e,base,f,o={}){if(!e||e.hp<=0||e.fled)return 0;const cb=W.cb
   if(f.flourish)d=Math.floor(d*f.fmult);if(f.mult>1)d*=f.mult;if(cb.p.st.weak)d=Math.floor(d*.75)}
  else if(f&&f.mult>1)d*=f.mult;
  if(!atk&&f&&f.lm)d*=2;
+ if(o.cap!=null)d=Math.min(d,o.cap); // a card's "max N" applies after relic doubling (Tuning Fork, Landmark)
  if(e.st.vuln)d=Math.floor(d*1.5);
  d=Math.max(0,Math.floor(mod('damage',{target:e,f,attack:atk,raw:!!o.raw},d)));
  if(atk&&e.st.bleed&&!(f.bled||(f.bled=new Set())).has(e)){f.bled.add(e);const b=Math.ceil(mod('bleedDamage',{target:e},e.st.bleed));loseHpEnemy(e,b,'bleed');if(!mod('keepBleed',{target:e},false)){e.st.bleed--;if(!e.st.bleed)delete e.st.bleed}if(e.hp<=0)return 0}
  const dealt=dmgEnemy(e,d,{f,attack:atk});
- if(atk&&e.st.barbs&&e.hp>=0){loseHp(e.st.barbs,{source:'barbs',guard:true})}
+ if(atk&&e.st.barbs&&alive().length){loseHp(e.st.barbs,{source:'barbs',guard:true})}
  if(f){f.lastDealt=dealt}
  if(W.run.stats&&dealt>W.run.stats.maxHit)W.run.stats.maxHit=dealt;
  return dealt}
@@ -129,7 +131,7 @@ export function dmgEnemy(e,d,o={}){if(e.hp<=0)return 0;const b=Math.min(e.block,
 function afterEnemyDamage(e,f){const t=EN[e.key];if(e.hp>0&&t.onDamaged)t.onDamaged(e);
  if(e.hp<=0){e.hp=0;W.run.kills++;if(W.run.stats)W.run.stats.kills++;log('💥 '+e.n+' defeated');if(f)f.killed=true;if(t.onDeath)t.onDeath(e);fire('enemyKilled',{enemy:e,summon:e.summoned,f})}}
 // Unblockable self HP loss (Brine Rot, Reckless...). guard:true lets Guard absorb it (Scald, Barbs).
-export function loseHp(n,o={}){const cb=W.cb;if(o.guard&&cb){const b=Math.min(cb.p.block,n);cb.p.block-=b;n-=b}if(n<=0)return;W.run.hp-=n;if(cb){floatText('p','-'+n);cb.pshake=Date.now()}if(W.run.hp<=0)cheatDeath()}
+export function loseHp(n,o={}){const cb=W.cb;if(o.guard&&cb){const b=Math.min(cb.p.block,n);cb.p.block-=b;n-=b}if(n<=0)return;W.run.hp=Math.max(0,W.run.hp-n);if(cb){floatText('p','-'+n);cb.pshake=Date.now()}if(W.run.hp<=0)cheatDeath()}
 export function heal(n){W.run.hp=Math.min(W.run.max,W.run.hp+Math.max(0,Math.floor(n)));if(W.cb&&n>0)floatText('p','+'+Math.floor(n)+'❤','h')}
 // onPlayerDeath (§4.2): relics first (Tidewrack Scale), then potions (Second Tide). Returns true if the death was cancelled.
 export function cheatDeath(){if(W.run.hp>0)return true;const ctx=fire('playerDeath',{});if(ctx.cancel&&W.run.hp>0){return true}return false}
@@ -186,7 +188,7 @@ export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=i
   dmg(n,h=1){if(f.allTargets)return f.all(n,h);for(let i=0;i<h;i++){const t=f.tg;if(!t)return;hit(t,f.num(n),f)}},
   all(n,h=1){for(let i=0;i<h;i++)alive().forEach(e=>hit(e,f.num(n),f))},
   dmgRandom(n){const t=randAlive();if(t)hit(t,n+f.rankDmg,f,{raw:true})},
-  blk(n){return gainBlock(f.num(n)*f.mult*(f.lm?2:1),{fromCard:!f.potion&&!f.wp})},
+  blk(n,cap){let g=f.num(n)*f.mult*(f.lm?2:1);if(cap!=null)g=Math.min(g,cap);return gainBlock(g,{fromCard:!f.potion&&!f.wp})},
   draw(n){return drawCards(n)},
   weak(n,t){t=t||f.tg;if(t)addSt(t,'weak',n*f.mult)},vuln(n,t){t=t||f.tg;if(t)addSt(t,'vuln',n*f.mult)},
   applyStatus(t,k,n){addSt(t,k,n)},
@@ -201,8 +203,10 @@ export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=i
  f._low=cb?cb.tide<=TI.low:false;f._high=cb?cb.tide>=TI.high:false;return f}
 // ================= Cartographer: Waypoints, Ranks, Advance =================
 export function expCount(){const cb=W.cb;return mod('expedition',{},cb.slots.length+cb.slots.filter(w=>(w.rank||0)>=CA.rank_max).length*(CA.landmark_extra||0))}
+// Advancing a Guard Waypoint (Camp, Supply Cache, Cairn, Outpost, Shore Post) adds this much Guard per Rank to each trigger.
+export const GUARD_PER_RANK=CA.guard_per_rank||2;
 export function trigWp(w){const d=CARDS[w.id];if(!d.wp)return;const r=w.rank||0;const f=F(w,{wp:true,rankDmg:CA.rank_dmg?CA.rank_dmg[Math.min(r,CA.rank_dmg.length-1)]:r*CA.per_rank}); // v2.2 Rank curve +2/+6/+11
- const gv=f.v;if(r&&CA.guard_per_rank&&d.wpGuard)f.v=(a,b)=>gv(a,b)+r*CA.guard_per_rank;d.wp(f);w.trigT=Date.now();fire('waypointTrigger',{wp:w,f})}
+ if(r&&d.wpGuard){const gb=f.blk;f.blk=(n,...x)=>gb.call(f,n+r*GUARD_PER_RANK,...x)}d.wp(f);w.trigT=Date.now();fire('waypointTrigger',{wp:w,f})}
 function advanceImpl(i){const cb=W.cb;if(!cb||cb.busy||cb.mode||W.run.cls!=='carto')return false;const w=cb.slots[i];const lim=mod('advances',{},1);
  if(!w||cb.advUsed>=lim||(w.rank||0)>=CA.rank_max){render();return false}
  cb.advUsed++;w.rank=(w.rank||0)+1;cb.stat.advances++;w.advT=Date.now();
@@ -239,7 +243,7 @@ function modeActImpl(a,i,j){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)re
 export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;
  if(cb.turn>1&&!mod('retainGuard',{},false))cb.p.block=0;
  Object.assign(cb,{parry:0,parryUsed:false,parries:{},advUsed:0,decUsed:0,breaks:0,markType:null,mark2Type:null,lastType:null,mark:null,markTgt:null,afterMark:0,armMark:false,armFlourish:false,mark2:null,markTgt2:null,after2:0,mark2Scale:1,extraMarks:0,lastNF:null,lastNFTgt:null,last:null,sel:null,insp:null,slack:false,keepMom:false,tideBtnUsed:false,wheelUsed:false});
- cb.stat.wpLeftLast=cb.stat.wpLeftTurn||0;cb.stat.echoesLast=cb.stat.echoesTurn||0;Object.assign(cb.stat,{playedTurn:0,attacksTurn:0,tideturnsTurn:0,echoesTurn:0,bigTurn:0,wpLeftTurn:0});cb.bitter={};
+ cb.stat.wpLeftLast=cb.stat.wpLeftTurn||0;cb.stat.echoesLast=cb.stat.echoesTurn||0;Object.assign(cb.stat,{typesTurn:{},playedTurn:0,attacksTurn:0,tideturnsTurn:0,echoesTurn:0,bigTurn:0,wpLeftTurn:0});cb.bitter={};
  cb.energy=cb.maxE;if(cb.drainE){cb.energy=Math.max(0,cb.energy-cb.drainE);log(`⚡ Drained: −${cb.drainE} Energy`);cb.drainE=0}
  cb.banner={txt:'Player Turn',t:Date.now()};
  const q=cb.nextTurnQ;cb.nextTurnQ=[];q.forEach(fn=>fn());
@@ -250,7 +254,7 @@ export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;
  const n=mod('drawCount',{},(W.run.cls==='carto'?4:5))+(ts.draw||0)+cb.wpDraw+cb.nextDraw;cb.wpDraw=0;cb.nextDraw=0;
  // v0.6.2 interim: say why the Cartographer opens with 4 cards (once per run), and pop the Tuning Fork's turn-1 bonus card.
  const fork=cb.turn===1&&hasRelic('tuningfork'),cartoHint=cb.turn===1&&W.run.cls==='carto'&&n===4&&!W.run.cartoHint;
- const drawn=()=>{if(!W.cb)return;drawCards(n);if(fork){const pop=()=>{if(W.cb!==cb)return;flash(relic('tuningfork'));callout('+1 card · Tuning Fork','relic');render()};if(window.FAST)pop();else setTimeout(pop,T(780))}if(cartoHint){W.run.cartoHint=1;cb.hint={t:Date.now(),ico:'🗺️',txt:'<b>4 cards</b> is by design: the Cartographer plans ahead and draws more from <b>Waypoints</b>.'}}if(cb.pendingE){gainEnergy(cb.pendingE);cb.pendingE=0}fire('afterDraw',{turn:cb.turn});drift();after()};
+ const drawn=()=>{if(!W.cb)return;drawCards(n);if(fork){const pop=()=>{if(W.cb!==cb)return;flash(relic('tuningfork'));callout('+1 card · Tuning Fork','relic');render()};if(window.FAST)pop();else setTimeout(pop,T(780))}if(cartoHint){W.run.cartoHint=1;cb.hint={t:Date.now(),txt:'<b>4 cards</b> is by design: the Cartographer plans ahead and draws more from <b>Waypoints</b>.'}}if(cb.pendingE){gainEnergy(cb.pendingE);cb.pendingE=0}fire('afterDraw',{turn:cb.turn});drift();after()};
  if(cb.chartQ){const k=cb.chartQ;cb.chartQ=0;chart(k,drawn);render()}else drawn()}
 // Tidecaller Drift (v2.1): from turn 2, the Tide moves `drift` in the direction of its last move. After the Guard reset and draw.
 function drift(){const cb=W.cb;if(W.run.cls!=='tide'||cb.turn<2||!cb.tideDir)return;
@@ -304,7 +308,7 @@ function playCardImpl(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)return
  if(W.run.cls==='duel'&&d.t==='A'){if(f.flourish)cb.mom=f.freeFlourish?f.savedMom:mod('momAfterFlourish',{f},0);else gainMom(1)}
  cb.lastType=d.t==='A'?'A':d.t==='P'?'P':'S';
  {cb.last=d.t==='P'?null:ci;cb.lastTgt=tg;if(d.t!=='P'&&!d.faint){cb.lastNF=ci;cb.lastNFTgt=tg}}
- const st=cb.stat;st.playedTurn++;st.playedCombat++;if(d.t==='A'){st.attacksTurn++;st.attacksCombat++}if(W.run.stats){W.run.stats.cardsPlayed++;W.run.stats.maxCardsTurn=Math.max(W.run.stats.maxCardsTurn,st.playedTurn)}
+ const st=cb.stat;(st.typesTurn=st.typesTurn||{})[d.t]=1;st.playedTurn++;st.playedCombat++;if(d.t==='A'){st.attacksTurn++;st.attacksCombat++}if(W.run.stats){W.run.stats.cardsPlayed++;W.run.stats.maxCardsTurn=Math.max(W.run.stats.maxCardsTurn,st.playedTurn)}
  fire('cardPlayed',{card:ci,f,nThisTurn:st.playedTurn,nThisCombat:st.playedCombat,type:d.t});
  cb.curF=null;after()}
 export function after(){if(W.previewing)return;if(!W.cb)return;if(W.run.hp<=0&&!cheatDeath())return lose();if(!alive().length&&!W.cb.mode)return win();render()}
@@ -334,8 +338,11 @@ export function echoPreview(plan){if(!plan)return null;const ci=plan.card,d=CARD
  if(rs&&/(deal|gain)\s+\d+/i.test(rs[1]))t=rs[1];
  const m=/\bdeal (\d+)(?: to ALL)?/i.exec(t),g=/\bgain (\d+) Guard/i.exec(t);const kind=m&&(!g||m.index<g.index)?'dmg':g?'blk':null;if(!kind)return null;
  let n=+(kind==='dmg'?m[1]:g[1]);n+=ci.sus||0;if(plan.half)n=Math.floor(n*(EC.unmarked_fallback||.5));if(plan.scale<1)n=Math.floor(n*plan.scale);n+=plan.bonus;
- if(kind==='dmg'&&d.t==='A')n+=might();n=Math.floor(n*plan.mult);const t0=plan.tgt&&plan.tgt.hp>0?plan.tgt:null;if(kind==='dmg'&&t0&&t0.st.vuln)n=Math.floor(n*1.5);
- if(kind==='dmg'&&t0&&t0.st.reson)n+=t0.st.reson*plan.mult;
+ // A18: same order as hit()/gainBlock(): +Might, damageAdd, +Resonance -> x mult -> Soaked -> Exposed -> 'damage' mods; Guard: +Poise, Brittle, 'guard' mods.
+ const t0=plan.tgt&&plan.tgt.hp>0?plan.tgt:null,P=W.cb.p.st;
+ if(kind==='dmg'){const atk=d.t==='A';if(atk){n+=might();const pre=n;n=mod('damageAdd',{target:t0,f:{ci,def:d,echo:true,preview:true},attack:true},n);if(n>pre)n=pre+Math.min(n-pre,Math.max(0,EC_BONUS_MAX-(plan.bonus||0)));if(t0&&t0.st.reson)n+=t0.st.reson}
+  n=Math.floor(n*plan.mult);if(atk&&P.weak)n=Math.floor(n*.75);if(t0&&t0.st.vuln)n=Math.floor(n*1.5);n=Math.max(0,Math.floor(mod('damage',{target:t0,f:{ci,def:d,echo:true,preview:true},attack:atk,raw:false},n)))}
+ else{n+=P.dex||0;if(P.brittle)n*=.75;n=Math.max(0,Math.floor(mod('guard',{fromCard:true},n)))}
  return {kind,n,total:n*Math.max(1,plan.repeats)}}
 export function doEcho(){const cb=W.cb;if(W.run.cls!=='echo')return;
  const order=(cb.mark2&&cb.mark&&(cb.mark2._seq||0)<(cb.mark._seq||0))?[2,1]:[1,2];
@@ -368,15 +375,27 @@ function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  if(window.FAST)enemyPhase();else setTimeout(enemyPhase,T(EB().pause+popT))}
 export const CURSE_POP=900;
 export const EC_BONUS_MAX=12; // rule 30: total Echo bonus per ring
-export function eAtk(e,a){let d=a+(e.st.str||0)+(e.st.mightTmp||0);if(e.elite&&d>0){const m=(ECON.eliteDmgByKey||{})[e.key]??ECON.eliteDmg??1;d=Math.max(1,Math.round(d*m))} // R1b elite damage (ECON)
- if(e.st.weak)d=Math.floor(d*.75);if(W.cb.p.st.vuln)d=Math.floor(d*1.5);return Math.max(0,d)}
+// eAtk(e,a) is the per-hit damage of a move's attack `a`. Without `o` it is the SHOWN value: it includes Might and Exposed that
+// land earlier in this enemy phase (the enemy's own Might from the move, ally buffs like Bark Orders / Grow, and Exposed from
+// enemies acting before it), so shown == taken. With o={str,vuln} it is computed from those exact values (used by act()).
+export function eAtk(e,a,o){if(!o)o=phasePlanFor(e);let d=a+(e.st.str||0)+(e.st.mightTmp||0)+(o.str||0);if(e.elite&&d>0){const m=(ECON.eliteDmgByKey||{})[e.key]??ECON.eliteDmg??1;d=Math.max(1,Math.round(d*m))} // R1b elite damage (ECON)
+ if(e.st.weak)d=Math.floor(d*.75);if(o.vuln)d=Math.floor(d*1.5);return Math.max(0,d)}
+// Predict the coming enemy phase in acting order: extra Might each enemy will have when it swings, and whether the player is Exposed then.
+export function phasePlan(){const cb=W.cb;const out={};if(!cb)return out;let vuln=!!cb.p.st.vuln;const extra={};
+ for(const x of cb.ens){if(x.hp<=0||x.fled)continue;const m=intentOf(x)||{};const own=(extra[x.uid]||0)+(m.s||0);out[x.uid]={str:own,vuln};
+  if(m.allyS)cb.ens.forEach(y=>{if(y!==x&&y.hp>0&&!y.fled)extra[y.uid]=(extra[y.uid]||0)+m.allyS});
+  if(m.grow)cb.ens.forEach(y=>{if(y.key==='tendril'&&y.hp>0&&!y.fled)extra[y.uid]=(extra[y.uid]||0)+1});
+  if(m.v)vuln=true}
+ return out}
+function phasePlanFor(e){const cb=W.cb;if(!cb)return {str:0,vuln:false};if(cb.acting)return {str:0,vuln:!!cb.p.st.vuln}; // live values while enemies act
+ return phasePlan()[e.uid]||{str:0,vuln:!!cb.p.st.vuln}}
 export function intentOf(e){const t=EN[e.key];const m=t.intent?t.intent(e):e.next;return mod('intentDisplay',{enemy:e},m)||{none:1}}
 // Enemy Attack on the player: Parry first (reduce the first Attack, reflect half, once per turn), then Guard, then HP.
 export function enemyHitPlayer(e,d){const cb=W.cb;
  if(d>0&&cb.parries&&cb.parries[e.uid]>0&&!cb.parryHit[e.uid])d=answerParry(e,d);
  if(d>0&&cb.parry>0&&!cb.parryUsed){cb.parryUsed=true;const red=Math.min(cb.parry,d);d-=red;const back=Math.floor(cb.parry*mod('parryReflect',{enemy:e},DU.parry_back_frac));
   log(`⚔️ Parry! −${red}, ${back} back to ${e.n}`);callout('PARRY! ↩ '+back,'parry');if(back)dmgEnemy(e,back);cb.retort=true;fire('parry',{enemy:e,reflected:back,reduced:red})}
- const b=Math.min(cb.p.block,d);cb.p.block-=b;const rest=d-b;W.run.hp-=rest;floatText('p',rest>0?'-'+rest:'🛡'+b,rest>0?'':'b');cb.pshake=Date.now();fire('playerHit',{enemy:e,amount:rest,blocked:b});
+ const b=Math.min(cb.p.block,d);cb.p.block-=b;const rest=d-b;W.run.hp=Math.max(0,W.run.hp-rest);floatText('p',rest>0?'-'+rest:'🛡'+b,rest>0?'':'b');cb.pshake=Date.now();fire('playerHit',{enemy:e,amount:rest,blocked:b});
  if(rest>0&&W.run.cls==='duel'&&cb.mom>0&&!cb.momLostPhase){cb.momLostPhase=true;const lose=mod('momLoss',{},DU.lose_on_unblocked);cb.mom=Math.max(0,cb.mom-lose);log('💢 Hit: −'+lose+' Momentum')}
  if(rest>0)fire('playerDamaged',{enemy:e,amount:rest});
  if(W.run.hp<=0)cheatDeath()}
@@ -393,7 +412,7 @@ function answerParry(e,d){const cb=W.cb;const p=cb.parries[e.uid];const red=Math
  cb.retort=true;fire('parry',{enemy:e,reflected:back,reduced:red,clean});return d-red}
 export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=intentOf(e);e.lastAct=m;fire('enemyAct',{enemy:e,intent:m});if(m.b)e.blkT=Date.now();if(m.lbl)log(`${e.e} ${e.n}: ${m.lbl}`);
  if(m.b)e.block+=m.b;if(m.s)addSt(e,'str',m.s);
- if(m.a){e.atkT=Date.now();for(let h=0;h<(m.h||1);h++){if(W.run.hp<=0||e.hp<=0||!W.cb)break;enemyHitPlayer(e,eAtk(e,m.a))}fire('playerAttacked',{enemy:e})}
+ if(m.a){e.atkT=Date.now();for(let h=0;h<(m.h||1);h++){if(W.run.hp<=0||e.hp<=0||!W.cb)break;enemyHitPlayer(e,eAtk(e,m.a,{str:0,vuln:!!cb.p.st.vuln}))}fire('playerAttacked',{enemy:e})}
  if(!W.cb||e.hp<=0&&!m.boom)return;
  if(m.healAlly){let t=alive().find(x=>x.uid===m.tgt&&x!==e),n=m.healAlly;if(!t){t=e;n=5}const h=Math.min(n,t.max-t.hp);t.hp+=h;if(h)floatText(t.uid,'+'+h,'h');log(`🪡 ${e.n} stitches ${t===e?'herself':t.n} (+${h})`)}
  if(m.allyB||m.allyS){alive().filter(x=>x!==e).forEach(x=>{if(m.allyB){x.block+=m.allyB;x.blkT=Date.now()}if(m.allyS)addSt(x,'str',m.allyS)});log(`📯 ${e.n} rallies its allies`)}
@@ -411,8 +430,9 @@ function endOfEnemyTurn(e){const t=EN[e.key];if(t.passive&&t.passive.endTurn)t.p
  if(e.st.shell)e.block+=e.st.shell;if(e.st.mending&&e.hp>0){const h=Math.min(e.st.mending,e.max-e.hp);e.hp+=h;if(h)floatText(e.uid,'+'+h,'h')}}
 // Enemy beats (telegraph crouch, gap between enemies, pause after End Turn) come from the ENEMY_BEATS table in core/timing.js (skipped when FAST).
 export function enemyPhase(){const cb=W.cb;if(!cb)return;cb.breaks=0;cb.parryHit={};cb.cleanDone={};cb.momLostPhase=false;
- // Start of the enemy turn: the player's Soaked / Exposed / Brittle wear off by 1.
- tick(cb.p.st);
+ // The player's Soaked / Exposed / Brittle wear off by 1 at the END of the enemy turn, so Exposed shown on the intents really lands.
+ // Only stacks held at the start of the phase tick; one applied this phase lasts through the next enemy turn.
+ const preSt={...cb.p.st};
  const list=cb.ens.slice();let k=0;const telegraphed=new Set();
  const step=()=>{if(!W.cb||W.cb!==cb)return;
   while(k<list.length&&(list[k].hp<=0||list[k].fled))k++;
@@ -423,7 +443,7 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;cb.breaks=0;cb.parryHit
   if(W.run.hp<=0&&!cheatDeath())return lose();
   if(!alive().length)return finish();
   if(window.FAST)return step();render();setTimeout(step,T(EB().gap))};
- const finish=()=>{if(!W.cb)return;cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
+ const finish=()=>{if(!W.cb)return;['weak','vuln','brittle','drench','reson'].forEach(k=>{if(preSt[k]&&cb.p.st[k]){cb.p.st[k]--;if(!cb.p.st[k])delete cb.p.st[k]}});cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
  step()}
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
  const allFled=cb.ens.some(e=>e.fled)&&cb.ens.every(e=>e.fled||e.summoned);

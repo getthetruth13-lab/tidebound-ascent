@@ -5,7 +5,7 @@
 //  • shakeFrames  decaying screen shake keyframes; slowmo; snapshot crossfade; flyIcon (reward -> HUD)
 // Everything is transform / opacity (canvas for particles). Quality follows the Effects option (env.quality()).
 import {settings} from '../save.js';
-import {quality} from './env.js';
+import {quality,envWillChange} from './env.js';
 import {T,U} from '../core/timing.js';
 const mq=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
 export const reducedMotion=()=>mq.matches||!!settings.reduceMotion;
@@ -138,7 +138,12 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
   fc.style.opacity=getComputedStyle(ef).opacity;o.appendChild(fc)}
  // flicker fix: the painted backdrop (#env) also swaps the instant the screen changes (shore -> map parchment), so a transparent old screen showed the NEW
  // backdrop under it for the whole fade. Carry a frozen copy of the old backdrop at the bottom of the snapshot.
- const ev=document.getElementById('env');if(ev){const ec=frozenCopy(ev);ec.style.setProperty('position','absolute','important');ec.style.setProperty('top',scrollOffset+'px','important');
+ // death-fix: only carry the frozen backdrop when the backdrop really changes. On a same-backdrop change (battle -> victory, rest/shop overlays) the
+ // opaque copy hid the live scene under the snapshot (death figure, health-bar drain, remains), then the whole screen snapped at the fade.
+ // crossfade() runs inside render() after W.S has moved to the new screen but before syncEnv(), so envWillChange() predicts the swap up front and the
+ // costly frozenCopy is skipped entirely when nothing changes. A gray (defeat) fade always carries it: the grayscale filter only reaches what is inside
+ // the overlay, so without the copy the backdrop would stay full colour (and a boss defeat's dim would snap in under it).
+ const ev=document.getElementById('env');if(ev&&(gray||envWillChange())){const ec=frozenCopy(ev);ec.style.setProperty('position','absolute','important');ec.style.setProperty('top',scrollOffset+'px','important');
   ec.style.setProperty('height',innerHeight+'px','important');ec.style.setProperty('z-index','-1','important');o.appendChild(ec)} // last child (index-stable for snapshot/live element matching); z -1 paints it under everything
  document.body.appendChild(o);xf=o;for(const [b,t,l] of scr){b.scrollTop=t;b.scrollLeft=l} // inner scrollers (map) keep their scroll position
  const fin=()=>{o.remove();if(xf===o)xf=null};

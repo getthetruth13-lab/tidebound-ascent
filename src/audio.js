@@ -138,7 +138,7 @@ function observeUI(){
  }).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
 }
 export function initAudio(){
- if(initialized)return;initialized=true;observeUI();
+ if(initialized)return;initialized=true;if(!['enlarge','tooltip','menuClose'].every(c=>SILENT_CUES.has(c)))observeUI(); // A58: its cues are all silenced, so skip the body-wide observer
  const unlock=()=>{unlocked=true;try{if(!ctx){const AC=window.AudioContext||window.webkitAudioContext;if(AC){ctx=new AC();master=ctx.createGain();master.gain.value=level('sfxVolume');const limiter=ctx.createDynamicsCompressor();limiter.threshold.value=-6;limiter.knee.value=0;limiter.ratio.value=20;limiter.attack.value=.003;limiter.release.value=.12;const ceiling=ctx.createWaveShaper(),curve=new Float32Array(2049);for(let i=0;i<curve.length;i++)curve[i]=.95*Math.tanh(i*2/(curve.length-1)-1);ceiling.curve=curve;ceiling.oversample='4x';master.connect(limiter);limiter.connect(ceiling);ceiling.connect(ctx.destination)}}if(ctx)ctx.resume().catch(()=>{})}catch(_){}
  warmSfx();syncAudio();startTrack();if(current&&(current.el.muted||current.blocked)){const voice=current;voice.el.muted=false;voice.blocked=false;voice.el.play().then(()=>{if(current===voice)ramp(voice,level('musicVolume'),.15)}).catch(()=>{voice.blocked=true})}};
  let pendingDrag=null;

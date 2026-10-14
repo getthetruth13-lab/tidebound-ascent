@@ -31,6 +31,21 @@ export function hl(text){let s=String(text==null?'':text).replace(/&(?!amp;|lt;|
  return s.replace(/\u0001(\d+)\u0002/g,(m,i)=>slots[+i])}
 const val=v=>typeof v==='function'?v():v;
 export function optName(o){return val(o.n)||String(val(o.l)||'').replace(/<[^>]+>/g,'').replace(/^(?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:️|‍\p{Extended_Pictographic}|\p{Emoji_Modifier})*\s*/u,'')}
+// One painted icon per event choice type (art/v2/ui/evicons/ev-<kind>.webp, see-through). o.kind wins; otherwise read from the option text.
+export const EV_KINDS=['fight','gamble','leave','heal','gold','card','upgrade','remove','transform','relic','potion','curse','blood','charm'];
+const EMO_KIND=[[/🚶|↩|🔙|⬅/,'leave'],[/🩸/,'blood'],[/💰|🪙|💎/,'gold'],[/🎲/,'gamble'],[/⬆|⚒|🔨/,'upgrade'],[/🔀|🫧/,'transform'],[/🃏|🂠/,'card'],[/⚔|🗡|💥|🦀/,'fight'],[/❤|💧|💚|🍲|🩹/,'heal'],[/💠|🔮|🧿/,'relic'],[/🧪|🫙|🍺/,'potion'],[/💀|☠|🕸|👿/,'curse'],[/✂|🗑/,'remove']];
+export function evKind(o,name,sum){const k=val(o.kind);if(k&&EV_KINDS.includes(k))return k;
+ const t=`${name||''} ${sum||''}`.toLowerCase(),em=splitLabel(val(o.l)).emoji||'';
+ if(/^(leave|back|walk on)/.test(t))return 'leave';
+ if(val(o.risk)!=null){// a risky row shows what it can win (the Risky mark says it is rolled); pure luck rolls keep the dice
+  const m=/\d+%:\s*([^,;]+)/.exec(sum||'');if(!m)return 'gamble';const w=evKind({},m[1],'');return ['blood','curse'].includes(w)?'gamble':w}
+ if(em)for(const [re,id] of EMO_KIND)if(re.test(em))return id;
+ if(/\bfight\b/.test(t))return 'fight';if(/charm/.test(t))return 'charm';if(/relic|gain [A-Z]/.test(`${name} ${sum}`)&&!/card/.test(t))return 'relic';
+ if(/upgrade|sharpen/.test(t))return 'upgrade';if(/remove|scrub/.test(t))return 'remove';if(/transform/.test(t))return 'transform';
+ if(/card/.test(t))return 'card';if(/potion/.test(t))return 'potion';if(/heal|rest/.test(t))return 'heal';if(/gold/.test(t))return 'gold';
+ if(/curse|dread/.test(t))return 'curse';if(/\bhp\b/.test(t))return 'blood';
+ const r=N_RELIC();return r.has(name)?'relic':'gamble'}
+const N_RELIC=()=>new Set(Object.values(RELICS).map(r=>r.n));
 function optHTML(o,i,out){const dis=!!(o.ok&&!o.ok());let name,sum;
  if(o.n!=null){name=val(o.n);sum=val(o.s)||''}else{const l=optName(o);const k=l.indexOf(': ');name=k>0&&k<=40?l.slice(0,k):l;sum=k>0&&k<=40?l.slice(k+2):''}
  const rk=val(o.risk);const risk=rk!=null?`<i class="evrisk">Risky <u>${typeof rk==='string'?rk:Math.round(rk*100)+'% good'}</u></i>`:'';
@@ -38,7 +53,7 @@ function optHTML(o,i,out){const dis=!!(o.ok&&!o.ok());let name,sum;
  const info=[val(o.d)||'',rk!=null?(typeof rk==='number'?`Risky: ${Math.round(rk*100)}% good outcome, ${100-Math.round(rk*100)}% bad. Rolled with the run seed.`:`Risky: ${rk}.`):'',dis&&o.why?`Locked: ${val(o.why)}`:''].filter(Boolean).join(' ');
  const cont=out&&o.cont;
  return `<li><button ${cont?'id="msgok" ':''}class="evo${dis?' off':''}${rk!=null?' risky':''}${cont?' cont':''}" ${dis?'aria-disabled="true" ':`onclick="evOpt(${i})" `}${info?`data-info="${esc((name?name+': ':'')+info)}"`:''}>`+
-  `${cont?'':`<span class="evico">${emblemHTML(o.tile||optIconId(splitLabel(val(o.l)).emoji),splitLabel(val(o.l)).emoji||o.e||'◈','evemb')}</span>`}<span class="evlab"><b class="evname">${hl(name)}</b>${sum?`<span class="evdash"> — </span><span class="es">${hl(sum)}</span>`:''}${risk}${why}</span></button></li>`}
+  `${cont?'':`<span class="evico"><img class="evi" src="art/v2/ui/evicons/ev-${evKind(o,name,sum)}.webp" alt="" draggable="false" onerror="this.remove()"></span>`}<span class="evlab"><b class="evname">${hl(name)}</b>${sum?`<span class="evdash"> — </span><span class="es">${hl(sum)}</span>`:''}${risk}${why}</span></button></li>`}
 export function eventSceneHTML(e){const sc={...DEF,...(SCENES[e.id]||{})};const t=TILES['event-'+(e.id||'generic')]||TILES['event-generic'];
  const scenePath=SCENES[e.id]?`art/v2/ui/scenes/task36-event-${e.id}.webp`:t?.path;
  const img=t&&t.ready?`<img src="${scenePath}" alt="" draggable="false">`:'';const out=e.out;

@@ -18,7 +18,7 @@ export function shortText(term){if(!names)build();const t=names.get(term)||'';co
 export const TEXT='.card .text,.tip .desc,.tip .kws,.ikw,.pop,.rrow .rd,.evtxt p,.evdesc,.evo .es,.msgp p,.tb-mech p,.tb-rule,.tb-lbody p,.tb-lbody li,.tb-rel,.tb-cols p,.tb-lore p,.tsum,.tcap,#kwtip .sx,.log div,.toast,.lp-hint,.lp-task b,.lp-tsk,.lp-lines td:first-child,.lp-story,.lp-nxt,#kwtip > span,#kwtip .itip span';
 export function decorateKeywords(root=document){if(!root.querySelectorAll)return;if(!names)build();
  for(const box of root.querySelectorAll(TEXT)){const w=document.createTreeWalker(box,NodeFilter.SHOW_TEXT);const hits=[];
-  for(let n=w.nextNode();n;n=w.nextNode()){const p=n.parentElement;if(!p||p.closest('.kw,.cref,.tb-btn,.flav')||p.closest('button:not(.rrow)'))continue;if(n.nodeValue.length>=3&&re.test(n.nodeValue))hits.push(n);re.lastIndex=0}
+  for(let n=w.nextNode();n;n=w.nextNode()){const p=n.parentElement;if(!p||p.closest('.kw,.cref,.tb-btn,.flav,.nokw')||p.closest('button:not(.rrow)'))continue;if(n.nodeValue.length>=3&&re.test(n.nodeValue))hits.push(n);re.lastIndex=0}
   for(const n of hits){const txt=n.nodeValue,f=document.createDocumentFragment();let last=0;re.lastIndex=0;
    for(let m;(m=re.exec(txt));){if(m.index>last)f.append(txt.slice(last,m.index));const s=document.createElement('span');s.className='kw';s.dataset.kw=canon(m);s.textContent=m[0];f.append(s);last=m.index+m[0].length}
    if(last<txt.length)f.append(txt.slice(last));re.lastIndex=0;n.replaceWith(f)}}
@@ -75,13 +75,13 @@ document.addEventListener('click',e=>{if(eat){eat=false;e.stopPropagation();e.pr
  if(inHand(el)||inButton(el)||(el.closest('.card')&&!el.closest('#inspect,#cardtip')))return hideTip();
  const open=anchor===el&&((tip&&tip.classList.contains('on'))||(ctip&&ctip.classList.contains('on')));if(open&&Date.now()-shownAt>400){hideTip()}else if(open){/* hover just opened it */}else showTip(el);
  e.stopPropagation();e.preventDefault()},true);
-document.addEventListener('pointerdown',e=>{if(lp){clearTimeout(lp.t);lp=null}if(e.pointerType==='mouse'&&e.button>0)return;
+document.addEventListener('pointerdown',e=>{eat=false; /* a new press: any click a previous hold was going to eat has already gone */if(lp){clearTimeout(lp.t);lp=null}if(e.pointerType==='mouse'&&e.button>0)return;
  const el=find(e);if(!el||inHand(el))return;const ok=el.matches('.bd,.hpblk')?e.pointerType!=='mouse':(el.dataset.kw||el.dataset.card)?inButton(el):el.matches('.relic,.potion,.shopicon,.tile,.evo,.rl,.lp-node,.nmf,.wrenline,.dais [data-info]');if(!ok)return;
  lp={x:e.clientX,y:e.clientY,t:setTimeout(()=>{lp=null;if(showTip(el)){eat=true;holdEl=el;clearTimeout(timer)}},LP)}},true);
 document.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){clearTimeout(lp.t);lp=null}},true);
 const release=()=>{if(holdEl){holdEl=null;hideTip()}};
 document.addEventListener('touchmove',e=>{if(holdEl)e.preventDefault()},{passive:false});
-document.addEventListener('pointercancel',()=>{release();if(lp){clearTimeout(lp.t);lp=null}},true);
+document.addEventListener('pointercancel',()=>{eat=false;release();if(lp){clearTimeout(lp.t);lp=null}},true);
 document.addEventListener('pointerup',()=>{release();if(lp){clearTimeout(lp.t);lp=null}setTimeout(()=>{eat=false},350)},true);
 document.addEventListener('contextmenu',e=>{const el=find(e);if(el&&el.matches('.shopicon,.tile,.evo,.lp-node,.bd,.hpblk'))e.preventDefault()});
 document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const el=find(e);if(el&&!el.contains(e.relatedTarget))showTip(el)});

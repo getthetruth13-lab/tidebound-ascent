@@ -475,9 +475,10 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 @keyframes tmInOff{from{opacity:0}to{opacity:.38}}
 .reduce-motion .tm-fade .tm-w{animation-duration:.01s;animation-delay:0s}
 #tbdip{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:99999}
-/* Title video: baked "Tap to begin" sits ~9% above the frame bottom; show the full frame height (above the safe-area inset) so it never hugs the screen edge. Sides filled with a blurred poster. */
+/* Title video (v0.6.5, Spencer's 1744x1168 cut): cover the screen, no side bars. Baked title top is at frame y~19%, baked TAP TO BEGIN bottom at ~86%.
+   Stage width = max(cover width, but capped so at least 69% of frame height stays visible) -> cover at 19.5:9 shows y~19-88%, so the title clears the top and TAP TO BEGIN keeps ~4% screen space above the bottom. Blurred poster fills any gap on ultra-wide screens. */
 .tb-start.tb-vid::before{content:"";position:absolute;inset:-40px;background:url(../art/v2/title/title-poster.jpg) center/cover;filter:blur(24px) brightness(.45)}
-.tb-start.tb-vid .tv-stage{width:calc((100dvh - env(safe-area-inset-bottom,0px))*16/9);top:0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.tb-start.tb-vid .tv-stage{--vh:calc(100dvh - env(safe-area-inset-bottom,0px));aspect-ratio:1744/1168;width:min(max(100vw,calc(var(--vh)*1744/1168)),calc(var(--vh)/.69*1744/1168));top:calc((var(--vh) - min(max(100vw,calc(var(--vh)*1744/1168)),calc(var(--vh)/.69*1744/1168))*1168/1744)*.6);-webkit-mask-image:none;mask-image:none}
 /* v0.6.1.1 layered title backdrop (TITLE_LAYERED in title.js). Transform/opacity-only animation for 60fps. */
 .tl-stage{overflow:hidden;background:#05080c}
 .tl-stage img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;user-select:none}

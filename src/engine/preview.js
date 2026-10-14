@@ -4,13 +4,14 @@ import {W} from '../core/state.js';
 import {canPlay,playCard,endTurn} from './combat.js';
 // Restore each original object in place, so existing hook closures keep their
 // card/target identity and every seeded stream, counter and pile is rolled back.
-function journal(root){const seen=new Map();
- const visit=o=>{if(!o||typeof o!=='object'||seen.has(o))return;const d=Object.getOwnPropertyDescriptors(o);seen.set(o,d);for(const x of Object.values(d))if('value' in x)visit(x.value)};
- visit(root);return ()=>{for(const [o,d] of seen){for(const k of Reflect.ownKeys(o))if(!(k in d))delete o[k];Object.defineProperties(o,d)}};
+// A50: `skip` objects (the run map: combat never writes it) are left out, so each drag preview journals only the live combat/run state.
+export function journal(root,skip=[]){const seen=new Map(),no=new Set(skip.filter(Boolean));
+ const visit=o=>{if(!o||typeof o!=='object'||seen.has(o)||no.has(o))return;const d=Object.getOwnPropertyDescriptors(o);seen.set(o,d);for(const x of Object.values(d))if('value' in x)visit(x.value)};
+ visit(root);journal.last=seen.size;return ()=>{for(const [o,d] of seen){for(const k of Reflect.ownKeys(o))if(!(k in d))delete o[k];Object.defineProperties(o,d)}};
 }
 export function previewCard(i,target=W.cb?.tgt,opts={}){
  if(!W.cb||W.cb.busy||W.cb.mode||W.previewing||!W.cb.hand[i])return null;
- const restore=journal(W);
+ const restore=journal(W,[W.run&&W.run.map]);
  try{
   W.previewing=true;W.cb.tgt=target;
   if(!canPlay(W.cb.hand[i]))return null;

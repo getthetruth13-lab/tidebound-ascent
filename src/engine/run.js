@@ -27,8 +27,10 @@ export const ECON={startGold:99,potionSlots:3,
  mend:.3,
  // R1b (Spencer 2026-10-13, SIM-ACT1-R1): hero HP overrides, heal after a won fight, elite damage multipliers, relics pulled from the pool.
  heroHp:{tide:60},winHeal:{fight:3,elite:5},eliteDmg:.88,eliteDmgByKey:{eel:.82},relicPulled:['duetbell'],
+ // Elite Artifact (Spencer 2026-10-13): a roll per elite reward, not guaranteed.
+ eliteArtifactChance:.35,
  // merchant stock (Task 65): slot lists, so the card redesign only changes data and pools
- shop:{cards:[{type:'A'},{type:'A'},{type:'S'},{type:'S'},{type:'P',alt:{carto:'W'}}],sale:{count:1,mult:.5},extra:[{r:'u'},{r:'r'}],
+ shop:{cards:[{type:'A'},{type:'A'},{type:'S'},{type:'S'},{type:'P',alt:{carto:'W'}}],sale:{count:1,mult:.5},extra:[{r:'u'},{r:'r',artifact:true}],
   relics:[{odds:'relicOdds'},{odds:'relicOdds'},{tier:'shop',fallback:'relicOdds'}],potions:3,removal:{base:75,step:25,perVisit:1}}};
 const TIERS=['c','u','r'];
 // ================= run setup =================
@@ -171,7 +173,7 @@ export function combatRewards(kind,{allFled,opts={},cb}={}){const run=W.run;cons
  if(kind==='elite'){const k=cb&&cb.ens.find(e=>e.elite);const idx={captain:0,warden:1,eel:2}[k&&k.key];if(idx!=null)run.stats.elites[idx]++}
  if(kind==='boss')run.stats.bosses++;
  let g=rollGold(kind);if(allFled)g=Math.floor(g/2);g=Math.round(mod('gold',{combat:true,kind},g));if(g>0)rows.push({k:'gold',n:g});
- if(kind==='elite'){const id=randomRelic(ECON.relicOdds);rows.push(id?{k:'relic',id}:{k:'gold',n:50,note:'(no relics left)'})}
+ if(kind==='elite'){const id=randomRelic(ECON.relicOdds);rows.push(id?{k:'relic',id}:{k:'gold',n:50,note:'(no relics left)'});const aid=rnd('artifacts')<ECON.eliteArtifactChance?eliteArtifact(cb&&cb.ens&&(cb.ens.find(e=>e.elite)||{}).key):null;if(aid)rows.push({k:'artifact',id:aid})}
  const pot=potionRoll(kind);if(pot)rows.push({k:'potion',id:pot});
  if(!allFled&&!opts.noCards){let cards;
   if(kind==='boss')cards=rollCards(rewardCardCount(),'boss',{forceR:'r'});
@@ -187,6 +189,7 @@ function claimRowImpl(i){const S=W.S;const row=S.rows&&S.rows[i];if(!row||row.do
  if(row.k==='gold'){gainGold(row.n);row.done=true}
  else if(row.k==='relic'){row.done=true;gainRelic(row.id);if(W.S!==S)return}
  else if(row.k==='potion'){if(addPotion(row.id))row.done=true;else{S.swap=i}}
+ else if(row.k==='artifact'){gainArtifact(row.id,ok=>{if(ok)row.done=true})}
  else if(row.k==='cards'){S.cardsOpen=i;S.cardSelected=null;S.skipConfirm=false}
  render()}
 function rewCardImpl(j){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done||!Number.isInteger(j)||!row.cards[j]||S.skipConfirm)return;
@@ -208,7 +211,21 @@ function potionSwapImpl(slot){const S=W.S;const row=S.rows&&S.rows[S.swap];if(!r
 export const tookNothing=S=>!!(S&&S.rows&&S.rows.length)&&!S.rows.some(r=>r.done&&!(r.k==='cards'&&r.skipped));
 export function rewLeave(){const S=W.S;if(S.screen!=='reward')return;if(tookNothing(S)&&!W.replaying){S.leaveConfirm=true;render();return}rewDone()}
 export function rewLeaveBack(){const S=W.S;if(S.screen!=='reward')return;S.leaveConfirm=false;render()}
-function rewDoneImpl(){const S=W.S;S.leaveConfirm=false;if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}
+function rewDoneImpl(){const S=W.S;S.leaveConfirm=false;
+ // Boss relic (P3): after the boss reward rows, offer 1 of 3 boss relics (like Slay the Spire's boss chest), then finish the act.
+ if(S.kind==='boss'&&!S.bossPick&&hasNextAct()){const ids=bossRelicChoices();if(ids.length){S.bossPick=ids;S.bossTook=null;S.t=Date.now();return render()}}
+ if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}
+// Acts that exist. Only Act 1 ships, so the boss relic pick stays hidden (Spencer 10-13) until Act 2 is added here.
+let ACT_COUNT=1;
+export const actCount=()=>ACT_COUNT;
+export function setActCount(n){ACT_COUNT=n} // tests / future acts only
+export const hasNextAct=()=>!!W.run&&(W.run.act||1)<ACT_COUNT;
+// Boss relics the hero can use (class-locked ones only for their class), not already held; 3 at random from the relics stream.
+export function bossRelicChoices(n=3){const run=W.run;const c=Object.values(RELICS).filter(r=>r.tier==='b'&&!r.stub&&(!r.cls||r.cls===run.cls)&&!isLocked('relics',r.id)&&!run.relics.some(x=>x.id===r.id));
+ const out=[];const pool=c.slice();while(out.length<n&&pool.length){const r=pick(pool,'relics');pool.splice(pool.indexOf(r),1);out.push(r.id);run.seenRelics[r.id]=1}return out}
+function bossRelicPickImpl(j){const S=W.S;if(S.screen!=='reward'||!S.bossPick||S.bossTook)return;
+ if(j<0){S.bossTook='skip';return rewDoneImpl()}const id=S.bossPick[j];if(!id)return;S.bossTook=id;gainRelic(id);if(W.S!==S)return;rewDoneImpl()}
+export function bossRelicPick(...args){return savedAction('bossRelicPick',args,()=>bossRelicPickImpl(...args))}
 // ================= relics =================
 export const campfireRelic=id=>!!(RELICS[id]&&RELICS[id].campfire);
 export function relicCandidates(tier){const run=W.run;const nCamp=run.relics.filter(r=>campfireRelic(r.id)).length;
@@ -242,6 +259,24 @@ function potPickDoneImpl(){const S=W.S;S.chosen.forEach(j=>addPotion(S.ids[j]));
 // ================= cards / curses / gold / HP =================
 export function gainCard(id,o={}){const d=CARDS[id];if(!d)return null;if(d.curse)return gainCurse(id);const ci=mk(id,o.up);W.run.deck.push(ci);fire('gainCard',{card:ci});return ci}
 export function gainCurse(id){const ctx=fire('gainCurse',{id});if(ctx.cancel){if(ctx.msg)toast(ctx.msg,'relic');return null}const ci=mk(id);W.run.deck.push(ci);toast(`${CARDS[id].e} Curse: ${CARDS[id].n}`,'curse');return ci}
+// ================= Artifacts (Act 1): shared rare cards, FULL-CARD-POOL.md Part 5 =================
+// Sources: 5 events, 6 in Wren's stock (one per visit, on the colourless shelf), 5 from elites. Never in card rewards (cls 'artifact' is no
+// hero pool). One copy of each per run (run.artGot), at most 3 held at once: a 4th asks which one to leave behind.
+export const ART_MAX=3;
+export const ART_SRC={event:['ledgerleaf','sealingwax','driftnet','ferrycoin','ampoule'],shop:['salvagehook','barnacledplate','watchwhistle','smokedglass','midden','manyfaced'],
+ elite:{any:['tallystick','needle'],captain:['tollingcup'],warden:['bastionbar'],eel:['lifebuoy']}};
+export const isArtifact=id=>!!CARDS[id]&&CARDS[id].cls==='artifact';
+export const heldArtifacts=()=>W.run.deck.filter(c=>isArtifact(c.id));
+export const artifactFree=id=>!(W.run.artGot&&W.run.artGot[id]);
+export function randomArtifact(ids,stream='artifacts'){const l=ids.filter(artifactFree);return l.length?pick(l,stream):null}
+export const eliteArtifact=key=>randomArtifact([...(ART_SRC.elite[key]||[]),...ART_SRC.elite.any]);
+// Take an Artifact into the deck. Full (3 held): a pick screen asks which to leave behind, Cancel/Skip declines. done(gained) runs after.
+export function gainArtifact(id,done){const run=W.run;
+ const add=()=>{(run.artGot||(run.artGot={}))[id]=1;const ci=gainCard(id);toast(`${CARDS[id].e} Artifact: ${CARDS[id].n}`,'relic');return ci};
+ if(heldArtifacts().length<ART_MAX){add();if(done)done(true);return true}
+ const back=W.S,fin=ok=>{W.S=back;if(done)done(ok);render()};
+ openPick('custom',`Carrying ${ART_MAX}: leave one behind for ${CARDS[id].n}?`,ci=>{if(!ci)return fin(false);const i=run.deck.indexOf(ci);if(i>=0)run.deck.splice(i,1);add();fin(true)},()=>fin(false),c=>isArtifact(c.id));
+ return false}
 export function gainGold(n){n=Math.max(0,Math.round(n));W.run.gold+=n;W.run.stats.goldEarned+=n;if(n>0)fire('goldGained',{amount:n});return n}
 export function spendGold(n){if(W.run.gold<n)return false;W.run.gold-=n;return true}
 export function gainMaxHp(n){W.run.max+=n;W.run.hp+=n}
@@ -278,7 +313,7 @@ function openChestImpl(){const run=W.run;const c=wpick(ECON.chest.map(x=>[x,x.w]
  W.S={screen:'chest',chest:c.k,name:c.n,rows,opened:false,t:Date.now()};render()}
 function openChestLidImpl(){if(W.S.screen!=='chest')return;W.S.opened=true;W.S.openT=Date.now();render()}
 // ================= camps (§1.8) =================
-export function campOptions(){const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${Math.floor(W.run.max*mod('mendFrac',{},ECON.mend))} HP (30% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
+export function campOptions(){const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${Math.floor(W.run.max*mod('mendFrac',{},ECON.mend))} HP (${Math.round(mod('mendFrac',{},ECON.mend)*100)}% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
  for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.camp)o.push({k:d.camp,l:{cook:'Cook',scour:'🪨 Scour',trawl:'Trawl',annotate:'📘 Annotate'}[d.camp],d:{cook:'Gain 4 Max HP (Galley Pot)',scour:'Remove a card (Pumice Stone)',trawl:'Gain a random Common or Uncommon relic (Grapnel Hook)',annotate:'Give a card Opening (Ship\'s Rutter)'}[d.camp],relic:r.id})}
  return mod('campOptions',{},o)}
 function campDoImpl(k){if(W.S.screen!=='rest')return;
@@ -300,7 +335,7 @@ function openShopImpl(){const run=W.run,P=ECON.price,C=ECON.shop;
  const S={screen:'shop',cards:[],colorless:[],relics:[],potions:[],scrubbed:false,scrubUses:0,t:Date.now()};const used=[];
  for(const slot of C.cards){const t=(slot.alt&&slot.alt[run.cls])||slot.type;const id=rollCards(1,'shop',{stream:'shop',type:t,exclude:used})[0];used.push(id);const r=CARDS[id].r;S.cards.push({id,base:rng(...P.card[r==='s'?'c':r],'shop')})}
  for(let k=0;k<C.sale.count&&S.cards.length;k++){let i=R(S.cards.length,'shop');for(let g=0;g<20&&S.cards[i].sale;g++)i=R(S.cards.length,'shop');S.cards[i].sale=true}
- for(const slot of C.extra){const id=shopExtra(slot.r,used);used.push(id);S.colorless.push({id,base:rng(...P.colorless[slot.r],'shop'),stand:true})}
+ for(const slot of C.extra){const id=(slot.artifact&&randomArtifact(ART_SRC.shop,'shop'))||shopExtra(slot.r,used);used.push(id);S.colorless.push({id,base:rng(...P.colorless[slot.r],'shop'),stand:true})}
  for(const slot of C.relics){let id=slot.tier?randomRelic(null,'shop',{tier:slot.tier}):randomRelic(ECON[slot.odds],'shop');if(!id&&slot.fallback)id=randomRelic(ECON[slot.fallback],'shop');
   if(id)S.relics.push({id,base:rng(...P.relic[RELICS[id].tier],'shop'),...(slot.tier?{right:true}:{})})}
  for(let k=0;k<C.potions;k++){let id=randomPotion('shop');for(let g=0;g<20&&S.potions.some(p=>p.id===id);g++)id=randomPotion('shop');S.potions.push({id,base:rng(...P.potion[POTIONS[id].rarity],'shop')})}
@@ -313,6 +348,7 @@ export function confirmShopCard(){return savedAction('confirmShopCard',[],()=>{c
 function buyImpl(shelf,i){const S=W.S;if(S.screen!=='shop')return;const it=S[shelf]&&S[shelf][i];if(!it||it.sold)return;if(W.run.gold<it.price){it.noT=Date.now();return render()}
  if(shelf==='potions'&&!W.run.potions.includes(null)){it.noT=Date.now();toast('Potion slots full','');return render()}
  W.run.gold-=it.price;it.sold=true;if(S.shopSelected===shelf+':'+i)S.shopSelected=null;
+ if(isArtifact(it.id)){const paid=it.price;it.sold=true;gainArtifact(it.id,ok=>{if(!ok){W.run.gold+=paid;it.sold=false}});return render()}
  if(shelf==='cards'||shelf==='colorless')gainCard(it.id);else if(shelf==='relics'){gainRelic(it.id);if(W.S!==S)return}else if(shelf==='potions')addPotion(it.id);
  render()}
 function shopRemoveImpl(){const S=W.S;if(S.screen!=='shop'||S.scrubbed||(S.scrubUses||0)>=ECON.shop.removal.perVisit||!pickable('remove').length)return;const p=scrubPrice();if(W.run.gold<p)return;

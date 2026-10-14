@@ -6,10 +6,11 @@
 import {W} from '../core/state.js';
 import {CARDS} from '../core/registry.js';
 import {cname,cost} from '../engine/cards.js';
-import {CORE,canMark,flourishMin,flourishMult,echoPlan,echoPreview} from '../engine/combat.js';
+import {CORE,canMark,flourishMin,flourishMult,echoPlan,echoPreview,GUARD_PER_RANK} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
 import {CARD_ART} from '../assets.js';
 import {playSound} from '../audio.js';
+import * as PFX from './painted-fx.js';
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 const HUD='art/v2/hud/';
 export const ORB_TITLE={tide:'Tide',echo:'Echo',carto:'Waypoints',duel:'Momentum'};
@@ -70,7 +71,7 @@ function panelBody(cb,cls){const T=CORE.tide;let expl='',vis='',cap='',nxt='',ca
   const ws=s.filter(Boolean),names=ws.map(w=>CARDS[w.id]?.n||w.id);
   nxt=ws.length?`${names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names[0]} ${names.length>1?'fire':'fires'} when your next turn starts.`:'No Waypoints yet. Play one to fill a slot.';
   const adv=cb.advUsed<lim&&ws.find(w=>(w.rank||0)<max);const rd=CORE.carto.rank_dmg;
-  if(adv){const r=adv.rank||0,gain=rd?(rd[Math.min(r+1,rd.length-1)]-rd[Math.min(r,rd.length-1)]):CORE.carto.per_rank;can.push(`Tap the orb, then ${CARDS[adv.id]?.n||'a Waypoint'}, to Advance it: +${gain} damage.`)}
+  if(adv){const r=adv.rank||0,gain=rd?(rd[Math.min(r+1,rd.length-1)]-rd[Math.min(r,rd.length-1)]):CORE.carto.per_rank;can.push(`Tap the orb, then ${CARDS[adv.id]?.n||'a Waypoint'}, to Advance it: ${CARDS[adv.id]?.wpGuard?`+${GUARD_PER_RANK} Guard`+(/deal/i.test(CARDS[adv.id].d||'')?` and +${gain} damage`:''):`+${gain} damage`}.`)}
   else if(ws.length)can.push(cb.advUsed>=lim?'Advance is used this turn.':'Every Waypoint is a Landmark.');else can.push('Play a Waypoint card.');
   let cards='';for(let i=0;i<n;i++){const w=s[i];if(!w){cards+='<div class="hpn-card empty"><span>Empty slot</span></div>';continue}const r=w.rank||0,land=r>=max;
    cards+=`<div class="hpn-card${land?' land':''}">${thumb(w)}<b>${esc(cname(w))}</b>${land?'<em class="gold">LANDMARK</em>':''}<span class="hpn-rank">${Array.from({length:max},(_,k)=>`<i${k<r?' class="on"':''}></i>`).join('')}</span></div>`}
@@ -80,7 +81,8 @@ function panelBody(cb,cls){const T=CORE.tide;let expl='',vis='',cap='',nxt='',ca
   vis=`<div class="hpn-flames">${Array.from({length:n},(_,i)=>`<i class="${i<m?'on':''}"><b>${i+1}</b></i>`).join('')}<div class="hpn-mult${m>=flourishMin()?'':' off'}">x${flourishMult(m)}</div></div>`}
  return `<header><img src="${HUD}orb-${cls}.webp" alt=""><div><h3>${ORB_TITLE[cls].toUpperCase()}</h3><p>${esc(expl)}</p></div></header>
  <h4>NOW</h4><div class="hpn-well">${vis}</div>${cap?`<p>${esc(cap)}</p>`:''}<h4>NEXT</h4><p class="b">${esc(nxt)}</p><h4>YOU CAN</h4>${can.map(c=>`<p class="can">${esc(c)}</p>`).join('')}`}
-export function openOrbPanel(){const cb=W.cb,cls=W.run?.cls;if(!cb||!cls)return;closeOrbPanel();const orb=document.getElementById('orb');if(!orb)return;
+export function openOrbPanel(){const cb=W.cb,cls=W.run?.cls;if(!cb||!cls)return;cb.tutHeld=1; // tutorial 'hold' step
+ closeOrbPanel();const orb=document.getElementById('orb');if(!orb)return;
  const p=document.createElement('div');p.id='orbpanel';p.className=`hpanel hpn-${cls}`;p.setAttribute('role','dialog');p.setAttribute('aria-label',ORB_TITLE[cls]+' details');
  p.style.setProperty('--plate',`url(${HUD}plate-${cls}.webp)`);p.innerHTML=`<div class="hpn-in">${panelBody(cb,cls)}</div><i class="hpn-ptr"></i>`;document.body.appendChild(p);
  const r=orb.getBoundingClientRect(),H=innerHeight,Wd=innerWidth;const pw=p.offsetWidth,ph=p.offsetHeight;
@@ -107,7 +109,7 @@ if(typeof document!=='undefined'){
   const orb=ev.target.closest?.('#orb.horb');if(!orb){if(cartoArmed&&!ev.target.closest?.('.hplate')){cartoArmed=null;window.G?.render?.()}return}
   if(document.querySelector('.hand .card.drag,.card.dragging')||window.__drag)return;
   ev.preventDefault();hold={x:ev.clientX,y:ev.clientY,open:false,t:setTimeout(()=>{if(hold){hold.open=true;openOrbPanel()}},350)}},true);
- const end=ev=>{if(!hold)return;clearTimeout(hold.t);const h=hold;hold=null;if(h.open){closeOrbPanel();return}if(ev.type==='pointerup'&&ev.target.closest?.('#orb.horb'))orbTap()};
+ const end=ev=>{if(!hold)return;clearTimeout(hold.t);const h=hold;hold=null;if(h.open){closeOrbPanel();if(W.cb&&W.cb.tutHeld===1){W.cb.tutHeld=2;window.G?.render?.()}return}if(ev.type==='pointerup'&&ev.target.closest?.('#orb.horb'))orbTap()};
  document.addEventListener('pointerup',end,true);document.addEventListener('pointercancel',end,true);
  document.addEventListener('pointermove',ev=>{if(hold&&!hold.open&&Math.hypot(ev.clientX-hold.x,ev.clientY-hold.y)>12){clearTimeout(hold.t);hold=null}},true);
  document.addEventListener('contextmenu',ev=>{if(ev.target.closest?.('#orb.horb'))ev.preventDefault()},true);
@@ -163,21 +165,8 @@ function burst(p,{color,ms=450,size=60,cls='',delay=0}={}){if(!p)return;const co
  addFx('hud-burst '+cls,ms,(c,t)=>{const k=easeO(t),R=size/2*(.3+1.1*k),al=1-t;
   if(cls==='ring'){c.lineWidth=Math.max(.5,4*(1-t));c.strokeStyle=rgba(col,.85*al);c.beginPath();c.arc(p.x,p.y,R,0,6.283);c.stroke()}
   else{const g=c.createRadialGradient(p.x,p.y,0,p.x,p.y,R);g.addColorStop(0,`rgba(255,255,255,${(.9*al).toFixed(3)})`);g.addColorStop(.3,rgba(col,.7*al));g.addColorStop(1,rgba(col,0));c.fillStyle=g;c.beginPath();c.arc(p.x,p.y,R,0,6.283);c.fill()}},delay)}
-// Crest: a curling water ribbon that rises off the orb and sweeps across the enemies, foam specks on its lip.
-function crestWave(o,ps){const col=toRgb(COL.tide),x0=Math.min(o.x,...ps.map(p=>p.x))-30,x1=Math.max(...ps.map(p=>p.x))+50,base=Math.max(...ps.map(p=>p.y+p.h*.25)),amp=Math.min(70,Math.max(40,...ps.map(p=>p.h*.55)));
- const r=rnd(x1|0),foam=[...Array(14)].map(()=>({u:r(),s:.8+r()*1.8,j:(r()-.5)*6}));
- addFx('hud-streak wave',1000,(c,p)=>{const k=easeO(cl(p/.8)),fx=x0+(x1-x0)*k,al=p<.75?1:1-(p-.75)/.25,back=Math.max(x0,fx-260);
-  const top=x=>{const u=(x-back)/Math.max(1,fx-back);return base-amp*Math.pow(u,1.6)*(.9+.1*Math.sin(x*.05+p*12))};
-  c.beginPath();c.moveTo(back,base+8);for(let x=back;x<=fx;x+=6)c.lineTo(x,top(x));
-  const cr=amp*.32,tx=fx,ty=base-amp;c.quadraticCurveTo(tx+cr*1.2,ty-cr*.2,tx+cr*.9,ty+cr*.9);c.quadraticCurveTo(tx+cr*.2,ty+cr*.5,tx-cr*.2,ty+cr*1.1);c.lineTo(fx+12,base+8);c.closePath();
-  const g=c.createLinearGradient(back,0,fx+cr,0);g.addColorStop(0,rgba(col,0));g.addColorStop(.6,rgba(col,.32*al));g.addColorStop(1,rgba(col,.65*al));c.fillStyle=g;c.fill();
-  c.lineWidth=2.2;c.strokeStyle=`rgba(235,255,252,${(.75*al).toFixed(3)})`;c.beginPath();const sx=Math.max(back,fx-140);c.moveTo(sx,top(sx));for(let x=sx;x<=fx;x+=6)c.lineTo(x,top(x));c.quadraticCurveTo(tx+cr*1.2,ty-cr*.2,tx+cr*.9,ty+cr*.9);c.stroke();
-  for(const f of foam){const x=fx-f.u*150;if(x<back)continue;const y=top(x)-3+f.j-(1-f.u)*4;c.fillStyle=`rgba(255,255,255,${(al*(1-f.u)*.9).toFixed(3)})`;c.beginPath();c.arc(x,y,f.s,0,6.283);c.fill()}})}
-// Flourish: a crescent blade-arc slash across the target (tapered both ends, hot white edge).
-function bladeArc(p,delay){const col=toRgb(COL.duel),R=Math.max(38,Math.min(70,p.h*.6)),a0=-2.6,a1=.55;
- addFx('hud-streak slash',600,(c,t)=>{const head=easeO(cl(t/.55)),tail=cl((t-.35)/.65);if(head<=tail)return;const N=24,pt=(u,r)=>{const a=a0+(a1-a0)*u;return [p.x+Math.cos(a)*r,p.y+Math.sin(a)*r*.7]};
-  for(const [th,fill] of [[16,rgba(col,.35)],[7,'rgba(255,240,215,.95)']]){c.beginPath();const out=[],inn=[];for(let i=0;i<=N;i++){const u=tail+(head-tail)*i/N,w=th*Math.sin(Math.PI*u)*(.35+.65*i/N);out.push(pt(u,R+w/2));inn.push(pt(u,R-w/2))}
-   c.moveTo(...out[0]);out.forEach(q=>c.lineTo(...q));inn.reverse().forEach(q=>c.lineTo(...q));c.closePath();c.fillStyle=fill;c.fill()}},delay)}
+// Crest: painted wave, see ui/painted-fx.js (replaced the canvas water ribbon).
+// Flourish: painted crescent, see ui/painted-fx.js (replaced the canvas blade arc).
 const COL={tide:'rgb(80,230,215)',echo:'rgb(190,150,255)',carto:'rgb(255,200,110)',duel:'rgb(255,110,40)'};
 let src=null,before=null;
 const orbP=()=>{const o=document.getElementById('orb');return o&&centre(o)};
@@ -188,9 +177,9 @@ if(typeof document!=='undefined')observeEvents((ev,c)=>{const cb=W.cb,cls=W.run?
  if(ev==='beforeCardPlay'){const ci=c?.ci||c?.card;const el=ci&&document.querySelector(`.hand .card[data-uid="${ci.uid}"]`);src=el?centre(el):null;before=meterOf(cb,cls).on;return}
  if(ev==='cardPlayed'){const s=src,b0=before;src=null;setTimeout(()=>{const now=W.cb&&meterOf(W.cb,cls).on;if(s&&b0!=null&&now!=null&&now!==b0)streak(s,orbP(),{color:now>b0?COL[cls]:'#8a8a90'})},30);return}
  const o=orbP();if(!o)return;
- if(ev==='crest'){const ps=cb.ens.filter(e=>e.hp>0).map(enP).filter(Boolean);if(ps.length){crestWave(o,ps);ps.forEach((p,i)=>burst(p,{color:COL.tide,ms:420,size:70,delay:420+i*90}))}}
+ if(ev==='crest'){const ps=cb.ens.filter(e=>e.hp>0).map(enP).filter(Boolean);if(ps.length){PFX.crest(ps);ps.forEach((p,i)=>burst(p,{color:COL.tide,ms:420,size:70,delay:420+i*90}))}}
  else if(ev==='undertow'){const h=heroP();if(h){streak(o,h,{color:'#bfe9ff',ms:600,width:5});setTimeout(()=>burst(h,{color:'#bfe9ff',ms:500,size:110,cls:'ring'}),450)}}
- else if(ev==='flourish'){const p=enP(cb.ens[cb.tgt]||cb.ens.find(e=>e.hp>0));if(p){streak(o,p,{color:COL.duel,ms:350,width:4});bladeArc(p,350);burst(p,{color:'#ffd27a',ms:400,size:56,delay:520})}}
- else if(ev==='echo'){const s=FX.get(cb);if(s)s.fx.fire=performance.now();burst(o,{color:COL.echo,ms:450,size:o.w*1.2,cls:'ring'});const p=enP(cb.markTgt)||enP(cb.ens.find(e=>e.hp>0));if(p){streak(o,p,{color:COL.echo,ms:350,width:3});[0,120,240].forEach((d,i)=>burst(p,{color:COL.echo,ms:420,size:120-i*22,cls:'ring',delay:330+d}))}}
+ else if(ev==='flourish'){const p=enP(cb.ens[cb.tgt]||cb.ens.find(e=>e.hp>0));if(p){streak(o,p,{color:COL.duel,ms:350,width:4});setTimeout(()=>PFX.flourish(p),350);burst(p,{color:'#ffd27a',ms:400,size:56,delay:520})}}
+ else if(ev==='echo'){const s=FX.get(cb);if(s)s.fx.fire=performance.now();burst(o,{color:COL.echo,ms:450,size:o.w*1.2,cls:'ring'});const p=enP(cb.markTgt)||enP(cb.ens.find(e=>e.hp>0));if(p){streak(o,p,{color:COL.echo,ms:350,width:3});setTimeout(()=>PFX.echo(p),330)}}
  else if(ev==='advance'){burst(o,{color:COL.carto,ms:450,size:o.w*1.2,cls:'ring'})}
  }catch(e){}});

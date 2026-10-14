@@ -131,7 +131,7 @@ registerEnemies({
     {w:20,m:{a:8,status:{id:'scald',n:1,pile:'disc'},lbl:'Bang the Pipes'},rep:1},
     {w:canWind(e,2,4)?28:0,m:{b:10,lbl:'Hefts the door…'},wind:{a:p2?42:36,lbl:'Slam the Door'}}])}),
   // Breached (Guard >0→0 in one hit sequence): the next action is skipped (Reeling), Exposed for that turn, 24 Guard back after it.
-  onGuardBroken:e=>{if(e.ph!==1||W.cb.acting===e)return;e.queued=null;e.next={none:1,b:24,lbl:'Reeling'};addSt(e,'vuln',1);log('🏚️ The Last Tenant is BREACHED: he reels, Exposed');callout('BREACHED!','boss')},
+  onGuardBroken:e=>{if(e.ph!==1||e.hp<=80||W.cb.acting===e)return;e.queued=null;e.next={none:1,b:24,lbl:'Reeling'};addSt(e,'vuln',1);log('🏚️ The Last Tenant is BREACHED: he reels, Exposed');callout('BREACHED!','boss')},
   onDamaged:e=>{if(e.ph===1&&e.hp<=80){e.ph=2;e.passive=null;e.hist=[];e.queued=null;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);if((e.st.str||0)<0)delete e.st.str;addSt(e,'str',2);e.ci=0;e.next=EN.tenant.ai(e);if(W.cb.acting===e)e.keepNext=true;
    log('🏚️ '+TENANT_LINES.phase2);bossBeat('phase','The door splinters','He does not seem to notice. He hits harder now.',e)}},
   onDeath:e=>{log('🏚️ '+TENANT_LINES.defeat)}},

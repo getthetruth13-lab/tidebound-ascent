@@ -1,0 +1,52 @@
+/* 2026-10-13 bug-sweep layout fixes (loaded last). */
+/* End / victory screen: the Lamplight panel fits under the top bar on a landscape phone; nothing clipped top or bottom. */
+.end.withlamp{align-items:start!important}
+.end.withlamp .lp-sum{align-self:start;max-height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-top:2px}
+.end.withlamp .lp-sum::-webkit-scrollbar{display:none}
+.end .lp-sum h3{font-size:15px}.end .lp-story{font-size:12.5px;margin:0}
+.end .lp-banner{padding:0 0 2px}
+.end .lp-lines{font-size:12.5px;line-height:1.12}.end .lp-lines tr.tot td{font-size:15px}
+.end .lp-row{margin-top:2px}
+.end .lp-tasks{flex-direction:row;flex-wrap:wrap;gap:0 12px;margin-top:2px}.end .lp-tsk{font-size:11.5px}
+.end .lp-sum .lp-btns{margin-top:2px}.end .lp-sum .lp-btns .btn{min-height:40px}
+/* No flat square behind the round lamp medallions (the level-up ring pulse was drawn on a square box). */
+.lp-med{border-radius:50%}
+.end.withlamp .lp-sum{border:0!important;border-left:1px solid #d9b46a44!important;border-image:none!important;padding:0 0 0 18px!important;background:none!important;box-shadow:none!important}
+.end .lp-bt{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.end .lp-lines{font-size:12px;line-height:1.05}.end .lp-lines td{padding-top:0;padding-bottom:0}
+.end .lp-med,.end .lp-med .emb{width:30px;height:30px;--ta:30px}
+.end .lp-sum .lp-btns .btn{min-height:38px}
+/* Settings overlay: every row fits on a landscape phone (no half-hidden last row). */
+@media (max-height:440px){.ov .box.plain>.settings.sx .sx-row{min-height:28px;padding-top:0;padding-bottom:0}.ov .box.plain>.settings{padding-bottom:4px}.ov .box.plain>h2{margin-bottom:2px}}
+/* Shop: relic / potion names wrap to two lines instead of being cut off; SALE sits by the price, not over the card title;
+   Scrub a Card reads on one line with its price fully inside the tile; hide the bare (i) so it never covers CARD. */
+.sh1-icon{width:calc(70px*var(--ik))}
+.sh1-icon .inm{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:normal;word-break:normal;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.sh1 .saletag{top:26%;bottom:auto;right:-6px;left:auto;transform:rotate(8deg)}
+.sh1-svc{width:calc(68px*var(--ik));height:auto;overflow:visible}
+.sh1-svc .tile .tname{white-space:normal!important;text-wrap:balance;font-size:calc(9.5px*var(--ik))!important;letter-spacing:0!important;line-height:1.1!important;left:2px!important;right:2px!important;max-width:none!important}
+.sh1-svc .tile .tsum{white-space:nowrap!important;overflow:visible!important}
+.sh1-svc .tile .tipi{display:none}
+/* Combat log: opens above the Tide label and hero HP bar (never over them), on top of the HUD, with clearly spaced lines;
+   its button sits above-left of the orb so the two tap areas never overlap. */
+.hplate .hp-log{bottom:calc(100% + 46px);max-height:min(calc(300*var(--hud-unit,1px)),calc(100dvh - 330px));z-index:70;line-height:1.3}
+@media (max-height:440px){.hplate .hp-log{max-height:150px}}
+.hp-log .hl{padding:1px 0;line-height:1.3}
+.hplate .hp-logbtn{top:-64px;height:48px;min-height:48px;width:48px;min-width:48px}
+/* Cartographer "4 cards" hint: sits left of the enemy intent row, never over it. */
+.coach.hero-hint{left:38%;max-width:min(42vw,340px);text-align:center}
+/* Reward tiles over the battle scene (compact row): no hard-cropped ledge strip behind the name. The potion / relic is shown as
+   its own painted icon with a soft shadow, and the POTION / RARE tag sits clear of it. */
+.pk-rewards.vic .rewtiles .tile.sp:is(.k-potion,.k-relic) .tart>.emb,.pk-rewards.vic .rewtiles .tile.sp .tart .ledgeimg{display:none}
+.pk-rewards.vic .rewtiles .tile.sp:is(.k-potion,.k-relic) .tart{background:none}
+.pk-rewards.vic .rewtiles .tile.sp:is(.k-potion,.k-relic) .tart .tslot{top:3px!important;left:calc(50% - 12px)!important;width:24px!important;height:24px!important;filter:drop-shadow(0 2px 3px #000) drop-shadow(0 0 8px #000a)}
+.pk-rewards.vic .rewtiles .tile.sp .ttag{top:5px;left:8px;font-size:9.5px;background:none;border:0}
+/* A defeated foe's leftover element never takes taps meant for the reward rows behind it. */
+.en.gone,.en.gone *{pointer-events:none!important}
+/* The boss's death plays on behind the reward rows, never over them. */
+body.battle-finale:not(.finale-hide) #app{position:relative;z-index:59}
+/* Temper: the pick grid scrolls when the deck is long (14+). Keep a phone-readable card size
+   (~7 across with no compare pane, ~5 when the before/after pane is open); bottom padding keeps
+   the last row clear of the fade and foot. */
+.pk-up .pk-body .grid{--gw:min(calc((100cqw - 6*10px - 12px)/7),100px);gap:10px;padding:6px 6px 28px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.pk-up:has(#upgradecompare:not(:empty)) .pk-body .grid{--gw:min(calc((100cqw - 220px - 4*10px - 12px)/5),100px)}

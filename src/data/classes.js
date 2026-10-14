@@ -12,7 +12,7 @@ registerClasses({
   rule:`Your first <b>Attack</b> and first <b>Skill</b> each turn are <b>Marked</b>; tap 🔔 to move a Mark onto your next card. Marked cards <b>Echo</b> free at end of turn, +${C.echo.bonus_per_card_after} if a card follows. Max ${C.echo.cap} Echoes a turn.`},
  carto:{n:'Cartographer',e:'🧭',hp:AH.carto,col:'var(--cartographer-primary)',theme:'cartographer',relic:'sextant',starter:ST.carto,
   tag:'Build the road, then burn it',
-  rule:`Your draw pile is <b>face up</b>. <b>Waypoints</b> fill 3 slots and trigger each turn. Once per turn, <b>Advance</b> one (+1 Rank: +${(C.carto.rank_dmg||[]).slice(1).join(' / +')} damage). Once per turn, <b>Decamp</b> one: it leaves and fires its Decamp line. Rank ${C.carto.rank_max} is a <b>Landmark</b>.`},
+  rule:`Your draw pile is <b>face up</b>. <b>Waypoints</b> fill 3 slots and trigger each turn. Once per turn, <b>Advance</b> one (+1 Rank: +${(C.carto.rank_dmg||[]).slice(1).join(' / +')} damage; Guard Waypoints also gain +${C.carto.guard_per_rank||2} Guard per Rank). Once per turn, <b>Decamp</b> one: it leaves and fires its Decamp line. Rank ${C.carto.rank_max} is a <b>Landmark</b>.`},
  duel:{n:'Duelist',e:'🤺',hp:AH.duel,col:'var(--duelist-primary)',theme:'duelist',relic:'glove',starter:ST.duel,
   tag:'Tempo, read, bleed',
   rule:`Attacks build <b>Momentum</b> (max ${C.duel.mom_max}). At ${C.duel.flourish_min}+, <b>Flourish</b> spends it all for up to ×3.5. <b>Parry</b> calls an enemy: its first hit next turn is reduced and half reflected. A full stop is a <b>Clean Answer</b> (+1 Momentum). +${C.duel.focus} damage to the highest-HP enemy.`},

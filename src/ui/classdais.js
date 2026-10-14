@@ -4,7 +4,7 @@
 // data-info popup (hover / tap / long-press). All motion is CSS; the objects are SVG / CSS stand-ins until painted pieces exist
 // (art/v2/ui/icons.json 'dais' ids dais-tide / dais-echo / dais-carto / dais-duel draw over the stand-in with no code change).
 // Drag previews: showMeterPreview(result) paints gold dashed "ghosts" of where the dragged card will leave the meter.
-import {canDecamp} from '../engine/combat.js';
+import {canDecamp,GUARD_PER_RANK} from '../engine/combat.js';
 import {CARDS} from '../core/registry.js';
 import {W} from '../core/state.js';
 import {cname,desc} from '../engine/cards.js';
@@ -92,7 +92,7 @@ function carto(cb){const pk=cb.mode&&cb.mode.k==='slot',lim=mod('advances',{},1)
  for(let i=0;i<cb.nslots;i++){const w=cb.slots[i];
   if(!w){s+=`<div class="wp empty" style="--wi:${i}" data-i="${i}" data-info="Empty Waypoint slot."><i class="pinn"></i><span class="wpn">Unmarked</span></div>`;continue}
   const r=w.rank||0,adv=canAdv&&r<CORE.carto.rank_max,land=r>=CORE.carto.rank_max;
-  const tip='Rank '+r+' / '+CORE.carto.rank_max+'. '+cname(w)+': '+plain(desc(w))+(adv?' — tap to Advance (+1 Rank; damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':'');
+  const tip='Rank '+r+' / '+CORE.carto.rank_max+'. '+cname(w)+': '+plain(desc(w))+(adv?' — tap to Advance (+1 Rank; '+(CARDS[w.id]&&CARDS[w.id].wpGuard?'+'+GUARD_PER_RANK+' Guard per Rank; ':'')+'damage bonuses '+CORE.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ')+')':'');
   s+=`<button class="wp full${pk?' pick':''}${adv?' adv':''}${land?' land':''}${anim(w.trigT,T(900))?' trig':''}" style="--wi:${i};${anim(w.trigT,T(900))||''}" data-i="${i}" data-slot="${i}" onclick="${pk?`modeAct('slot',${i})`:adv?`advance(${i})`:''}" data-info="${esc(tip)}">${CAIRN(r)}<span class="wpn cref" data-card="${w.id}">${cname(w)}</span><span class="map-rank">${r}</span><span class="map-act">${pk?'Replace':''}</span><span class="pips">${[0,1,2].map(k=>`<i class="${k<r?'on':''}"></i>`).join('')}</span></button>${!pk&&canDecamp()?`<button class="tbtn decamp" data-decamp="${i}" onclick="decampWp(${i})" data-info="${esc('Decamp '+cname(w)+': it leaves and fires its Decamp line. Once a turn.')}">⛺</button>`:''}`}
  const nd=mod('drawCount',{},4);const nx=cb.draw.slice(0,3).map((ci,i)=>`<span class="nx cref ${i<nd?'next':''}" data-card="${ci.id}">${cname(ci)}</span>`).join('')||'<span class="muted">reshuffle</span>';
  const left=Math.max(0,lim-cb.advUsed);const hint=`${left} Advance${left===1?'':'s'} left`;

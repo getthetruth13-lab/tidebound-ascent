@@ -10,7 +10,7 @@ export let drag=null;
 export function enemyAt(x,y){for(const el of document.elementsFromPoint(x,y)){const en=el.closest&&el.closest('.en');if(en)return +en.dataset.en}return null}
 // ----- long-press (450 ms, < 10 px movement) or right-click enlarges ANY card (hand, reward, shop, piles) -----
 export const LONGPRESS_MS=450;
-let lp=null,eatClick=false;
+let lp=null,eatClick=false,eatUntil=0; // eatUntil: drag-end eats only the click that follows at once; a later keyboard/programmatic click must still work
 function cardOf(el){const i=el.dataset.i;if(i!=null&&W.cb&&el.closest('.hand'))return W.cb.hand[+i];const uid=+el.dataset.uid;const piles=W.cb?[W.cb.hand,W.cb.draw,W.cb.disc,W.cb.exh,W.cb.slots]:[];if(W.run)piles.push(W.run.deck);const live=uid>0?piles.flat().find(c=>c&&c.uid===uid&&c.id===el.dataset.id):null;return {...live,id:el.dataset.id,uid,up:el.dataset.up==='1'}}
 export const cancelLongPress=()=>{if(lp){clearTimeout(lp.t);lp=null}clearTimeout(hh);hh=0};
 let hh=0,holdTouch=false;
@@ -20,7 +20,7 @@ let hh=0,holdTouch=false;
 function handSide(el,point){const cs=el&&el.closest?.('.hand')?[...el.closest('.hand').querySelectorAll('.card')]:[],i=cs.indexOf(el);
  if(i>=0)return i>=Math.floor(cs.length/2)?'left':'right';return point.x>=innerWidth/2?'left':'right'}
 function inspectNow(el,touch,point){const side=touch?handSide(el,point):null;clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
-document.addEventListener('pointerdown',ev=>{eatClick=false;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest&&ev.target.closest('.card');if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected)any=peek;if(!any||any.closest('#inspect'))return;
+document.addEventListener('pointerdown',ev=>{eatClick=false;eatUntil=0;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest&&ev.target.closest('.card');if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected)any=peek;if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,true,{x:ev.clientX,y:ev.clientY})},LONGPRESS_MS)}},true);
 document.addEventListener('pointermove',ev=>{if(lp&&Math.hypot(ev.clientX-lp.x0,ev.clientY-lp.y0)>10){clearTimeout(lp.t);lp=null}},true);
@@ -40,7 +40,7 @@ document.addEventListener('pointerover',ev=>{if(ev.pointerType!=='mouse')return;
  const hand=!!c.closest('.hand');hh=setTimeout(()=>{hh=0;if(holdTouch||inspecting||!c.isConnected||!c.matches(':hover')||drag||(hand&&(c.classList.contains('sel')||c.classList.contains('drag')))||(W.cb&&W.cb.busy&&hand))return;inspectNow(c,false)},hand?1500:900)},true);
 document.addEventListener('pointerdown',()=>{clearTimeout(hh);hh=0},true);
 document.addEventListener('pointerout',ev=>{if(ev.pointerType==='mouse'&&(!ev.relatedTarget||!ev.relatedTarget.closest||ev.relatedTarget.closest('.card')!==ev.target.closest('.card'))){clearTimeout(hh);hh=0}},true);
-document.addEventListener('click',ev=>{if(eatClick){eatClick=false;ev.stopPropagation();ev.preventDefault()}},true);
+document.addEventListener('click',ev=>{if(eatClick&&eatUntil&&performance.now()>eatUntil){eatClick=false;eatUntil=0}if(eatClick){eatClick=false;eatUntil=0;ev.stopPropagation();ev.preventDefault()}},true);
 // Android Chrome fires its own long-press 'contextmenu' while a card is already held; it used to reopen the preview
 // with no point/side, which snapped the held preview to the screen centre. While a hold is open, just swallow it.
 document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(holdTouch||lp||ev.pointerType==='touch'||ev.sourceCapabilities?.firesTouchEvents){ev.preventDefault();return}if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
@@ -96,7 +96,7 @@ export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)retur
  if(d.raf)cancelAnimationFrame(d.raf);
  // Pointer release can arrive before the queued animation-frame move.
  if(!cancel&&rafPending&&rafPending.pointerId===d.id)dragMove(d,rafPending);
- drag=null;rafPending=null;if(!d.moved&&!cancel)releasePeek();else clearPeek();dropSel();d.el.classList.remove('drag','armed');d.el.style.removeProperty('transform');clearTargets();eatClick=true;
+ drag=null;rafPending=null;if(!d.moved&&!cancel)releasePeek();else clearPeek();dropSel();d.el.classList.remove('drag','armed');d.el.style.removeProperty('transform');clearTargets();eatClick=true;eatUntil=performance.now()+350;
  if(cancel||!W.cb){if(W.cb){W.cb.sel=null;render()}return}
  if(!d.moved){W.cb.sel=null;W.cb.insp=null;layoutHand();return}
  const ci=W.cb.hand[d.i],target=ci&&canPlay(ci)?dropTarget(ci,ev.clientX,ev.clientY):null;
@@ -120,8 +120,9 @@ function dropSel(keep){if(!W.cb)return;let any=false;document.querySelectorAll('
 // Restore the resting --x from dataset (not removeProperty): layoutHand's unchanged-hand cache returns early
 // and would otherwise leave the peek neighbours collapsed onto the centre.
 let relT=0,hc=null,leanX=null,leanDir=0,lastBuzz=0;
-// Haptic tick when the lifted card changes: touch only, ~50 ms rate limit so a fast sweep is a soft riffle. No sound (UI tap sounds were removed on purpose).
-function buzz(){if(settings.handHaptic===false||!navigator.vibrate)return;const t=performance.now();if(t-lastBuzz<50)return;lastBuzz=t;try{navigator.vibrate(4)}catch(_){}}
+// Haptic tick when the lifted card changes: touch only, ~50 ms rate limit so a fast sweep is a soft riffle.
+// 12 ms is long enough for a phone motor to register (4 ms was easy to miss). No sound (UI tap sounds were removed on purpose).
+function buzz(){if(settings.handHaptic===false||!navigator.vibrate)return;const t=performance.now();if(t-lastBuzz<50)return;lastBuzz=t;try{navigator.vibrate(12)}catch(_){}}
 const NB_SHIFT=[16,6,2]; // px pushed from the lifted card: neighbour, next, then the third card out
 // Soft release (Task 43): an undragged tap keeps the lifted card ~150 ms, then lowers.
 function releasePeek(){const p=peek;if(!p)return;clearTimeout(relT);relT=setTimeout(()=>{relT=0;if(peek===p)clearPeek(true)},150)}
@@ -165,7 +166,9 @@ document.addEventListener('pointermove',ev=>{if(ev.pointerType!=='mouse'||drag)r
 // Choice screens: a frantic double tap must not fall through onto the next screen (e.g. chained upgrade/remove picks
 // or a reward pick reopening the list). A card click is ignored when it lands <350 ms after the screen changed AND follows another card click
 // at the same spot (<600 ms, <40 px), i.e. a continuation of the same frantic tapping; a single deliberate tap always goes through.
-{let lastS=null,sAt=0,lastPick=-1e9,lpX=0,lpY=0;const watch=()=>{if(W.S!==lastS){lastS=W.S;sAt=performance.now()}requestAnimationFrame(watch)};requestAnimationFrame(watch);
+{let lastS=null,sAt=0,lastPick=-1e9,lpX=0,lpY=0;const watch=()=>{if(W.S!==lastS){lastS=W.S;sAt=performance.now()}};watch();
+ // A52: stamp screen changes when render() touches the DOM, instead of a requestAnimationFrame loop that ran forever.
+ new MutationObserver(watch).observe(document.getElementById('app')||document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['data-screen']});
  document.addEventListener('click',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(!c||c.closest('.hand,#inspect'))return;
   if(W.S!==lastS){lastS=W.S;sAt=performance.now()}
   const now=performance.now();if(now-sAt<350&&now-lastPick<600&&Math.hypot(ev.clientX-lpX,ev.clientY-lpY)<40){ev.stopPropagation();ev.preventDefault();return}lastPick=now;lpX=ev.clientX;lpY=ev.clientY},true);}

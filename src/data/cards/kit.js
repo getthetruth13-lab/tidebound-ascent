@@ -11,9 +11,14 @@ export const cb=()=>W.cb;
 export const stacks=inst=>inst&&inst.n||1;
 // Cards played this turn BEFORE the current one (during an Echo: every card played this turn).
 export const playedBefore=()=>W.cb.stat.playedTurn;
-// A choice. Echoes (end of turn) and Mimic Ink replays can't open a menu, so they take a seeded random option.
+// A choice. Echoes (end of turn) and Mimic Ink replays can't open a menu: an Echo repeats the option the player picked when the card
+// was played this turn (Chime, Ping, Mirror Step); anything else takes a seeded random option.
 export function ask(f,title,opts){opts=opts.filter(Boolean);if(!opts.length)return;if(opts.length===1&&opts[0].auto){return opts[0].f()}
- if(f.echo||W.cb.mode||W.cb.ending){const o=pick(opts,'combat');log('🎲 '+title.replace(/:.*$/,'')+': '+o.l);return o.f()}choose(title,opts)}
+ const ci=f.ci,turn=W.cb.turn,key=title.replace(/:.*$/,'');
+ if(f.echo||W.cb.mode||W.cb.ending){const last=f.echo&&ci&&ci._askPick&&ci._askPick.turn===turn&&ci._askPick.key===key?ci._askPick:null;
+  const o=last&&(opts.find(x=>x.l===last.l)||(opts.length===last.n?opts[last.i]:null));if(o){log('🔔 '+key+': '+o.l);return o.f()}
+  const r=pick(opts,'combat');log('🎲 '+key+': '+r.l);return r.f()}
+ choose(title,opts.map((o,i)=>({...o,f:(...a)=>{if(ci)ci._askPick={turn,key,l:o.l,i,n:opts.length};return o.f(...a)}})))}
 // Run fn after this card has fully resolved (after the engine's own Momentum step, etc.). Echoes run it at once.
 export function afterPlay(f,fn){if(f.echo||!W.cb)return fn();const ci=f.ci;thisTurn({id:'afterPlay',on:{cardPlayed(inst,ctx){if(inst.dead||ctx.card!==ci)return;inst.dead=true;fn(ctx)}}})}
 // Snapshot of the Tide counters around an action: did it cause a Crest / Undertow / Tideturn?

@@ -2,7 +2,7 @@
 // STATUS is the single icon map: each status has a name, kind (buff/debuff), rule text, duration rule and a placeholder SVG.
 // Painted art replaces a placeholder with no code change: add the status to art/v2/ui/icons.json (assets.js ST_ICON) and it is used first.
 import {KW,CARDS,RELICS} from '../core/registry.js';
-import {intentOf,CORE} from '../engine/combat.js';
+import {intentOf,CORE,eAtk,phasePlan} from '../engine/combat.js';
 import {W} from '../core/state.js';
 import {assetSrc} from '../assets.js';
 const S=(d,x='')=>`<svg class="sti" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" stroke="#05070b" stroke-width="1" stroke-linejoin="round">${d}</g>${x}</svg>`;
@@ -35,6 +35,11 @@ const ICON={
  power:S('<path d="M12 2l2.400 7.400H22l-6.200 4.500 2.400 7.400L12 16.800 5.800 21.300l2.400-7.400L2 9.400h7.600z"/>'), // sigil star: Power in play
  armed:S('<path d="M12 2l9 10h-6v10H9V12H3z"/>'), // up-chevron: armed / ready
  queued:S('<path d="M6 2h12v5l-5 5 5 5v5H6v-5l5-5-5-5z"/>'), // hourglass: this-turn effect
+ guardHold:S('<path d="M12 2L3 5v7c0 5 4 9 9 10 5-1 9-5 9-10V5z"/>','<path d="M3 12h18" stroke="#05070b" stroke-width="2.400"/>'), // barred shield: Guard Held
+ drawLess:S('<rect x="5" y="3" width="14" height="18" rx="2"/>','<path d="M8 12h8" stroke="#05070b" stroke-width="1.800"/>'), // card minus: Draw Less Next Turn
+ grudge:S('<path d="M6 3h9l3 6v9a3 3 0 01-3 3H8a3 3 0 01-3-3V9z"/>'), // glove: Grudge
+ breath:S('<circle cx="12" cy="12" r="8"/>','<circle cx="9" cy="9" r="2" fill="#fff6"/>'), // bubble: Breath
+ crestUp:S('<path d="M2 20c4-10 9-14 16-16-3 4-3 8 4 10v6z"/>'), // wave crest: Crest Bonus
  rooted:S('<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10"/>','<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>')
 };
 const T=(n,kind,kw,dur,rule)=>({n,kind,kw,dur,rule});
@@ -68,7 +73,13 @@ const STATUS={
  banks:T('Banked Crest','buff',null,'Until released.','Release: 1½× Crest damage to ALL enemies per stack.'),
  power:T('Vigil','buff',null,'Lasts all combat.',''),
  armed:T('Ready','buff',null,'Until used (once per combat).',''),
- queued:T('Active','buff',null,'Until it is used or the turn ends.','')
+ queued:T('Active','buff',null,'Until it is used or the turn ends.',''),
+ // clovis/status-icons: lasting effects that had no badge of their own.
+ guardHold:T('Guard Held','buff',null,'Next turn.','Your Guard is not removed at the start of your next turn.'),
+ drawLess:T('Fewer Cards Next Turn','debuff',null,'Next turn.','Draw this many fewer cards next turn.'),
+ grudge:T('Grudge','debuff',null,'Lasts all combat.','Takes this much more damage from your Attacks.'),
+ breath:T('Breath','buff',null,'Until your next Crest or Undertow.','Your next Crest or Undertow is stronger for each Breath.'),
+ crestUp:T('Crest Bonus','buff',null,'Until your next Crest.','Your next Crest deals this much more damage to ALL.')
 };
 const ORDER=Object.keys(STATUS);
 export const GUARD_SVG='<svg class="sti" viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1.5L2.5 5v8c0 6.5 4 11 9.5 13.5C17.500 24 21.500 19.500 21.500 13V5z" fill="currentColor" stroke="#05070b" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 4.5v19M5 9h14" fill="none" stroke="#05070b66" stroke-width="1"/></svg>';
@@ -81,13 +92,13 @@ const sentence=t=>{const s=(t||'').split(/(?<=[.!?])\s+/);return s.slice(0,2).jo
 // ---- Task 33: status tooltip content. describe() -> {line, now, dur}: the rule, the live numbers, and how long it lasts.
 // `who` is 'p' (the hero) or the enemy object that owns the status. Every number mirrors engine/combat.js.
 const turns=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
-const atkVal=(e,a,vuln)=>{let d=a+(e.st.str||0)+(e.st.mightTmp||0);if(e.st.weak)d=Math.floor(d*.75);if(vuln)d=Math.floor(d*1.5);return Math.max(0,d)};
+const atkVal=(e,a,vuln,pl)=>eAtk(e,a,{str:((pl||{})[e.uid]||{}).str||0,vuln});
 // What the enemies' shown Attacks would deal to you, with and without your Exposed.
-function incoming(){const cb=W.cb;let a=0,b=0;if(!cb)return null;
- for(const e of cb.ens){if(e.hp<=0||e.fled)continue;const m=intentOf(e);if(!m||!m.a)continue;const h=m.h||1;a+=atkVal(e,m.a,true)*h;b+=atkVal(e,m.a,false)*h}
+function incoming(){const cb=W.cb;let a=0,b=0;if(!cb)return null;const pl=phasePlan();
+ for(const e of cb.ens){if(e.hp<=0||e.fled)continue;const m=intentOf(e);if(!m||!m.a)continue;const h=m.h||1;a+=atkVal(e,m.a,true,pl)*h;b+=atkVal(e,m.a,false,pl)*h}
  return a?{with:a,without:b}:null}
 function enemyAtk(e,drop){const m=intentOf(e);if(!m||!m.a)return null;const h=m.h||1;
- const base=m.a+(e.st.str||0)+(e.st.mightTmp||0),vu=W.cb&&W.cb.p.st.vuln;
+ const pe=phasePlan()[e.uid]||{},base=m.a+(e.st.str||0)+(e.st.mightTmp||0)+(pe.str||0),vu=pe.vuln;
  const f=(d,w)=>Math.max(0,Math.floor(w?Math.floor(d*.75):d)*(vu?1.5:1));
  const cur=Math.floor(f(base,!!e.st.weak)),alt=Math.floor(f(base,drop==='weak'?false:!!e.st.weak));return {cur:cur*h,alt:alt*h}}
 function describe(k,v,who){const cb=W.cb,P=who==='p',e=P?null:who,n=Math.abs(v),more=v>0?'more':'less';
@@ -112,6 +123,7 @@ function describe(k,v,who){const cb=W.cb,P=who==='p',e=P?null:who,n=Math.abs(v),
  case 'mending':{const h=e?Math.min(n,Math.max(0,e.max-e.hp)):n;return {line:'Heals every turn.',now:`Heals ${n} HP at the end of its turn${e&&h<n?(h?` (${h} right now)`:' (already at full HP)'):''}.`,dur:'Lasts all combat.'}}
  case 'parry':{const back=Math.floor(n*(CORE.duel.parry_back_frac||.5));return {line:'Softens the first enemy hit.',now:`It loses ${n} damage; the attacker takes ${back}.`,dur:'Until hit, or your next turn.'}}
  case 'mightTmp':return {line:'Temporary change to its Attack damage.',now:`Its Attacks deal ${n} ${more} damage.`,dur:'Until the end of its next turn.'};
+ case 'grudge':return {line:'Takes more damage from your Attacks.',now:`Your Attacks deal ${n} more to it.`,dur:'Lasts all combat (max 5).'};
  case 'rooted':{const t=W.cb?W.cb.ens.filter(x=>x.key==='tendril'&&x.hp>0&&!x.fled).length:0;return {line:'Gains 3 Guard per living Tendril each turn.',now:`${3*t} Guard (${t} alive).`,dur:'Lasts all combat.'}}
  }return null}
 export function statusText(k,v,who,extraText){const d=STATUS[k];if(!d)return '';
@@ -144,10 +156,12 @@ export const LISTENER_INFO={
  abyssaloil:['Abyssal Oil','Gain 1 Energy at the start of each of your next turns.']};
 const INTERNAL_LISTENERS=new Set(['afterPlay','chartClamp']); // plumbing that finishes a card's own text, not a separate effect
 // Everything the player has pending or armed that is NOT in cb.p.st: [{k,v,n?,t?}] (k = STATUS key; n / t override name / rule text).
+// Lasting effects on an enemy that live outside e.st (your Powers' per-enemy marks): merged into its status row.
+export function enemyExtraSt(e){const o={};for(const p of (W.cb&&W.cb.powers)||[])if(p.id==='grudge'&&p.g&&p.g[e.uid])o.grudge=(o.grudge||0)+p.g[e.uid];return o}
 export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
  const add=(k,v,n,t,ico)=>{if(v)out.push({k,v,n,t,ico})};
  if(cb.keepMom)add('keepMom',1);
- add('nextDraw',cb.nextDraw||0);
+ if((cb.nextDraw||0)>0)add('nextDraw',cb.nextDraw);else if(cb.nextDraw<0)add('drawLess',-cb.nextDraw);
  let ne=cb.pendingE||0,nm=0;for(const q of cb.nextTurnQ||[]){const m=q&&q.meta;if(m){ne+=m.energy||0;nm+=m.mom||0}}
  for(const r of W.run.relics)if(r.carry>0)ne+=r.carry;
  add('nextEnergy',ne);add('nextMom',nm);add('drained',cb.drainE||0);
@@ -158,7 +172,8 @@ export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
  add('chartQ',cb.chartQ||0);add('banks',cb.banks||0);
  if(W.run.cls==='echo'&&cb.extraMarks)add('armed',cb.extraMarks,'Second Mark','You may Mark a second card this turn.');
  for(const p of cb.powers||[]){const d=CARDS[p.id];if(d)add('power',p.n||1,d.n,plain(d.d))}
- for(const l of cb.fx||[]){if(l.dead||!l.id||INTERNAL_LISTENERS.has(l.id))continue;const i=LISTENER_INFO[l.id];add('queued',1,i?i[0]:l.id,i?i[1]:'A card or potion effect is waiting to happen.')}
+ for(const p of cb.powers||[]){if(p.id==='heldbreath'&&p.breath)add('breath',p.breath,null,`Your next Crest deals +${(p.up?6:5)*p.breath} or Undertow gives +${(p.up?6:5)*p.breath} Guard.`);if(p.id==='wreckerstide'&&p.wb)add('crestUp',p.wb,null,`Your next Crest deals ${p.wb} more damage to ALL.`)}
+ for(const l of cb.fx||[]){if(l.dead||!l.id||INTERNAL_LISTENERS.has(l.id))continue;if(l.id==='bastionbar'){if(l.want==null||cb.turn<l.want)add('guardHold',1);continue}const i=LISTENER_INFO[l.id];add('queued',1,i?i[0]:l.id,i?i[1]:'A card or potion effect is waiting to happen.')}
  for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.ready&&d.ready(r))add('armed',1,d.n,d.d?plain(d.d):'Ready.',assetSrc('relics',r.id))} // clovis/hud: the relic's own painted icon, not the vector up-arrow
  return out}
 export function statusRowHTML(st,extra,who='p',limit=6){const p=[],all=[];

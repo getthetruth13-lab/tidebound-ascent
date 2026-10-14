@@ -2,12 +2,14 @@
 // (generated/data-v2.js); only the code lives here. Instances in W.run.relics are {id,n,used,...}; per-combat flags are
 // reset on combatStart (r.c = {}), per-turn flags on turnStart (r.t = {}).
 // Listen with on:{event(r,ctx)} and modify with mod:{name(r,ctx,value)} (see core/bus.js). pickup(r) runs on gain.
-// Phase: P1 relics roll in pools; P2 (need Phase 2 keywords) and P3 (boss relics) are registered but never roll yet.
+// Phase: P1 relics roll in pools; P2 (need Phase 2 keywords) are registered but never roll yet. P3 boss relics (tier 'b') are offered
+// as a pick-1-of-3 row on the boss reward screen (engine/run.js bossRelicChoices).
 import {registerRelic,RELICS,CARDS} from '../core/registry.js';
 import {W,pick} from '../core/state.js';
 import {DATA} from './generated/data-v2.js';
 import {addCard,addSt,alive,choose,dmgEnemy,drawCards,flash,gainBlock,gainEnergy,bonusEnergy,gainMom,heal,log,callout,curTgt} from '../engine/combat.js';
-import {gainGold,gainCurse,openPick,pickPotions,gainMaxHp,addPotionSlot,revealRows} from '../engine/run.js';
+import {gainGold,gainCurse,openPick,pickPotions,gainMaxHp,addPotionSlot,revealRows,loseRelic,gainRelic,randomRelic} from '../engine/run.js';
+import {render} from '../ui/render.js';
 const TIER={Starter:'s',Common:'c',Uncommon:'u',Rare:'r',Boss:'b',Shop:'shop',Event:'e'};
 export const RELIC_ICON={moonshell:'🐚',tuningfork:'🎐',sextant:'🧭',glove:'🧤',barnaclecharm:'🦪',kelpwrap:'🌿',coral:'🪸',whaletooth:'🦷',biscuit:'🍪',oysterpurse:'👛',starfish:'⭐',bandolier:'🎽',foghorn:'📯',galleypot:'🍲',
  wetsand:'🏖️',tuningpeg:'🎚️',pocketcompass:'🧭',griptape:'🎗️',totem:'🗿',coralspur:'🦴',earring:'🦪',lens:'🔆',conch:'🐚',scale:'⚖️',chargedcoral:'⚡',pumice:'🪨',anklet:'📿',echochamber:'🕳️',flags:'🚩',fencermask:'🥽',
@@ -89,6 +91,26 @@ const B={
  echochamber:{on:{combatStart(r){addCard('note','hand');flash(r)}},mod:{damageAdd(r,ctx,v){return ctx.f&&ctx.f.ci&&ctx.f.ci.id==='note'?v+2:v}}},
  fencermask:{on:{parry(r,ctx){addSt(ctx.enemy,'bleed',2);flash(r)}}},
  rapier:{on:{flourish(r,ctx){const t=ctx.f.tg;if(t)addSt(t,'bleed',4);gainBlock(4);flash(r)}}},
+ // ---- P3 boss relics (offered after the boss reward; v0.6.4 clovis/victory-fixes) ----
+ anchor:{on:{turnStart(r,ctx){ctx.energy=(ctx.energy||0)+1}},mod:{handLimit(r,ctx,v){return Math.min(v,7)}}},
+ gullcrown:{on:{turnStart(r,ctx){ctx.energy=(ctx.energy||0)+1}},mod:{rewardCards(r,ctx,v){return Math.min(v,2)}}},
+ fogcompass:{on:{turnStart(r,ctx){ctx.energy=(ctx.energy||0)+1}},mod:{intentDisplay(r,ctx,m){return m?{...m,fog:1}:m}}},
+ inkwell:{on:{turnStart(r,ctx){ctx.energy=(ctx.energy||0)+1},shuffle(r){if(W.cb){addCard('murk','drawRandom');flash(r)}}}},
+ ledger:{on:{turnStart(r,ctx){ctx.energy=(ctx.energy||0)+1}},mod:{gold(r,ctx,v){return ctx.combat?0:v}}},
+ hourglass:{on:{turnStart(r,ctx){ctx.energy=(ctx.energy||0)+1}},mod:{mendFrac(r,ctx,v){return Math.min(v,.10)}}},
+ satchel:{on:{turnStart(r,ctx){ctx.draw=(ctx.draw||0)+1}},mod:{cost(r,ctx,c){return W.cb&&W.cb.stat.playedTurn===0&&!CARDS[ctx.card.id].unplay?Math.max(1,c+1):c}}},
+ divernet:{pickup(r){const back=W.S;const ret=()=>{if(back){W.S=back;render()}};
+  openPick('remove','Diver\'s Net: remove a card (1 of 2)',()=>openPick('remove','Diver\'s Net: remove a card (2 of 2)',()=>openPick('transform','Diver\'s Net: transform a card',ret,ret),ret),ret)}},
+ salvage:{pickup(r){for(let k=0;k<2;k++){const id=randomRelic({c:50,u:50,r:0},'relics');if(id)gainRelic(id)}gainCurse('anchorchain')}},
+ fullmoon:{pickup(){loseRelic('moonshell')},ready:r=>W.run.cls==='tide'&&!!r.c&&(!r.c.ec||!r.c.eu),on:{combatStart(r){r.c={};if(W.run.cls!=='tide')return;W.cb.startQ.push(()=>choose('🌕 Full Moon: choose the starting Tide',[2,3,4,5,6,7,8].map(v=>({l:'Tide '+v,tile:v>5?'choice-tide-high':v<5?'choice-tide-low':'choice-tide-mid',sum:v>5?'Start near High Tide.':v<5?'Start near Low Tide.':'Start balanced.',f:()=>{W.cb.tide=v;log('🌕 Full Moon: the Tide starts at '+v)}}))))},
+  crest(r){if(!r.c.ec){r.c.ec=1;bonusEnergy(1,'tide');flash(r);log('🌕 Full Moon: +1 Energy')}},undertow(r){if(!r.c.eu){r.c.eu=1;gainEnergy(1);flash(r);log('🌕 Full Moon: +1 Energy')}}}},
+ resfork:{pickup(){loseRelic('tuningfork')},on:{turnStart(r){r.t={}}},mod:{echoPlan(r,ctx,p){if(!p||r.t&&r.t.used||p.mult>1)return p;if(!ctx.preview){r.t={used:1};flash(r)}return {...p,mult:2,fork:1}}}},
+ celestial:{pickup(){loseRelic('sextant')}}, // engine: startCombat offers 3 starting Waypoints (upgraded, Rank 1) and sets 4 Waypoint slots
+ gauntlet:{pickup(){loseRelic('glove')},on:{turnStart(r){r.t={}},parry(r){if(r.t&&r.t.used)return;r.t={used:1};flash(r);const q=()=>{gainMom(1);log('🥊 Gauntlet: +1 Momentum')};q.meta={mom:1};W.cb.nextTurnQ.push(q)}},mod:{keepMomentum(){return true}}},
+ springlocket:{mod:{drift(r,ctx,v){return v*2},crest(r,ctx,c){return {...c,dmg:c.dmg+6}},undertow(r,ctx,u){return {...u,guard:u.guard+6}}}},
+ twinclapper:{mod:{markPer(){return 0}}}, // two Marks per turn are already the base rule (Twin Tines), so only the drawback applies
+ trailboots:{mod:{advances(r,ctx,v){return Math.max(v,2)}}}, // engine: startCombat places no starting Waypoint when held
+ gamblersedge:{on:{flourish(r,ctx){if(ctx.mom>=6){ctx.f.allTargets=true;flash(r)}}},mod:{momMax(r,ctx,v){return Math.max(v,8)},momLoss(){return 99}}},
 };
 // Act 1 pull-forward (design/act1-complete.md §(b)): these 4 P2 relics join the Act 1 pools because their archetypes are in the Act 1 card set.
 export const ACT1_PULL=new Set(['wetsand','echochamber','fencermask','rapier']);

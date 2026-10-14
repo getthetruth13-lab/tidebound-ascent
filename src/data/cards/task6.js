@@ -10,7 +10,7 @@ import {thisTurn,log,callout,stacks} from './kit.js';
 const T=(id,o)=>card('tide',id,o),E=(id,o)=>card('echo',id,o),K=(id,o)=>card('carto',id,o),D=(id,o)=>card('duel',id,o);
 // ---------------- Tidecaller ----------------
 T('brinedrench',{e:'💦',d:'Deal {6|8}. Apply {3|4} Drenched. Surge 1.',p:f=>{f.dmg(f.v(6,8));const t=f.tg;if(t)addSt(t,'drench',f.v(3,4));f.surge(1)}});
-T('drawtide',{e:'🌀',req:()=>W.cb.tide>2,d:'Spend all Tide above 2: deal {4|5} for each Tide spent.',p:f=>{const n=spendTide(W.cb.tide-2);if(n>0){log('🌀 Draw the Tide: spent '+n);f.dmg(f.v(4,5)*n)}}});
+T('drawtide',{e:'🌀',req:()=>W.cb.tide>2,d:'Spend all Tide above 2: deal {4|5} for each Tide spent. (Cannot be played at Tide 2 or below.)',p:f=>{const n=spendTide(W.cb.tide-2);if(n>0){log('🌀 Draw the Tide: spent '+n);f.dmg(f.v(4,5)*n)}}});
 T('tithe',{e:'🐚',req:()=>W.cb.tide>=3,d:'Spend 3 Tide: gain {16|21} Guard and draw 1.',p:f=>{if(spendTide(3)<3)return;f.blk(f.v(16,21));f.draw(1)}});
 T('moonlock',{e:'🔒',d:'The Tide won\'t drift at the start of your next turn. At High or Low Tide: also gain {8|11} Guard and, next turn, 1 Energy.',p:f=>{const cb=W.cb;cb.holdDrift=true;log('🔒 Moonlock: the Tide will hold');
  if(f.highNow()||f.lowNow()){f.blk(f.v(8,11));f.nextTurn(()=>{gainEnergy(1);log('🔒 Moonlock: +1 Energy')},{energy:1})}}});

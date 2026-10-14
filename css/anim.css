@@ -42,7 +42,8 @@
 .fxring{position:absolute;transform:translate(-50%,-50%);border:2px solid #7fd0c8;border-radius:50%;opacity:0}
 .flyicon{position:absolute;font-size:26px;line-height:1;filter:drop-shadow(0 0 6px #d8a446)}
 .flyicon img{height:30px;width:auto}
-.cardback{position:fixed;z-index:70;width:26px;height:36px;border-radius:4px;pointer-events:none;background:linear-gradient(135deg,#1c2b3a,#0d1621);border:1.5px solid #7fd0c8;box-shadow:0 0 6px #7fd0c855}
+/* A37: i.cardback = the flying draw/shuffle backs (anim.js); beats the reward .cardback rule in cards.css, which loads later */
+i.cardback{position:fixed;z-index:70;width:26px;height:36px;border-radius:4px;pointer-events:none;background:linear-gradient(135deg,#1c2b3a,#0d1621);border:1.5px solid #7fd0c8;box-shadow:0 0 6px #7fd0c855}
 .travelmark{position:fixed;z-index:70;width:14px;height:14px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff4c8,#d8a446 60%,transparent 72%);box-shadow:0 0 12px 3px #d8a44699}
 .xfade{will-change:opacity}
 .action-ghost.death-sink{will-change:transform,opacity,filter}
@@ -110,3 +111,9 @@ body.reduce-motion .combat .remains{animation:none;opacity:1}
 .page.fit-reward .bossvic{margin:2px auto 0}.page.fit-reward .bossvic q{display:none}
 .page.fit-reward .pk-rewards.vic.hasboss .pk-body{padding-top:0}
 .page.fit-reward .pk-rewards.vic.hasboss .etitle{display:none}
+/* clovis/painted-fx: painted effect pieces (src/ui/painted-fx.js). Compositor-only animation. */
+/* no paint containment: it clipped blurred/scaled pieces to a flat box edge. Feathered mask keeps every edge soft. */
+.pfx{position:fixed;pointer-events:none;user-select:none;will-change:transform,opacity;max-width:none;
+ -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 72%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 72%,transparent 100%)}
+
+.pfx.pfx-shard{-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 92%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 92%)}

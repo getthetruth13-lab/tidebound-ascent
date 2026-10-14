@@ -5,7 +5,7 @@ import {registerEvents,registerCharm,RELICS,CARDS,POTIONS,CHARMS} from '../core/
 import {W,pick,rng,R,rnd,shuffle} from '../core/state.js';
 import {cname,mk} from '../engine/cards.js';
 import {isLocked,goMap,heal,hurt,msg,openPick,randomCard,gainCard,gainCurse,gainGold,gainRelic,loseRelic,randomRelic,randomPotion,addPotion,addPotionSlot,
- loseMaxHp,gainMaxHp,eventFight,toast,pickable} from '../engine/run.js';
+ loseMaxHp,gainMaxHp,eventFight,toast,pickable,gainArtifact,artifactFree} from '../engine/run.js';
 import {mod} from '../core/bus.js';
 import {eventText} from './lore.js';
 import {render} from '../ui/render.js';
@@ -36,6 +36,8 @@ const B=s=>`<b>${s}</b>`;
 const rel=id=>B(`${RELICS[id].e} ${RELICS[id].n}`);
 const loseGold=n=>{const l=Math.min(run().gold,n);run().gold-=l;return l};
 const pct=()=>run().hp/run().max;
+// Take an Artifact from an event: a full hand of 3 asks which to leave behind first; declining it ends the scene with nothing gained.
+const takeArt=(id,text,pay)=>{cur=W.S.ev;gainArtifact(id,ok=>{if(ok&&pay)pay();done(ok?`${text} You gain <b>${CARDS[id].e} ${CARDS[id].n}</b>.`:'You leave it where it lies.',ok?'good':'mixed',ok?undefined:'Left Behind')})};
 // A card pick that applies after you confirm, with Cancel returning to the scene.
 const pickThen=(mode,title,after,filter)=>{const S=W.S;cur=S.ev;openPick(mode,title,ci=>{if(!ci)return goMap();after(ci)},()=>{W.S=S;render()},filter)};
 const randomRemovable=()=>{const c=pickable('remove');return c.length?pick(c,'events'):null};
@@ -92,7 +94,7 @@ registerEvents([
     const id=randomRelic(null,'events',{tier:up});if(id){gainRelic(id);return done(`It spits back ${rel(id)}.`)}const g=gainGold(50);done(`Only gold: +${g}.`,'mixed')}}));
    choice('Throw in which relic?','',opts.concat([{l:'↩️ Back',f:()=>{W.S.ev=EV('wishing');render()}}]))}}),
   O('Throw in a card','lose 6 HP, remove it; your next card reward is all Rares',{ok:()=>pickable('remove').length>0&&run().hp>6,why:'Needs more than 6 HP',d:'The card is removed. The whirlpool bruises you (lose 6 HP) but your next card reward shows only Rares.',f:()=>pickThen('remove','🌀 Wishing Undertow: throw in a card',ci=>{hurt(6);run().rareNext=true;done(`<b>${cname(ci)}</b> spirals down. Lose 6 HP. Your next card reward will be all Rares.`,'mixed','The Water Churns')})}),
-  O('Throw in 50 gold','50%: a Rare relic, else nothing',{risk:.5,ok:()=>run().gold>=50,why:'Needs 50 gold',d:'Pay 50 gold. 50%: the whirlpool returns a random Uncommon relic. 50%: gone.',f:()=>{run().gold-=50;
+  O('Throw in 50 gold','50%: an Uncommon relic, else nothing',{risk:.5,ok:()=>run().gold>=50,why:'Needs 50 gold',d:'Pay 50 gold. 50%: the whirlpool returns a random Uncommon relic. 50%: gone.',f:()=>{run().gold-=50;
    if(roll(.5)){const id=randomRelic(null,'events',{tier:'u'});if(id){gainRelic(id);return done(`A glint rises from the dark: ${rel(id)}.`)}const g=gainGold(80);return done(`Coin comes back, and more. +${g} gold.`)}
    done('The coin spins down and is gone.','bad','Swallowed')}}),
   LEAVE]},
@@ -172,6 +174,22 @@ registerEvents([
    if(roll(.5)){const c=pickable('upgrade');if(c.length){const x=pick(c,'events');x.up=true;heal(8);return done(`The thread comes loose in your hand. <b>${cname(x)}</b> is improved. Heal 8 HP.`)}heal(8);return done('The thread comes loose and warm. Heal 8 HP.')}
    hurt(6);done('The net closes round your hand. Lose 6 HP.','bad','Tangled')}}),
   LEAVE]},
+ // ================= Artifact sources (Act 1): each offers one shared Artifact card, once per run =================
+ {id:'keeperstudy',pool:'act',act:1,n:"Flooded Keeper's Study",e:'📜',t:'A Keeper\'s study, flooded to the desk. A page of the Ledger floats loose, every line still legible.',req:()=>artifactFree('ledgerleaf'),o:[
+  O('Take the loose page','gain the Torn Ledger Leaf Artifact',{d:'Fish out the page. Gain Torn Ledger Leaf, an Artifact card (Skill, Sink): put a card from your discard pile on top of your draw pile.',f:()=>takeArt('ledgerleaf','You wade in and cut the page free.')}),
+  O('Dry the room','heal 6 HP',{d:'Rest on the one dry shelf. Heal 6 HP.',f:()=>{heal(6);done('You sit out the tide on a dry shelf. Heal 6 HP.')}}),LEAVE]},
+ {id:'keeperchest',pool:'act',act:1,n:"Sealed Keeper's Chest",e:'🧰',t:'A Keeper\'s chest, still sealed with soft wax. Something inside is dry.',req:()=>artifactFree('sealingwax'),o:[
+  O('Break the seal','lose 5 HP, gain the Sealing Wax Artifact',{ok:()=>run().hp>5,why:'Needs more than 5 HP',d:'The wax bites as it breaks: lose 5 HP. Gain Sealing Wax, an Artifact card (Skill, Sink): a chosen card in your hand has Moor for the fight.',f:()=>takeArt('sealingwax','The seal gives under your thumb. Lose 5 HP.',()=>hurt(5))}),
+  O('Sell the chest','+30 gold',{d:'Strip the brass fittings and sell them. +30 gold.',f:()=>{const g=gainGold(30);done(`The brass sells well enough. +${g} gold.`)}}),LEAVE]},
+ {id:'wrackfolknet',pool:'act',act:1,n:'Wrackfolk Drift-Net',e:'🕸️',t:'A net of knotted kelp hangs across the passage, tied by hands that forgot they were hands. Junk is caught in it.',req:()=>artifactFree('driftnet'),o:[
+  O('Cut it free','lose 4 HP, gain the Drift-Net Artifact',{ok:()=>run().hp>4,why:'Needs more than 4 HP',d:'The knots fight back: lose 4 HP. Gain Drift-Net, an Artifact card (Vigil): junk added to your hand is Sunk for Guard.',f:()=>takeArt('driftnet','The net comes away in your arms. Lose 4 HP.',()=>hurt(4))}),
+  O('Pick the net clean','+20 gold',{d:'Sift what the net caught. +20 gold.',f:()=>{const g=gainGold(20);done(`Trinkets, mostly. +${g} gold.`)}}),LEAVE]},
+ {id:'ferrymantoll',pool:'act',act:1,n:"The Ferryman's Toll",e:'🪙',t:'On a drowned step, a single coin rests in a dish. Far off, the Ferryman\'s lamp does not turn your way.',req:()=>artifactFree('ferrycoin'),o:[
+  O('Take the coin','pay 25 gold, gain the Ferryman\'s Coin Artifact',{ok:()=>run().gold>=25,why:'Needs 25 gold',d:'Leave your own fare in the dish and take the coin he did not. Gain Ferryman\'s Coin, an Artifact card (Skill, Sink, Opening): Energy now for a card later.',f:()=>takeArt('ferrycoin','You leave 25 gold in the dish and pocket the coin.',()=>{run().gold-=25})}),
+  O('Pay the toll','pay 25 gold, heal 12 HP',{ok:()=>run().gold>=25,why:'Needs 25 gold',d:'Drop 25 gold in the dish. A warm current carries you on: heal 12 HP.',f:()=>{run().gold-=25;heal(12);done('The dish is empty when you look back. Heal 12 HP.')}}),LEAVE]},
+ {id:'lampbearerflask',pool:'act',act:1,n:"A Lampbearer's Last Flask",e:'🛢️',t:'A Lampbearer sits against the wall, lamp cold, one flask in a hand that no longer closes on it.',req:()=>artifactFree('ampoule'),o:[
+  O('Take the flask','gain the Ampoule of Lamp-Oil Artifact',{d:'Gain Ampoule of Lamp-Oil, an Artifact card (Skill, Sink): lose 4 HP, gain 2 Energy.',f:()=>takeArt('ampoule','The fingers open. The oil is warm.')}),
+  O('Sit with them','heal 5 HP',{d:'Stay a while. Heal 5 HP.',f:()=>{heal(5);done('You stay until the tide turns. Heal 5 HP.')}}),LEAVE]},
 ]);
 import {EVENTS} from '../core/registry.js';
 function EV(id){const e=EVENTS.find(e=>e.id===id);return e&&{...e,t:eventText(e.id,e.t)}}

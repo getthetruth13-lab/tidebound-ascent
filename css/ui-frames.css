@@ -1,0 +1,58 @@
+/* ===== ui-frames.css (Clovis ui-frames, Spencer 2026-10-13): painted verdigris-bronze tile border (9-slice) and
+   tarnished-gold button plate. Loaded last so it overrides the old thin CSS borders. Art: art/v2/ui/frames/. ===== */
+/* ---- 1. tile border: every choice tile (rewards, events, camp, combat choices, potion swap, Lamplight) is a .tile.sp ---- */
+.tile.sp{--fb:clamp(14px,calc(var(--th,200px)*.085),20px);padding-bottom:calc(var(--fb) - 4px);border:0;border-radius:4px;box-shadow:0 7px 16px #000b,inset 0 0 26px #000c}
+.tile.sp::before{inset:-1px;border:var(--fb) solid transparent;border-image:url(../art/v2/ui/frames/tile-border.webp) 102 stretch;border-radius:0;z-index:6;filter:drop-shadow(0 1px 2px #000c)}
+.tile.sp .tname{width:calc(100% - var(--fb)*1.4)}
+.tile.sp .ttag{left:calc(var(--fb) - 2px);top:calc(var(--fb) - 4px)}
+.tile.sp .tsig{left:calc(var(--fb) - 2px);top:calc(var(--fb) - 4px)}
+.tile.sp .tck{right:var(--fb);top:var(--fb)}
+.tile.sp:hover:not(:disabled),.tile.sp:focus-visible{border:0;box-shadow:0 0 18px #d9b46a77,0 10px 18px #000c,inset 0 0 26px #000a}
+.tile.sp:hover:not(:disabled)::before,.tile.sp:focus-visible::before{filter:drop-shadow(0 1px 2px #000c) brightness(1.2) saturate(1.1)}
+.tile.sp.on{box-shadow:0 0 0 2px #ffd84a88,0 0 20px #ffd84a66,0 6px 14px #000a}
+.tile.static:hover{box-shadow:0 7px 16px #000b,inset 0 0 26px #000c}
+/* ---- 3. victory reward tiles: noticeably bigger (was ~102px tall, max 190px wide) ---- */
+.page.fit-reward .pk.pk-rewards.vic .pk-body{height:clamp(140px,calc(100dvh - 202px),240px)}
+.page.fit-reward .pk-rewards.vic .rewtiles{gap:12px}
+.page.fit-reward .pk-rewards.vic .rewtiles .tile.sp{width:min(calc((100cqw - 14px*var(--n,3))/var(--n,3)),224px)}
+.page.fit-reward .pk-rewards.vic .rewtiles .tile.sp .tsum{-webkit-line-clamp:3}
+/* ---- 4. shop: Scrub a Card tile is exactly one shop card (width --gw, height --gw*1.4, top-aligned with the cards) ---- */
+.sh1-svc{width:var(--gw);height:auto;overflow:visible;align-self:flex-start}
+.sh1-svc .tile.sp{--th:calc(var(--gw)*1.4);--fb:12px;width:var(--gw);height:calc(var(--gw)*1.4);min-height:0;box-sizing:border-box}
+/* ---- 5. inline painted potion bottle (toasts, event text, logs) ---- */
+img.pot-ic{display:inline-block;width:1.35em;height:1.35em;vertical-align:-.3em;object-fit:contain;filter:drop-shadow(0 1px 1px #000a)}
+.slot .ph img.pot-ic{width:70%;height:70%}
+/* ---- 2. buttons: painted tarnished-gold plate with a bronze rim (9-slice, art/v2/ui/frames/btn-plate.webp 472x120, slice 26/28).
+   Covers every Continue-style button: .btn (Continue, Skip, Leave, Buy, Back, Drink, Discard, Close, camp, Lamplight/end menus),
+   .tb-btn (title / options menus) and .tb-x (window close). States: hover = brighter, pressed = darker + 1px down, disabled = dim grey-gold. ---- */
+.btn,.tb-btn,.tb-x{box-sizing:border-box;border-style:solid;border-color:transparent;border-width:9px 11px;border-radius:0;
+ border-image:url(../art/v2/ui/frames/btn-plate.webp) 26 28 fill / 9px 11px stretch;background:none;box-shadow:none;
+ color:#2a1a08;text-shadow:0 1px 0 #f3d99a88;font-family:var(--font-display);font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+ padding:0 8px;filter:drop-shadow(0 2px 3px #000b) brightness(.86) saturate(.9);transition:filter calc(.1s*var(--us,1)),transform calc(.08s*var(--us,1))}
+.btn.pri,.tb-btn.pri,.btn.pri:hover,.tb-btn.pri:hover{background:none;box-shadow:none;border-color:transparent;color:#1c1206;filter:drop-shadow(0 2px 4px #000c) drop-shadow(0 0 8px #d9b46a44)}
+.btn:hover:not(:disabled),.tb-btn:hover:not(:disabled),.tb-x:hover,.btn:focus-visible,.tb-btn:focus-visible{background:none;box-shadow:none;border-color:transparent;filter:drop-shadow(0 2px 4px #000c) drop-shadow(0 0 10px #f0d89077) brightness(1.08)}
+.btn:active:not(:disabled),.tb-btn:active:not(:disabled),.tb-x:active{transform:translateY(1px) scale(.985);box-shadow:none;filter:drop-shadow(0 1px 1px #000c) brightness(.72) saturate(.85)}
+.btn:disabled,.tb-btn:disabled,.sh1-foot .pkbtn:disabled,.pk-shop .pk-foot .pkbtn:disabled{opacity:1;color:#d2c4a2;text-shadow:0 1px 2px #000;box-shadow:none;transform:none;filter:drop-shadow(0 2px 3px #000a) grayscale(.75) brightness(.5)}
+.tb-btn.danger{background:none;box-shadow:none;color:#3a0c0a;filter:drop-shadow(0 2px 3px #000b) hue-rotate(-28deg) saturate(1.3) brightness(.85)}
+.btn .gi,.tb-btn .gi,.tb-x .gi{color:inherit}
+.btn.camp{background:none}
+.btn.camp span,.tb-btn span{color:inherit}
+/* Lamplight / run-end menu buttons were bare underlined text; now plates too */
+.end .lp-btns .btn,.end .lp-sum .lp-btns .btn{border-style:solid;border-width:9px 11px;border-image:url(../art/v2/ui/frames/btn-plate.webp) 26 28 fill / 9px 11px stretch;background:none;color:#2a1a08;text-shadow:0 1px 0 #f3d99a88;padding:0 4px}
+.end .lp-btns .btn:hover,.end .lp-btns .btn:focus-visible{background:none;color:#1c1206}
+/* event choice rows wear the same bronze tile border; the event Continue row is a button plate */
+.evo{border:10px solid transparent;border-image:url(../art/v2/ui/frames/tile-border.webp) 102 stretch;background-clip:padding-box;border-radius:0;padding:.15em .5em .15em .15em}
+.evo:hover,.evo:focus-visible,.evo.off:hover{border-color:transparent;background-clip:padding-box}
+.evo:hover,.evo:focus-visible{filter:brightness(1.12)}
+.evo.cont{border-width:9px 11px;border-image:url(../art/v2/ui/frames/btn-plate.webp) 26 28 fill / 9px 11px stretch;background:none;box-shadow:none;color:#1c1206;text-shadow:0 1px 0 #f3d99a88;filter:drop-shadow(0 2px 4px #000c)}
+.evo.cont .evname,.evo.cont:hover .evname{color:#1c1206}.evo.cont .evname::after{color:#1c1206}
+.evo.cont:hover,.evo.cont:focus-visible{background:none;filter:drop-shadow(0 2px 4px #000c) drop-shadow(0 0 10px #f0d89077) brightness(1.08)}
+.evo.cont:active{transform:translateY(1px) scale(.985);filter:brightness(.72)}
+/* potion popup: keep the plates compact so the window clears the END button */
+.pop.potpop .row .btn{min-height:40px;padding-top:0;padding-bottom:0}
+/* ui-frames 7: painted see-through event choice icons (art/v2/ui/evicons), no box behind them */
+.evico{display:flex;align-items:center;justify-content:center;background:none;border:0}
+.evico .evi{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1px 2px #000c);pointer-events:none}
+/* v0.6.5: long tile titles wrap at spaces and never spill past the frame; JS (fitTileNames) shrinks further if one word is too wide */
+.tile .tname{white-space:normal;overflow-wrap:normal;text-wrap:balance;box-sizing:border-box;max-width:calc(100% - 4px);overflow:hidden;text-overflow:clip}
+.tile .tname.fit{letter-spacing:0;padding-left:3px;padding-right:3px}

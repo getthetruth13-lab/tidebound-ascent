@@ -53,7 +53,7 @@ N('retune',{e:'🎚️',d:'Faint. Move a Mark to a card of the same type you alr
  if(!opts.length){log('🎚️ Retune: no other card of a Marked type played this turn');if(!f.echo)callout('Nothing to retune','echo');return done()}
  ask(f,'Retune: which card takes the Mark?',opts.map(ci=>({l:'🔔 '+(CARDS[ci.id].e||'')+' '+cname(ci),card:{id:ci.id,up:ci.up},f:()=>{moveMark(ci,ci._tgt||(ci===c.last?c.lastTgt:null));log('🎚️ Retuned: '+cname(ci)+' is Marked');callout('RETUNED: '+cname(ci),'echo');done()}})))}});
 N('tollingward',{e:'🔕',d:'Gain {6|8} Guard. <b>Resound:</b> deal damage equal to your Guard (max 15) to a random enemy.',p:f=>{f.blk(f.v(6,8));if(!f.echo)return;
- const t=randAlive();const n=Math.min(15,W.cb.p.block);if(t&&n>0){hit(t,n,f,{raw:true});callout('TOLL '+n,'echo')}}});
+ const t=randAlive();const n=Math.min(15,W.cb.p.block);if(t&&n>0){hit(t,n,f,{raw:true,cap:15});callout('TOLL '+n,'echo')}}});
 // Salvage Chime: playable Flotsam (Kelp, Ringing) cost 0, up to 3 a turn; each one played that way also adds a Note.
 // Unplayable Flotsam (Murk, Scald, Static) become playable through the engine's 'playUnplayable' modifier.
 N('salvagechime',{e:'🪝',openU:1,d:'Flotsam in your hand can be played for 0 (up to 3 a turn). Playing one Sinks it and adds a Note to your hand. Faint.{| Opening.}',power:{
@@ -75,7 +75,7 @@ R('harmonics',{e:'🎛️',sus:3,d:'Gain {8|11} Guard. Sustain 3.',p:f=>f.blk(f.
 R('choir',{e:'👥',d:'At the start of your turn, add 1 Note to your hand.',power:{on:{turnStart(inst){addCard('note','hand');floatText('p','🎵 +1 Note','')}}}});
 
 // ================= Rare =================
-R('infinitehum',{e:'🎵',d:'Your Marked cards gain +2 per card played after them instead of +1 (max +{6|8}).',power:{mod:{markPer(inst,ctx,v){return 2},markCap(inst,ctx,v){return inst.up?8:6}}}});
+R('infinitehum',{e:'🎵',cu:0,d:'Your Marked cards gain +2 per card played after them instead of +1 (max +6).',power:{mod:{markPer(inst,ctx,v){return 2},markCap(inst,ctx,v){return 6}}}});
 R('symphony',{e:'🎻',d:'Whenever you play your 5th card in a turn, gain 1 Energy and draw 2.',power:{on:{cardPlayed(inst,ctx){if(ctx.nThisTurn!==5)return;bonusEnergy(1,'echo');drawCards(2);callout('SYMPHONY! +1⚡ draw 2','echo')}}}});
 // Full Belfry: X = Flotsam in hand + draw + discard (max 3). An Attack ring's first hit gets +X; a non-Attack ring gives X Guard.
 const belfryN=()=>{const c=W.cb;return Math.min(3,[...c.hand,...c.draw,...c.disc].filter(isFlot).length)};

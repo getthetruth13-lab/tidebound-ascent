@@ -8,7 +8,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: coin (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "purse": {
    "path": "art/v2/ui/glyphs/purse.webp",
@@ -17,7 +17,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: purse (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "drop": {
    "path": "art/v2/ui/glyphs/drop.webp",
@@ -26,7 +26,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: drop (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "blood": {
    "path": "art/v2/ui/glyphs/blood.webp",
@@ -35,7 +35,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: blood (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "flame": {
    "path": "art/v2/ui/glyphs/flame.webp",
@@ -44,7 +44,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: flame (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "lantern": {
    "path": "art/v2/ui/glyphs/lantern.webp",
@@ -53,7 +53,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: lantern (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "candle": {
    "path": "art/v2/ui/glyphs/candle.webp",
@@ -62,7 +62,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: candle (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "bell": {
    "path": "art/v2/ui/glyphs/bell.webp",
@@ -71,7 +71,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: bell (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "bolt": {
    "path": "art/v2/ui/glyphs/bolt.webp",
@@ -80,7 +80,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: bolt (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "wave": {
    "path": "art/v2/ui/glyphs/wave.webp",
@@ -89,7 +89,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: wave (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "spiral": {
    "path": "art/v2/ui/glyphs/spiral.webp",
@@ -98,7 +98,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: spiral (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "boot": {
    "path": "art/v2/ui/glyphs/boot.webp",
@@ -107,7 +107,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: boot (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "walker": {
    "path": "art/v2/ui/glyphs/walker.webp",
@@ -116,7 +116,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: walker (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "stone": {
    "path": "art/v2/ui/glyphs/stone.webp",
@@ -125,7 +125,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: stone (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "mountain": {
    "path": "art/v2/ui/glyphs/mountain.webp",
@@ -134,7 +134,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: mountain (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "map": {
    "path": "art/v2/ui/glyphs/map.webp",
@@ -143,7 +143,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: map (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "pin": {
    "path": "art/v2/ui/glyphs/pin.webp",
@@ -152,7 +152,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: pin (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "compass": {
    "path": "art/v2/ui/glyphs/compass.webp",
@@ -161,7 +161,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: compass (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "shell": {
    "path": "art/v2/ui/glyphs/shell.webp",
@@ -170,7 +170,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: shell (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "lock": {
    "path": "art/v2/ui/glyphs/lock.webp",
@@ -179,7 +179,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: lock (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "note": {
    "path": "art/v2/ui/glyphs/note.webp",
@@ -188,7 +188,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: note (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "arrowup": {
    "path": "art/v2/ui/glyphs/arrowup.webp",
@@ -197,7 +197,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: arrowup (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "arrowdown": {
    "path": "art/v2/ui/glyphs/arrowdown.webp",
@@ -206,7 +206,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: arrowdown (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "arrowright": {
    "path": "art/v2/ui/glyphs/arrowright.webp",
@@ -215,7 +215,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: arrowright (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "undo": {
    "path": "art/v2/ui/glyphs/undo.webp",
@@ -224,7 +224,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: undo (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "cycle": {
    "path": "art/v2/ui/glyphs/cycle.webp",
@@ -233,7 +233,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: cycle (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "sword": {
    "path": "art/v2/ui/glyphs/sword.webp",
@@ -242,7 +242,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: sword (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "hammer": {
    "path": "art/v2/ui/glyphs/hammer.webp",
@@ -251,7 +251,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: hammer (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "trident": {
    "path": "art/v2/ui/glyphs/trident.webp",
@@ -260,7 +260,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: trident (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "shield": {
    "path": "art/v2/ui/glyphs/shield.webp",
@@ -269,7 +269,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: shield (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "skull": {
    "path": "art/v2/ui/glyphs/skull.webp",
@@ -278,7 +278,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: skull (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "heart": {
    "path": "art/v2/ui/glyphs/heart.webp",
@@ -287,7 +287,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: heart (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "eye": {
    "path": "art/v2/ui/glyphs/eye.webp",
@@ -296,7 +296,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: eye (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "moon": {
    "path": "art/v2/ui/glyphs/moon.webp",
@@ -305,7 +305,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: moon (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "star": {
    "path": "art/v2/ui/glyphs/star.webp",
@@ -314,7 +314,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: star (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "spark": {
    "path": "art/v2/ui/glyphs/spark.webp",
@@ -323,7 +323,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: spark (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "sun": {
    "path": "art/v2/ui/glyphs/sun.webp",
@@ -332,7 +332,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: sun (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "gem": {
    "path": "art/v2/ui/glyphs/gem.webp",
@@ -341,7 +341,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: gem (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "flask": {
    "path": "art/v2/ui/glyphs/flask.webp",
@@ -350,7 +350,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: flask (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "pot": {
    "path": "art/v2/ui/glyphs/pot.webp",
@@ -359,7 +359,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: pot (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "scroll": {
    "path": "art/v2/ui/glyphs/scroll.webp",
@@ -368,7 +368,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: scroll (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "book": {
    "path": "art/v2/ui/glyphs/book.webp",
@@ -377,7 +377,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: book (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "feather": {
    "path": "art/v2/ui/glyphs/feather.webp",
@@ -386,7 +386,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: feather (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "anchor": {
    "path": "art/v2/ui/glyphs/anchor.webp",
@@ -395,7 +395,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: anchor (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "scissors": {
    "path": "art/v2/ui/glyphs/scissors.webp",
@@ -404,7 +404,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: scissors (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "dice": {
    "path": "art/v2/ui/glyphs/dice.webp",
@@ -413,7 +413,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: dice (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "tower": {
    "path": "art/v2/ui/glyphs/tower.webp",
@@ -422,7 +422,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: tower (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "house": {
    "path": "art/v2/ui/glyphs/house.webp",
@@ -431,7 +431,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: house (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "tent": {
    "path": "art/v2/ui/glyphs/tent.webp",
@@ -440,7 +440,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: tent (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "door": {
    "path": "art/v2/ui/glyphs/door.webp",
@@ -449,7 +449,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: door (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "crab": {
    "path": "art/v2/ui/glyphs/crab.webp",
@@ -458,7 +458,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: crab (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "fish": {
    "path": "art/v2/ui/glyphs/fish.webp",
@@ -467,7 +467,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: fish (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "bird": {
    "path": "art/v2/ui/glyphs/bird.webp",
@@ -476,7 +476,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: bird (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "paw": {
    "path": "art/v2/ui/glyphs/paw.webp",
@@ -485,7 +485,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: paw (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "leaf": {
    "path": "art/v2/ui/glyphs/leaf.webp",
@@ -494,7 +494,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: leaf (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "ghost": {
    "path": "art/v2/ui/glyphs/ghost.webp",
@@ -503,7 +503,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: ghost (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "mask": {
    "path": "art/v2/ui/glyphs/mask.webp",
@@ -512,7 +512,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: mask (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "figure": {
    "path": "art/v2/ui/glyphs/figure.webp",
@@ -521,7 +521,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: figure (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "hand": {
    "path": "art/v2/ui/glyphs/hand.webp",
@@ -530,7 +530,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: hand (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "crown": {
    "path": "art/v2/ui/glyphs/crown.webp",
@@ -539,7 +539,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: crown (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "chest": {
    "path": "art/v2/ui/glyphs/chest.webp",
@@ -548,7 +548,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: chest (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "flag": {
    "path": "art/v2/ui/glyphs/flag.webp",
@@ -557,7 +557,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: flag (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "check": {
    "path": "art/v2/ui/glyphs/check.webp",
@@ -566,7 +566,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: check (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "cross": {
    "path": "art/v2/ui/glyphs/cross.webp",
@@ -575,7 +575,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: cross (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "question": {
    "path": "art/v2/ui/glyphs/question.webp",
@@ -584,7 +584,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: question (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "wind": {
    "path": "art/v2/ui/glyphs/wind.webp",
@@ -593,7 +593,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: wind (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "cloud": {
    "path": "art/v2/ui/glyphs/cloud.webp",
@@ -602,7 +602,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: cloud (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "hourglass": {
    "path": "art/v2/ui/glyphs/hourglass.webp",
@@ -611,7 +611,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: hourglass (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "gear": {
    "path": "art/v2/ui/glyphs/gear.webp",
@@ -620,7 +620,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: gear (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "knot": {
    "path": "art/v2/ui/glyphs/knot.webp",
@@ -629,7 +629,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: knot (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "ruler": {
    "path": "art/v2/ui/glyphs/ruler.webp",
@@ -638,7 +638,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: ruler (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "mirror": {
    "path": "art/v2/ui/glyphs/mirror.webp",
@@ -647,7 +647,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: mirror (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "card": {
    "path": "art/v2/ui/glyphs/card.webp",
@@ -656,7 +656,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: card (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "play": {
    "path": "art/v2/ui/glyphs/play.webp",
@@ -665,7 +665,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: play (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "rewind": {
    "path": "art/v2/ui/glyphs/rewind.webp",
@@ -674,7 +674,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: rewind (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "pause": {
    "path": "art/v2/ui/glyphs/pause.webp",
@@ -683,7 +683,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: pause (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "fast": {
    "path": "art/v2/ui/glyphs/fast.webp",
@@ -692,7 +692,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: fast (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   },
   "sigil": {
    "path": "art/v2/ui/glyphs/sigil.webp",
@@ -701,7 +701,7 @@
     128
    ],
    "desc": "Drowned bronze line icon: sigil (transparent, centred, ~10% margin)",
-   "ready": false
+   "ready": true
   }
  }
 }

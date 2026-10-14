@@ -37,26 +37,26 @@ R('readwater',{e:'👁️',d:'<b>High Tide:</b> draw {2|3}. <b>Low Tide:</b> gai
  if(f.high)f.draw(f.v(2,3));else if(f.low)f.blk(f.v(6,8));else ask(f,'Read the Water: move the Tide 2',dirOpts(2,dir=>dir>0?f.surge(2):f.recede(2)))}});
 R('floodgate',{e:'🚪',d:'Gain {5|7} Guard. Surge 1 for each Attack you played this turn (max 3).',p:f=>{f.blk(f.v(5,7));const n=Math.min(3,W.cb.stat.attacksTurn);if(n)f.surge(n);else log('🚪 Flood Gate: no Attacks yet')}});
 R('foamburst',{e:'💥',d:'Deal 4 to ALL, +{3|4} for each Crest this combat.',p:f=>f.all(4+f.v(3,4)*W.cb.stat.crests)});
-R('brineward',{e:'🛡️',d:'Gain 5 Guard, +{5|6} for each Undertow this combat.',p:f=>f.blk(5+f.v(5,6)*W.cb.stat.undertows)});
+R('brineward',{e:'🛡️',d:'Gain {5|8} Guard, +5 for each Undertow this combat.',p:f=>f.blk(f.v(5,8)+5*W.cb.stat.undertows)});
 // ---------------- Uncommon ----------------
 R('turningpoint',{e:'🔄',d:'Whenever a Tideturn happens, deal {3|4} to a random enemy (max 6 times a turn).',power:{on:{tideTurn(inst){
  if(!turnCap(inst,'tp',6))return;const t=randAlive();if(t){hit(t,inst.up?4:3,null,{raw:true});floatText(t.uid,'🔄','')}}}}});
 R('risingwater',{e:'⤴️',open:1,d:'Opening. At the start of your turn, Surge 1.',power:{on:{turnStart(){log('⤴️ Rising Water: Surge 1');tideShift(1,'power')}}}});
 R('tithe',{e:'🧂',req:()=>canSpend(3),d:'Spend 3 Tide. Apply {2|3} Soaked to ALL. Draw 1. (Cannot be played at Tide below 3.)',p:f=>{
  spendTide(3);if(!W.cb)return;alive().forEach(e=>f.weak(f.v(2,3),e));f.draw(1)}});
-N('heldbreath',{e:'🫁',d:'If you end your turn with the Tide at 9 or 1, it will not drift next turn and this gains a Breath (max 3). Your next break gets +{5|6} for each Breath, then the Breaths are used up.',power:{
+N('heldbreath',{e:'🫁',d:'End your turn with the Tide at 9 or 1: it won\'t drift next turn, and this gains a Breath (max 3). Your next break spends them for +{5|8} each.',power:{
  on:{turnEnd(inst){const t=W.cb.tide;if(t!==9&&t!==1)return;W.cb.holdDrift=true;inst.breath=Math.min(3,(inst.breath||0)+1);log(`🫁 Held Breath: the Tide holds (${inst.breath} Breath)`);callout('BREATH ×'+inst.breath,'crest')},
   crest(inst){inst.breath=0},undertow(inst){inst.breath=0}},
- mod:{crest(inst,ctx,c){const b=inst.breath||0;return b?{...c,dmg:c.dmg+(inst.up?6:5)*b}:c},undertow(inst,ctx,u){const b=inst.breath||0;return b?{...u,guard:u.guard+(inst.up?6:5)*b}:u}}}});
+ mod:{crest(inst,ctx,c){const b=inst.breath||0;return b?{...c,dmg:c.dmg+(inst.up?8:5)*b}:c},undertow(inst,ctx,u){const b=inst.breath||0;return b?{...u,guard:u.guard+(inst.up?8:5)*b}:u}}}});
 N('springrush',{e:'🌧️',d:'Full Flame. Deal {5|6} to ALL for each Energy spent. Then Surge X.',p:f=>{const x=f.x||0;if(!x){log('🌧️ Spring Rush: no Energy spent');return}
  f.all(f.v(5,6)*x);if(W.cb)f.surge(x)}});
 N('wreckerstide',{e:'⚓',d:'Whenever you Sink a Flotsam or Burden, your next Crest deals +{4|6} to ALL (max +{12|18}).',power:{
  on:{sink(inst,ctx){if(!ctx.card||!isJunk(ctx.card))return;const per=inst.up?6:4;inst.wb=Math.min(per*3,(inst.wb||0)+per);log(`⚓ Wrecker's Tide: next Crest +${inst.wb}`)},crest(inst){inst.wb=0}},
  mod:{crest(inst,ctx,c){return inst.wb?{...c,dmg:c.dmg+inst.wb}:c}}}});
 // ---------------- Rare ----------------
-R('spring',{e:'🌕',d:'Crest deals 18 instead of 14. After each Crest this fight, the base grows by {3|4} (max 30).',power:{
+R('spring',{e:'🌕',d:'Crest deals {18|20} instead of 14. After each Crest this fight, the base grows by 3 (max 30).',power:{
  on:{crest(inst){inst.grown=(inst.grown||0)+1}},
- mod:{crest(inst,ctx,c){const base=Math.min(30,18+(inst.up?4:3)*(inst.grown||0));return {...c,dmg:c.dmg+base-14}}}}});
+ mod:{crest(inst,ctx,c){const base=Math.min(30,(inst.up?20:18)+3*(inst.grown||0));return {...c,dmg:c.dmg+base-14}}}}});
 // Tidebreaker: a one-shot modifier source is put LAST among the Vigils for the Surge, so the doubling applies after every base change.
 R('tidebreaker',{e:'🪓',d:'Surge to 10. The Crest hits only this enemy, for double.',p:f=>{const cb=W.cb;const t=f.tg;const src={id:'tidebreaker',n:1,tb:t,up:f.u,tmp:1};
  cb.powers.push(src);try{callout('TIDEBREAKER','crest');f.surge(10-cb.tide)}finally{if(W.cb){const i=W.cb.powers.indexOf(src);if(i>=0)W.cb.powers.splice(i,1)}}},

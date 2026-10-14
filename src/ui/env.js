@@ -73,10 +73,15 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
  if(room)return {id:(ENV.screenScene[room]||{})[act]||(ENV.screenScene[room]||{})[1],grade:'room',dim:{event:.5,shop:.3,rest:.25,treasure:.8}[room]};
  return {id:bandEnv(act,Math.min(14,floor+(run.pos.r>=0?1:0))),grade:'map',dim:.4}}
 // Called after every render(): touches the DOM only when the key changes.
+// death-fix: the backdrop signature syncEnv() is about to apply vs the one on screen, so crossfade() can decide BEFORE paying for frozenCopy (15-50ms on phones)
+// whether the backdrop changes at all. Must stay in step with the sig built in syncEnv().
+const nextSig=()=>{const k=envKeyFor();return `${k.id}|${k.band||''}|${k.grade}|${k.dim||0}|${quality()}`};
+// body.env-combat / body.scene-choice also restyle #env (stack position, blur + darken), so a flip of either counts as a backdrop change too
+const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks')});
+export function envWillChange(){if(!root)return false;if(nextSig()!==cur)return true;const c=sceneCls();return Object.keys(c).some(n=>document.body.classList.contains(n)!==c[n])}
 export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&W.S.view||'');if(scr!==lastScr){lastScr=scr;quiet(500);if(adaptive!=='full'&&lastP75<=panelMs()*1.25)govTo(adaptive==='off'?'reduced':'full')} // next screen: one step back up if the last stretch ran smooth
- startLoop();const k=envKeyFor();const sig=`${k.id}|${k.band||''}|${k.grade}|${k.dim||0}|${quality()}`;anchor();
- overlayOpen=!!document.querySelector('#app .ov');document.body.classList.toggle('env-combat',!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))));
- document.body.classList.toggle('scene-choice',!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'));
+ startLoop();const k=envKeyFor();const sig=nextSig();anchor();
+ overlayOpen=!!document.querySelector('#app .ov');{const c=sceneCls();for(const n in c)document.body.classList.toggle(n,c[n])}
  if(sig===cur)return;const prev=cur;cur=sig;
  const e0=ENV.envs[k.id]||ENV.envs.a1_shore||{};const e=k.id==='map_a1'?mapEnv(e0,k.band):e0;const g=ENV.grades[k.grade]||{tint_add:0,vig_add:0};
  const changedEnv=root.dataset.env!==k.id;

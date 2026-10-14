@@ -1,9 +1,11 @@
 // data/potions.js — potion BEHAVIOUR (meta from data-v2.json). use(f,target): f is a card-like effect context
 // (engine/combat.js F) with potion:true, so drinking is never a card play (no Momentum, Echo, Mark or cardPlayed).
+// Every potion's inline icon (.e: toasts, event text, logs) is its painted bottle (ui-frames 5); the emoji is only a last-resort fallback.
 // Passive potions (Second Tide) listen on the bus while they sit in a slot.
 import {registerPotion,POTIONS,CARDS} from '../core/registry.js';
 import {W,pick,shuffle} from '../core/state.js';
 import {DATA} from './generated/data-v2.js';
+import {ICONS} from './icons.js';
 import {addSt,alive,addCard,chart,choose,gainBlock,gainEnergy,gainMom,heal,log,callout,placeWp,escape,setTide} from '../engine/combat.js';
 import {randomPotion} from '../engine/run.js';
 import {mk,cname} from '../engine/cards.js';
@@ -40,5 +42,5 @@ const B={
  mistbomb:{can:()=>W.cb&&W.cb.kind==='fight',use:f=>{log('💨 Mist Bomb!');escape()}},
 };
 for(const m of DATA.potions){const b=B[m.id];if(!b)throw new Error('No behaviour for potion '+m.id);
- registerPotion(m.id,Object.assign({n:m.name,rarity:RAR[m.rarity]||'c',cls:m.cls==='any'?null:m.cls,target:m.target==='enemy'?'enemy':'no',d:m.effect,flavour:m.flavour,e:ICON[m.id]||'🧪',col:COL[m.id]||'#8ad'},b))}
+ registerPotion(m.id,Object.assign({n:m.name,rarity:RAR[m.rarity]||'c',cls:m.cls==='any'?null:m.cls,target:m.target==='enemy'?'enemy':'no',d:m.effect,flavour:m.flavour,e:ICONS.potion[m.id]?`<img class="pot-ic" src="${ICONS.potion[m.id]}" alt="" draggable="false">`:(ICON[m.id]||'🧪'),col:COL[m.id]||'#8ad'},b))}
 export {POTIONS};

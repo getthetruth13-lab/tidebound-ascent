@@ -79,7 +79,7 @@ K('relocate',{e:'📦',d:'Return one of your Waypoints to your hand (triggers De
 K('lore',{e:'📚',d:'Whenever you Chart, gain {3|5} Guard.',power:{on:{chart(inst){gainBlock((inst.up?5:3)*stacks(inst),{fromCard:true})}}}});
 K('longshot',{e:'🏹',d:'Deal {16|20}. Bearing (Attack): deal {24|30} instead.',p:f=>f.dmg(bearing(f,'A')?f.v(24,30):f.v(16,20))});
 K('beacon',{e:'🗼',d:'Waypoint: at the start of your turn, deal {3|4} to ALL.{| Decamp: deal 10 to ALL.}',wp:f=>zapAll(f.v(3,4),f),decamp:f=>{if(f.u){zapAll(10,null);log('🗼 Decamp: Beacon, 10 to ALL')}}});
-K('quartermaster',{e:'🎒',d:'Add a random Waypoint to your hand. It costs 0 this turn.{| (Choose 1 of 3.)}',p:f=>{const add=d=>{addCard(d.id,'hand',{cost0Turn:true});log('🎒 Quartermaster: '+d.n+' (costs 0)');floatText('p','🎒 '+d.n,'')};
+K('quartermaster',{e:'🎒',d:'{Add a random Waypoint to your hand|Choose 1 of 3 random Waypoints to add to your hand}. It costs 0 this turn.',p:f=>{const add=d=>{addCard(d.id,'hand',{cost0Turn:true});log('🎒 Quartermaster: '+d.n+' (costs 0)');floatText('p','🎒 '+d.n,'')};
  const pool=allWps();if(!f.u)return add(pick(pool,'combat'));const three=[];const p2=pool.slice();while(three.length<3&&p2.length)three.push(p2.splice(Math.floor(pick([...p2.keys()],'combat')),1)[0]);
  ask(f,'Quartermaster: choose a Waypoint',three.map(d=>({l:(d.e||'')+' '+d.n,f:()=>add(d)})))}});
 K('exppack',{e:'🎒',d:'Gain {6|8} + {2|3} Guard per Waypoint. Draw 1. <b>Expedition.</b>',p:f=>{f.blk(f.v(6,8)+f.v(2,3)*f.wpCount());f.draw(1)}});

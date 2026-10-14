@@ -15,6 +15,8 @@
 .card.tT,.card.status{--pan:#1f2621;--pan2:#0c100d;--gem:#8a909c;--gem2:#3b404a;--frame:url(../assets/cardframes/frame-status.webp)}
 .card.r-u:not(.curse):not(.status){--frame:url(../assets/cardframes/frame-silver.webp)}
 .card.r-r:not(.curse):not(.status){--frame:url(../assets/cardframes/frame-gold.webp)}
+/* Artifact cards (Spencer 10-13, option 3 mother-of-pearl over dark bronze): own frame at every rarity, everywhere a card is drawn */
+.card.card.artifact:not(.curse):not(.status){--frame:url(../assets/cardframes/frame-artifact.webp)}
 .card.curse,.card.status{--grime:1}
 .card>.cfr{position:absolute;inset:0;z-index:2;pointer-events:none;background:var(--frame) center/100% 100% no-repeat}
 /* brass lantern emblem, centred under the name plate over the top of the art window */

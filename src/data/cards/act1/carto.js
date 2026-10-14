@@ -36,7 +36,7 @@ const decampAt=i=>removeWp(i,'decamp');
 // ---------------- Starters ----------------
 R('signal',{e:'🔥',d:'At the start of your turn, deal {3|4} to a random enemy. Decamp: deal {6|8} to a random enemy.',
  wp:f=>f.dmgRandom(f.v(3,4)),decamp:f=>{f.dmgRandom(f.v(6,8));log('🔥 Decamp: Signal Fire')}});
-R('bivouac',{e:'🏕️',d:'Gain 5 Guard, +{2|3} for each Waypoint. Expedition.',p:f=>f.blk(5+f.v(2,3)*f.wpCount())});
+R('bivouac',{e:'🏕️',d:'Gain {5|7} Guard, +{2|3} for each Waypoint. Expedition.',p:f=>f.blk(f.v(5,7)+f.v(2,3)*f.wpCount())});
 R('cairn',{e:'🪨',d:'Enters at Rank 1. Does nothing while it stands. Decamp: draw {1|2}.',wp:f=>{},
  on:{waypointPlaced(inst,ctx){if(ctx.wp===inst&&(inst.rank||0)<1)inst.rank=1}},
  decamp:f=>{drawCards(f.v(1,2));log('🪨 Decamp: Cairn, draw '+f.v(1,2))}});
@@ -45,7 +45,7 @@ R('trail',{e:'🥾',d:'Deal {7|10}. Advance a Waypoint.',p:f=>{f.dmg(f.v(7,10));
 R('cache',{e:'📦',d:'At the start of your turn, gain {3|4} Guard. Decamp: gain {6|8} Guard.',wp:f=>f.blk(f.v(3,4)),decamp:f=>{f.blk(f.v(6,8));log('📦 Decamp: Supply Cache')}});
 R('stake',{e:'📍',d:'At the start of your turn, deal {2|3} to ALL. Decamp: deal 6 to ALL.',wp:f=>zapAll(f.v(2,3),f),decamp:f=>{zapAll(6,f);log('📍 Decamp: Survey Stake, 6 to ALL')}});
 R('lookout',{e:'🗼',d:'At the start of your turn, draw 1. Decamp: Chart 3.',wp:f=>cartoPassiveDraw(1,{startOfTurn:true}),decamp:f=>chartSafe(f,3)});
-R('waymarker',{e:'🪧',d:'At the start of your turn, if the top card of your draw pile is an Attack, deal {4|5} to a random enemy; if it is a Skill, gain {4|5} Guard. Decamp: Chart 3 and gain 4 Guard.',
+R('waymarker',{e:'🪧',d:'Turn start: if your top draw card is an Attack, deal {4|5} to a random enemy; if a Skill, gain {4|5} Guard. Decamp: Chart 3, gain 4 Guard.',
  wp:f=>{refill(1);const t=topType();if(t==='A')f.dmgRandom(f.v(4,5));else if(t==='S')f.blk(f.v(4,5))},decamp:f=>{f.blk(4);chartSafe(f,3)}});
 R('compassrose',{e:'🧭',d:'Choose: gain {6|8} Guard; or Chart 4 and draw 1.',p:f=>ask(f,'Compass Rose',[{l:'Gain '+f.v(6,8)+' Guard',f:()=>f.blk(f.v(6,8))},{l:'Chart 4; draw 1',f:()=>chartSafe(f,4,()=>drawCards(1))}])});
 R('scout',{e:'🔭',d:'Choose: deal {8|10}; or deal {4|6} and Bearing (Attack): draw 2.',tg:1,p:f=>{const b=bearing('A');ask(f,'Scout Ahead',[{l:'Deal '+f.v(8,10),f:()=>f.dmg(f.v(8,10))},{l:'Deal '+f.v(4,6)+(b?'; draw 2':' (no Bearing)'),f:()=>{f.dmg(f.v(4,6));if(b)f.draw(2)}}])}});
@@ -55,7 +55,7 @@ R('rockfall',{e:'🪨',d:'Deal {14|17}. You may Decamp a Waypoint to deal {8|10}
  ask(f,'Rockfall: Decamp a Waypoint to deal '+f.v(8,10)+' more?',[{l:'🛡️ Keep my Waypoints',f:()=>{}},...cb.slots.map(w=>({l:'🔥 Decamp '+(CARDS[w.id].e||'')+' '+cname(w),card:{id:w.id,up:w.up,rank:w.rank},cap:'🔥 Decamp',f:()=>{const i=cb.slots.indexOf(w);if(i<0)return;decampAt(i);f.dmg(f.v(8,10))}}))])}});
 // Fork in the Road: the path (A or B) is chosen when it is placed; an unchosen Fork (never placed by play) acts as A.
 const forkPath=w=>w.fork||'A';
-N('forkroad',{e:'🔀',d:'Choose when placed. A: at the start of your turn deal {3|4} to a random enemy; Decamp: gain 8 Guard. B: at the start of your turn gain {3|4} Guard; Decamp: deal 8 to a random enemy.',
+N('forkroad',{e:'🔀',d:'Choose when placed. A: turn start, deal {3|4} to a random enemy; Decamp: gain 8 Guard. B: turn start, gain {3|4} Guard; Decamp: deal 8 to a random enemy.',
  on:{waypointPlaced(inst,ctx){if(ctx.wp!==inst||inst.fork)return;const set=k=>{inst.fork=k;log('🔀 Fork in the Road: path '+k);floatText('p','🔀 Path '+k,'')};
   ask({echo:false},'Fork in the Road: choose a path',[{l:'A: start of turn deal '+(inst.up?4:3)+' to a random enemy; Decamp: gain 8 Guard',f:()=>set('A')},{l:'B: start of turn gain '+(inst.up?4:3)+' Guard; Decamp: deal 8 to a random enemy',f:()=>set('B')}])}},
  wp:f=>{if(forkPath(f.ci)==='A')f.dmgRandom(f.v(3,4));else f.blk(f.v(3,4))},
@@ -80,7 +80,7 @@ N('clearbrush',{e:'🌿',d:'Chart {3|4}. You may Sink one of them. Sink.',p:f=>{
 R('foreknow',{e:'🔮',tg:1,d:'Fleeting. If the top card of your draw pile is an Attack, deal {6|8}. If it is a Skill, gain {6|8} Guard. Then draw it. Sink.',
  p:f=>{refill(1);const t=topType();if(!t)return;if(t==='A')f.dmg(f.v(6,8));else if(t==='S')f.blk(f.v(6,8));drawCards(1)}});
 R('longshot',{e:'🏹',moor:1,d:'Moor. Deal {16|19}. Bearing (Attack): deal {24|28} instead.',p:f=>{const b=bearing('A');if(b)floatText('p','🧭 Bearing!','');f.dmg(b?f.v(24,28):f.v(16,19))}});
-R('burn',{e:'🔥',d:'Whenever one of your Waypoints leaves a slot (Decamped, destroyed or replaced), draw 1 and deal {5|6} to a random enemy (max 3 times a turn).',
+R('burn',{e:'🔥',d:'Whenever one of your Waypoints leaves a slot, draw 1 and deal {5|6} to a random enemy (max 3 a turn).',
  power:{on:{decamp(inst,ctx){const cb=W.cb;if(!cb)return;if(inst.pcT!==cb.turn){inst.pcT=cb.turn;inst.pcN=0}if(inst.pcN>=3)return;inst.pcN++;
   cartoPassiveDraw(1);zap(randAlive(),inst.up?6:5,null);floatText('p','🔥 Planned Collapse','')}}}});
 R('avalanche',{e:'🏔️',d:'Deal {6|7} to ALL for each Waypoint that has left a slot this combat (min 1).',p:f=>{const n=Math.max(1,W.cb.stat.wpLeft||0);f.all(f.v(6,7)*n);if(n>=3)callout('AVALANCHE ×'+n,'adv')}});
@@ -88,7 +88,7 @@ R('scorched',{e:'🔥',d:'Decamp all your Waypoints (their Decamp lines fire). G
  for(const w of list){if(!W.cb)return;const i=cb.slots.indexOf(w);if(i<0)continue;decampAt(i);n++}
  if(!n){log('🔥 Burnt Bridges: no Waypoints');return}callout('BURNT BRIDGES ×'+n,'adv');for(let k=0;k<n;k++)f.blk(f.v(4,5))}});
 R('charge',{e:'🧨',d:'Does nothing while it stands. Decamp: deal {18|24} to ALL.',wp:f=>{},decamp:f=>{const n=f.v(18,24);callout('BOOM! '+(f.lm?n*2:n)+' to ALL','adv');zapAll(n,f)}});
-R('millwheel',{e:'⚙️',d:'Every 2nd turn, gain 1 Energy. Decamp: gain 1 Energy (once, even as a Landmark).',
+R('millwheel',{e:'⚙️',d:'Every 2nd turn{| (every turn at Rank 2+)}, gain 1 Energy. Decamp: gain 1 Energy (once, even as a Landmark).',
  wp:f=>{const w=f.ci,t=W.cb.turn;if(w.mwT===t)return;w.mwT=t;w.mwN=(w.mwN||0)+1;
   if((f.u&&(w.rank||0)>=2)||w.mwN%2===0)cartoEnergy(1,'Mill Wheel');else floatText('p','⚙️ next turn','')},
  decamp:f=>cartoEnergy(1,'Mill Wheel Decamp')});

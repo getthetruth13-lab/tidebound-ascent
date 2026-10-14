@@ -38,7 +38,7 @@ export function syncHitLog(){const cb=W.cb,r=record();if(!cb||!r||W.previewing)r
  for(const x of cb.vfx||[]){if(r.seen.has(x))continue;r.seen.add(x);
   if(x.cls==='drench')continue; // Drench emits a decorative float plus its actual HP-loss float.
   const target=x.who==='p'?'you':nameOf(cb.ens.find(e=>e.uid===x.who));
-  const text=String(x.txt).replace('🛡',' Guard').replace('⚡',' Energy').replace('❤',' health');
+  const text=String(x.txt).replace(/🛡\s*(\d+)/,'$1 Guard').replace('🛡','Guard').replace('⚡',' Energy').replace('❤',' health').replace(/\s+/g,' ').trim();
   push(`${target}: ${text}`,x.cls||(/^-/ .test(x.txt)?'hurt':''));r.floatLines.set(x,r.lines[r.lines.length-1]);
  }
  for(const [key,e] of [['p',cb.p],...cb.ens.map(e=>[e.uid,e])]){

@@ -14,8 +14,28 @@
   "soaked": "art/v2/ui/status-soaked.webp",
   "drenched": "art/v2/ui/status-drenched.webp",
   "resonating": "art/v2/ui/status-resonating.webp",
-  "temporary-might": null,
-  "guard": "art/v2/ui/status-guard.webp"
+  "temporary-might": "art/v2/ui/status-temporary-might.webp",
+  "guard": "art/v2/ui/status-guard.webp",
+  "active": "art/v2/ui/status-active.webp",
+  "banked-crest": "art/v2/ui/status-banked-crest.webp",
+  "cairn-rank": "art/v2/ui/status-cairn-rank.webp",
+  "chart-next": "art/v2/ui/status-chart-next.webp",
+  "crest-bonus": "art/v2/ui/status-crest-bonus.webp",
+  "drained": "art/v2/ui/status-drained.webp",
+  "draw-less": "art/v2/ui/status-draw-less.webp",
+  "draw-next": "art/v2/ui/status-draw-next.webp",
+  "energy-next": "art/v2/ui/status-energy-next.webp",
+  "grudge": "art/v2/ui/status-grudge.webp",
+  "guard-held": "art/v2/ui/status-guard-held.webp",
+  "held-breath": "art/v2/ui/status-held-breath.webp",
+  "mimic-ink": "art/v2/ui/status-mimic-ink.webp",
+  "momentum-held": "art/v2/ui/status-momentum-held.webp",
+  "momentum-next": "art/v2/ui/status-momentum-next.webp",
+  "moonlock": "art/v2/ui/status-moonlock.webp",
+  "parry": "art/v2/ui/status-parry.webp",
+  "retort-ready": "art/v2/ui/status-retort-ready.webp",
+  "second-mark": "art/v2/ui/status-second-mark.webp",
+  "vigil": "art/v2/ui/status-vigil.webp"
  },
  "relic": {
   "abyssalpearl": "art/v2/ui/relic-abyssalpearl.webp",
@@ -95,7 +115,11 @@
   "sprayflask": "art/v2/ui/potion-sprayflask.webp",
   "temperoil": "art/v2/ui/potion-temperoil.webp",
   "tidalflask": "art/v2/ui/potion-tidalflask.webp",
-  "urchin": "art/v2/ui/potion-urchin.webp"
+  "urchin": "art/v2/ui/potion-urchin.webp",
+  "redsalt": "art/v2/ui/potion-redsalt.webp",
+  "cairndust": "art/v2/ui/potion-cairndust.webp",
+  "duetdraught": "art/v2/ui/potion-duetdraught.webp",
+  "squallbottle": "art/v2/ui/potion-squallbottle.webp"
  },
  "hud": {
   "deck": "art/v2/ui/icon-deck.webp",
@@ -122,7 +146,7 @@
   "intent-potion": "art/v2/ui/intent-potion.webp",
   "intent-drain": "art/v2/ui/intent-drain.webp"
  },
- "combatant_art_note": "Null slots use distinct inline bronze SVG placeholders. Set a slot to its painted file path; loaded at runtime, no code changes required. Expected missing files: status-drenched.webp, status-resonating.webp, status-temporary-might.webp and intent-<slot>.webp (192x192 transparent).",
+ "combatant_art_note": "Null slots use distinct inline bronze SVG placeholders. Set a slot to its painted file path; loaded at runtime, no code changes required. Expected missing files: status-drenched.webp, status-resonating.webp, intent-<slot>.webp (192x192 transparent).",
  "dais": {
   "dais-tide": "art/v2/ui/dais-tide.webp",
   "dais-echo": null,
