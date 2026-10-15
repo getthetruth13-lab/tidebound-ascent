@@ -9,6 +9,7 @@ import {bgHTML,frameOpen,frameClose} from './frame.js';
 import {selectScr} from './select.js';
 import {learnScr} from './learn.js';
 import {introScr,newGame} from './intro.js';
+import {loadingScr,toMenuOrLoad} from './loading.js';
 import {lampPickScr,ledgerScr,totalPending} from './lamp.js';
 import {loadProfile} from '../../progress.js';
 import {dip} from '../dip.js';
@@ -34,7 +35,7 @@ export function studioNext(){clearTimeout(studioTimer);if(W.S.screen==='title'&&
 // Tap anywhere on the start screen: fade out, then the main menu (the tap also unlocks audio, so the menu music starts).
 export function startTap(){if(W.S.screen!=='title'||W.S.view!=='start'||W.S.leaving)return;
  // Menu background is the video's frame 0, so swap instantly and fade only the words in.
- dip(()=>{W.S={screen:'title',view:'main',page:0,hero:null,fade:!window.FAST};render()})}
+ dip(()=>{if(toMenuOrLoad())return;W.S={screen:'title',view:'main',page:0,hero:null,fade:!window.FAST};render()})}
 export function titleGo(view){dip(()=>{W.S={screen:'title',view:view||'main',page:0,hero:null};render()})}
 export function loadSlot(key){if(key===RUN_KEY){continueRun();return}
  const s=listSlots().find(x=>x.key===key);if(!s)return;W.run=s.run;W.uid=Math.max(W.uid,s.data.uid||1);W.cb=null;W.S={screen:'map'};render()}
@@ -52,6 +53,7 @@ function framed(id,title,body,cls=''){return `<div class="tb-scr tb-title">${bgH
 export function titleScr(){const v=W.S.view||'main';
  if(v==='studio'){clearTimeout(studioTimer);studioTimer=setTimeout(studioNext,window.FAST?50:2500);return `<div class="tb-scr tb-studio" id="studio" onclick="studioNext()"><img src="${STUDIO_LOGO}" alt=""></div>`}
  if(v==='start')return `<div class="tb-scr tb-title tb-start tb-vid" id="startscr" onclick="startTap()"><div class="tv-stage"><video class="tv-video" src="art/v2/title/title-loop.mp4" poster="art/v2/title/title-poster.jpg" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture preload="auto" aria-label="The Drowned Sun. Tap to begin"></video></div></div>`;
+ if(v==='loading')return loadingScr();
  if(v==='select')return selectScr();
  if(v==='learn')return learnScr();
  if(v==='intro')return introScr();
@@ -66,7 +68,7 @@ export function titleScr(){const v=W.S.view||'main';
  const R=[['continue','Continue','continueRun()',!K],['newgame','New Game','newGame()'],['loadgame','Load Game',"titleGo('load')",!nsl],
   ['options','Options',"titleGo('options')"],['learn','Learn to Play',"titleGo('learn')"],['ledger','Ledger','openLedger()']];
  const w=([id,label,act,off],i)=>`<button class="tm-w${off?' off':''}" id="${id}" data-sfx="confirm" style="--i:${i}" aria-label="${label}${id==='continue'&&K?`: ${K.n}, Floor ${sv.run.floor}/15`:''}"${off?' disabled':` onclick="menuPress(this,&quot;${act.replace(/"/g,'')}&quot;)"`}><span>${label}</span>${id==='ledger'&&pend?`<em class="lp-dot">${pend}</em>`:''}</button>`;
- const fade=W.S.fade?' tm-fade':'';if(W.S.fade){W.S.fade=0;requestAnimationFrame(flyEmblem)}
+ const fade=W.S.fade?' tm-fade':'';if(W.S.fade){W.S.fade=0;if(!W.S.noFly)requestAnimationFrame(flyEmblem)}
  return `<div class="tb-scr tb-title tb-main tb-imgmenu${fade}">${TITLE_LAYERED?layeredStage():`<div class="tv-stage"><img class="tv-img" src="art/v2/title/menu-plate.webp" alt="" draggable="false"></div>`}<img class="tm-emb" id="tmemb" src="art/v2/title/menu-emblem.webp" alt="The Drowned Sun" draggable="false">
  <nav class="tm-nav tm-words" aria-label="Main menu">${R.map(w).join('')}</nav><span class="tm-ver" id="tmver">v${VERSION}</span></div>`}
 // Press: warm flash (CSS .tm-hit) then act, so the flash is seen. Click SFX comes from audio.js (data-sfx).
