@@ -1,0 +1,50 @@
+/* howto.css: How to Play guide (title Learn door + Settings overlay door) and first-time contextual hint pill. */
+.hw-page{flex:1;min-height:0;overflow:auto;padding:2px 4px 6px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.hw-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:2px}.hw-head h2,.hw-hhead h2{margin:0;text-align:left;font-size:20px}.hw-head .tb-epi,.hw-hhead .tb-epi{text-align:left;margin:0 0 2px;font-size:13px}
+.hw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr));gap:8px 16px;align-items:start}
+.hw-b{border-top:1px solid #8a744066;padding-top:4px;min-width:0}
+.hw-b h3{margin:0 0 3px;font:600 13px/1.2 var(--font-display,var(--serif));letter-spacing:.04em;color:var(--gold,#d9b46a);text-transform:none}
+.hw-b p,.hw-list li,.hw-steps li{font:400 13px/1.28 var(--serif);color:var(--cream,#e8dfc8)}
+.hw-b p{margin:0 0 5px}
+.hw-b b{color:#ffd9a0}
+.hw-list{margin:0;padding-left:16px}.hw-list li{margin-bottom:3px}
+.hw-steps{margin:4px 0;padding-left:18px}.hw-steps li{margin-bottom:3px}
+.hw-res{padding:4px 8px;border-left:3px solid var(--class-primary,#d9b46a);background:#0d0a0788;border-radius:0 5px 5px 0}
+.hw-bad h3{color:#e08a7a}.hw-win h3{color:#9fd9d0}
+.hw-cards{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.hw-card{--gw:64px;width:64px;flex:none;pointer-events:auto}
+.hw-card .card{--gw:64px;width:64px;cursor:default}
+.hw-pair{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px}.hw-pair .hw-cards{flex:none;margin:0;flex-wrap:nowrap}.hw-pair p{margin:0}
+.hw-pair .hw-card,.hw-pair .hw-card .card{--gw:50px;width:50px}
+.hw-ints{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:3px 8px;margin-top:4px}
+.hw-int{display:flex;align-items:center;gap:6px;font:400 12px/1.2 var(--serif);color:var(--cream,#e8dfc8)}
+.hw-ic{flex:none;display:inline-block;width:26px;height:28px}.hw-ic .intent-art{width:26px;height:28px}
+svg.hw-art{display:block;width:100%;max-width:240px;height:auto;margin:4px 0 2px}
+svg.hw-art .t{font:400 8.5px var(--serif,serif);fill:#e8dfc8}
+.hw-hhead{display:flex;gap:10px;align-items:flex-end;margin-bottom:4px}.hw-spr{width:48px;max-height:70px;object-fit:contain;flex:none;filter:drop-shadow(0 3px 5px #000)}
+.hw-hhead .tb-rel{margin-top:2px}
+.hw-lore{font:italic 400 13px var(--serif);color:#9fd9d0;margin:8px 0 4px}
+.hw-nav{display:flex;align-items:center;gap:8px;padding-top:5px;border-top:1px solid #8a744044;flex:none}
+.hw-nav .hw-reset{margin-left:auto}
+.hw-tabs{display:flex;gap:2px;overflow-x:auto;flex:1 1 auto;min-width:0;padding:2px 0;scrollbar-width:none}.hw-tabs::-webkit-scrollbar{display:none}
+.hw-tabs button{flex:none;width:auto!important;height:28px!important;padding:0 8px;border:1px solid #8a744066;border-radius:5px;background:#10141b;color:var(--cream-dim,#b9b4a6);font:500 11.5px var(--serif);cursor:pointer;position:static!important;white-space:nowrap}
+.hw-tabs button::after{display:none!important}
+.hw-tabs button.on{background:#2a2112;border-color:var(--gold,#d9b46a);color:#ffd9a0;box-shadow:0 0 6px #d9b46a55}.hw-tabs button.hero{border-color:#3fb4b066}
+.hw-nav .tb-btn,.hw-nav .btn{min-width:0!important;height:30px;padding:0 10px;font-size:12px;flex:none}
+.hw-win .tb-lpage{padding:0}
+.tb-lwin.hw-win{height:min(352px,calc(100dvh - 20px))}.hw-win .tb-inner{display:flex;flex-direction:column;min-height:0}
+.tb-lwin.hw-win .tb-lnav{flex-wrap:nowrap}
+/* in-run overlay */
+.ov.hw-ov{z-index:60}
+.hw-box{display:flex!important;flex-direction:column;width:min(790px,97vw)!important;max-width:97vw;height:min(362px,calc(100dvh - 12px))!important;max-height:calc(100dvh - 12px)!important;padding:8px 12px!important;gap:4px;box-sizing:border-box;overflow:hidden!important}
+.hw-bar{display:flex;align-items:center;gap:8px;flex:none;min-width:0}.hw-bar h2{margin:0;font-size:16px;white-space:nowrap;flex:none}.hw-bar .hw-tabs{flex:1 1 auto;width:auto}
+.hw-close{width:34px;height:34px;border:0;background:none;color:#d9b46a;cursor:pointer}.hw-close svg{width:18px;height:18px}
+@media (max-width:480px){.hw-bar h2{display:none}.hw-grid{grid-template-columns:1fr}.hw-box{padding:6px 8px!important}.hw-nav .hw-reset{margin-left:0}}
+.sx-howto .btn{min-width:110px}
+/* first-time contextual hint pill (ui/hints.js). Same pill as the coach; fades by itself; X dismisses. */
+.coach.ctx-hint{top:10%;font-size:12px!important;padding:4px 8px!important;gap:6px!important;pointer-events:none;border-color:#3fb4b0cc;background:linear-gradient(180deg,#121a20f4,#0b0e14f4);animation:ctx-hint 16s ease-out both;max-width:min(64vw,500px);border-radius:12px;line-height:1.22}.coach.ctx-hint .co-ico{width:1.2em;height:1.2em}
+.coach.ctx-hint .co-x{pointer-events:auto;min-width:28px;min-height:28px}
+@keyframes ctx-hint{0%{opacity:0;transform:translateX(-50%) translateY(-6px)}4%{opacity:1;transform:translateX(-50%)}92%{opacity:1}100%{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.coach.ctx-hint{animation:ctx-hint 16s steps(1,end) both}}
+.hw-ic{position:relative}.hw-ic .intent-art{position:relative;width:26px;height:28px}.hw-ic .intent-art .intent-svg,.hw-ic .intent-art .uic{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.hw-bar .hw-close{flex:none}.hw-bar .hw-tabs{margin-right:2px}

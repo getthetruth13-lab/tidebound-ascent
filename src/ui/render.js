@@ -18,6 +18,8 @@ import {deathLine} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
 import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
 import {loadProfile,saveProfile,tutSeen,markTutSeen} from '../progress.js';
+import {ctxHintHTML} from './hints.js';
+import {openHowTo,learnOverlayHTML} from './screens/learn.js';
 import {TUTORIAL,snap as tutSnap} from '../data/tutorial.js';
 import {W} from '../core/state.js';
 import {T,U,SPEEDS,SPEED_LABEL,setAnimSpeedValue,setEnemyPace,enemyPace} from '../core/timing.js';
@@ -243,7 +245,7 @@ export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==
  const incoming=cb.ens.filter(e=>e.hp>0&&!e.fled).reduce((a,e)=>{const m=intentOf(e);return a+(m.a?eAtk(e,m.a)*(m.h||1):0)},0);let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
  h+=daisHTML();
  const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>!e.fled); // the fallen stay in their slot as remains. victory-sweep: a dead summoned foe keeps its slot as an empty gap (drawn as nothing), so its death never re-spaces the others (they used to slide, and the survivors jumped again at victory)
- h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>e.hp>0?enemyHTML(e,i,k,live.length,g):e.summoned?'':remainsHTML(e,k,live.length,g,cb.ens.slice(0,i).filter(x=>x.key===e.key).length)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}${hintHTML()}`;
+ h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>e.hp>0?enemyHTML(e,i,k,live.length,g):e.summoned?'':remainsHTML(e,k,live.length,g,cb.ens.slice(0,i).filter(x=>x.key===e.key).length)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${(()=>{const c=coachHTML(),hh=hintHTML();if(hh&&!cb.hhRe){cb.hhRe=1;setTimeout(()=>{if(W.cb===cb&&!drag)render()},HINT_MS+120)}return c+hh+ctxHintHTML(cb,W.run.cls,!!c||!!hh)})()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,T(560));if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
@@ -335,18 +337,20 @@ const sxSw=(id,label,on,fn,dis)=>`<label class="sx-row"><span class="sx-t">${lab
 const sxSeg=(id,label,vals,cur,fn)=>`<div class="sx-row"><span class="sx-t">${label}</span><span class="sx-seg" id="${id}" role="radiogroup" aria-label="${label}">${vals.map(([v,t])=>`<button type="button" role="radio" aria-checked="${v===cur}" class="${v===cur?'on':''}" data-v="${v}" onclick="${fn}('${v}');render()">${t}</button>`).join('')}</span></div>`;
 const sxRange=(id,label,key,val)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-rng" id="${id}" aria-label="${label} volume" type="range" min="0" max="1" step="0.01" value="${val}" style="--p:${Math.round(val*100)}%" oninput="this.style.setProperty('--p',this.value*100+'%');setAudioSetting('${key}',this.value)"></label>`;
 export function settingsHTML(){return `<div class="settings sx">
+ <div class="sx-row sx-howto"><span class="sx-t">Rules, heroes and tips</span><button type="button" class="btn sm" id="howtobtn" onclick="openHowTo()">How to Play</button></div>
  ${sxSeg('setanimspeed','Animation speed',Object.keys(SPEEDS).map(v=>[v,SPEED_LABEL[v]]),settings.animSpeed||'normal','setAnimSpeed')}
  ${sxSeg('setenemypace','Enemy turns',[['measured','Measured'],['classic','Fast']],settings.enemyPace||'measured','setEnemyPaceMode')}
  ${sxSeg('setenvfx','Effects',['full','reduced','off'].map(v=>[v,envFxSettingLabel(v)]),settings.envFx,'setEnvFx')}
  ${sxRange('setmusic','Music','musicVolume',settings.musicVolume)}${sxRange('setsfx','SFX','sfxVolume',settings.sfxVolume)}
  ${sxSw('setfast','Fast animations',settings.fastAnim,'setFast')}${sxSw('setmute','Mute audio',settings.audioMuted,'setMute')}
- ${sxSw('sethints','First-fight hints',settings.coach!==false,'setCoach')}${sxSw('setcardskip','Confirm skipping card rewards',settings.confirmCardSkip!==false,'setConfirmCardSkip')}
+ ${sxSw('sethints','First-fight hints',settings.coach!==false,'setCoach')}${sxSw('setctxhints','Hero and rules hints',settings.hints!==false,'setCtxHints')}${sxSw('setcardskip','Confirm skipping card rewards',settings.confirmCardSkip!==false,'setConfirmCardSkip')}
  ${sxSw('setshake','Screen shake',settings.screenShake!==false,'setScreenShake')}${sxSw('sethaptic','Hand vibration',settings.handHaptic!==false,'setHandHaptic')}
  ${sxSw('settaptwice','Tap twice to confirm',!!settings.tapConfirm,'setTapConfirm')}
  ${sxSw('setcharselpar','Hero select motion',settings.charselParallax!==false&&!settings.reduceMotion,'setCharselParallax',settings.reduceMotion)}${sxSw('setreduce','Reduced motion',settings.reduceMotion,'setReduceMotion')}
  </div>`}
 export function setMute(on){setAudioSetting('audioMuted',!!on)}
 export function setConfirmCardSkip(on){settings.confirmCardSkip=!!on;saveSettings()}
+export function setCtxHints(on){settings.hints=!!on;saveSettings();render()}
 export function setCoach(on){settings.coach=!!on;saveSettings();render()}
 export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
 export function setCharselParallax(on){settings.charselParallax=!!on;saveSettings()}
@@ -516,6 +520,7 @@ export function render(){if(W.previewing||W.replaying)return;tutSync();if(drag||
  if(W.run&&s!=='title'&&s!=='end')h+=popHTML();
  if(W.S.ov==='map'&&W.run){h+=`<div class="ov" id="ovl" onclick="if(event.target===this){W.S.ov=null;render()}"><div class="box mapbox">${mapHTML(false)}<button class="btn full" onclick="W.S.ov=null;render()">Close map</button></div></div>`}
  else if(W.S.ov==='tasks'&&W.run){h+=tasksHTML()}
+ else if(W.S.ov==='learn'){h+=learnOverlayHTML()}
  else if(W.S.ov==='settings'){h+=`<div class="ov" id="ovl" onclick="if(event.target===this){W.S.ov=null;render()}"><div class="box plain"><h2>Settings</h2>${settingsHTML()}<button class="btn full" onclick="W.S.ov=null;render()">Close</button></div></div>`}
  else if(W.S.ov&&W.run){const cb=W.cb;const list=W.S.ov==='deck'?W.run.deck:cb?(W.S.ov==='draw'?(W.run.cls==='carto'?cb.draw:cb.draw.slice().sort((a,b)=>a.id<b.id?-1:1)):W.S.ov==='disc'?cb.disc:cb.exh):[];
   const t={deck:'Your deck',draw:W.run.cls==='carto'?'Draw pile (in order: face up)':'Draw pile (order hidden)',disc:'Discard pile',exh:'Sunk this combat'}[W.S.ov];

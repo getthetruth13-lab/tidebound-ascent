@@ -23,6 +23,7 @@ import * as env from './ui/env.js';
 import * as title from './ui/screens/title.js';
 import * as select from './ui/screens/select.js';
 import * as learn from './ui/screens/learn.js';
+import * as hints from './ui/hints.js';
 import * as intro from './ui/screens/intro.js';
 import * as loading from './ui/screens/loading.js';
 import * as lamp from './ui/screens/lamp.js';
@@ -33,7 +34,7 @@ import * as lampData from './data/lamplight.js';
 installGlyphs();
 
 // Inline onclick="..." handlers in rendered HTML (and the test scripts) call these by name.
-for(const m of [assets,cards,combat,runMod,render,fx,save,bus,env,title,select,learn,intro,loading,lamp])for(const [k,v] of Object.entries(m))if(typeof v==='function')window[k]=v;
+for(const m of [assets,cards,combat,runMod,render,fx,save,bus,env,title,select,learn,hints,intro,loading,lamp])for(const [k,v] of Object.entries(m))if(typeof v==='function')window[k]=v;
 window.setAudioSetting=setAudioSetting;
 window.W=W;
 window.G={get S(){return W.S},get run(){return W.run},get cb(){return W.cb},CARDS:registry.CARDS,EN:registry.EN,CLASSES:registry.CLASSES,
