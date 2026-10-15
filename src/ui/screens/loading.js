@@ -1,5 +1,5 @@
 // ui/screens/loading.js: the loading screen between the opening title video and the main menu (v0.6.12).
-// Progress is real: sw.js caches the ~94 MB app shell in batches and posts {type:'precache-progress',name,done,total,state} to every page.
+// Progress is real: sw.js caches the ~115 MB app shell in batches and posts {type:'precache-progress',name,done,total,state} to every page.
 // Once the whole shell is cached the version is remembered in localStorage, so later launches skip this screen (instant).
 // Never hangs: no service worker / failed install / no progress for STALL_MS lets the player continue with a button (or a tap).
 import {W} from '../../core/state.js';
