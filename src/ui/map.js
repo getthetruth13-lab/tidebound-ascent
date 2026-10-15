@@ -5,6 +5,7 @@ import {EN} from '../core/registry.js';
 import {uiIcon} from '../assets.js';
 import {reachable,bootsLeft} from '../engine/run.js';
 import {actName,ACT_NAMES,MAP_LINE} from '../data/places.js';
+import {lanternHTML} from './lantern.js';
 export const ICON={fight:'⚔️',elite:'💀',rest:'🔥',shop:'💰',unknown:'❓',event:'❓',treasure:'💎',boss:'🔔'};
 const REV={fight:['⚔️','a Fight'],treasure:['💎','a Chest'],shop:['💰','a Merchant'],event:['📜','an Event'],rest:['🔥','a Camp']};
 // ---- the climb on parchment: terrace contours, tide line, Bell Gate; flooded and collapsed spots are seeded so every run differs (cosmetic only) ----
@@ -37,6 +38,8 @@ const nodeKey=t=>t==='unknown'?'node-unknown':'node-'+t;
 export function mapHTML(interactive){const run=W.run,rows=run.map,H=74,N=rows.length;const av=reachable();const cuts=run.cut||0,boots=interactive&&(bootsLeft()>0||cuts>0);
  const X=(n,r,i)=>n.t==='boss'?50:(n.c+.5)*22+6+(((r*7+i*13)%5)-2)*1.6, Y=r=>(N-1-r)*H+50+TOP;let svg='',nodes='',land='';const a1=(run.act||1)===1;const deco=mapDeco(run,rows,X,Y,N,H,a1);
  const bossE=EN[run.boss]||{};
+ // the lantern sits at the current node, or on the shore below the first row before the first step
+ const cn=run.pos.r>=0&&rows[run.pos.r]&&rows[run.pos.r][run.pos.i],lx=cn?X(cn,run.pos.r,run.pos.i):50,ly=cn?Y(run.pos.r):Y(0)+46;
  rows.forEach((row,r)=>row.forEach((n,i)=>{const x=X(n,r,i),y=Y(r);
   n.to.forEach(j=>{const m=rows[r+1][j];const x2=X(m,r+1,j),y2=Y(r+1);const ek=(((run.seed|0)+r*31+i*17+j*7)>>>0)%3;const on=run.vis[r+':'+i]&&run.vis[(r+1)+':'+j];const mx=(x+x2)/2+((r+i)%2?3:-3);
    const dd=`M${x*4} ${y} Q${mx*4} ${(y+y2)/2} ${x2*4} ${y2}`;
@@ -48,4 +51,4 @@ export function mapHTML(interactive){const run=W.run,rows=run.map,H=74,N=rows.le
   const ic=uiIcon(nodeKey(n.t),ICON[n.t]||ICON.boss,'nodeic');
   nodes+=`<button class="node ${n.t} ${n.t==='boss'?'boss':''} ${isAv||bootsAv?'av':''} ${bootsAv?'boots':''} ${vis?'vis':''} ${run.pos.r===r&&run.pos.i===i?'cur':''} ${r<=run.pos.r&&!vis?'dim':''}" style="left:${x}%;top:${y}px" ${isAv||bootsAv?`onclick="goNode(${r},${i})"`:''} title="${n.t==='boss'?'Boss: '+(bossE.n||''):NAME[n.t]||n.t}" data-r="${r}" data-i="${i}" data-t="${n.t}">${ic}${bootsAv?`<i class="bootb">${cuts>0?'✂️':'🥾'}</i>`:''}${n.pre&&!vis?`<i class="revb" title="Revealed: ${REV[n.pre][1]}">${REV[n.pre][0]}</i>`:''}</button>`}));
  return `<div class="parch"><h2>${interactive?'Choose your path':actName(run.act||1)}</h2><div class="mapact">${ACT_NAMES[run.act||1]?(interactive||actName(run.act||1)!==ACT_NAMES[run.act||1].n?ACT_NAMES[run.act||1].n+' · ':'')+ACT_NAMES[run.act||1].sub:''}</div><div class="maplore">${MAP_LINE}</div><div class="legend">${[['fight','Fight'],['elite','Elite'],['unknown','?'],['rest','Camp'],['shop','Merchant'],['treasure','Chest']].map(([k,l])=>`<span>${uiIcon(nodeKey(k),ICON[k],'legic')}${l}</span>`).join('')}<span class="bossleg">${bossE.e||''} ${bossE.n||''}</span>${boots?`<span>${cuts>0?`✂️×${cuts} `:''}${bootsLeft()>0?`🥾×${bootsLeft()}`:''}</span>`:''}${rows.some(r=>r.some(n=>n.pre&&!run.vis[rows.indexOf(r)+':'+r.indexOf(n)]))?'<span><i class="revleg">🔭</i>Revealed</span>':''}</div>
- <div class="mapwrap${a1?' a1':''}" style="height:${N*H+30+TOP+BOT}px;width:92%">${a1?`<i class="a1art top" style="top:${Y(N-1)-32}px"></i>`:''}<span class="gate-w" style="top:${Y(N-1)-52}px">${a1?GATE_A1:GATE}</span>${deco.html}${land}<svg width="100%" height="${N*H+30+TOP+BOT}" viewBox="0 0 400 ${N*H+30+TOP+BOT}" preserveAspectRatio="none">${deco.svg}${svg}</svg>${nodes}</div></div>`}
+ <div class="mapwrap${a1?' a1':''}" style="height:${N*H+30+TOP+BOT}px;width:92%">${a1?`<i class="a1art top" style="top:${Y(N-1)-32}px"></i>`:''}<span class="gate-w" style="top:${Y(N-1)-52}px">${a1?GATE_A1:GATE}</span>${deco.html}${land}<svg width="100%" height="${N*H+30+TOP+BOT}" viewBox="0 0 400 ${N*H+30+TOP+BOT}" preserveAspectRatio="none">${deco.svg}${svg}</svg>${nodes}${lanternHTML(lx,ly)}</div></div>`}

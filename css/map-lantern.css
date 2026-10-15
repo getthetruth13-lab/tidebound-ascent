@@ -1,0 +1,17 @@
+/* Map lantern (v0.6.15). Replaces the old pulsing ring / sparkle / bobbing icon on the current node. Layers: .mlan (transform) + .mlan-glow (opacity/transform). */
+.mlan{position:absolute;width:0;height:0;z-index:4;pointer-events:none;will-change:transform}
+.mlan-glow{position:absolute;left:-80px;top:-92px;width:160px;height:160px;pointer-events:none;will-change:opacity,transform;animation:mlanflick 2.6s ease-in-out infinite}
+.mlan-glow img{width:100%;height:100%;display:block}
+.mlan-img{position:absolute;left:-23px;top:-40px;width:46px;height:46px;display:block;transform-origin:50% 6%;animation:mlansway 3.8s ease-in-out infinite;filter:drop-shadow(0 2px 2px #2a1a0a88)}
+@keyframes mlansway{0%,100%{transform:rotate(-2.4deg)}50%{transform:rotate(2.4deg)}}
+@keyframes mlanflick{0%,100%{opacity:.88}18%{opacity:1}34%{opacity:.8}52%{opacity:1}71%{opacity:.9}86%{opacity:.98}}
+.mlan-puff,.mlan-mote{position:absolute;pointer-events:none;will-change:opacity,transform}
+.mlan-puff img,.mlan-mote img{width:100%;height:100%;display:block}
+.mlan-mote{filter:brightness(1.25)}
+/* the old "you are here" effects are gone; the node under the lantern just reads as visited */
+.node.cur::before,.node.cur::after{content:none;display:none;animation:none}
+.node.cur .nodeic{animation:none;opacity:.55}
+.mappage .gliding .node{pointer-events:none}
+.reduce-motion .mlan-img,.reduce-motion .mlan-glow{animation:none}
+.reduce-motion .mlan-glow{opacity:.85}
+@media(prefers-reduced-motion:reduce){.mlan-img,.mlan-glow{animation:none}.mlan-glow{opacity:.85}}

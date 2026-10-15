@@ -14,6 +14,7 @@ import {T,U,EB,HIT_WEIGHT,beatsFor} from '../core/timing.js';
 import {cardHTML} from './render.js';
 import {cloneCard,IMPACT_MS} from './fx.js';
 import * as PFX from './painted-fx.js';
+import {glideTo,lanternBusy} from './lantern.js';
 import {fxOn,motionOn,reducedMotion,fxQueue,emit,ring,vignette,shakeFrames,slowmo,freezeIdle,rectOf,setImpact,impactBase,crossfade,xfadeEl,flyIcon,cue,COL,CLASS_COL} from './vfx.js';
 const enabled=()=>motionOn();
 export const motionEnabled=enabled;
@@ -469,14 +470,10 @@ addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.clos
  if(chest&&!chest.dataset.shaking){chest.dataset.shaking=1;ev.stopImmediatePropagation();ev.preventDefault();
   chest.animate([{translate:'0 0'},{translate:'-5px 0',rotate:'-3deg',offset:.15},{translate:'5px 0',rotate:'3deg',offset:.3},{translate:'-4px 0',rotate:'-2deg',offset:.45},{translate:'4px 0',rotate:'2deg',offset:.6},{translate:'0 0',rotate:'0deg'}],{duration:U(340)});
   setTimeout(()=>{if(window.openChestLid)window.openChestLid()},U(340))}
- // map travel: a lantern glides from the current node (or the foot of the map) to the chosen node while the old map lingers
- const node=t.closest('.node.av');
- if(node&&W.S.screen==='map'&&!W.S.ov){const cur=$('.node.cur'),from=cur?rectOf(cur):{x:innerWidth/2,y:innerHeight+20},to=rectOf(node);
-  const m=document.createElement('i');m.className='travelmark';m.setAttribute('aria-hidden','true');Object.assign(m.style,{left:from.x+'px',top:from.y+'px'});document.body.appendChild(m);
-  const dx=to.x-from.x,dy=to.y-from.y;let raf=0;const trail=()=>{if(!m.isConnected)return;const q=m.getBoundingClientRect();emit('trail',q.left+q.width/2,q.top+q.height/2,COL.gold);raf=requestAnimationFrame(trail)};raf=requestAnimationFrame(trail);
-  const end=()=>{cancelAnimationFrame(raf);m.remove();ring(to.x,to.y,COL.gold,56,320)};
-  m.animate([{transform:'translate(-50%,-50%) translate(0,0)'},{transform:`translate(-50%,-50%) translate(${dx*.5}px,${dy*.5-8}px)`,offset:.5},{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px)`}],{duration:U(480),easing:'ease-in-out'}).finished.then(end,end);
-  holdFor(U(480))}
+ // map travel: the painted map lantern glides to the chosen node along the path; the room opens on arrival (ui/lantern.js). Input is locked meanwhile.
+ const mnode=t.closest('.node');
+ if(mnode&&W.S.screen==='map'&&!W.S.ov){if(lanternBusy()){ev.stopImmediatePropagation();ev.preventDefault()}
+  else if(mnode.classList.contains('av')){const r=+mnode.dataset.r,i=+mnode.dataset.i;if(glideTo(mnode,()=>{if(W.S.screen==='map'&&!W.S.ov&&window.goNode)window.goNode(r,i)})){ev.stopImmediatePropagation();ev.preventDefault()}}}
 },true);
 // A collected reward's frame lifts away (its art flies to the HUD separately); the live slot is hidden by CSS so the other tiles stay put
 function rewardGhost(tile){const r=tile.getBoundingClientRect(),g=tile.cloneNode(true);g.removeAttribute('onclick');g.removeAttribute('id');g.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));g.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
