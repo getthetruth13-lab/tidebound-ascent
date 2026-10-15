@@ -123,7 +123,8 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
  if(src.length===dst.length)for(let i=0;i<src.length;i++){const a=src[i],b=dst[i];
   if(frozen.has(a)){const cs=getComputedStyle(a);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}b.style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important'}
   if(a.scrollTop||a.scrollLeft)scr.push([b,a.scrollTop,a.scrollLeft]);
-  if(getComputedStyle(a).position==='sticky'){const r=a.getBoundingClientRect();const cs=getComputedStyle(a),ph=document.createElement('div');ph.setAttribute('aria-hidden','true');ph.style.cssText=`height:${r.height}px;margin:${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft};flex:none;visibility:hidden`;b.before(ph); // v0.6.2: a spacer keeps the bar's room so the screen under it does not jump up
+  if((a.id==='playbtn'||a.classList.contains('topbar'))&&getComputedStyle(a).position==='sticky'){ // gfxmem: only the two sticky elements the css has (a computed-style read per node of the whole screen was ~100 ms on the map)
+   const r=a.getBoundingClientRect();const cs=getComputedStyle(a),ph=document.createElement('div');ph.setAttribute('aria-hidden','true');ph.style.cssText=`height:${r.height}px;margin:${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft};flex:none;visibility:hidden`;b.before(ph); // v0.6.2: a spacer keeps the bar's room so the screen under it does not jump up
    Object.assign(b.style,{position:'fixed',top:r.top+'px',left:r.left+'px',width:r.width+'px',height:r.height+'px',margin:'0',zIndex:'5'})} // sticky top bar: the clone does not scroll, so pin it where it was on screen
   if(a.tagName==='CANVAS'&&a.width&&a.height){try{b.width=a.width;b.height=a.height;b.getContext('2d').drawImage(a,0,0)}catch(_){}}
   const all=a.getAnimations?a.getAnimations():[],an=all.filter(x=>x.animationName);if(an.length){b.style.animationDelay=an.map(x=>-(x.currentTime||0)+'ms').join(',');b.style.animationPlayState='paused'}
@@ -153,8 +154,14 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
  // backdrop decode async; on a phone that took longer than the hold, so blank boxes and the bare backdrop popped in mid-fade). The hold still runs;
  // the fade waits at full opacity for readiness (cap 700ms), then starts on a fresh frame so a long decode frame never skips it ahead.
  anim.pause();const t0=performance.now();whenPainted(app).then(()=>requestAnimationFrame(()=>{if(xf!==o||anim.playState==='finished')return;anim.currentTime=Math.min(performance.now()-t0,hold);anim.play()}))}
+// gfxmem: the painted living layers (.envlv: ~40 animated elements) are copied with 8 baked properties instead of all ~350 computed ones (that loop was most of the
+// ~150 ms main-thread block when a fight starts). The pose is baked as a plain 2D transform / translate, with no animation and no will-change, so the copy adds no composited layers.
+const LIV=['transform','translate','opacity','display','visibility','mix-blend-mode','filter'];
 function frozenCopy(src){const c=src.cloneNode(true);c.removeAttribute('id');c.setAttribute('aria-hidden','true');const s=[src,...src.querySelectorAll('*')],d=[c,...c.querySelectorAll('*')];
- if(s.length===d.length)for(let i=0;i<s.length;i++){d[i].removeAttribute('id');const cs=getComputedStyle(s[i]);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}
+ if(s.length===d.length)for(let i=0;i<s.length;i++){d[i].removeAttribute('id');
+  if(s[i].closest('.envlv')){const cs=getComputedStyle(s[i]);let t=s[i].style.cssText.replace(/animation[^;]*;?/g,'')+';position:absolute;';for(const n of LIV)t+=n+':'+cs.getPropertyValue(n)+' !important;';
+   d[i].style.cssText=t+'animation:none!important;transition:none!important;will-change:auto!important;pointer-events:none!important';continue}
+  const cs=getComputedStyle(s[i]);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}
   d[i].style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important';if(s[i].tagName==='CANVAS'&&s[i].width){try{d[i].width=s[i].width;d[i].height=s[i].height;d[i].getContext('2d').drawImage(s[i],0,0)}catch(_){}}}
  return c}
 // The incoming screen is ready when its <img>s are decoded and the new backdrop layers have finished their own decode-then-fade swap (env.js swapLayer).

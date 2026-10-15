@@ -13,7 +13,8 @@ import {ENV} from '../core/registry.js';
 import {U} from '../core/timing.js';
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
-import {syncLiving} from './env-living.js';
+import {syncLiving,prewarmLiving} from './env-living.js';
+import './gfxstats.js';
 const LAYERS=['sky','far','mid','ground'];// fg lives in #env-front (design-v2 §W.7.3 DOM order: over the figures, under the UI)
 export const FEET=.694; // the painted battle floor: feet of every figure sit on this fraction of the viewport (sceneGeom, anchor() and stage all read it)
 // C2 sun seal: on a landscape fight the whole standing line (figures, painted floor, HP bars, status rows) is 150px higher on a 1080-tall canvas, so nothing sits under the End Turn button. Portrait stays on FEET.
@@ -47,7 +48,7 @@ export function initEnv(){if(root)return;root=document.createElement('div');root
  document.body.insertBefore(root,document.body.firstChild);document.body.classList.add('env-on');
  canvas=document.createElement('canvas');canvas.id='envfx';canvas.setAttribute('aria-hidden','true');root.after(canvas);ctx2=canvas.getContext('2d');
  front=document.createElement('div');front.id='env-front';front.setAttribute('aria-hidden','true');front.innerHTML='<div class="envstack"><div class="envL" data-l="fg"></div></div>';canvas.after(front);canvas.style.transition='opacity .5s';
- allL().forEach(el=>{el.style.willChange='transform';el.innerHTML='<div class="envSh" style="position:absolute;inset:0"></div>'}); // will-change set once; .envSh is the wrapper stage.js animates (shake, camera push)
+ allL().forEach(el=>{el.innerHTML='<div class="envSh" style="position:absolute;inset:0"></div>'}); // will-change comes from css only while the camera slides (gfxmem: an inline will-change kept all 5 full-size layers resident); .envSh is the wrapper stage.js animates (shake, camera push)
  wipe=document.createElement('div');wipe.id='envwipe';wipe.setAttribute('aria-hidden','true');document.body.appendChild(wipe);
  addEventListener('resize',()=>{anchor(true);sizeCanvas()});sizeCanvas();
  ['pointerdown','keydown'].forEach(t=>addEventListener(t,()=>{lastInput=performance.now()},{passive:true}));
@@ -83,7 +84,7 @@ const nextSig=()=>{const k=envKeyFor();return `${k.id}|${k.band||''}|${k.grade}|
 // body.env-combat / body.scene-choice also restyle #env (stack position, blur + darken), so a flip of either counts as a backdrop change too
 const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'),'env-still':!!(W.S&&W.S.screen==='end')});
 export function envWillChange(){if(!root)return false;if(nextSig()!==cur)return true;const c=sceneCls();return Object.keys(c).some(n=>document.body.classList.contains(n)!==c[n])}
-export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&W.S.view||'');if(scr!==lastScr){lastScr=scr;quiet(500);if(adaptive!=='full'&&lastP75<=panelMs()*1.25)govTo(adaptive==='off'?'reduced':'full')} // next screen: one step back up if the last stretch ran smooth
+export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&W.S.view||'');if(scr!==lastScr){lastScr=scr;quiet(500);document.body.toggleAttribute('data-env-rest',['title','reward','event','pick','msg','potpick'].includes(W.S.screen));if(adaptive!=='full'&&lastP75<=panelMs()*1.25)govTo(adaptive==='off'?'reduced':'full');if(W.S.screen==='map')prewarmEnv(W.run?bandEnv(W.run.act||1,Math.min(14,Math.max(1,(W.run.floor||1)+1))):'a1_shore')} // next screen: one step back up if the last stretch ran smooth
  startLoop();const k=envKeyFor();const sig=nextSig();anchor();
  overlayOpen=!!document.querySelector('#app .ov');{const c=sceneCls();for(const n in c)document.body.classList.toggle(n,c[n])}
  if(sig===cur)return;const prev=cur;cur=sig;
@@ -177,3 +178,9 @@ export function envFiles(id){const e=ENV.envs[id];if(!e||!e.art)return [];const 
 // Offline precache: only the current act's painted layers (they are large).
 export function envURLs(act){return Object.entries(ENV.envs).filter(([,e])=>e.act===(act||1)&&e.art).flatMap(([id])=>envFiles(id))}
 export function preloadEnv(id){envFiles(id).forEach(f=>{const im=new Image();im.src=f})}
+// gfxmem: while the map / title is up, decode the next fight's backdrop (img.decode, off the main thread) and bake its living plates in idle slices, one file per task,
+// so entering a fight does not stall the dissolve. Once per env id.
+const warm=new Set();
+export function prewarmEnv(id){if(warm.has(id)||!ENV.envs[id]||window.FAST)return;warm.add(id);const e=ENV.envs[id],q=envFiles(id).slice();
+ const idle=f=>typeof requestIdleCallback==='function'?requestIdleCallback(f,{timeout:1500}):setTimeout(f,60);
+ const step=()=>{const f=q.shift();if(!f){prewarmLiving(e).catch(()=>{});return}const im=new Image();im.decoding='async';im.src=f;(im.decode?im.decode():Promise.resolve()).catch(()=>{}).then(()=>idle(step))};idle(step)}

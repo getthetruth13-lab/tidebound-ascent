@@ -1336,14 +1336,17 @@ body.reduce-motion .combat #endbtn .end-seal{animation:none}
 #env[data-still] .envL,#env-front[data-still] .envL{animation:none!important;transform:none!important}
 #env .envlv i{position:absolute;display:block}
 #env .envlv .envlv-a{will-change:transform}
+body[data-env-rest] #env .envlv,body[data-env-rest] #env .envlv *{animation-play-state:paused!important}
 #env[data-q="off"] .envlv-a,#env.gov-off .envlv-a,#env[data-q="reduced"] .envlv-part,#env.gov-reduced .envlv-part{display:none}
+/* gfxmem: the empty ambient canvas / back div (code-drawn effects were deleted) each held a viewport-size composited layer (17 MB at DPR 3.75) for nothing */
+#envfx,#env .envfx-back:empty{display:none}
 #env .envlv-combat{display:none}body.env-combat #env .envlv-combat{display:block}
 @media (prefers-reduced-motion:reduce){#env .envlv,#env .envlv *{animation:none!important}}
 .reduce-motion #env .envlv,.reduce-motion #env .envlv *{animation:none!important}
 /* bugsweep 10-14: behind scene-choice screens (event/reward/pick/tasks: blur 7px + dim) and a card inspect (backdrop blur) the stack is filtered every frame. The two swell groups
    (masked, 836x388, one pair per paint) make that filter cost ~2x (headless event screen 33 ms median vs 16.7 with them hidden; p95 50). The swell is a +-6 px shift of the plate that
    already sits underneath, so hiding it under a 7 px blur changes nothing visible. Everything else on the stack freezes (paused) while blurred. */
-body.scene-choice #env .envlv-water,body:has(#inspect:not(.held-hand)) #env .envlv-water{display:none}
+body.scene-choice #env .envlv-water,body:has(#inspect:not(.held-hand)) #env .envlv-water,body.scene-choice #env .envlv-swell,body:has(#inspect:not(.held-hand)) #env .envlv-swell{display:none}
 body.scene-choice #env .envlv *,body:has(#inspect:not(.held-hand)) #env .envlv *{animation-play-state:paused!important}
 /* Wrack Terraces is a pale wet stage: contact shadows read stronger so feet never float (Spencer flagged twice; matches v-new2g mock cores) */
 body[data-still-env] .combat .shadow{opacity:.88}
