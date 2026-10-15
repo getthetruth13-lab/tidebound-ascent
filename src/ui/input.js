@@ -112,7 +112,8 @@ document.addEventListener('pointerup',ev=>endDrag(ev,false));
 document.addEventListener('pointercancel',ev=>endDrag(ev,true));
 document.addEventListener('lostpointercapture',ev=>endDrag(ev,true));
 addEventListener('blur',()=>{cancelLongPress();heldDrag=null;if(drag)endDrag({pointerId:drag.id},true);else clearArm();dropSel();if(holdTouch){holdTouch=false;closeInspect()}});
-addEventListener('resize',()=>{hc=null;if(W.S.screen==='combat'&&!drag)requestAnimationFrame(()=>render())});// figure positions are viewport px
+addEventListener('resize',()=>{hc=null;const vic=W.S.screen==='reward'&&W.S.scene;if(vic)document.querySelectorAll('.death-sink,.death-fade,.ghostwrap').forEach(n=>n.remove()); // victory-sweep: body-level ghosts keep their old viewport px, so drop them with the resize and let the live remains take over
+ if((W.S.screen==='combat'||vic)&&!drag)requestAnimationFrame(()=>render())});// figure positions are viewport px
 
 
 // Stable resting centres, independent of the enlarged card's hit box and pointer capture.

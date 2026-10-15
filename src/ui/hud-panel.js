@@ -131,8 +131,9 @@ if(typeof document!=='undefined')document.addEventListener('pointerdown',ev=>{co
  const ci=cb.hand.find(h=>String(h.uid)===c.dataset.uid);if(!ci||CARDS[ci.id]?.unplay)return;let k;try{k=cost(ci)}catch(e){return}if(k<=cb.energy)return;
  flashNoAfford(c)},true);
 // ---- C7: an intent number that changed since the last render flashes (green = weaker, red = stronger), 400 ms
-const INT=new Map();
-export function flashIntents(){if(typeof document==='undefined')return;for(const el of document.querySelectorAll('.en[data-en] .intent')){const k=el.closest('.en').dataset.en,v=el.textContent.replace(/\s+/g,'');const n=parseInt(v)||0;
+const INT=new Map();let intFor=null;
+export function flashIntents(){if(typeof document==='undefined')return;if(intFor!==W.cb){intFor=W.cb;INT.clear()} // victory-sweep: memory is per encounter, not per slot
+ for(const el of document.querySelectorAll('.en[data-en] .intent')){const k=el.closest('.en').dataset.en,v=el.textContent.replace(/\s+/g,'');const n=parseInt(v)||0;
  const prev=INT.get(k);INT.set(k,{v,n,t:prev&&prev.v!==v&&prev.n&&n?performance.now():prev?.t||0,dir:prev&&prev.v!==v?(n<prev.n?'down':'up'):prev?.dir});const r=INT.get(k);
  el.classList.remove('fx-ichange','fx-iup','fx-idown');if(r.t&&performance.now()-r.t<400){void el.offsetWidth;el.classList.add('fx-ichange','fx-i'+r.dir);el.style.setProperty('--d-ich',-(performance.now()-r.t|0)+'ms');setTimeout(()=>{if(performance.now()-r.t>=400)el.classList.remove('fx-ichange','fx-iup','fx-idown')},420)}}}
 let ichQ=0;

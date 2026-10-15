@@ -192,7 +192,7 @@ export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const cb
   badgesH:W.cb?badges(0,0,{...cb.p.st,...(cb.parry&&!cb.parryUsed?{parry:cb.parry}:{})},playerStates(),'p'):'',fx:W.cb?fxHTML('p'):'',cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
 // Painted fallen-remains of a foe (B061): lies where it fell, same foot line and slot as the standing figure. e = a live enemy or a snapshot {key,sv,vi,boss,elite,ph,remT}.
 // It fades in as the death animation ends (CSS animation delay, resumed from remT so re-renders never restart it) and never blocks a tap.
-export function remainsHTML(e,k,n,g,vi){g=g||sceneGeom();const multi=(n||1)>1,mw=multi?g.vw*((.98-1720/2340)/((n||1)-.5)-.012):g.vw*.43;
+export function remainsHTML(e,k,n,g,vi){if(e.gap)return '';g=g||sceneGeom();const multi=(n||1)>1,mw=multi?g.vw*((.98-1720/2340)/((n||1)-.5)-.012):g.vw*.43;
  const sp=spriteFor('enemies',e.key,e.sv!=null?e.sv:vi||0),fa=fallenFor(sp,e);if(!fa)return '';
  const sc=figureScale(!!e.boss),H=Math.round(Math.min(sc*(e.boss?g.vh*.44:e.elite?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(g.top+32)));
  const x=enemyX(k,n||1,g);let w=Math.round(Math.max(H*(sp?sp.w/sp.h:.8),H*.9)*(e.boss?.92:.85));w=Math.min(w,Math.round(mw*.96),Math.round(g.vw*.4));const h=Math.round(w*fa.h/fa.w);
@@ -242,8 +242,8 @@ const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.sl
 export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==enemyPace())setEnemyPace(settings.enemyPace);
  const incoming=cb.ens.filter(e=>e.hp>0&&!e.fled).reduce((a,e)=>{const m=intentOf(e);return a+(m.a?eAtk(e,m.a)*(m.h||1):0)},0);let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
  h+=daisHTML();
- const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>!e.fled&&(e.hp>0||!e.summoned)); // the fallen stay in their slot as remains
- h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>e.hp>0?enemyHTML(e,i,k,live.length,g):remainsHTML(e,k,live.length,g,cb.ens.slice(0,i).filter(x=>x.key===e.key).length)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}${hintHTML()}`;
+ const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>!e.fled); // the fallen stay in their slot as remains. victory-sweep: a dead summoned foe keeps its slot as an empty gap (drawn as nothing), so its death never re-spaces the others (they used to slide, and the survivors jumped again at victory)
+ h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>e.hp>0?enemyHTML(e,i,k,live.length,g):e.summoned?'':remainsHTML(e,k,live.length,g,cb.ens.slice(0,i).filter(x=>x.key===e.key).length)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}${hintHTML()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,T(560));if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;

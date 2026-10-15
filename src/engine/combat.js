@@ -449,7 +449,7 @@ export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won
  const allFled=cb.ens.some(e=>e.fled)&&cb.ens.every(e=>e.fled||e.summoned);
  // R1b: heal after a won fight / elite (ECON.winHeal), shown as a heal pop + callout before the rewards.
  const wh=(ECON.winHeal||{})[k]||0;if(wh>0&&W.run.hp>0){const h=Math.min(wh,W.run.max-W.run.hp);if(h>0)W.run.hp+=h;W.run.lastWinHeal=h}
- W.cb=null;if(W.run.lastWinHeal>0)W.run.healPop={n:W.run.lastWinHeal,t:Date.now()};combatRewards(k,{allFled,opts:cb.opts,cb});if(W.run.lastWinHeal>0&&!window.FAST)setTimeout(render,1450)}
+ W.cb=null;if(W.run.lastWinHeal>0)W.run.healPop={n:W.run.lastWinHeal,t:Date.now()};combatRewards(k,{allFled,opts:cb.opts,cb});if(W.run.lastWinHeal>0&&!window.FAST){const S1=W.S;setTimeout(()=>{if(W.S===S1)render()},1450)}}
 export function lose(){if(W.cb)fire('combatEnd',{kind:W.cb.kind,won:false});W.cb=null;endRun(false)}
 // Mist Bomb: escape a normal combat with no rewards.
 export function escape(){const cb=W.cb;fire('combatEnd',{kind:cb.kind,won:false,escaped:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});W.cb=null;goMap()}

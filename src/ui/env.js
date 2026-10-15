@@ -114,14 +114,14 @@ export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&
 // art, which is removed only after the fade. The old art is never blanked and a slow decode never freezes a frame.
 function swapLayer(el,list,sp){const sig=list.map(x=>x.f).join('|');const sh=el.firstChild;
  if(el.dataset.src===sig){el.style.opacity=list.length?1:0;return}
- el.dataset.src=sig;
+ el.dataset.src=sig;const tok=el._tok=(el._tok||0)+1; // victory-sweep: a late decode of an older swap to the same art must not append/prune over a newer one
  if(!list.length){el.style.opacity=0;setTimeout(()=>{if(el.dataset.src===sig)sh.innerHTML=''},450);return}
  const box=document.createElement('div');box.className='envS';box.style.cssText='position:absolute;inset:0;opacity:0;transition:opacity .35s';
  box.innerHTML=list.map(x=>`<i class="envI" style="left:${x.r[0]/sp[0]*100}%;top:${x.r[1]/sp[1]*100}%;width:${x.r[2]/sp[0]*100}%;height:${x.r[3]/sp[1]*100}%"></i>`).join('');
  const load=(x,i)=>{const im=new Image();im.decoding='async';im.src=x.f;
   const done=()=>{const it=box.children[i];if(it)it.style.backgroundImage=`url("${x.f}")`};
   return (im.decode?im.decode():new Promise((ok,no)=>{im.onload=ok;im.onerror=no})).then(done,()=>{})};
- Promise.race([Promise.all(list.map(load)),new Promise(r=>setTimeout(r,3000))]).then(()=>{if(el.dataset.src!==sig)return;
+ Promise.race([Promise.all(list.map(load)),new Promise(r=>setTimeout(r,3000))]).then(()=>{if(el.dataset.src!==sig||el._tok!==tok)return;
   const fresh=!sh.firstChild||el.style.opacity==='0';rebuilds++;
   if(fresh)box.style.transition='none';sh.appendChild(box);el.style.opacity=1;box.getBoundingClientRect();box.style.opacity=1;
   setTimeout(()=>{if(box.parentNode===sh)[...sh.children].forEach(c=>{if(c!==box&&!c.classList.contains('envlv'))c.remove()})},fresh?60:450)})} // .envlv (painted living layers) is owned by env-living.js
@@ -159,7 +159,7 @@ export function bandToast(name){const el=document.createElement('div');el.classN
 // (the S24's 19.5:9 frame is exactly the centred 3120×1440, i.e. 240 px overscan each side), aspect never distorted.
 // On screens wider than 2.5:1 the stack grows 4% so the fg parallax still has overscan.
 let anchorWidth=0,anchorHeight=0;
-function anchor(force){if(!root)return;if(force||!anchorWidth){anchorWidth=innerWidth;anchorHeight=innerHeight}const vw=anchorWidth,vh=anchorHeight;const combat=W.S.screen==='combat';
+function anchor(force){if(!root)return;if(force||!anchorWidth){anchorWidth=innerWidth;anchorHeight=innerHeight}const vw=anchorWidth,vh=anchorHeight;const combat=W.S.screen==='combat'||(W.S.screen==='reward'&&!!W.S.scene); // victory-sweep: the reward screen keeps the battle scene (hero + remains on the fight line), so the backdrop keeps the fight anchor; it used to snap to the map anchor (stack ~2.2x smaller) the moment the last foe fell
  const ASPECT=aspect();let h=Math.max(vh,vw*1.04/ASPECT),top,gy;const still=!!(ENV.envs[root.dataset.env]||{}).still;
  if(still){h=Math.max(vh,vw/ASPECT);top=vh-h;const sig=`${vw}x${vh}@${Math.round(top)}/${Math.round(h)}`;if(!force&&root.dataset.anchor===sig)return;root.dataset.anchor=sig;
   document.querySelectorAll('#env .envstack,#env-front .envstack').forEach(el=>{const st=el.style;st.height=h+'px';st.width=h*ASPECT+'px';st.top=top+'px'});return} // still env (no parallax): exact cover, bottom anchored, no overscan

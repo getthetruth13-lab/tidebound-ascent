@@ -180,7 +180,7 @@ export function combatRewards(kind,{allFled,opts={},cb}={}){const run=W.run;cons
   else if(run.rareNext){run.rareNext=false;cards=rollCards(rewardCardCount(),kind,{forceR:'r'})}
   else cards=rollCards(rewardCardCount(),kind==='elite'?'elite':'fight');
   remember('offerHist',cards);rows.push({k:'cards',cards})}
- const scene=cb&&cb.ens?{foes:cb.ens.map((e,i)=>({e,i})).filter(({e})=>!e.fled&&!e.summoned).map(({e,i})=>({key:e.key,sv:e.sv,vi:cb.ens.slice(0,i).filter(x=>x.key===e.key).length,boss:e.boss,elite:e.elite,ph:e.ph,remT:e.remT}))}:null; // the fallen stay on screen behind the rewards
+ const scene=cb&&cb.ens?{foes:cb.ens.map((e,i)=>({e,i})).filter(({e})=>!e.fled).map(({e,i})=>({gap:!!e.summoned||undefined,key:e.key,sv:e.sv,vi:cb.ens.slice(0,i).filter(x=>x.key===e.key).length,boss:e.boss,elite:e.elite,ph:e.ph,remT:e.remT}))}:null; // the fallen stay on screen behind the rewards
  W.S={screen:'reward',kind,rows,scene,boss:kind==='boss'?(cb&&cb.bossKey)||run.boss:null,title:kind==='boss'?'Boss defeated!':kind==='elite'?'Elite defeated!':allFled?'They fled with your gold…':'Victory!',t:Date.now()};
  // Keep the map checkpoint; the save journal reconstructs this room and its
  // claimed/unclaimed rewards when the player continues.
@@ -211,7 +211,8 @@ function potionSwapImpl(slot){const S=W.S;const row=S.rows&&S.rows[S.swap];if(!r
 export const tookNothing=S=>!!(S&&S.rows&&S.rows.length)&&!S.rows.some(r=>r.done&&!(r.k==='cards'&&r.skipped));
 export function rewLeave(){const S=W.S;if(S.screen!=='reward')return;if(tookNothing(S)&&!W.replaying){S.leaveConfirm=true;render();return}rewDone()}
 export function rewLeaveBack(){const S=W.S;if(S.screen!=='reward')return;S.leaveConfirm=false;render()}
-function rewDoneImpl(){const S=W.S;S.leaveConfirm=false;
+function rewDoneImpl(){const S=W.S;if(S.screen!=='reward')return;S.leaveConfirm=false; // victory-sweep: never leave twice (a stale second call from the walk-off fell through to goMap on the end screen)
+
  // Boss relic (P3): after the boss reward rows, offer 1 of 3 boss relics (like Slay the Spire's boss chest), then finish the act.
  if(S.kind==='boss'&&!S.bossPick&&hasNextAct()){const ids=bossRelicChoices();if(ids.length){S.bossPick=ids;S.bossTook=null;S.t=Date.now();return render()}}
  if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}

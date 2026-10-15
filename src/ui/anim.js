@@ -61,7 +61,7 @@ let finalEnd=0,finaleTimer=0,finaleEls=[],finaleOn=false,rewardAt=0;
 const keep=el=>{finaleEls.push(el);return el};
 const drop=el=>{el.remove();finaleEls=finaleEls.filter(x=>x!==el)};
 // Remove every finale element and release the held screen. Always safe to call (new fight, tap, hidden tab).
-export function finaleCleanup(){clearTimeout(finaleTimer);finaleTimer=0;finaleEls.forEach(el=>el.remove());finaleEls=[];finaleOn=false;finalEnd=0;rewardAt=0;
+export function finaleCleanup(){finaleTs.forEach(clearTimeout);finaleTs=[];clearTimeout(finaleTimer);finaleTimer=0;finaleEls.forEach(el=>el.remove());finaleEls=[];finaleOn=false;finalEnd=0;rewardAt=0;
  document.body.classList.remove('battle-finale','finale-hide')}
 function skipFinale(){if(!finaleOn)return;xfadeEl()?.getAnimations().forEach(a=>{try{a.finish()}catch(_){}});holdUntil=0;finaleCleanup()}
 document.addEventListener('pointerdown',()=>{if(finaleOn&&performance.now()-finaleStart>T(350))skipFinale()},true);
@@ -149,12 +149,13 @@ function death(e,lead){const sel=enemy(e);const el=sel&&$(sel);if(!el)return;
 }
 // Boss kill: the reward screen shows ~0.6 s after the killing blow while the boss death and finale play on over it (sweep S2-1: it was hidden ~5 s).
 const BOSS_REWARD_AT=600;
-function scheduleFinale(delay,info){setTimeout(()=>document.body.classList.remove('finale-hide'),Math.max(0,(info.hideEnd||finalEnd)-performance.now()));
+let finaleTs=[];const fT=(fn,ms)=>{const t=setTimeout(fn,ms);finaleTs.push(t);return t}; // victory-sweep: finale timers are stored so a cleanup / the next fight can cancel them
+function scheduleFinale(delay,info){finaleTs.forEach(clearTimeout);finaleTs=[];fT(()=>document.body.classList.remove('finale-hide'),Math.max(0,(info.hideEnd||finalEnd)-performance.now()));
  clearTimeout(finaleTimer);finaleOn=true;if(info.hero)keep(info.hero.el);
  info.hero&&(info.hero.el.style.opacity=0);cue.victoryAt=performance.now()+delay;
  finaleTimer=setTimeout(()=>runFinale(info),delay);
- setTimeout(()=>{if(finalEnd&&performance.now()>finalEnd+T(900))finaleCleanup()},delay+T(1800));
- setTimeout(()=>finaleOn&&performance.now()>finalEnd+T(500)&&finaleCleanup(),delay+T(2600))}
+ fT(()=>{if(finalEnd&&performance.now()>finalEnd+T(900))finaleCleanup()},delay+T(1800));
+ fT(()=>finaleOn&&performance.now()>finalEnd+T(500)&&finaleCleanup(),delay+T(2600))}
 // The battle-won moment: a sweep of light, the hero's lantern flares, then the centred banner. All body-level, so rerenders can't disturb it.
 function runFinale({boss,kind,name,hero}){if(!finaleOn||document.hidden)return;finaleTimer=0;
  const part=(cls,html='')=>{const el=keep(document.createElement('div'));el.className=cls;el.setAttribute('aria-hidden','true');el.innerHTML=html;document.body.appendChild(el);return el};
@@ -408,12 +409,12 @@ function flyInTiles(hold){const tiles=$$('.rewtiles .tile');if(!tiles.length)ret
 // Proceed: the hero turns toward the path and walks off to the right in a step-and-bob, the tiles and prompt fade; then the map (design ms)
 export const HERO_WALK={turn:260,walk:2300,steps:7,bob:7};
 let walking=false;
-function heroWalkOff(done){const hero=$('.victory-wrap .hero');if(!hero||!hero.animate||walking)return false;walking=true;
+function heroWalkOff(done){const hero=$('.victory-wrap .hero');if(!hero||!hero.animate||walking)return false;walking=true;const S0=W.S;$$('#app .rewtiles,#app .pk-foot,#app #proceed').forEach(el=>{el.style.pointerEvents='none'});
  const r=hero.getBoundingClientRect(),fig=hero.querySelector('.fig'),dist=innerWidth-r.left+40,W0=U(HERO_WALK.turn),W1=U(HERO_WALK.walk),tot=W0+W1;
  $$('.rewtiles .tile,#pksub,.reward-banner,.bossvic,.pk-foot').forEach(el=>el.animate&&el.animate([{opacity:1},{opacity:0}],{duration:U(420),easing:'ease-in',fill:'forwards'}));
  hero.querySelector('.plate')?.animate([{opacity:1},{opacity:0}],{duration:U(300),fill:'forwards'});
  const k=W0/tot;
- hero.animate([{translate:'0 0',scale:'1',offset:0},{translate:'0 0',scale:'.8 1',offset:k*.5},{translate:'0 0',scale:'1',offset:k},{translate:`${dist}px 0`,scale:'1',offset:1}],{duration:tot,easing:'linear',fill:'forwards'}).finished.then(()=>{walking=false;done()},()=>{walking=false;done()});
+ hero.animate([{translate:'0 0',scale:'1',offset:0},{translate:'0 0',scale:'.8 1',offset:k*.5},{translate:'0 0',scale:'1',offset:k},{translate:`${dist}px 0`,scale:'1',offset:1}],{duration:tot,easing:'linear',fill:'forwards'}).finished.then(()=>{walking=false;if(W.S===S0&&W.S.screen==='reward')done()},()=>{walking=false}); // victory-sweep: a cancelled walk (double Proceed, tap on a reward tile, re-render) must NOT call done() again: it re-ran rewDone (boss end -> map)
  // the walk's x-motion eases in on its own layer (the bob is on .fig so the two never fight over one property)
  if(fig&&fig.animate){const b=[{translate:'0 0',rotate:'0deg',offset:0},{translate:'0 0',rotate:'0deg',offset:k}];
   for(let i=0;i<HERO_WALK.steps*2;i++)b.push({translate:`0 ${i%2?0:-HERO_WALK.bob}px`,rotate:`${i%2?0:(i%4?-1.6:1.6)}deg`,offset:k+(1-k)*(i+1)/(HERO_WALK.steps*2),easing:'ease-in-out'});
