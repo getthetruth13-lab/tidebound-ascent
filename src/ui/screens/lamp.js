@@ -4,7 +4,7 @@ import {W} from '../../core/state.js';
 import {CARDS,CLASSES,RELICS,POTIONS} from '../../core/registry.js';
 import {ACT1_CARDS} from '../../data/act1.js';
 import {LAMP_XP,CLIMB_XP,LAMP_PLAN,CLIMB_PLAN,CLASS_ORDER,LOCK_CARDS,LOCK_CLASS_RELICS,LOCK_SHARED_RELICS,LOCK_POTIONS} from '../../data/lamplight.js';
-import {loadProfile,saveProfile,lampLevel,climbLevel,lampPending,climbPending,totalPending,barOf,offerFor,claim,lockedFor,firstLevel} from '../../progress.js';
+import {loadProfile,saveProfile,lampLevel,climbLevel,lampPending,climbPending,totalPending,barOf,offerFor,claim,lockedFor,firstLevel,lockHint,classRelicIds} from '../../progress.js';
 import {glyph} from '../glyphs.js';
 import {slotHTML} from '../../assets.js';
 import {TASKS,taskProgress} from '../../engine/lamplight.js';
@@ -34,6 +34,7 @@ const KIND_ICON={card:'🂠',relic:'💠',potion:'🧪',mixed:'✨',all:'🏮'};
 export function planAt(track,lv){
  if(track==='climb'){const k=CLIMB_PLAN[lv-1].k;return {k:{relics:'relic',potions:'potion',mixed:'mixed',all:'all'}[k],label:{relics:'a relic',potions:'a potion',mixed:'a relic or a potion',all:'every lantern still dark'}[k]}}
  const q=LAMP_PLAN[lv-1];if(q.k==='cards')return {k:'card',label:q.pref==='r'?'a Rare card':q.pref==='u'?'an Uncommon card':'a card'};
+ if(q.k==='relics')return {k:'relic',label:'a hero relic or cards'};
  if(q.k==='shop')return {k:'relic',label:'a class relic or cards'};if(q.k==='rare')return {k:'relic',label:'a Rare class relic or cards'};return {k:'all',label:'every lantern still dark'}}
 export function trackHTML(track,lvl){const N=TRACK_LEVELS(track);let h='';
  for(let i=1;i<=N;i++){const pl=planAt(track,i),lit=i<=lvl;
@@ -73,10 +74,17 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
   ${pend?`<button class="tb-btn pri sm lp-claim" id="ledgerclaim" onclick="openLampPick('${tab}',null);W.S.from='ledger';W.S.tab='${tab}'">Choose unlock${pend>1?' ('+pend+')':''}</button>`:''}</div>`;
  let tiles='';
  if(!climb){const ids=(ACT1_CARDS[tab]||[]).filter(id=>CARDS[id]&&!CARDS[id].stub).sort((a,c)=>'scur'.indexOf(CARDS[a].r)-'scur'.indexOf(CARDS[c].r)||CARDS[a].n.localeCompare(CARDS[c].n));
-  tiles=ids.map((id,i)=>{const d=CARDS[id];if(!lock.cards[id])return `<div class="lp-cardwrap">${cardHTML({id,uid:-700-i,up:false},{})}</div>`;
-   const lv=firstLevel(tab,'card',id,CARDS);return lockTile(d.r,TYPE_N[d.t],on.has(id)?'On offer: choose it now':`A lantern waits. Lamp ${lv}+`,on.has(id)?d.n:null)}).join('');
-  const R=LOCK_CLASS_RELICS[tab];tiles+=[R.shop,R.rare].map(id=>lock.relics[id]?lockItem('relic',id,on.has(id)?'On offer: choose it now':`A lantern waits. Lamp ${firstLevel(tab,'relic',id,CARDS)}`,on.has(id)):itemTile('relic',id)).join('')}
- else{tiles=[...LOCK_SHARED_RELICS.map(id=>[ 'relic',id]),...LOCK_POTIONS.map(id=>['potion',id])].map(([k,id])=>(k==='relic'?lock.relics[id]:lock.potions[id])?lockItem(k,id,on.has(id)?'On offer: choose it now':`A lantern waits. Stair ${firstLevel('climb',k,id,CARDS)}+`,on.has(id)):itemTile(k,id)).join('')}
+  // Four sections (design/CARD-PROGRESSION.md): Starter, Unlocked (earned ones carry a lit pip), Locked with a real hint, Later acts.
+  const earned=new Set([...(p.unlocked.cards||[]),...(p.unlocked.relics||[])]),sec={starter:[],unlocked:[],locked:[]};
+  const hintOf=(kind,id)=>on.has(id)?'On offer: choose it now':lockHint(p,tab,kind,id,CARDS);
+  ids.forEach((id,i)=>{const d=CARDS[id];if(lock.cards[id])return sec.locked.push(lockTile(d.r,TYPE_N[d.t],hintOf('card',id),on.has(id)?d.n:null));
+   const pip=earned.has(id)?'<i class="lp-earned" title="Earned with Lamplight"></i>':'';
+   (d.r==='s'?sec.starter:sec.unlocked).push(`<div class="lp-cardwrap${d.r==='s'?' lp-starter':''}">${cardHTML({id,uid:-700-i,up:false},{})}${pip}</div>`)});
+  for(const id of classRelicIds(tab))lock.relics[id]?sec.locked.push(lockItem('relic',id,hintOf('relic',id),on.has(id))):sec.unlocked.push(itemTile('relic',id));
+  const head=(k,t,n)=>`<h3 class="lp-sec" data-sec="${k}">${t}<em>${n}</em></h3>`,nLock=sec.locked.length;
+  tiles=head('starter','Starter',sec.starter.length)+sec.starter.join('')+head('unlocked','Unlocked',sec.unlocked.length)+sec.unlocked.join('')
+   +(nLock?head('locked','Locked',nLock)+sec.locked.join(''):'')+head('later','Later acts','')+`<p class="lp-later" data-sec-body="later">Cards for the acts beyond the Bell Gate are not lit yet. Owned cards appear when their act arrives. Acts never lock anything.</p>`}
+ else{tiles=[...LOCK_SHARED_RELICS.map(id=>[ 'relic',id]),...LOCK_POTIONS.map(id=>['potion',id])].map(([k,id])=>(k==='relic'?lock.relics[id]:lock.potions[id])?lockItem(k,id,on.has(id)?'On offer: choose it now':lockHint(p,'climb',k,id,CARDS),on.has(id)):itemTile(k,id)).join('')}
  return asy(`<div class="tb-scr tb-ledger${climb?'':' theme-'+TH[tab]}">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">${glyph('undo')}<span>Back</span></button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
   <div class="lp-tabs">${tabs}</div>${info}<div class="lp-grid" id="ledgergrid">${tiles}</div></div>`)}
 // ---------- the Keeper's Ledger pages: eight reveal stages, one per lit window (design/lore/LORE-BIBLE.md §14.2) ----------

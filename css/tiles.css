@@ -335,3 +335,10 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 @keyframes vl-grow{from{transform:scaleX(0)}}
 @keyframes vl-pulse{0%,100%{opacity:.6;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
 .reduce-motion .vic-lamp .vl-new,.reduce-motion .vic-lamp .vl-glow{animation:none}
+
+.lp-sec{flex:0 0 100%;width:100%;grid-column:1/-1;margin:6px 0 0;font:600 13px/1.2 var(--font-display,serif);letter-spacing:.08em;text-transform:uppercase;color:#d9c9a0;border-bottom:1px solid #4a5366;padding-bottom:3px}
+.lp-sec em{font-style:normal;opacity:.65;margin-left:8px}
+.lp-later{flex:0 0 100%;grid-column:1/-1;margin:0;font-size:12px;opacity:.7}
+.lp-earned{position:absolute;right:4px;top:4px;width:9px;height:9px;border-radius:50%;background:#f2c14e;box-shadow:0 0 8px #f2c14e,0 0 0 2px #05070b;pointer-events:none}
+.lp-cardwrap{position:relative}
+.lp-lock .lp-hint{font-size:10px;line-height:1.25}
