@@ -104,6 +104,14 @@ export function flyIcon(fromEl,toEl,{html,ms=520,col=COL.gold,done}={}){
  const dx=b.x-a.x,dy=b.y-a.y;let tr=0;const t0=performance.now();
  const tick=()=>{if(!el.isConnected)return;const r=el.getBoundingClientRect();emit('trail',r.left+r.width/2,r.top+r.height/2,col);tr=requestAnimationFrame(tick)};tr=requestAnimationFrame(tick);
  el.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${dx*.4}px),calc(-50% + ${dy*.4-34}px)) scale(1.15)`,opacity:1,offset:.45},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.5)`,opacity:.9}],{duration:U(ms),easing:'cubic-bezier(.4,0,.4,1)'}).finished.then(()=>{cancelAnimationFrame(tr);el.remove();emit('coin',b.x,b.y);ring(b.x,b.y,col,44,300);done&&done()},()=>{cancelAnimationFrame(tr);el.remove();done&&done()})}
+// perf (combat-start): freeze a computed style into inline text. The property list is computed once and skips what can never change the picture: animation/transition longhands (as
+// before), logical longhands (the physical ones are baked too) and experimental properties that are always at their initial value. ~12% fewer reads, no per-property string tests.
+const SKIP_PROP=/^(animation|transition|border-(block|inline)-|border-(start|end)-(start|end)-radius|inset-(block|inline)|margin-(block|inline)|padding-(block|inline)|scroll-(margin|padding)-(block|inline)|(min-|max-)?(block|inline)-size$|overflow-(block|inline)$|overscroll-behavior-(block|inline)|contain-intrinsic-(block|inline)|(column|row)-rule-inset|corner-|interest-delay|timeline-trigger)/;
+let propNames=null;
+function frozenText(cs){if(!propNames){propNames=[];for(let j=0;j<cs.length;j++){const n=cs[j];if(n.charCodeAt(1)!==45&&!SKIP_PROP.test(n))propNames.push(n)}} // standard properties: the same list for every element
+ let t='';for(let j=0;j<propNames.length;j++){const n=propNames[j];t+=n+':'+cs.getPropertyValue(n)+' !important;'}
+ for(let j=0;j<cs.length;j++){const n=cs[j];if(n.charCodeAt(0)===45&&n.charCodeAt(1)===45)t+=n+':'+cs.getPropertyValue(n)+' !important;'} // custom properties differ per element: read them per element
+ return t}
 // ---------- screen crossfade: the old #app contents fade out over the new screen ----------
 let xf=null;
 export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!app||!app.firstChild)return;
@@ -116,18 +124,20 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
  // and cloned CSS animations restart from 0% (sprites/meters jump). Decode images sync, copy canvas pixels, freeze each animation at its current time.
  o.querySelectorAll('img').forEach(i=>{i.decoding='sync';i.loading='eager'});
  const src=[...app.querySelectorAll('*')],dst=[...o.querySelectorAll('*')],scr=[];
+ // perf (combat-start): one document.getAnimations() call, grouped by target, instead of an element.getAnimations() per node (each one forced a style flush: ~100+ ms on a phone)
+ const animsOf=new Map();for(const x of (document.getAnimations?document.getAnimations():[])){const t=x.effect&&x.effect.target;if(!t||x.effect.pseudoElement)continue;let l=animsOf.get(t);if(!l)animsOf.set(t,l=[]);l.push(x)}
  // v0.6.2: ids are stripped from the clone, so #app/#relicbar/... rules stop matching and the top bar re-laid out (potions/relics jumped up,
  // bar looked gone) on the first faded frame. Freeze the top bar subtree with its live computed styles so it stays pixel-identical.
  // morning: same for the combat controls styled by id (orb, hero plate, piles, End): without this they flew to the top-left / lost their size for the first second of the victory scene.
  const frozen=new Set(app.querySelectorAll('.topbar,.topbar *,'+['dais','hplate','orb','hpability','hplogbtn','flourishbtn','drawpile','exhpile','discpile','endbtn'].map(i=>`#${i},#${i} *`).join(',')));
  if(src.length===dst.length)for(let i=0;i<src.length;i++){const a=src[i],b=dst[i];
-  if(frozen.has(a)){const cs=getComputedStyle(a);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}b.style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important'}
+  if(frozen.has(a)){b.style.cssText=frozenText(getComputedStyle(a))+'transition:none!important;animation:none!important;pointer-events:none!important'}
   if(a.scrollTop||a.scrollLeft)scr.push([b,a.scrollTop,a.scrollLeft]);
   if((a.id==='playbtn'||a.classList.contains('topbar'))&&getComputedStyle(a).position==='sticky'){ // gfxmem: only the two sticky elements the css has (a computed-style read per node of the whole screen was ~100 ms on the map)
    const r=a.getBoundingClientRect();const cs=getComputedStyle(a),ph=document.createElement('div');ph.setAttribute('aria-hidden','true');ph.style.cssText=`height:${r.height}px;margin:${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft};flex:none;visibility:hidden`;b.before(ph); // v0.6.2: a spacer keeps the bar's room so the screen under it does not jump up
    Object.assign(b.style,{position:'fixed',top:r.top+'px',left:r.left+'px',width:r.width+'px',height:r.height+'px',margin:'0',zIndex:'5'})} // sticky top bar: the clone does not scroll, so pin it where it was on screen
   if(a.tagName==='CANVAS'&&a.width&&a.height){try{b.width=a.width;b.height=a.height;b.getContext('2d').drawImage(a,0,0)}catch(_){}}
-  const all=a.getAnimations?a.getAnimations():[],an=all.filter(x=>x.animationName);if(an.length){b.style.animationDelay=an.map(x=>-(x.currentTime||0)+'ms').join(',');b.style.animationPlayState='paused'}
+  const all=animsOf.get(a)||[],an=all.filter(x=>x.animationName);if(an.length){b.style.animationDelay=an.map(x=>-(x.currentTime||0)+'ms').join(',');b.style.animationPlayState='paused'}
   // flicker fix: script (WAAPI) animations and CSS transitions do not travel with cloneNode. The victory walk-off fades the tiles/banner and walks the hero
   // off with fill:forwards, so the clone popped the old screen (hero, tiles, VICTORY) back for a frame. Bake their current values onto the clone.
   const live=all.filter(x=>!x.animationName);if(live.length){const cs=getComputedStyle(a);for(const x of live){const ks=x.effect&&x.effect.getKeyframes?x.effect.getKeyframes():[];
@@ -161,7 +171,7 @@ function frozenCopy(src){const c=src.cloneNode(true);c.removeAttribute('id');c.s
  if(s.length===d.length)for(let i=0;i<s.length;i++){d[i].removeAttribute('id');
   if(s[i].closest('.envlv')){const cs=getComputedStyle(s[i]);let t=s[i].style.cssText.replace(/animation[^;]*;?/g,'')+';position:absolute;';for(const n of LIV)t+=n+':'+cs.getPropertyValue(n)+' !important;';
    d[i].style.cssText=t+'animation:none!important;transition:none!important;will-change:auto!important;pointer-events:none!important';continue}
-  const cs=getComputedStyle(s[i]);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}
+  const t=frozenText(getComputedStyle(s[i]));
   d[i].style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important';if(s[i].tagName==='CANVAS'&&s[i].width){try{d[i].width=s[i].width;d[i].height=s[i].height;d[i].getContext('2d').drawImage(s[i],0,0)}catch(_){}}}
  return c}
 // The incoming screen is ready when its <img>s are decoded and the new backdrop layers have finished their own decode-then-fade swap (env.js swapLayer).
