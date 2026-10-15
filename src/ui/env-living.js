@@ -11,6 +11,8 @@ function css(){if(styled)return;styled=true;const s=document.createElement('styl
 @keyframes envlv-bob{from{translate:0 calc(var(--bob) * -1)}to{translate:0 var(--bob)}}
 @keyframes envlv-swell{from{transform:translate3d(calc(var(--sx) * -1),calc(var(--sy) * -1),0)}to{transform:translate3d(var(--sx),var(--sy),0)}}
 @keyframes envlv-flame{${seq.map((f,i)=>`${(i/seq.length*100).toFixed(3)}%{background-position:${f%3*50}% ${Math.floor(f/3)*100}%}`).join('')}}
+@keyframes envlv-tile{from{transform:translate3d(var(--fx),var(--fy),0)}to{transform:translate3d(var(--tx),var(--ty),0)}}
+@keyframes envlv-pulse{0%,100%{opacity:var(--p0)}25%{opacity:var(--p1)}50%{opacity:var(--p2)}75%{opacity:var(--p3)}}
 @keyframes envlv-flicker{0%{opacity:.62}18%{opacity:.95}33%{opacity:.7}52%{opacity:1}71%{opacity:.66}86%{opacity:.9}100%{opacity:.62}}`;
  document.head.appendChild(s)}
 const crops={};
@@ -34,10 +36,24 @@ function el(tag,cls,st){const e=document.createElement(tag);if(cls)e.className=c
 function scrollBand(box,W,H,{src,y,h,tw,v,op,filter}){ // a repeat-x painted band drifting right->left on a seamless track
  const w=W+tw,e=el('i','envlv-a envlv-band',`left:0;top:${P(y,H)};height:${P(h,H)};width:${P(w,W)};opacity:${op};background:url("${src}") 0 0/${P(tw,w)} 100% repeat-x;--dx:${P(-tw,w)};animation:envlv-scroll ${(tw/Math.abs(v)).toFixed(2)}s linear infinite${filter?';filter:'+filter:''}`);
  box.appendChild(e);return e}
+
+// plates (v0.6.17, Act 1 battle backgrounds): one painted RGBA plate (normal blend, edge fades baked into its alpha) per effect.
+//  kind 'tile'  : a seamless tile (tile:[tw,th]) in a clipped window r, moving exactly one tile along loop:[sx,sy] (each -1,0,1) per period seconds: fog, mist, rain veils, motes, clouds.
+//  kind 'pulse' : a static plate at r whose opacity breathes between the ops[] stops over period seconds: lamp glow, light shafts, glints.
+function plates(box,L,W,H){
+ for(const p of L){const r=p.r;
+  if(p.kind==='pulse'){const o=p.ops,e=el('i','envlv-a envlv-pulse',`left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};background:url("${p.f}") 0 0/100% 100% no-repeat;--p0:${o[0]};--p1:${o[1]};--p2:${o[2]};--p3:${o[3]};animation:envlv-pulse ${p.period}s ease-in-out ${(-(p.phase||0)*p.period).toFixed(2)}s infinite`);
+   if(p.op!=null)e.style.setProperty('--m',p.op);box.appendChild(e);continue}
+  const [tw,th]=p.tile,[sx,sy]=p.loop,iw=r[2]+(sx?tw:0),ih=r[3]+(sy?th:0),box2=el('i','envlv-clip'+(p.cls?' '+p.cls:''),`position:absolute;left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};overflow:hidden;opacity:${p.op}`);
+  const fx=sx>0?-tw:0,tx=sx<0?-tw:0,fy=sy>0?-th:0,ty=sy<0?-th:0,e=el('i','envlv-a envlv-tile',`left:0;top:0;width:${P(iw,r[2])};height:${P(ih,r[3])};background:url("${p.f}") 0 0/${P(tw,iw)} ${P(th,ih)} repeat;--fx:${(fx/iw*100).toFixed(4)}%;--fy:${(fy/ih*100).toFixed(4)}%;--tx:${(tx/iw*100).toFixed(4)}%;--ty:${(ty/ih*100).toFixed(4)}%;animation:envlv-tile ${p.period}s linear ${(-(p.phase||0)*p.period).toFixed(2)}s infinite`);
+  if(p.ops){const o=p.ops;box2.style.setProperty('--p0',o[0]);box2.style.setProperty('--p1',o[1]);box2.style.setProperty('--p2',o[2]);box2.style.setProperty('--p3',o[3]);box2.style.animation=`envlv-pulse ${p.pperiod||p.period}s ease-in-out ${(-(p.pphase||0)).toFixed(2)}s infinite`}
+  if(p.fade){const f=p.fade,g=`linear-gradient(90deg,transparent,#000 ${f[0]*100}%,#000 ${100-f[1]*100}%,${f[1]?'transparent':'#000'})`;box2.style.webkitMaskImage=g;box2.style.maskImage=g}
+  box2.appendChild(e);box.appendChild(box2)}}
 function build(layer,L,sp,still){const [W,H]=sp;const box=el('div','envlv','position:absolute;inset:0;z-index:1;pointer-events:none');css();
  for(const c of L.clouds||[]){const tw=c.tile[0]*c.h/c.tile[1];scrollBand(box,W,H,{src:c.f,y:c.y,h:c.h,tw,v:c.v,op:c.op,filter:[c.con?`contrast(${c.con})`:'',c.dark?`brightness(${c.dark})`:''].join(' ').trim()})}
  for(const s of L.swell||[]){const r=s.r,e=el('i','envlv-a envlv-swell',`left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};background:0 0/100% 100% no-repeat;--sx:${P(s.amp[0],r[2])};--sy:${P(s.amp[1],r[3])};animation:envlv-swell ${s.period/2}s ease-in-out infinite alternate;visibility:hidden`);
   bakeSwell(s,sp).then(u=>{if(u){e.style.backgroundImage=`url("${u}")`;e.style.visibility=''}});box.appendChild(e)}
+ plates(box,L.plates||[],W,H); // painted plates draw above the swell plates (artist order: water first, then mist/rain/light)
  for(const f of L.fog||[]){const tw=f.tw,b=scrollBand(box,W,H,{src:'',y:f.y,h:f.h,tw,v:f.v,op:f.op});crop(f.atlas,f.crop).then(u=>{if(u)b.style.backgroundImage=`url("${u}")`})}
  for(const lan of L.lantern||[]){const r=lan.r,w=el('i','envlv-a envlv-lantern',`left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};mix-blend-mode:${lan.blend||'screen'};opacity:${lan.op};animation:envlv-flicker 2.3s linear infinite`);
   w.appendChild(el('i','',`position:absolute;inset:0;background:url("${lan.f}") 0 0/300% 200% no-repeat;animation:envlv-flame ${(12/lan.fps).toFixed(2)}s step-end infinite`));box.appendChild(w)}

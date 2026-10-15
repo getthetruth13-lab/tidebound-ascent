@@ -98,7 +98,7 @@ export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&
  // painted layers: each layer is the full rect space (3600x1440); every shipped file sits at its rect (trimmed mid / fg-l / fg-r)
  const sp=e.space||[3600,1440];root.classList.toggle('has-art',!!e.art);
  allL().forEach(el=>swapLayer(el,(e.art&&e.art[el.dataset.l])||[],sp));
- root.toggleAttribute('data-still',!!e.still);document.body.toggleAttribute('data-still-env',!!e.still);front.toggleAttribute('data-still',!!e.still);syncLiving(k.id,e); // still env: solids never move; painted living layers only
+ root.toggleAttribute('data-still',!!e.still);root.toggleAttribute('data-sandwich',!!e.sandwich);document.body.toggleAttribute('data-still-env',!!e.still);front.toggleAttribute('data-still',!!e.still);syncLiving(k.id,e); // still env: solids never move; painted living layers only
  const t=e.tint||{col:'#000',a:0},v=e.vig||{s:.4,col:'#000'};
  const hx=(c,a)=>c+Math.round(Math.max(0,Math.min(1,a))*255).toString(16).padStart(2,'0');
  root.querySelector('.envlight').style.background=`radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, ${hx(v.col,(v.s||.4)+(g.vig_add||0)+.3)} 100%), linear-gradient(${hx(t.col,(t.a||0)+(g.tint_add||0))}, ${hx(t.col,(t.a||0)+(g.tint_add||0))})`;
