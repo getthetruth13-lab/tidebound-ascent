@@ -141,7 +141,7 @@ registerEvents([
    if(roll(.4)){const id=randomRelic(null,'events',{tier:'c'});if(id){gainRelic(id);return done(`Nobody sees. You walk off with ${rel(id)}.`)}const g=gainGold(40);return done(`Nobody sees. +${g} gold.`)}
    hurt(9);const l=loseGold(30);done(`Claws, everywhere. Lose 9 HP${l?` and ${l} gold`:''}.`,'bad','Caught')}}),
   LEAVE]},
- {id:'gullnest',pool:'act',act:1,n:'Gull Nest',e:'🪺',t:'On a broken parapet sits a huge nest of driftwood and stolen trinkets. Something golden glints inside.',o:[
+ {id:'gullnest',pool:'act',act:1,req:()=>run().floor<=10,n:'Gull Nest',e:'🪺',t:'On a broken parapet sits a huge nest of driftwood and stolen trinkets. Something golden glints inside.',o:[
   O('Raid the nest','gain Golden Gull, then fight 2 Gull Thieves (no card reward)',{d:'Take the Golden Gull relic, then fight two Gull Thieves. No card reward from this fight.',f:()=>{gainRelic('goldengull');eventFight(['gull','gull'],{noCards:true,event:'gullnest'})}}),
   O('Take one egg','65%: +30 gold, else fight a Gull Thief',{risk:.65,d:'65%: you slip away and sell the egg for 30 gold. 35%: the mother gull fights you (a Gull Thief, no card reward, no gold).',f:()=>{
    if(roll(.65)){const g=gainGold(30);return done(`You sell the egg later. +${g} gold.`)}toast('The mother gull returns!','curse');eventFight(['gull'],{noCards:true,event:'gullnest'})}}),

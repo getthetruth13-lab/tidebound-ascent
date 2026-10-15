@@ -476,5 +476,9 @@ const quiet=new Set(['title']);
 export function screenChange(app,prev,next){if(prev!==next)document.querySelectorAll('.reward-ghost').forEach(g=>g.remove());if(!prev||prev===next||quiet.has(prev)||quiet.has(next))return;
  if(next==='combat')finaleCleanup();const hero=W.run&&W.run.hp<=0&&prev==='combat';const hold=Math.max(prev==='combat'?deathHold():0,holdReal(),hero?U(700):0);
  if(hold)holdUntil=Math.max(holdUntil,performance.now()+hold);
- crossfade(app,{hold,ms:prev==='combat'?T(340):U(260),gray:hero})}
+ crossfade(app,{hold,ms:prev==='combat'?T(340):U(260),gray:hero});
+ // screen-flicker: the battle-won finale layers (lantern hero ghost, glow, dim, banner) live on <body>, outside #app, so the snapshot never had them. Leaving the
+ // victory scene for the map while they were alive dropped the dim on the snapshot's first frame (a brightness pop), then left the battle hero standing on the
+ // map for ~0.5 s until the finale timer removed it. Hand them to the snapshot so they fade out with the old screen, then end the finale.
+ if(next!=='reward'&&finaleEls.length){const x=xfadeEl();if(x){const env=x.lastElementChild;for(const el of finaleEls)if(el.isConnected)x.insertBefore(el,env&&env.style.zIndex==='-1'?env:null);finaleEls=[]}finaleCleanup()}}
 matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',syncCombatAnimations);

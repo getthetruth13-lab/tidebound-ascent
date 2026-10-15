@@ -511,5 +511,6 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 .tl-ghost img{object-fit:contain}
 .reduce-motion .tl-stage>*{animation:none}
 /* v0.6.1.3: the layered title is opaque; park the battle backdrop behind it so phones don't hold 5 extra full-screen GPU layers + fog animations */
-body:has(.tl-stage) #env,body:has(.tl-stage) #env-front,body:has(.tl-stage) #envfx{visibility:hidden}
-body:has(.tl-stage) #env *,body:has(.tl-stage) #env-front *{animation-play-state:paused!important;will-change:auto!important}
+/* titlefix: every title-flow screen (.tb-scr: video start, menu, load, options, select, learn, ledger, intro) is opaque, so the battle backdrop is parked behind ALL of them, not just the layered menu (the video start screen used to composite + animate the Wrack Terraces living layers behind the H.264 video). */
+body:has(.tb-scr) #env,body:has(.tb-scr) #env-front,body:has(.tb-scr) #envfx{visibility:hidden}
+body:has(.tb-scr) #env *,body:has(.tb-scr) #env-front *{animation-play-state:paused!important;will-change:auto!important}
