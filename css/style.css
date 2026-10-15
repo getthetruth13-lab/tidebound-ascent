@@ -1351,3 +1351,18 @@ body.scene-choice #env .envlv *,body:has(#inspect:not(.held-hand)) #env .envlv *
 /* Wrack Terraces is a pale wet stage: contact shadows read stronger so feet never float (Spencer flagged twice; matches v-new2g mock cores) */
 body[data-still-env] .combat .shadow{opacity:.88}
 body[data-still-env] .combat .shadow::before{left:16%;right:16%;top:calc(50% - 2px);height:4px}
+
+/* End Turn sun states (v0.6.17): dim = you can still act; ready = energy 0, burning bright; work = burning through the enemy turn. Glow is one small pseudo layer animated with opacity/transform only; the seal only gets a static filter. */
+.combat #endbtn::before{content:"";position:absolute;inset:-22%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,#fff3b0cc 0,#ffb53ccc 28%,#ff7a1a66 52%,#ff7a1a00 70%)}
+.combat #endbtn[data-sun=dim] .end-seal{filter:brightness(.62) saturate(.6)}
+.combat #endbtn[data-sun=dim]:not(:disabled) .end-seal{animation:none}
+.combat #endbtn[data-sun=ready],.combat #endbtn[data-sun=work]{opacity:1}
+.combat #endbtn[data-sun=ready] .end-seal,.combat #endbtn[data-sun=work] .end-seal{filter:brightness(1.3) saturate(1.25);animation:sunburn 1.6s ease-in-out var(--sp,0ms) infinite}
+.combat #endbtn[data-sun=ready]::before,.combat #endbtn[data-sun=work]::before{animation:sunglow 1.6s ease-in-out var(--sp,0ms) infinite}
+.combat #endbtn[data-sun=work]::before{inset:-30%}
+.combat #endbtn.sun-pop .end-seal{filter:brightness(1.8) saturate(1.4)}
+@keyframes sunburn{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes sunglow{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.12)}}
+body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .combat #endbtn[data-sun=work]::before,body.reduce-motion .combat #endbtn[data-sun=ready] .end-seal,body.reduce-motion .combat #endbtn[data-sun=work] .end-seal{animation:none}
+body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .combat #endbtn[data-sun=work]::before{opacity:.85}
+@media(prefers-reduced-motion:reduce){.combat #endbtn[data-sun=ready]::before,.combat #endbtn[data-sun=work]::before,.combat #endbtn[data-sun=ready] .end-seal,.combat #endbtn[data-sun=work] .end-seal{animation:none}.combat #endbtn[data-sun=ready]::before,.combat #endbtn[data-sun=work]::before{opacity:.85}}

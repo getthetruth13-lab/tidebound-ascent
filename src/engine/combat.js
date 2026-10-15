@@ -240,7 +240,7 @@ function modeActImpl(a,i,j){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)re
   render()}}
 // ================= turn lifecycle =================
 // startTurn: turn++ -> clear Guard -> energy -> "next turn" effects -> onTurnStart -> Waypoints -> [Chart] -> draw -> onAfterDraw -> Drift (v2.1)
-export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;
+export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;cb.enemyTurn=false;
  if(cb.turn>1&&!mod('retainGuard',{},false))cb.p.block=0;
  Object.assign(cb,{parry:0,parryUsed:false,parries:{},advUsed:0,decUsed:0,breaks:0,markType:null,mark2Type:null,lastType:null,mark:null,markTgt:null,afterMark:0,armMark:false,armFlourish:false,mark2:null,markTgt2:null,after2:0,mark2Scale:1,extraMarks:0,lastNF:null,lastNFTgt:null,last:null,sel:null,insp:null,slack:false,keepMom:false,tideBtnUsed:false,wheelUsed:false});
  cb.stat.wpLeftLast=cb.stat.wpLeftTurn||0;cb.stat.echoesLast=cb.stat.echoesTurn||0;Object.assign(cb.stat,{typesTurn:{},playedTurn:0,attacksTurn:0,tideturnsTurn:0,echoesTurn:0,bigTurn:0,wpLeftTurn:0});cb.bitter={};
@@ -369,7 +369,7 @@ function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  cb.hand=keep;cb.sel=null;cb.insp=null;
  if(W.run.cls==='duel'&&!cb.keepMom&&!mod('keepMomentum',{},false))cb.mom=Math.max(0,cb.mom-DU.decay);cb.keepMom=false;
  cb.fx=cb.fx.filter(l=>l.combat||(l.turns&&--l.turns>0));
- cb.busy=true;cb.banner={txt:'Enemy Turn',t:Date.now(),en:1};render();
+ cb.busy=true;cb.enemyTurn=true;cb.banner={txt:'Enemy Turn',t:Date.now(),en:1};render();
  // A curse that fired in hand (Dread) pops over the hand first; hold the enemy turn so its notice can be read.
  const popT=(cb.cursePops||[]).some(x=>Date.now()-x.t<200)?CURSE_POP:0;
  if(window.FAST)enemyPhase();else setTimeout(enemyPhase,T(EB().pause+popT))}
@@ -449,7 +449,7 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;cb.breaks=0;cb.parryHit
   if(W.run.hp<=0&&!cheatDeath())return lose();
   if(!alive().length)return finish();
   if(window.FAST)return step();render();setTimeout(step,T(B.lead>0?B.hitstop+B.recover+Math.max(0,B.hits-1)*B.hitGap+B.gap:B.gap))};
- const finish=()=>{if(!W.cb)return;['weak','vuln','brittle','drench','reson'].forEach(k=>{if(preSt[k]&&cb.p.st[k]){cb.p.st[k]--;if(!cb.p.st[k])delete cb.p.st[k]}});cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
+ const finish=()=>{if(!W.cb)return;['weak','vuln','brittle','drench','reson'].forEach(k=>{if(preSt[k]&&cb.p.st[k]){cb.p.st[k]--;if(!cb.p.st[k])delete cb.p.st[k]}});cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.enemyTurn=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
  step()}
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
  const allFled=cb.ens.some(e=>e.fled)&&cb.ens.every(e=>e.fled||e.summoned);

@@ -3,7 +3,7 @@
 // loaded resources plus every URL in the asset map. Strategy: stale-while-revalidate for code/data, cache-first for media.
 // The cache name comes from version.js (the one place the version number lives): bump it there and
 // sw.js's cache changes with it. version.js is an ES module, so it is read as text, not imported.
-// build v0.6.17 (any byte change here makes browsers install the new worker)
+// build v0.6.20 (any byte change here makes browsers install the new worker)
 const PREFIX='tidebound-';
 const nameP=(async()=>{
  try{const r=await fetch('./version.js',{cache:'no-store'});const m=/VERSION\s*=\s*['"]([^'"]+)['"]/.exec(await r.text());if(m)return PREFIX+m[1]}catch(_){}

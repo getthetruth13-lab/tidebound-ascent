@@ -241,6 +241,8 @@ function cursePopsHTML(){const now=Date.now(),cb=W.cb;const c=(cb.cursePops||[])
  return `<div class="cursepops">${c.map((x,i)=>`<div class="cursepop" style="--i:${i};animation-delay:-${now-x.t}ms">${cardHTML({id:x.id,uid:-800-i,up:false})}</div>`).join('')}</div>`}
 function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<T(1300));return cursePopsHTML()+(c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:'')}
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
+// End Turn sun: dim while you can still act, burning once energy is 0, burning through the whole enemy turn (cb.enemyTurn, set by endTurn, cleared in finish/win/lose), dim again on your next turn.
+export const sunState=cb=>cb.enemyTurn?'work':(cb.energy<=0?'ready':'dim');
 export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==enemyPace())setEnemyPace(settings.enemyPace);
  const incoming=cb.ens.filter(e=>e.hp>0&&!e.fled).reduce((a,e)=>{const m=intentOf(e);return a+(m.a?eAtk(e,m.a)*(m.h||1):0)},0);let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
  h+=daisHTML();
@@ -251,7 +253,7 @@ export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
  h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&canTakeMove(ci)})}).join('')}</div>
  <div class="ctl"><div>${heroPlateHTML({incoming})}<button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile.">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
- <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurnTap()" ${cb.busy||cb.mode?'disabled':''} aria-label="End turn"><img class="end-seal" src="${assetSrc('ui','end-turn-c2')}" alt="" draggable="false"><span class="end-label">END</span></button></div></div></div>`;
+ <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurnTap()" ${cb.busy||cb.mode?'disabled':''} data-sun="${sunState(cb)}" style="--sp:-${Date.now()%1600}ms" aria-label="End turn"><img class="end-seal" src="${assetSrc('ui','end-turn-c2')}" alt="" draggable="false"><span class="end-label">END</span></button></div></div></div>`;
  const m=cb.mode;
  if(m&&m.k==='choice')h+=`<div class="ov battle"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
  if(m&&m.k==='slot')h+=`<div class="ov battle"><div class="box tilebox" id="slotbox">${titleHTML(m.title)}<div class="tiles chtiles slottiles" style="--n:${cb.slots.length}">${cb.slots.map((w,i)=>`<div class="tcard opt slotpick">${cardHTML(w,{click:`modeAct('slot',${i})`})}<span class="tcap">${w.rank?'Rank '+w.rank:'Rank 0'}${w.temp?' · starting':''}</span></div>`).join('')}</div></div></div>`;
@@ -265,7 +267,7 @@ export function endTurnTap(){const btn=document.getElementById('endbtn');
  if(btn&&!btn.disabled&&!reduce){const r=btn.getBoundingClientRect(),fx=document.createElement('img');
   fx.className='end-burst-fx';fx.alt='';fx.draggable=false;fx.src=assetSrc('ui','end-turn-c2-burst');
   fx.style.left=(r.left+r.width/2)+'px';fx.style.top=(r.top+r.height/2)+'px';fx.style.width=r.width+'px';fx.style.height=r.height+'px';
-  document.body.appendChild(fx);const done=()=>fx.remove();fx.addEventListener('animationend',done,{once:true});setTimeout(done,900)}
+  btn.classList.remove('sun-pop');void btn.offsetWidth;btn.classList.add('sun-pop');setTimeout(()=>btn.classList.remove('sun-pop'),620);document.body.appendChild(fx);const done=()=>fx.remove();fx.addEventListener('animationend',done,{once:true});setTimeout(done,900)}
  window.endTurn?.()}
 function tgtImpl(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return;const e=cb.ens[i];if(!e||e.hp<=0)return;cb.tgt=i;
  cb.insp=cb.insp===i?null:i;cb.sel=null;render()}
