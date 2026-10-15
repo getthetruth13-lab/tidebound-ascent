@@ -81,7 +81,7 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
 // whether the backdrop changes at all. Must stay in step with the sig built in syncEnv().
 const nextSig=()=>{const k=envKeyFor();return `${k.id}|${k.band||''}|${k.grade}|${k.dim||0}|${quality()}`};
 // body.env-combat / body.scene-choice also restyle #env (stack position, blur + darken), so a flip of either counts as a backdrop change too
-const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks')});
+const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'),'env-still':!!(W.S&&W.S.screen==='end')});
 export function envWillChange(){if(!root)return false;if(nextSig()!==cur)return true;const c=sceneCls();return Object.keys(c).some(n=>document.body.classList.contains(n)!==c[n])}
 export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&W.S.view||'');if(scr!==lastScr){lastScr=scr;quiet(500);if(adaptive!=='full'&&lastP75<=panelMs()*1.25)govTo(adaptive==='off'?'reduced':'full')} // next screen: one step back up if the last stretch ran smooth
  startLoop();const k=envKeyFor();const sig=nextSig();anchor();

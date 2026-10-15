@@ -514,3 +514,9 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 /* titlefix: every title-flow screen (.tb-scr: video start, menu, load, options, select, learn, ledger, intro) is opaque, so the battle backdrop is parked behind ALL of them, not just the layered menu (the video start screen used to composite + animate the Wrack Terraces living layers behind the H.264 video). */
 body:has(.tb-scr) #env,body:has(.tb-scr) #env-front,body:has(.tb-scr) #envfx{visibility:hidden}
 body:has(.tb-scr) #env *,body:has(.tb-scr) #env-front *{animation-play-state:paused!important;will-change:auto!important}
+
+/* strobe-fix (2026-10-14): Spencer's S24 recording went black / strobed on DEFEATED and the Stair Climb pick: the battle backdrop was still fully animated behind DEFEATED (62 layers, ~290 MB at DPR 3.75), and the lamp screens held 2 fog + 1 shimmer layers on top of ~10 others.
+   DEFEATED parks every backdrop animation (the painted picture stays, dimmed); the lamp pick screens keep their fog/shimmer still. Fewer live layers = less for the GPU to evict. */
+body.env-still #env *,body.env-still #env-front *{animation:none!important;will-change:auto!important}
+body.env-still #envfx{visibility:hidden}
+.tb-lampscr .tb-fog,.tb-lampscr .tb-shim{animation:none;will-change:auto}
