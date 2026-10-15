@@ -115,7 +115,7 @@ export function hit(e,base,f,o={}){if(!e||e.hp<=0||e.fled)return 0;const cb=W.cb
  if(atk){d+=might();if(W.run.cls==='duel'){const top=Math.max(...alive().map(x=>x.hp));if(e.hp===top)d+=mod('focus',{target:e,f},DU.focus)}{const pre=d;d=mod('damageAdd',{target:e,f,attack:true},d);if(f.echo&&d>pre)d=pre+Math.min(d-pre,Math.max(0,EC_BONUS_MAX-(f.bonus||0)))}if(f.echo&&e.st.reson)d+=e.st.reson;
   if(f.flourish)d=Math.floor(d*f.fmult);if(f.mult>1)d*=f.mult;if(cb.p.st.weak)d=Math.floor(d*.75)}
  else if(f&&f.mult>1)d*=f.mult;
- if(!atk&&f&&f.lm)d*=2;
+ if(!atk&&f&&f.lm)d*=2;else if(!atk&&f&&f.ramp>1)d=Math.floor(d*f.ramp);
  if(o.cap!=null)d=Math.min(d,o.cap); // a card's "max N" applies after relic doubling (Tuning Fork, Landmark)
  if(e.st.vuln)d=Math.floor(d*1.5);
  d=Math.max(0,Math.floor(mod('damage',{target:e,f,attack:atk,raw:!!o.raw},d)));
@@ -180,7 +180,7 @@ export function spendTide(n){const cb=W.cb;n=Math.min(n,cb.tide);if(n<=0||cb.sla
 // ================= effect context =================
 // f is what a card's effect code (fx ops, p:f=>{}) talks to. Helpers per content-impl-plan §2.3.
 export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=isUp(ci),lvl=u?lvlOf(ci):0;
- const f={u,lvl,ci,def,m:o.mult||1,mult:o.mult||1,echo:!!o.echo,potion:!!o.potion,half:!!o.half,scale:o.scale||1,bonus:o.bonus||0,wp:!!o.wp,lm:!!o.lm,rankDmg:o.rankDmg||0,x:o.x||0,allTargets:!!o.allTargets,
+ const f={u,lvl,ci,def,m:o.mult||1,mult:o.mult||1,echo:!!o.echo,potion:!!o.potion,half:!!o.half,scale:o.scale||1,bonus:o.bonus||0,wp:!!o.wp,lm:!!o.lm,ramp:o.ramp||1,rankDmg:o.rankDmg||0,x:o.x||0,allTargets:!!o.allTargets,
   v:(a,b)=>u?b:a,r:(a,b,step,max)=>rv(a,b,step,lvl,max), // r: per-level value (see cards.js rv)
   get tg(){let t=o.tgt;if(!t||t.hp<=0||t.fled)t=o.echo?randAlive():curTgt();return t},
   get low(){return f._low}, get high(){return f._high}, lowNow:()=>isLow(), highNow:()=>isHigh(),
@@ -188,7 +188,7 @@ export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=i
   dmg(n,h=1){if(f.allTargets)return f.all(n,h);for(let i=0;i<h;i++){const t=f.tg;if(!t)return;hit(t,f.num(n),f)}},
   all(n,h=1){for(let i=0;i<h;i++)alive().forEach(e=>hit(e,f.num(n),f))},
   dmgRandom(n){const t=randAlive();if(t)hit(t,n+f.rankDmg,f,{raw:true})},
-  blk(n,cap){let g=f.num(n)*f.mult*(f.lm?2:1);if(cap!=null)g=Math.min(g,cap);return gainBlock(g,{fromCard:!f.potion&&!f.wp})},
+  blk(n,cap){let g=f.num(n)*f.mult*(f.lm?2:1);if(!f.lm&&f.ramp>1)g=Math.floor(g*f.ramp);if(cap!=null)g=Math.min(g,cap);return gainBlock(g,{fromCard:!f.potion&&!f.wp})},
   draw(n){return drawCards(n)},
   weak(n,t){t=t||f.tg;if(t)addSt(t,'weak',n*f.mult)},vuln(n,t){t=t||f.tg;if(t)addSt(t,'vuln',n*f.mult)},
   applyStatus(t,k,n){addSt(t,k,n)},
@@ -217,7 +217,7 @@ export const canDecamp=()=>{const cb=W.cb;return !!cb&&W.run.cls==='carto'&&!cb.
 function decampWpImpl(i){const cb=W.cb;if(!canDecamp()||!cb.slots[i]){render();return false}cb.decUsed++;const w=cb.slots[i];log(`🔥 Decamp: ${cname(w)}`);callout('DECAMP','adv');removeWp(i,'decamp');after();return true}
 // A Waypoint leaves its slot: Decamp effect + listeners, Ranks lost (Cairn Stone stores them).
 export function removeWp(i,reason){const cb=W.cb;const w=cb.slots.splice(i,1)[0];if(!w)return null;const d=CARDS[w.id];
- const lm=(w.rank||0)>=CA.rank_max;const rank0=w.rank||0;if(d.decamp){const fd=F(w,{wp:true,lm});fd.rankLeft=rank0;fd.reason=reason;d.decamp(fd,reason)}cb.stat.wpLeft++;cb.stat.wpLeftTurn++;fire('decamp',{wp:w,reason,rank:rank0,landmark:lm,slot:i});if(d.decamp)bigMoment('decamp',{wp:w});if(reason!=='returned')cb.stat.wpDestroyed++;
+ const lm=(w.rank||0)>=CA.rank_max;const rank0=w.rank||0;if(d.decamp){const fd=F(w,{wp:true,lm,ramp:lm?1:1+rank0/CA.rank_max});fd.rankLeft=rank0;fd.reason=reason;d.decamp(fd,reason)}cb.stat.wpLeft++;cb.stat.wpLeftTurn++;fire('decamp',{wp:w,reason,rank:rank0,landmark:lm,slot:i});if(d.decamp)bigMoment('decamp',{wp:w});if(reason!=='returned')cb.stat.wpDestroyed++;
  if((w.rank||0)>0&&hasRelic('cairnstone'))cb.cairn=Math.max(cb.cairn,w.rank);w.rank=0;
  if(!w.temp&&reason!=='returned')cb.disc.push(w);return w}
 export function placeWp(ci,o={}){const cb=W.cb;const put=()=>{if(cb.cairn){ci.rank=cb.cairn;cb.cairn=0;log('🪨 Cairn Stone: '+cname(ci)+' starts at Rank '+ci.rank)}fire('waypointPlaced',{wp:ci})};

@@ -13,8 +13,8 @@ const turnCap=(inst,key,max)=>{const t=W.cb.turn;if(inst[key+'T']!==t){inst[key+
 // ---------------- Starter ----------------
 N('drawback',{e:'🪣',rk:{max:5},d:'Spend up to 2 Tide. Draw 1 card for each Tide spent.{@1| Also gain [0|3|+] Guard.}',p:f=>{
  const n=spendTide(Math.min(2,W.cb.tide));if(!W.cb)return;if(n)f.draw(n);else log('🪣 Draw Back: no Tide to spend');if(f.u)f.blk(f.r(0,3))}});
-R('riptide',{e:'🌀',rk:{max:5},d:'Deal {5|8|+}. Surge 2. <b>Low Tide:</b> also gain {5|7|+} Guard.',p:f=>{f.dmg(f.r(5,8));if(!W.cb)return;f.surge(2);if(W.cb&&f.low)f.blk(f.r(5,7))}});
-R('still',{e:'🪷',rk:{max:5},d:'Gain {5|8|+} Guard. The Tide will not drift at the start of your next turn.',p:f=>{f.blk(f.r(5,8));W.cb.holdDrift=true;log('🪷 Still Water: the Tide holds next turn')}});
+R('riptide',{e:'🌀',rk:{max:5},d:'Deal {7|10|+}. Surge 2. <b>Low Tide:</b> also gain {7|9|+} Guard.',p:f=>{f.dmg(f.r(7,10));if(!W.cb)return;f.surge(2);if(W.cb&&f.low)f.blk(f.r(7,9))}});
+R('still',{e:'🪷',rk:{max:5},d:'Gain {6|9|+} Guard. The Tide will not drift at the start of your next turn.',p:f=>{f.blk(f.r(6,9));W.cb.holdDrift=true;log('🪷 Still Water: the Tide holds next turn')}});
 // ---------------- Common ----------------
 R('swell',{e:'🌊',d:'Surge {3|4}. Sink.',p:f=>f.surge(f.v(3,4))});
 R('sinking',{e:'⚓',d:'Deal {5|7}. Recede 3. If this causes an Undertow, deal {5|7} to ALL.',p:f=>{f.dmg(f.v(5,7));if(!W.cb)return;
@@ -27,7 +27,7 @@ N('castadrift',{e:'🛶',d:'Gain {4|6} Guard. Sink any junk in hand: +{3|4} Guar
  if(junk.length)log(`🛶 Cast Adrift: ${junk.length} junk Sunk`);f.blk(f.v(4,6)+f.v(3,4)*junk.length);
  const n=Math.min(3,junk.length);if(n&&W.cb)ask(f,'Cast Adrift: move the Tide '+n,dirOpts(n,dir=>dir>0?f.surge(n):f.recede(n)))}});
 // Worklist says SAME, but the shipped UPGRADE numbers differ from the doc: re-registered with the doc's upgrade (base unchanged).
-R('hammer',{e:'🔨',rk:{max:5},d:'Deal {12|15|+3,2,2,2}. <b>High Tide:</b> deal {18|21|+3,2,2,2} instead. Recede 3.',p:f=>{f.dmg(f.high?f.r(18,21,'3,2,2,2'):f.r(12,15,'3,2,2,2'));if(W.cb)f.recede(3)}});
+R('hammer',{e:'🔨',rk:{max:5},d:'Deal {14|17|+3,2,2,2}. <b>High Tide:</b> deal {20|23|+3,2,2,2} instead. Recede 3.',p:f=>{f.dmg(f.high?f.r(20,23,'3,2,2,2'):f.r(14,17,'3,2,2,2'));if(W.cb)f.recede(3)}});
 R('coastward',{e:'🏰',d:'Gain {6|8} Guard. Whenever a Tideturn happens this turn, gain 2 Guard.',p:f=>{f.blk(f.v(6,8));
  thisTurn({id:'coastward',on:{tideTurn(){gainBlock(2,{fromCard:true});floatText('p','🏰 Coastal Ward','b')}}})}});
 R('crosscur',{e:'✖️',d:'Deal {5|6}, +{4|5} for each Tideturn this turn.',p:f=>f.dmg(f.v(5,6)+f.v(4,5)*W.cb.stat.tideturnsTurn)});

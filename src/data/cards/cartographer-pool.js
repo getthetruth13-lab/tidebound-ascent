@@ -89,7 +89,7 @@ K('piton',{e:'🧗',d:'Put any card from your draw pile on top of it. Draw 1.',p
 K('rubble',{e:'🧱',d:'Deal {10|13}. Whenever one of your Waypoints is destroyed, return this from your discard pile to your hand.',onDrawSelf:(f,ci)=>armRubble(ci),p:f=>{armRubble(f.ci);f.dmg(f.v(10,13))}});
 K('fieldnotes',{e:'📓',d:'Draw {2|3}. Chart 2.',p:f=>{f.draw(f.v(2,3));f.chart(2)}});
 // ---------------- Rare ----------------
-K('atlas',{e:'🌍',d:'Your Waypoints trigger twice at the start of your turn.',power:{mod:{wpTriggers(inst,ctx,v){return v+stacks(inst)}}}});
+K('atlas',{e:'🌍',d:'Your Waypoints trigger twice at the start of your turn.',power:{mod:{wpTriggers(inst,ctx,v){if(ctx&&ctx._atlas)return v;if(ctx)ctx._atlas=1;return v+1}}}}); // one extra trigger total: extra copies and Echo replays do not stack
 K('rekindle',{e:'🕯️',d:'Once per turn, when one of your Waypoints is destroyed, place a random common Waypoint (temporary) in its slot.',power:{on:{decamp(inst,ctx){const cb=W.cb;
  if(ctx.reason!=='destroyed'||inst.rkT===cb.turn||cb.slots.length>=cb.nslots)return;inst.rkT=cb.turn;const d=pick(commonWps(),'combat');if(!d)return;
  const w=mk(d.id,false,{temp:true});placeWp(w);callout('REKINDLED: '+d.n,'adv')}}}});

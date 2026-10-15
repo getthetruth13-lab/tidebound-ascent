@@ -26,7 +26,7 @@ export const ECON={startGold:99,potionSlots:3,
  map:{rows:15,weights:{fight:45,unknown:22,rest:12,elite:10,shop:7}},
  mend:.3,
  // R1b (Spencer 2026-10-13, SIM-ACT1-R1): hero HP overrides, heal after a won fight, elite damage multipliers, relics pulled from the pool.
- heroHp:{tide:60},winHeal:{fight:3,elite:5},eliteDmg:.88,eliteDmgByKey:{eel:.82},relicPulled:['duetbell'],
+ heroHp:{tide:70,carto:64,duel:85},winHeal:{fight:3,elite:5},eliteDmg:.88,eliteDmgByKey:{eel:.82},relicPulled:['duetbell'],
  // Elite Artifact (Spencer 2026-10-13): a roll per elite reward, not guaranteed.
  eliteArtifactChance:.35,
  // merchant stock (Task 65): slot lists, so the card redesign only changes data and pools

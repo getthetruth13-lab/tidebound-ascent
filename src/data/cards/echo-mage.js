@@ -7,7 +7,7 @@ import {alive,log,addSt,addCard} from '../../engine/combat.js';
 import {ask} from './kit.js';
 const E=(id,o)=>card('echo',id,o);
 const playedNow=f=>W.cb.stat.playedTurn+(f.echo?0:1);
-E('arc',{e:'⚡',rk:{max:4},d:'Deal {7|10|+2,1,1,1}.',p:f=>f.dmg(f.r(7,10,'2,1,1,1'))});
+E('arc',{e:'⚡',rk:{max:4},d:'Deal {6|9|+2,1,1,1}.',p:f=>f.dmg(f.r(6,9,'2,1,1,1'))});
 E('shimmer',{e:'🔷',rk:{max:5},d:'Gain {5|8|+} Guard.',p:f=>f.blk(f.r(5,8))});
 E('reverb',{e:'📣',rk:{max:5},d:'Deal {6|8|+}. <b>Resound:</b> deal {10|13|+} instead.',p:f=>f.dmg(f.echo?f.r(10,13):f.r(6,8))});
 E('hum',{e:'🎶',rk:{max:5},d:'Draw {1|2}.{@2| Gain [0|0|+] Guard.} Faint.',p:f=>{f.draw(f.v(1,2));if(f.lvl>=2)f.blk(f.r(0,0))}});
