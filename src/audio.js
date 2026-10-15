@@ -188,6 +188,8 @@ function contextSound(event,c){
  if(event==='enterRoom'){const room={shop:'shop',rest:'camp',chest:'chest',treasure:'chest'}[c.type];if(room)playSound(room)}
  if(event==='statusApplied'&&c.n>0){const sound={str:'might',dex:'poise',regen:'heal',drench:'drenched',reson:'resonating',shell:'shell',barbs:'barbs',ward:'rebuff',mending:'mending',mightTmp:'might',rooted:'entangle',parry:'guard'}[c.key];if(sound)playSound(sound)}
  if(event==='combatStart'&&c.kind==='boss')playSound('bossIntro');
+ if(event==='enemyStrike'&&c.beats&&c.beats.lead>0&&c.intent&&c.intent.a)playSound('cloth-open',c.beats.w==='boss'?.7:.85); // wind-up whoosh as the lunge starts
+ if(event==='playerHit'&&c.amount>0)playSound(c.amount>=Math.max(10,(W.run?.max||60)*.15)?'heavy':'light',.88); // the blow lands on the hero
  if(event==='enemyAct'){
   const e=c.enemy,m=c.intent||{};
   if(e.key==='bell'||e.key==='novice'||m.ring)playSound('knell');

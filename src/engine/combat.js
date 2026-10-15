@@ -12,7 +12,7 @@ import {BOSS_OPEN,bellCount} from '../data/lore.js';
 import {combatRewards,gainCard,goMap,endRun,ECON} from './run.js';
 import {flyCard} from '../ui/fx.js';
 import {impactDelay} from '../ui/vfx.js';
-import {T,EB} from '../core/timing.js';
+import {T,EB,beatsFor} from '../core/timing.js';
 import {render} from '../ui/render.js';
 export const CORE=DATA.v21.sim.core;
 const DU=CORE.duel,TI=CORE.tide,EC=CORE.echo,CA=CORE.carto;
@@ -433,16 +433,22 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;cb.breaks=0;cb.parryHit
  // The player's Soaked / Exposed / Brittle wear off by 1 at the END of the enemy turn, so Exposed shown on the intents really lands.
  // Only stacks held at the start of the phase tick; one applied this phase lasts through the next enemy turn.
  const preSt={...cb.p.st};
- const list=cb.ens.slice();let k=0;const telegraphed=new Set();
+ const list=cb.ens.slice();let k=0;const telegraphed=new Set(),struck=new Set();
  const step=()=>{if(!W.cb||W.cb!==cb)return;
   while(k<list.length&&(list[k].hp<=0||list[k].fled))k++;
   if(k>=list.length)return finish();
-  const e=list[k++];cb.tele=e;if(!window.FAST&&!telegraphed.has(e)){telegraphed.add(e);k--;fire('enemyTelegraph',{enemy:e});render();return setTimeout(step,T(EB().tele))}
+  const e=list[k++];cb.tele=e;
+  // v0.6.13 beats: (1) telegraph/wind-up -> (2) strike lead (lunge or cast) -> (3) IMPACT: act() runs here, so HP/block/buffs change at the contact frame
+  //  -> (4) hit-stop + recover -> (5) gap before the next enemy. FAST skips all of it; the 'classic' (Fast) enemy pace has lead 0 and resolves right after the telegraph.
+  const B=beatsFor(e,intentOf(e),window.FAST?'classic':undefined);cb.beats=B;
+  if(!window.FAST&&!telegraphed.has(e)){telegraphed.add(e);k--;fire('enemyTelegraph',{enemy:e,beats:B});render();return setTimeout(step,T(B.tele+B.teleHold))}
+  if(!window.FAST&&B.lead>0&&!struck.has(e)){struck.add(e);k--;fire('enemyStrike',{enemy:e,intent:intentOf(e),beats:B});render();return setTimeout(step,T(B.lead))}
+  if(window.FAST||B.lead<=0)fire('enemyStrike',{enemy:e,intent:intentOf(e),beats:B});
   if(!(e.passive&&e.passive.keepGuard))e.block=0;act(e);if(!W.cb)return;cb.acting=null;e.t++;if(e.hp>0)endOfEnemyTurn(e);tick(e.st,e.hold);e.hold=null;delete e.st.mightTmp;
   if(e.hp>0&&!e.fled){if(e.keepNext)e.keepNext=false;else e.next=EN[e.key].ai(e)}
   if(W.run.hp<=0&&!cheatDeath())return lose();
   if(!alive().length)return finish();
-  if(window.FAST)return step();render();setTimeout(step,T(EB().gap))};
+  if(window.FAST)return step();render();setTimeout(step,T(B.lead>0?B.hitstop+B.recover+Math.max(0,B.hits-1)*B.hitGap+B.gap:B.gap))};
  const finish=()=>{if(!W.cb)return;['weak','vuln','brittle','drench','reson'].forEach(k=>{if(preSt[k]&&cb.p.st[k]){cb.p.st[k]--;if(!cb.p.st[k])delete cb.p.st[k]}});cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
  step()}
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
