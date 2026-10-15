@@ -25,3 +25,6 @@ export const LAMP_PLAN=[{k:'cards',pref:'u'},{k:'relics'},{k:'cards',pref:'u'},{
 export const LAMP_PER_RUN=110;
 // Stair Climb: relic, potion, relic, mixed, potion, relic, potion, then the Stair blazes and the rest unlock.
 export const CLIMB_PLAN=[{k:'relics'},{k:'potions'},{k:'relics'},{k:'mixed'},{k:'potions'},{k:'relics'},{k:'potions'},{k:'all'}];
+
+// Later-act (Act 2 / Act 3) hero card counts from design/FULL-CARD-POOL. The cards are designed but not in play yet; the Ledger shows one dark placeholder per card so players see the true total.
+export const LATER_ACT_CARDS={tide:{2:20,3:19},echo:{2:20,3:19},carto:{2:21,3:18},duel:{2:19,3:19}};
