@@ -13,7 +13,7 @@ import {barHTML,statusRowHTML,playerStates,enemyExtraSt} from './combatant.js';
 import {CARD_ART,assetEntry,assetSrc,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE,fallenFor} from '../assets.js';
 import {syncAudio} from '../audio.js';
 import {syncEnv,envFxSettingLabel} from './env.js';
-import {FEET,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
+import {fightFeet,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
 import {deathLine} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
 import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
@@ -24,14 +24,14 @@ import {T,U,SPEEDS,SPEED_LABEL,setAnimSpeedValue,setEnemyPace,enemyPace} from '.
 import {heroPlateHTML} from './hero-plate.js';
 import {heroHook} from './herohooks.js';
 export {toggleHitLog} from './hero-plate.js';
-import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,baseCost,costSurcharge} from '../engine/cards.js';
+import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,lvlLabel,rkMax,baseCost,costSurcharge} from '../engine/cards.js';
 import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,canTakeMove,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
 import {ECON,campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
 import {anim,syncCombatAnimations} from './fx.js';
 import {screenChange,motionEnabled} from './anim.js';
 import {deathStyleOf,DEATH_STYLES,DEATH_DRAIN} from './deathstyles.js';
-import {drag} from './input.js';
+import {drag, syncTapArm} from './input.js';
 import {mapHTML} from './map.js';
 import './screens/frame.js';
 import {titleScr} from './screens/title.js';
@@ -74,7 +74,7 @@ export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const ba
  const cls=['card','t'+d.t,'r-'+d.r,'theme-'+(TH[d.cls]||''),o.sel?'sel':'',o.can===false?'unp':'',d.curse?'curse':'',d.cls==='status'?'status':'',o.mark?'markable':'',o.flourish?'flourishable':'',ci.open?'opening':'',d.unplay?'nocost':'',d.cls==='artifact'?'artifact':''].filter(Boolean).join(' ');
  return `<div class="${cls}" ${o.click?`onclick="${o.click}"`:''} data-id="${ci.id}" data-uid="${ci.uid}" data-up="${up?1:0}"${o.i!=null?` data-i="${o.i}"`:''}>
  <i class="cfr"></i>${cardArtHTML(ci.id,d,!!(o.sel||o.full))}
- <div class="card-print">${costGem(ci,d,c,base)}<span class="name" style="--nf:${nameFit(d.n+(up?'+':'')).toFixed(2)}cqw"><span class="nmi">${d.n}${up?'<span class="up">+</span>':''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${d.cls==='artifact'?'Artifact':TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.cls==='artifact'?'<span class="artbadge" title="Artifact"><img src="art/v2/ui/artbadge-128.webp" alt="" draggable="false" decoding="async"></span>':''}${d.r!=='x'?`<span class="rarity ${d.r==='s'?'c':d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}</div><i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}</div>`}
+ <div class="card-print">${costGem(ci,d,c,base)}<span class="name" style="--nf:${nameFit(d.n+lvlLabel(ci)).toFixed(2)}cqw"><span class="nmi">${d.n}${up?`<span class="up">${lvlLabel(ci)}</span>`:''}</span></span><span class="type"${d.unplay?' title="Unplayable"':''}>${d.unplay?'⛔ ':''}${d.cls==='artifact'?'Artifact':TYPEN[d.t]}</span><span class="text" style="--tf:${textFit(desc(ci)).toFixed(2)}cqw"><span>${d.unplay?desc(ci).replace(/^(<[^>]+>)?Unplayable\.(<\/[^>]+>)?\s*/,''):desc(ci)}${ci.sus?` <b class="sus">(+${ci.sus})</b>`:''}</span></span>${d.cls==='artifact'?'<span class="artbadge" title="Artifact"><img src="art/v2/ui/artbadge-128.webp" alt="" draggable="false" decoding="async"></span>':''}${d.r!=='x'?`<span class="rarity ${d.r==='s'?'c':d.r}"></span>`:''}${o.full?`<span class="setno">${setNo(ci.id)}</span>`:''}</div><i class="foil"></i>${o.isNew?'<span class="newseal">NEW</span>':''}${ci.open&&!d.open?'<span class="openpip" title="Opening">⚓</span>':''}${o.mark?'<span class="bell">🔔</span>':''}</div>`}
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
@@ -164,7 +164,7 @@ export function classBar(){const c=W.run.cls,cb=W.cb;
 // ---------------- combat ----------------
 // ---------------- battle figures (Art Director spec) ----------------
 // Fill the free battle area, keeping foot anchors above the resting hand.
-export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*FEET),top:vw>vh?56:40,heroTop:40}}
+export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:Math.min(vh/720,vw/1560),feet:Math.round(vh*fightFeet(vw,vh)),top:vw>vh?56:40,heroTop:40}}
 // One standing figure: sprite (or placeholder) with its foot anchor on the floor point, an ellipse shadow, intent above the head,
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
 // v0.6.2.1 (Spencer): every battle figure 15% taller; top = feet - H keeps the ground anchor fixed. Head-room and width clamps still apply.
@@ -249,7 +249,7 @@ export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
  h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&canTakeMove(ci)})}).join('')}</div>
  <div class="ctl"><div>${heroPlateHTML({incoming})}<button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile.">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
- <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurn()" ${cb.busy||cb.mode?'disabled':''}>END</button></div></div></div>`;
+ <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurnTap()" ${cb.busy||cb.mode?'disabled':''} aria-label="End turn"><img class="end-seal" src="${assetSrc('ui','end-turn-c2')}" alt="" draggable="false"><span class="end-label">END</span></button></div></div></div>`;
  const m=cb.mode;
  if(m&&m.k==='choice')h+=`<div class="ov battle"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
  if(m&&m.k==='slot')h+=`<div class="ov battle"><div class="box tilebox" id="slotbox">${titleHTML(m.title)}<div class="tiles chtiles slottiles" style="--n:${cb.slots.length}">${cb.slots.map((w,i)=>`<div class="tcard opt slotpick">${cardHTML(w,{click:`modeAct('slot',${i})`})}<span class="tcap">${w.rank?'Rank '+w.rank:'Rank 0'}${w.temp?' · starting':''}</span></div>`).join('')}</div></div></div>`;
@@ -257,19 +257,39 @@ export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==
   h+=`<div class="ov battle"><div class="box chartbox" id="chartbox"><h2>🗺️ Chart: set the order of your next draws</h2><div class="muted csub">Drag cards left or right. The leftmost card is drawn first. Drop one in the Bottom slot to send it under the pile.</div>
   <div class="chartrow" style="--n:${n}"><div class="cards" id="chartcards">${cards}</div><div class="cright"><div class="cbottom${m.moved?' used':''}" id="chartbottom"><span class="cbi">⤓</span><b>Bottom</b><i>${m.moved?'Card sent down':'Drop 1 card here'}</i></div><button class="btn pri" id="chartdone" onclick="modeAct('done')">Done</button></div></div></div></div>`}
  return h+'</div>'}
+// C2 sun seal: press scales the button; ending the turn plays the painted burst (transform/opacity only, never past 1.6x) on a layer that survives the re-render.
+export function endTurnTap(){const btn=document.getElementById('endbtn');
+ const reduce=document.body.classList.contains('reduce-motion')||matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(btn&&!btn.disabled&&!reduce){const r=btn.getBoundingClientRect(),fx=document.createElement('img');
+  fx.className='end-burst-fx';fx.alt='';fx.draggable=false;fx.src=assetSrc('ui','end-turn-c2-burst');
+  fx.style.left=(r.left+r.width/2)+'px';fx.style.top=(r.top+r.height/2)+'px';fx.style.width=r.width+'px';fx.style.height=r.height+'px';
+  document.body.appendChild(fx);const done=()=>fx.remove();fx.addEventListener('animationend',done,{once:true});setTimeout(done,900)}
+ window.endTurn?.()}
 function tgtImpl(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return;const e=cb.ens[i];if(!e||e.hp<=0)return;cb.tgt=i;
  cb.insp=cb.insp===i?null:i;cb.sel=null;render()}
 export function sceneTap(ev){if(!W.cb||drag)return;if(ev.target.closest('.en,.tip,.hero'))return;if(W.cb.sel!=null||W.cb.insp!=null){W.cb.sel=null;W.cb.insp=null;render()}}
 // Full framed cards at rest; one card rises above a scrubbing finger or cursor.
 export const HAND_REST_TOP=(1080-238*1.4*.6)/1080;export const HAND_REST_W=238,HAND_LIFT_W=340,HAND_LIFT_TOP=550;
 const handLayouts=new WeakMap();
+// Invisible tap pads above the fan. Middle cards get a wider pad; the pads stay under the raised peek and off enemy figures.
+function placeHandHits(hand,cards){let box=hand.querySelector(':scope > .hand-hits');
+ if(!box){box=document.createElement('div');box.className='hand-hits';hand.appendChild(box)}
+ while(box.children.length<cards.length){const d=document.createElement('div');d.className='hand-hit';box.appendChild(d)}
+ while(box.children.length>cards.length)box.lastChild.remove();
+ const n=cards.length,Wd=hand.clientWidth,H=hand.clientHeight,hr=hand.getBoundingClientRect();
+ let ceil=hr.top-30;
+ for(const f of document.querySelectorAll('.combat .en .fig,.combat .en .plate,.combat .hero .fig,.combat .hero .plate,.combat .intentw')){const r=f.getBoundingClientRect();if(r.width&&r.height&&r.bottom<hr.bottom)ceil=Math.max(ceil,r.bottom+4)}
+ cards.forEach((el,i)=>{const cw=el.offsetWidth,ch=el.offsetHeight,x=+el.dataset.x||0,y=+el.dataset.y||0,b=parseFloat(getComputedStyle(el).bottom)||0;
+  const top=H-b-ch+y,mid=Math.abs(i-(n-1)/2),edge=n<=2||mid>=(n-1)/2-.01,half=cw*(edge?.58:.96),lift=edge?20:40;
+  const bandTop=Math.max(ceil-hr.top,top-lift),bandBot=Math.min(H,top+6),hit=box.children[i];
+  hit.dataset.i=el.dataset.i;hit.style.left=(Wd/2+x-half)+'px';hit.style.top=bandTop+'px';hit.style.width=(half*2)+'px';hit.style.height=Math.max(18,bandBot-bandTop)+'px';hit.style.zIndex=String(50-Math.round(mid*6))})}
 export function layoutHand(animate=false){const hand=document.getElementById('hand');if(!hand)return;const cards=[...hand.querySelectorAll('.card:not(.drag)')];const n=cards.length;if(!n)return;
  const land=matchMedia('(orientation:landscape)').matches;const vh=innerHeight;
  const signature=[innerWidth,vh,hand.className,W.cb?.mode?.k,!!W.cb?.busy,
   cards.map(c=>c.dataset.uid+':'+c.className+':'+c.style.width+':'+c.style.height).join('|'),
   W.cb?.ens.filter(e=>e.hp>0&&!e.fled).map(e=>e.uid).join(',')].join('/');
  // Enemy telegraphs and HP changes do not change the resting fan.
- if(W.cb?.sel==null&&handLayouts.get(hand)===signature){if(land){clampPlates(hand);placeStatusRows()}return}
+ if(W.cb?.sel==null&&handLayouts.get(hand)===signature){if(land){clampPlates(hand);placeStatusRows()}if(hand.querySelectorAll('.hand-hit').length!==n)placeHandHits(hand,cards);return}
  if(!animate)hand.classList.add('instant');
  const Wd=hand.clientWidth,cw=cards[0].offsetWidth,ch=cards[0].offsetHeight;const hr=hand.getBoundingClientRect();const cx=hr.left+Wd/2;
  const step=n>1?Math.min(cw*.78,(Wd-cw)/(n-1)):0;const ang=land?1.6:n>6?2.5:4;
@@ -283,7 +303,7 @@ export function layoutHand(animate=false){const hand=document.getElementById('ha
   // a lifted card slides left of the enemy row when there is room, so it doesn't hide the target it's aimed at
   const zw=cw*zl;const lo=zw/2+4-cx;let hi=innerWidth-zw/2-4-cx;if(land&&eL<innerWidth&&eL-zw-10>0)hi=Math.min(hi,eL-zw/2-6-cx);const xs=Math.max(lo,Math.min(hi,x));
   el.style.setProperty('--x',x+'px');el.style.setProperty('--y',y+'px');el.style.setProperty('--r',off*ang+'deg');el.style.setProperty('--xs',xs+'px');
-  el.style.setProperty('--zl',zl.toFixed(3));el.style.setProperty('--ly',ly+'px');el.dataset.x=x;el.dataset.y=y;el.dataset.zl=zl.toFixed(3);el.dataset.ly=ly});void hand.offsetWidth;hand.classList.remove('instant');handLayouts.set(hand,signature);if(land){clampPlates(hand);placeStatusRows()}}
+  el.style.setProperty('--zl',zl.toFixed(3));el.style.setProperty('--ly',ly+'px');el.dataset.x=x;el.dataset.y=y;el.dataset.zl=zl.toFixed(3);el.dataset.ly=ly});void hand.offsetWidth;hand.classList.remove('instant');handLayouts.set(hand,signature);placeHandHits(hand,cards);if(land){clampPlates(hand);placeStatusRows()}}
 // Name plates + HP bars (incl. extra lines such as the Matriarch's 'Rooted') always sit above the resting hand's top edge.
 function clampPlates(hand){
  // The floor anchor is independent of every temporary hand pose.
@@ -322,6 +342,7 @@ export function settingsHTML(){return `<div class="settings sx">
  ${sxSw('setfast','Fast animations',settings.fastAnim,'setFast')}${sxSw('setmute','Mute audio',settings.audioMuted,'setMute')}
  ${sxSw('sethints','First-fight hints',settings.coach!==false,'setCoach')}${sxSw('setcardskip','Confirm skipping card rewards',settings.confirmCardSkip!==false,'setConfirmCardSkip')}
  ${sxSw('setshake','Screen shake',settings.screenShake!==false,'setScreenShake')}${sxSw('sethaptic','Hand vibration',settings.handHaptic!==false,'setHandHaptic')}
+ ${sxSw('settaptwice','Tap twice to confirm',!!settings.tapConfirm,'setTapConfirm')}
  ${sxSw('setcharselpar','Hero select motion',settings.charselParallax!==false&&!settings.reduceMotion,'setCharselParallax',settings.reduceMotion)}${sxSw('setreduce','Reduced motion',settings.reduceMotion,'setReduceMotion')}
  </div>`}
 export function setMute(on){setAudioSetting('audioMuted',!!on)}
@@ -330,6 +351,7 @@ export function setCoach(on){settings.coach=!!on;saveSettings();render()}
 export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
 export function setCharselParallax(on){settings.charselParallax=!!on;saveSettings()}
 export function setHandHaptic(on){settings.handHaptic=!!on;saveSettings()}
+export function setTapConfirm(on){settings.tapConfirm=!!on;saveSettings()}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
 export function setEnemyPaceMode(v){settings.enemyPace=v==='classic'?'classic':'measured';setEnemyPace(settings.enemyPace);saveSettings()}
 export function setAnimSpeed(v){settings.animSpeed=SPEEDS[v]?v:'normal';setAnimSpeedValue(settings.animSpeed);saveSettings()}
@@ -423,7 +445,7 @@ export function updateCardSelection(){const S=W.S;
  if(S.screen==='reward'){document.querySelectorAll('.rewgrid .rcw').forEach((el,j)=>{el.classList.toggle('reward-selected',S.cardSelected===j);el.setAttribute('aria-selected',S.cardSelected===j)});const sb=document.getElementById('pksub');if(sb)sb.innerHTML=cardSelSub(S.cardSelected!=null?CARDS[S.rows[S.cardsOpen].cards[S.cardSelected]].n:null)}
  if(S.screen==='shop'){document.querySelectorAll('[data-shop-card],.sh1-icon').forEach(el=>el.classList.toggle('reward-selected',(el.dataset.shopCard||el.dataset.shelf+':'+el.dataset.i)===S.shopSelected));const btn=document.getElementById('buyselected');if(btn){btn.disabled=!S.shopSelected;const sp=btn.querySelector('span');if(sp)sp.textContent=S.shopSelected?'Buy':'Select to buy'}const tip=document.getElementById('shoptip');if(tip)tip.innerHTML=shopTipHTML(S)}
  if(S.screen==='pick'){document.querySelectorAll('[data-pick]').forEach(el=>{const on=+el.dataset.pick===S.pickSelected;el.classList.toggle('reward-selected',on);el.setAttribute('aria-selected',on)});const box=document.getElementById('upgradecompare'),ci=W.run.deck.find(c=>c.uid===S.pickSelected);
- if(box){box.innerHTML=ci&&S.mode==='upgrade'?`<div><b>Current</b>${cardHTML(ci)}</div><div class="upgrade-after"><b>After Temper</b>${cardHTML({...ci,up:true})}</div>`:'';
+ if(box){box.innerHTML=ci&&S.mode==='upgrade'?`<div><b>Current</b>${cardHTML(ci)}</div><div class="upgrade-after"><b>After Temper</b>${cardHTML({...ci,up:true,lvl:Math.min(rkMax(ci),Math.max(ci.lvl||0,ci.up?1:0)+1)})}</div>`:'';
  if(ci&&S.mode==='upgrade'){for(const q of ['.cost','.text']){const old=box.querySelector(q),next=box.querySelector('.upgrade-after '+q);if(old?.textContent!==next?.textContent&&next){if(q==='.cost')next.classList.add('upgrade-change');else highlightUpgradeText(old,next)}}decorateKeywords(box);fitCards(box)}}}
 }
 function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;return topBar()+pkScreen({cls:'pk-potpick',title:stripEmoji(S.title),sub:`Pick up to ${Math.min(3,free)} (free slots: ${free}).`,body:tilesRow(S.ids.map((id,j)=>potionTile(id,{click:`potPickToggle(${j})`,on:S.chosen.includes(j)})),'pottiles'),right:pkBtn('Done','potPickDone()',{pri:1,id:'potpickdone'})})}
@@ -507,7 +529,7 @@ export function render(){if(W.previewing||W.replaying)return;tutSync();if(drag||
  for(const el of a.querySelectorAll('.hand .card.drag,.cslot')){el.style.transform='';el.classList.remove('drag','armed','lift','over-zone')}
  for(const el of a.querySelectorAll('.en.hot,.foes.armed,.chartbox.dragging,.cbottom.hot'))el.classList.remove('hot','armed','dragging');
  fitRelics();decorateCardRefs(a);decorateKeywords(a);fitCards(a);if(inspecting)placeHeldInspect();if(s==='pick')updateCardSelection();
- if(s==='combat'){layoutHand();placeDetail()}
+ if(s==='combat'){layoutHand();placeDetail();syncTapArm()}
  syncEnv();syncStage();syncAudio();syncCombatAnimations();
  if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
 // Fit text within the printed frame areas; never grow a panel into the illustration.

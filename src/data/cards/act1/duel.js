@@ -14,10 +14,10 @@ const live=(inst)=>!inst.dead&&W.cb&&W.cb.turn===inst.turn;
 export const firstHit=e=>{const m=intentOf(e);return m&&m.a?eAtk(e,m.a):0};
 
 // ---------------- Starters ----------------
-R('parry',{e:'🛡️',tg:1,d:'Call a Parry of {5|8}.',p:f=>f.parry(f.v(5,8))});
-R('lunge',{e:'🤺',d:'Deal {9|12}. Apply 2 Exposed.',p:f=>{f.dmg(f.v(9,12));f.vuln(2)}});
-N('lightfeet',{e:'👣',d:'Gain {1|2} Momentum. Draw 1.',p:f=>{f.mom(f.v(1,2));f.draw(1)}});
-R('hiltguard',{e:'🛡️',tg:1,d:'Call a Parry of {4|6}. Gain {4|6} Guard.',p:f=>{f.parry(f.v(4,6));f.blk(f.v(4,6))}});
+R('parry',{e:'🛡️',tg:1,rk:{max:5},d:'Call a Parry of {5|8|+}.',p:f=>f.parry(f.r(5,8))});
+R('lunge',{e:'🤺',rk:{max:5},d:'Deal {9|12|+}. Apply 2 Exposed.',p:f=>{f.dmg(f.r(9,12));f.vuln(2)}});
+N('lightfeet',{e:'👣',rk:{max:5},d:'Gain {1|2} Momentum. Draw 1.{@2| Gain [0|0|+] Guard.}',p:f=>{f.mom(f.v(1,2));f.draw(1);if(f.lvl>=2)f.blk(f.r(0,0))}});
+R('hiltguard',{e:'🛡️',tg:1,rk:{max:5},d:'Call a Parry of {4|6|+1,1,1,0}. Gain {4|6|+1,1,0,1} Guard.',p:f=>{f.parry(f.r(4,6,'1,1,1,0'));f.blk(f.r(4,6,'1,1,0,1'))}});
 // ---------------- Common ----------------
 R('advance',{e:'➡️',d:'Deal {6|8}. If you have 2 or more Momentum, draw 1.',p:f=>{const ok=W.cb.mom>=2;f.dmg(f.v(6,8));if(ok)f.draw(1)}});
 R('sidestep',{e:'💃',tg:1,d:'Choose: Call a Parry of {9|11}; or gain 2 Momentum.',p:f=>ask(f,'Sidestep',[{l:'Call a Parry of '+f.v(9,11),f:()=>f.parry(f.v(9,11))},{l:'Gain 2 Momentum',f:()=>f.mom(2)}])});
@@ -42,7 +42,7 @@ R('tempothrust',{e:'⏱️',d:'Deal {6|8}. If this is a Flourish, return this ca
 R('coup',{e:'💀',d:'Deal {12|15}. If this is a Flourish and it kills, gain 1 Energy and draw 2.',p:f=>{const t=f.tg;f.dmg(f.v(12,15));if(f.flourish&&t&&t.hp<=0){bonusEnergy(1,'duel');f.draw(2);log('💀 Coup! +1 Energy, draw 2')}}});
 N('rashflourish',{e:'😵',cu:0,d:'Gain 3 Momentum. Lose 3 HP.',p:f=>{f.mom(3);f.loseHp(3)}});
 // Riposte: this enemy's answer reflects min(stopped, 3 x Momentum) instead of half (half is suppressed, then the new reflect is dealt).
-R('riposte',{e:'↪️',tg:1,d:'Call a Parry of {6|8}. When it triggers, it reflects 3 for each Momentum you have (at most the damage it stopped) instead of half.',p:f=>{const t=f.tg;if(!f.parry(f.v(6,8)))return;
+R('riposte',{e:'↪️',tg:1,rk:{max:5},d:'Call a Parry of {6|8|+2}. When it triggers, it reflects 3 for each Momentum you have (at most the damage it stopped) instead of half.',p:f=>{const t=f.tg;if(!f.parry(f.r(6,8,2)))return;
  nextPhase('riposte',{mod:{parryReflect(inst,ctx,v){if(!live(inst)||inst.done||ctx.enemy!==t)return v;inst.done=true;const n=Math.min(ctx.reduced,3*W.cb.mom);
    log('↪️ Riposte reflects '+n);if(n>0)callout('RIPOSTE ↩ '+n,'parry');return {abs:n}}}})}});
 R('mirrorguard',{e:'🪞',tg:1,cu:0,d:'Call a Parry equal to the target\'s intended hit (max 20). A Clean Answer unless the hit grows.',p:f=>{const t=f.tg;const h=t?firstHit(t):0;

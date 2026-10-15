@@ -5,7 +5,7 @@ import {savedAction,settings,saveSettings} from '../save.js';
 import {ACT1_SET} from '../data/act1.js';
 import {CARDS,CLASSES,ENCOUNTERS,EVENTS,RELICS,POTIONS,CHARMS,EN} from '../core/registry.js';
 import {R,W,pick,rng,shuffle,wpick,rnd,seedStreams} from '../core/state.js';
-import {mk,cname} from './cards.js';
+import {mk,cname,canTemper,upgradeCard,rawLvl} from './cards.js';
 import {startCombat,heal as cHeal} from './combat.js';
 import {fire,mod} from '../core/bus.js';
 import {saveRun,clearRun} from '../save.js';
@@ -289,16 +289,16 @@ export function msg(title,text,next){W.S={screen:'msg',title,text,next:next||goM
 // Small non-blocking toast (relic/potion/curse gained). Visual only.
 export function toast(txt,cls){W.toasts=(W.toasts||[]).filter(t=>Date.now()-t.t<2600);W.toasts.push({txt,cls:cls||'',t:Date.now()})}
 // ================= deck picks: upgrade / remove / transform / duplicate / annotate / custom =================
-export function pickable(mode,filter){return W.run.deck.filter(c=>{const d=CARDS[c.id];if(mode==='upgrade'&&(c.up||d.curse||d.cls==='status'))return false;
+export function pickable(mode,filter){return W.run.deck.filter(c=>{const d=CARDS[c.id];if(mode==='upgrade'&&(!canTemper(c)||d.curse||d.cls==='status'))return false;
  if((mode==='remove'||mode==='transform'||mode==='offer')&&d.noRemove)return false;if(mode==='annotate'&&(c.open||d.open))return false;return !filter||filter(c)})}
 export function openPick(mode,title,then,cancel,filter,onPick){const list=pickable(mode,filter);if(!list.length){then?then(null):goMap();return}
  W.S={screen:'pick',mode,title,then:then||goMap,cancel,filter,onPick};render()}
 function applyPickCard(uid){const S=W.S;if(S.screen!=='pick')return;const i=W.run.deck.findIndex(c=>c.uid===uid);if(i<0)return;const ci=W.run.deck[i];
  if(!pickable(S.mode,S.filter).includes(ci))return;
- if(S.mode==='upgrade')ci.up=true;
+ if(S.mode==='upgrade')upgradeCard(ci);
  else if(S.mode==='remove'){W.run.deck.splice(i,1)}
  else if(S.mode==='transform'){const n=pick(poolOf().filter(c=>c.id!==ci.id),'events');W.run.deck[i]=mk(n.id);toast('🔀 '+CARDS[ci.id].n+' → '+n.n,'')}
- else if(S.mode==='duplicate'){W.run.deck.push(mk(ci.id,ci.up));toast('🪞 Duplicated '+cname(ci),'')}
+ else if(S.mode==='duplicate'){W.run.deck.push(mk(ci.id,rawLvl(ci)));toast('🪞 Duplicated '+cname(ci),'')}
  else if(S.mode==='annotate'){ci.open=true;toast('📘 '+cname(ci)+' gains Opening','')}
  if(S.onPick)S.onPick(ci);S.then(ci)}
 function pickCardImpl(uid){return applyPickCard(uid)}

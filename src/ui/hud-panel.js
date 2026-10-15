@@ -123,10 +123,13 @@ export function playableCount(cb){let n=0;for(const ci of cb.hand||[]){const d=C
 if(typeof document!=='undefined')document.addEventListener('pointerdown',ev=>{if(!ev.target.closest?.('#endbtn'))return;const cb=W.cb;if(!cb||cb.busy||!cb.energy||!playableCount(cb))return;
  const o=document.getElementById('orb');if(o){o.classList.remove('fx-unspent');void o.offsetWidth;o.classList.add('fx-unspent')}},true);
 // ---- C2: touching a card you can't afford shakes it, rings its cost gem red and flashes the orb red (300 ms). Play rules unchanged.
-if(typeof document!=='undefined')document.addEventListener('pointerdown',ev=>{const c=ev.target.closest?.('.hand .card[data-uid]');const cb=W.cb;if(!c||!cb||W.S.screen!=='combat')return;
- const ci=cb.hand.find(h=>String(h.uid)===c.dataset.uid);if(!ci||CARDS[ci.id]?.unplay)return;let k;try{k=cost(ci)}catch(e){return}if(k<=cb.energy)return;
+export function flashNoAfford(cardEl){const c=cardEl&&cardEl.isConnected?cardEl:document.querySelector('.hand .card.peek,.hand .card.tap-armed');
  for(const el of [c,document.getElementById('orb')])if(el){el.classList.remove(el===c?'fx-noafford':'fx-poor');void el.offsetWidth;el.classList.add(el===c?'fx-noafford':'fx-poor')}
- playSound('cancel',.7)},true);
+ playSound('cancel',.7)}
+function handCardEl(node){const hit=node?.closest?.('.hand-hit');if(hit)return document.querySelector(`.hand .card[data-i="${hit.dataset.i}"]`);return node?.closest?.('.hand .card[data-uid]')||null}
+if(typeof document!=='undefined')document.addEventListener('pointerdown',ev=>{const c=handCardEl(ev.target);const cb=W.cb;if(!c||!cb||W.S.screen!=='combat')return;
+ const ci=cb.hand.find(h=>String(h.uid)===c.dataset.uid);if(!ci||CARDS[ci.id]?.unplay)return;let k;try{k=cost(ci)}catch(e){return}if(k<=cb.energy)return;
+ flashNoAfford(c)},true);
 // ---- C7: an intent number that changed since the last render flashes (green = weaker, red = stronger), 400 ms
 const INT=new Map();
 export function flashIntents(){if(typeof document==='undefined')return;for(const el of document.querySelectorAll('.en[data-en] .intent')){const k=el.closest('.en').dataset.en,v=el.textContent.replace(/\s+/g,'');const n=parseInt(v)||0;

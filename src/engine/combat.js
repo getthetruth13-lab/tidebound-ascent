@@ -4,7 +4,7 @@ import {savedAction} from '../save.js';
 import {CARDS,EN,POTIONS} from '../core/registry.js';
 import {W,nextId,pick,rng,shuffle,R} from '../core/state.js';
 import {spriteCount} from '../assets.js';
-import {cname,cost,desc,isEx,isUp,isX,mk,needsTarget,plain} from './cards.js';
+import {cname,cost,desc,isEx,isUp,isX,lvlOf,mk,needsTarget,plain,rv} from './cards.js';
 import {runCard} from './effects.js';
 import {fire,mod,thisTurn} from '../core/bus.js';
 import {DATA} from '../data/generated/data-v2.js';
@@ -179,9 +179,9 @@ export const canSpend=n=>!!W.cb&&W.cb.tide>=n&&!W.cb.slack;
 export function spendTide(n){const cb=W.cb;n=Math.min(n,cb.tide);if(n<=0||cb.slack)return 0;tideShift(-n,'spend');return n}
 // ================= effect context =================
 // f is what a card's effect code (fx ops, p:f=>{}) talks to. Helpers per content-impl-plan §2.3.
-export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=isUp(ci);
- const f={u,ci,def,m:o.mult||1,mult:o.mult||1,echo:!!o.echo,potion:!!o.potion,half:!!o.half,scale:o.scale||1,bonus:o.bonus||0,wp:!!o.wp,lm:!!o.lm,rankDmg:o.rankDmg||0,x:o.x||0,allTargets:!!o.allTargets,
-  v:(a,b)=>u?b:a,
+export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=isUp(ci),lvl=u?lvlOf(ci):0;
+ const f={u,lvl,ci,def,m:o.mult||1,mult:o.mult||1,echo:!!o.echo,potion:!!o.potion,half:!!o.half,scale:o.scale||1,bonus:o.bonus||0,wp:!!o.wp,lm:!!o.lm,rankDmg:o.rankDmg||0,x:o.x||0,allTargets:!!o.allTargets,
+  v:(a,b)=>u?b:a,r:(a,b,step,max)=>rv(a,b,step,lvl,max), // r: per-level value (see cards.js rv)
   get tg(){let t=o.tgt;if(!t||t.hp<=0||t.fled)t=o.echo?randAlive():curTgt();return t},
   get low(){return f._low}, get high(){return f._high}, lowNow:()=>isLow(), highNow:()=>isHigh(),
   num(n){n+=(ci&&ci.sus)||0;if(f.half)n=Math.floor(n*(EC.unmarked_fallback||.5));if(f.scale<1)n=Math.floor(n*f.scale);return n+f.bonus}, // unmarked Echo fallback: v2.2 = 1/4

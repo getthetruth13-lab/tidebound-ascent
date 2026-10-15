@@ -7,7 +7,7 @@ import {log,addSt,gainMom} from '../../engine/combat.js';
 import {forCombat} from '../../core/bus.js';
 import {ask} from './kit.js';
 const D=(id,o)=>card('duel',id,o);
-D('thrust',{e:'🗡️',d:'Deal {5|8}.',fx:[['dmg',5,8]]});
+D('thrust',{e:'🗡️',rk:{max:5},d:'Deal {5|8|+}.',p:f=>f.dmg(f.r(5,8))});
 D('parry',{e:'🛡️',d:'Parry {5|8}.',fx:[['parry',5,8]]});
 D('lunge',{e:'🤺',d:'Deal {10|14}.',fx:[['dmg',10,14]]});
 D('footwork',{e:'👣',d:'Gain 1 Momentum. Draw {1|2}.',p:f=>{f.mom(1);f.draw(f.v(1,2))}});

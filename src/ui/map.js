@@ -2,7 +2,7 @@
 // Tidewalker Boots: with charges left, every node on the next floor is selectable (non-linked ones show a 🥾 badge).
 import {W} from '../core/state.js';
 import {EN} from '../core/registry.js';
-import {uiIcon,slotHTML} from '../assets.js';
+import {uiIcon} from '../assets.js';
 import {reachable,bootsLeft} from '../engine/run.js';
 import {actName,ACT_NAMES,MAP_LINE} from '../data/places.js';
 export const ICON={fight:'⚔️',elite:'💀',rest:'🔥',shop:'💰',unknown:'❓',event:'❓',treasure:'💎',boss:'🔔'};
@@ -44,7 +44,8 @@ export function mapHTML(interactive){const run=W.run,rows=run.map,H=74,N=rows.le
    svg+=`<path d="M${x*4} ${y} Q${mx*4} ${(y+y2)/2} ${x2*4} ${y2}" fill="none" stroke="${on?'#7c1f2c':'#4a3a22'}" stroke-width="${on?3.5:2}" stroke-dasharray="${on?'':'2 7'}" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity="${on?.9:.7}"/>`});
   land+=`<i class="ldg${n.t==='boss'?' boss':''}" style="left:${x}%;top:${y+(n.t==='boss'?22:15)}px"></i>`;
   const next=interactive&&r===run.pos.r+1;const isAv=next&&av.includes(i),bootsAv=next&&!isAv&&boots,vis=run.vis[r+':'+i];
-  const ic=n.t==='boss'?slotHTML('enemies',run.boss,'bossart',bossE.e||'🔔'):uiIcon(nodeKey(n.t),ICON[n.t],'nodeic');
+  // The boss node uses the painted medallion (node-boss). The battle sprite is a dark full-body cut-out and reads as an empty navy disc at this size.
+  const ic=uiIcon(nodeKey(n.t),ICON[n.t]||ICON.boss,'nodeic');
   nodes+=`<button class="node ${n.t} ${n.t==='boss'?'boss':''} ${isAv||bootsAv?'av':''} ${bootsAv?'boots':''} ${vis?'vis':''} ${run.pos.r===r&&run.pos.i===i?'cur':''} ${r<=run.pos.r&&!vis?'dim':''}" style="left:${x}%;top:${y}px" ${isAv||bootsAv?`onclick="goNode(${r},${i})"`:''} title="${n.t==='boss'?'Boss: '+(bossE.n||''):NAME[n.t]||n.t}" data-r="${r}" data-i="${i}" data-t="${n.t}">${ic}${bootsAv?`<i class="bootb">${cuts>0?'✂️':'🥾'}</i>`:''}${n.pre&&!vis?`<i class="revb" title="Revealed: ${REV[n.pre][1]}">${REV[n.pre][0]}</i>`:''}</button>`}));
  return `<div class="parch"><h2>${interactive?'Choose your path':actName(run.act||1)}</h2><div class="mapact">${ACT_NAMES[run.act||1]?(interactive||actName(run.act||1)!==ACT_NAMES[run.act||1].n?ACT_NAMES[run.act||1].n+' · ':'')+ACT_NAMES[run.act||1].sub:''}</div><div class="maplore">${MAP_LINE}</div><div class="legend">${[['fight','Fight'],['elite','Elite'],['unknown','?'],['rest','Camp'],['shop','Merchant'],['treasure','Chest']].map(([k,l])=>`<span>${uiIcon(nodeKey(k),ICON[k],'legic')}${l}</span>`).join('')}<span class="bossleg">${bossE.e||''} ${bossE.n||''}</span>${boots?`<span>${cuts>0?`✂️×${cuts} `:''}${bootsLeft()>0?`🥾×${bootsLeft()}`:''}</span>`:''}${rows.some(r=>r.some(n=>n.pre&&!run.vis[rows.indexOf(r)+':'+r.indexOf(n)]))?'<span><i class="revleg">🔭</i>Revealed</span>':''}</div>
  <div class="mapwrap${a1?' a1':''}" style="height:${N*H+30+TOP+BOT}px;width:92%">${a1?`<i class="a1art top" style="top:${Y(N-1)-32}px"></i>`:''}<span class="gate-w" style="top:${Y(N-1)-52}px">${a1?GATE_A1:GATE}</span>${deco.html}${land}<svg width="100%" height="${N*H+30+TOP+BOT}" viewBox="0 0 400 ${N*H+30+TOP+BOT}" preserveAspectRatio="none">${deco.svg}${svg}</svg>${nodes}</div></div>`}

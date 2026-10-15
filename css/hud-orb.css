@@ -93,12 +93,11 @@
 .hpn-duel{--c:255,110,40}
 .combat:has(.hplate.hud-b.hp-tide) .dais.compact-meter{bottom:31dvh}
 #orbpanel.hpanel.fit{transform:scale(var(--fit));animation:none}
-/* C3: End Turn pulses once you are out of plays (starts 600 ms after the last play) */
-.combat:has(.hplate[data-done]) #endbtn{animation:endpulse 1.2s ease-in-out .6s infinite}
-@keyframes endpulse{0%,100%{filter:drop-shadow(0 0 0 #ffd27000)}50%{filter:drop-shadow(0 0 8px #ffd270) brightness(1.12)}}
+/* C3: the C2 seal carries its own transform pulse (style.css). No filter animation on the button. */
+.combat:has(.hplate[data-done]) #endbtn{animation:none}
 /* C8: End Turn with Energy left and a playable card: the orb flashes amber twice */
 #orb.horb.fx-unspent .ho-glow{animation:hounspent .3s ease-in-out 2}@keyframes hounspent{50%{background:radial-gradient(circle,#ffc040 0,#ffc04000 72%);opacity:1;transform:scale(1.25)}}
-.reduce-motion .combat:has(.hplate[data-done]) #endbtn{animation:none;filter:drop-shadow(0 0 6px #ffd270)}
+.reduce-motion .combat:has(.hplate[data-done]) #endbtn{animation:none;filter:none}
 /* C2 unaffordable */
 .hand .card.fx-noafford{animation:noafford .3s linear}@keyframes noafford{20%{translate:-4px 0}40%{translate:4px 0}60%{translate:-3px 0}80%{translate:2px 0}}
 .hand .card.fx-noafford .cost,.hand .card.fx-noafford [class*=cost]{box-shadow:0 0 0 2px #ff3a2a,0 0 8px #ff3a2a;border-radius:50%}

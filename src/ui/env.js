@@ -13,8 +13,12 @@ import {ENV} from '../core/registry.js';
 import {U} from '../core/timing.js';
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
+import {syncLiving} from './env-living.js';
 const LAYERS=['sky','far','mid','ground'];// fg lives in #env-front (design-v2 §W.7.3 DOM order: over the figures, under the UI)
-export const FEET=.694; // the one battle floor line: feet of every figure sit at FEET of the viewport height (sceneGeom, anchor() and stage all read it)
+export const FEET=.694; // the painted battle floor: feet of every figure sit on this fraction of the viewport (sceneGeom, anchor() and stage all read it)
+// C2 sun seal: on a landscape fight the whole standing line (figures, painted floor, HP bars, status rows) is 150px higher on a 1080-tall canvas, so nothing sits under the End Turn button. Portrait stays on FEET.
+export const FIGHT_LIFT=150/1080;
+export function fightFeet(vw,vh){return FEET-(vw>vh?FIGHT_LIFT:0)}
 const GROUND=.69; // ground line at 69% of the layer height (environments.json layers.ground)
 const aspect=()=>{const e=ENV.envs[root&&root.dataset.env]||{};const sp=e.space||[3600,1440];return sp[0]/sp[1]};
 let root=null,front=null,wipe=null,canvas=null,ctx2=null,cur='',last=null,curEnv=null,lastBand=null;
@@ -93,6 +97,7 @@ export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&
  // painted layers: each layer is the full rect space (3600x1440); every shipped file sits at its rect (trimmed mid / fg-l / fg-r)
  const sp=e.space||[3600,1440];root.classList.toggle('has-art',!!e.art);
  allL().forEach(el=>swapLayer(el,(e.art&&e.art[el.dataset.l])||[],sp));
+ root.toggleAttribute('data-still',!!e.still);document.body.toggleAttribute('data-still-env',!!e.still);front.toggleAttribute('data-still',!!e.still);syncLiving(k.id,e); // still env: solids never move; painted living layers only
  const t=e.tint||{col:'#000',a:0},v=e.vig||{s:.4,col:'#000'};
  const hx=(c,a)=>c+Math.round(Math.max(0,Math.min(1,a))*255).toString(16).padStart(2,'0');
  root.querySelector('.envlight').style.background=`radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, ${hx(v.col,(v.s||.4)+(g.vig_add||0)+.3)} 100%), linear-gradient(${hx(t.col,(t.a||0)+(g.tint_add||0))}, ${hx(t.col,(t.a||0)+(g.tint_add||0))})`;
@@ -102,7 +107,7 @@ export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&
  // enemy rim light (AD): on where the backdrop swallows silhouettes (Matriarch's green hollow); strength 0..1
  document.body.style.setProperty('--env-rim-s',String(RIM_ON[k.id]||0));
  if(changedEnv||curEnv!==k.id+quality()){curEnv=k.id+quality();
-  if(W.S.screen==='combat'&&motionOK())slideIn()}
+  if(W.S.screen==='combat'&&motionOK()&&!e.still)slideIn()}
  // band toast on the map
  if(W.S.screen==='map'&&W.run){const b=bandOf(W.run.act||1,Math.max(1,Math.min(14,(W.run.floor||0)+1)));if(b&&lastBand&&b.band!==lastBand.band)bandToast(ENV.envs[b.env]?ENV.envs[b.env].n:b.band);lastBand=b}}
 // A/B art swap: the new art is built off-screen in its own box, decoded (img.decode, off the main thread), then faded in OVER the old
@@ -119,7 +124,7 @@ function swapLayer(el,list,sp){const sig=list.map(x=>x.f).join('|');const sh=el.
  Promise.race([Promise.all(list.map(load)),new Promise(r=>setTimeout(r,3000))]).then(()=>{if(el.dataset.src!==sig)return;
   const fresh=!sh.firstChild||el.style.opacity==='0';rebuilds++;
   if(fresh)box.style.transition='none';sh.appendChild(box);el.style.opacity=1;box.getBoundingClientRect();box.style.opacity=1;
-  setTimeout(()=>{if(box.parentNode===sh)while(sh.firstChild&&sh.firstChild!==box)sh.firstChild.remove()},fresh?60:450)})}
+  setTimeout(()=>{if(box.parentNode===sh)[...sh.children].forEach(c=>{if(c!==box&&!c.classList.contains('envlv'))c.remove()})},fresh?60:450)})} // .envlv (painted living layers) is owned by env-living.js
 // ---------- camera: slide-in (cam.x 1 → 0, 900 ms cubic-out) via transform on each layer ----------
 let cam={x:0,from:0,t0:0,dur:0};
 function slideIn(){cam={x:1,from:1,t0:performance.now(),dur:window.FAST?315:900};root.classList.add('sliding')}
@@ -135,7 +140,7 @@ function startLoop(){if(raf||!motionOK())return;lastT=performance.now();raf=requ
 function stopLoop(){if(raf)cancelAnimationFrame(raf);raf=0;if(ctx2)ctx2.clearRect(0,0,canvas.width,canvas.height)}
 function loop(now){raf=requestAnimationFrame(loop);const dtMs=now-lastT;lastT=now;if(document.hidden)return;
  if(!motionOK()&&!cam.dur){stopLoop();return} // Effects Off / reduced motion: nothing animates, so no rAF at all
- const live=cam.dur&&!overlayOpen;
+ const live=(cam.dur||(root.hasAttribute('data-still')&&W.S&&W.S.screen==='combat'))&&!overlayOpen; // still env: the painted living layers are the load to govern
  // governor: env frames only, ignoring 500 ms after a screen / visibility change. Down only after >=3 s with p75 > 1.5x the panel interval.
  if(live&&dtMs>4&&dtMs<1000){hist[dtMs<9.7?0:dtMs<13.9?1:2]++;if(hist[0]+hist[1]+hist[2]>2000)for(let i=0;i<3;i++)hist[i]>>=1;
   if(now>=quietUntil){ts.push(now);ds.push(dtMs);while(ts.length&&now-ts[0]>3000){ts.shift();ds.shift()}
@@ -155,9 +160,11 @@ export function bandToast(name){const el=document.createElement('div');el.classN
 // On screens wider than 2.5:1 the stack grows 4% so the fg parallax still has overscan.
 let anchorWidth=0,anchorHeight=0;
 function anchor(force){if(!root)return;if(force||!anchorWidth){anchorWidth=innerWidth;anchorHeight=innerHeight}const vw=anchorWidth,vh=anchorHeight;const combat=W.S.screen==='combat';
- const ASPECT=aspect();let h=Math.max(vh,vw*1.04/ASPECT),top,gy;
- if(combat){// painted floor row (env.foot of the plate) lands on FEET; stack grows until it also covers the bottom of the screen
-  const id=envKeyFor().id,foot=ENV.envs[id]?.foot||GROUND;gy=vh*FEET;h=Math.max(h,vh*FEET/foot,vh*(1-FEET)/(1-foot));top=gy-h*foot}
+ const ASPECT=aspect();let h=Math.max(vh,vw*1.04/ASPECT),top,gy;const still=!!(ENV.envs[root.dataset.env]||{}).still;
+ if(still){h=Math.max(vh,vw/ASPECT);top=vh-h;const sig=`${vw}x${vh}@${Math.round(top)}/${Math.round(h)}`;if(!force&&root.dataset.anchor===sig)return;root.dataset.anchor=sig;
+  document.querySelectorAll('#env .envstack,#env-front .envstack').forEach(el=>{const st=el.style;st.height=h+'px';st.width=h*ASPECT+'px';st.top=top+'px'});return} // still env (no parallax): exact cover, bottom anchored, no overscan
+ if(combat){// painted floor row (env.foot of the plate) lands on the fight line (FEET, lifted in landscape); stack grows until it also covers the bottom of the screen
+  const id=envKeyFor().id,foot=ENV.envs[id]?.foot||GROUND,line=fightFeet(vw,vh);gy=vh*line;h=Math.max(h,vh*line/foot,vh*(1-line)/(1-foot));top=gy-h*foot}
  else{gy=vh*GROUND;top=gy-h*GROUND}
  const sig=`${vw}x${vh}@${Math.round(top)}/${Math.round(h)}`;if(!force&&root.dataset.anchor===sig)return;root.dataset.anchor=sig;
  document.querySelectorAll('#env .envstack,#env-front .envstack').forEach(el=>{const st=el.style;st.height=h+'px';st.width=h*ASPECT+'px';st.top=top+'px'})}
@@ -166,7 +173,7 @@ export function envState(){return root?{id:root.dataset.env,band:root.dataset.ba
  cssFx:root.querySelectorAll('.envfx-back .efx').length,layers:[...allL()].filter(l=>l.dataset.src).map(l=>l.dataset.l),files:[...document.querySelectorAll('#env .envI,#env-front .envI')].filter(i=>i.style.backgroundImage).length,wipeEvents:getComputedStyle(wipe).pointerEvents}:null}
 // G.debugEnv(id, grade): force an environment (shot.js / art review). Pass no id to return to normal routing.
 export function debugEnv(id,grade){forced=id&&ENV.envs[id]?{id,grade:grade||'normal'}:null;cur='';syncEnv();return !!forced||!id}
-export function envFiles(id){const e=ENV.envs[id];return e&&e.art?Object.values(e.art).flat().map(x=>x.f):[]}
+export function envFiles(id){const e=ENV.envs[id];if(!e||!e.art)return [];const live=e.living?[...new Set(JSON.stringify(e.living).match(/art\/[^"]+\.webp/g)||[])]:[];return [...new Set([...Object.values(e.art).flat().map(x=>x.f),...live])]}
 // Offline precache: only the current act's painted layers (they are large).
 export function envURLs(act){return Object.entries(ENV.envs).filter(([,e])=>e.act===(act||1)&&e.art).flatMap(([id])=>envFiles(id))}
 export function preloadEnv(id){envFiles(id).forEach(f=>{const im=new Image();im.src=f})}

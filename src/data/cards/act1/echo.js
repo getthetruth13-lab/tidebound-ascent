@@ -69,9 +69,9 @@ N('crackedclapper',{e:'🔔',d:'Whenever an Echo repeats, a Ringing in your hand
 // SAME ids whose upgrade differs from the shipped one (doc 2.A.1 upgrades):
 R('sharp',{e:'♯',d:'Deal {8|10}. <b>Resound:</b> apply {2|3} Exposed.',p:f=>{f.dmg(f.v(8,10));if(f.echo)f.vuln(f.v(2,3))}});
 R('silence',{e:'🤫',tg:1,d:'Remove all Guard from the target. Apply {2|3} Exposed. <b>Resound:</b> also apply 2 Soaked.',p:f=>{const t=f.tg;if(!t)return;t.block=0;f.vuln(f.v(2,3));if(f.echo)f.weak(2)}});
-R('tuningstrike',{e:'🔔',tg:1,d:'Deal {7|9}. Apply 2 Resonating.',p:f=>{f.dmg(f.v(7,9));const t=f.tg;if(t)addSt(t,'reson',2)}});
+R('tuningstrike',{e:'🔔',tg:1,rk:{max:4},d:'Deal {7|9|+2}. Apply 2 Resonating.',p:f=>{f.dmg(f.r(7,9,2));const t=f.tg;if(t)addSt(t,'reson',2)}});
 R('struckbell',{e:'🛎️',d:'Deal {7|9} to ALL. Apply 2 Resonating to ALL.',p:f=>{f.all(f.v(7,9));alive().forEach(e=>addSt(e,'reson',2))}});
-R('harmonics',{e:'🎛️',sus:3,d:'Gain {8|11} Guard. Sustain 3.',p:f=>f.blk(f.v(8,11))});
+R('harmonics',{e:'🎛️',sus:3,rk:{max:5},d:'Gain {8|11|+2} Guard. Sustain 3.',p:f=>f.blk(f.r(8,11,2))});
 R('choir',{e:'👥',d:'At the start of your turn, add 1 Note to your hand.',power:{on:{turnStart(inst){addCard('note','hand');floatText('p','🎵 +1 Note','')}}}});
 
 // ================= Rare =================

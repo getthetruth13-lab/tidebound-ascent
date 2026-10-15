@@ -886,7 +886,7 @@ body.scene-choice .wrap{background:transparent}
 .outcome-status{top:-51px;left:50%;translate:-50% 0}.outcome-status>span{display:flex;align-items:center;gap:1px;background:#080d13cc;border:1px dashed #d8a44677;padding:1px 2px}.outcome-status .status-art{width:14px;height:14px}
 
 /* map_a1: painted lighthouse (top, tower base on the boss node) + shore/boat (bottom, waterline on the tide line); edges alpha-faded into the repeating strip */
-.mapwrap.a1{isolation:isolate}
+.mapwrap.a1{isolation:isolate;margin-top:72px}
 .mapwrap.a1 .a1art{position:absolute;left:-4.348%;width:108.696%;aspect-ratio:16/9;z-index:-1;pointer-events:none;background:center/100% 100% no-repeat}
 .mapwrap.a1 .a1art.top{background-image:url("../art/v2/bg/map-a1-top@2x.webp");transform:translateY(-31.3%)}
 .mapwrap.a1 .a1art.bot{background-image:url("../art/v2/bg/map-a1-bot@2x.webp");transform:translateY(-74.2%)}
@@ -901,8 +901,8 @@ body.scene-choice .wrap{background:transparent}
 .turn-sweep::before,.turn-sweep::after{content:'◆';position:absolute;top:50%;transform:translateY(-50%);font-size:12px;color:#b89a62}.turn-sweep::before{left:12px}.turn-sweep::after{right:12px}
 @keyframes turn-sweep{0%{opacity:0;translate:-25px 0}18%,65%{opacity:1;translate:0 0}100%{opacity:0;translate:25px 0}}
 .turn-sweep.still{animation:turn-still calc(750ms*var(--ts,1)) linear both}@keyframes turn-still{0%,100%{opacity:0}15%,70%{opacity:1}}
-body.combat-motion #endbtn:not(:disabled){transition:transform 160ms ease-out,filter 160ms ease-out}
-body.combat-motion .combat #endbtn:active:not(:disabled){transform:translateY(2px) scale(.97);filter:brightness(1.2) drop-shadow(0 0 4px #58d7ca)}
+body.combat-motion #endbtn:not(:disabled){transition:transform 120ms ease-out}
+body.combat-motion .combat #endbtn:active:not(:disabled){transform:scale(.94);filter:none}
 .combo-pop{font-size:clamp(30px,calc(var(--fs) * 1.2),48px)!important;color:#ffe5ac!important;text-shadow:0 2px 3px #000,0 0 8px #713d20;font-weight:900}
 @media(prefers-reduced-motion:reduce){#endbtn:active{transform:none}.turn-sweep{animation:turn-still calc(750ms*var(--ts,1)) linear both}}
 
@@ -949,6 +949,8 @@ body.combat-motion .combat #endbtn:active:not(:disabled){transform:translateY(2p
 body.env-combat #env-front{display:none}
 .combat #orb{left:calc(16px + env(safe-area-inset-left));bottom:74px}
 .hand .card.drag{pointer-events:none}
+.combat .hand .hand-hits{position:absolute;inset:0;z-index:4;pointer-events:none}
+.combat .hand .hand-hit{position:absolute;pointer-events:auto;background:transparent;touch-action:none}
 .combat .drop-valid .fig{filter:drop-shadow(0 0 5px #65d6bb)}
 .combat .drop-over .fig{filter:drop-shadow(0 0 9px #ffe6a4)}
 .combat .drop-invalid{opacity:.55}
@@ -1131,8 +1133,8 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 
 /* Task 41: measured 2340×1080 battle baseline, scaled by height and UI size. */
 @media(orientation:landscape){
- .combat,.runhud{--unit:calc(100dvh / 1080);--hud-unit:calc(var(--unit)*1);--hud-icon:calc(40*var(--hud-unit));--hud-text:calc(30*var(--hud-unit));--hud-gap:calc(8*var(--hud-unit));--edge:calc(20*var(--hud-unit));--relic-cell:calc(63*var(--hud-unit))}
- :is(.combat,.runhud)>.topbar{position:absolute;inset:0 0 auto;width:100%;height:calc(78*var(--hud-unit));transform:none;padding:0;background:linear-gradient(#15212bd9,#18242bc4,#18242b00);border:0;box-shadow:none;display:block;font-size:var(--hud-text)}
+ .combat,.runhud{--unit:calc(100dvh / 1080);--hud-unit:calc(var(--unit)*1);--topbar-h:calc(78*var(--hud-unit));--hud-icon:calc(40*var(--hud-unit));--hud-text:calc(30*var(--hud-unit));--hud-gap:calc(8*var(--hud-unit));--edge:calc(20*var(--hud-unit));--relic-cell:calc(63*var(--hud-unit))}
+ :is(.combat,.runhud)>.topbar{position:absolute;inset:0 0 auto;width:100%;height:var(--topbar-h);transform:none;padding:0;background:linear-gradient(#15212bd9,#18242bc4,#18242b00);border:0;box-shadow:none;display:block;font-size:var(--hud-text)}
  :is(.combat,.runhud) .topbar>.who,:is(.combat,.runhud) .topbar>.stat,:is(.combat,.runhud) .topbar>.mini,:is(.combat,:where(.runhud>.topbar.sts)) #potions{position:absolute;top:calc(40*var(--hud-unit));transform:translateY(-50%);padding:0;background:none;border:0;box-shadow:none;min-height:0;white-space:nowrap}
  :is(.combat,:where(.runhud>.topbar.sts)) .who{left:2.56%;width:calc(170*var(--hud-unit))}:is(.combat,:where(.runhud>.topbar.sts)) .who>.slot{display:none}:is(.combat,:where(.runhud>.topbar.sts)) .who .nm{font-size:var(--hud-text);line-height:1}:is(.combat,:where(.runhud>.topbar.sts)) .who small{display:block;font:calc(20*var(--hud-unit))/1 var(--font-body)}
  :is(.combat,.runhud) .topbar .hp{left:12.18%}:is(.combat,.runhud) .topbar .gold{left:20.51%}:is(.combat,.runhud) .topbar .floor{left:45.3%}
@@ -1188,8 +1190,8 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 .combat .plate .stw .status-art.more-chip{min-width:20px!important;width:20px!important;padding:0!important;box-sizing:border-box}
 .combat .plate .stw{top:0;margin-top:2px}
 
-/* Task 61: approved cutout plate; pressed art remains visible under HUD resets. */
-.combat #endbtn:active:not(:disabled){background-image:var(--ui-end-turn-pressed)!important}
+/* Task 61: press no longer swaps plates. The C2 seal scales; the burst is a separate layer. */
+.combat #endbtn:active:not(:disabled){background-image:none!important}
 body.reduce-motion .combat #endbtn{transition:none}
 body.reduce-motion .combat #endbtn:active:not(:disabled){transform:none}
 @media(prefers-reduced-motion:reduce){body.combat-motion .combat #endbtn{transition:none}body.combat-motion .combat #endbtn:active:not(:disabled){transform:none}}
@@ -1308,3 +1310,36 @@ body.kw-frame .keyword-window::before{content:none}
 .inspect-keywords .cref-card{padding:4px;display:flex;justify-content:center}
 .inspect-keywords .cref-card{width:100%}
 .inspect-keywords .cref-card .card{--gw:min(132px,calc(100% - 4px));width:132px;max-width:100%;flex:none;pointer-events:none;box-shadow:0 0 0 2px #58d6c0aa,0 0 14px #58d6c044}
+
+/* C2 sun seal: painted End Turn. Idle pulse and the end-of-turn burst are transform/opacity only (one composited layer, 60fps). */
+.combat #endbtn{background:none!important;border:0;box-shadow:none;filter:none;overflow:visible;padding:0}
+.combat #endbtn .end-seal{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;transform-origin:center;display:block}
+.combat #endbtn .end-label{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.combat #endbtn:not(:disabled) .end-seal{animation:endidle 2.8s ease-in-out infinite}
+@keyframes endidle{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.combat #endbtn:hover{filter:none}
+.combat #endbtn:disabled{filter:none;opacity:.62;cursor:default}
+.combat #endbtn:disabled .end-seal{animation:none}
+.combat #endbtn:active .end-seal{animation:none}
+body.reduce-motion .combat #endbtn .end-seal{animation:none}
+@media(prefers-reduced-motion:reduce){.combat #endbtn .end-seal{animation:none}}
+.end-burst-fx{position:fixed;z-index:45;pointer-events:none;translate:-50% -50%;transform-origin:center;animation:endburst .72s ease-out both;will-change:transform,opacity}
+@keyframes endburst{0%{opacity:0;transform:scale(.5)}22%{opacity:1;transform:scale(1.05)}100%{opacity:0;transform:scale(1.6)}}
+@media(orientation:landscape){
+ /* Mirror of the energy orb: 174px seal centred at (2105, 875) on a 2340x1080 canvas. bottom is from the viewport bottom (the control row's box is pinned there). */
+ .combat #endbtn{left:calc(2105 / 2340 * 100% - 87*var(--hud-unit));right:auto;top:auto;bottom:calc((1080 - 875) / 1080 * 100dvh - 87*var(--hud-unit));width:calc(174*var(--hud-unit));height:calc(174*var(--hud-unit));min-width:0;min-height:0;transform:none;transform-origin:center;font-size:0;z-index:12}
+ /* The chart scrolls in the band under the shared top bar, so a node can never sit in the bar. */
+ .page.mappage.runhud{position:relative;height:100dvh;max-height:100dvh;overflow:hidden;padding-top:0;box-sizing:border-box}
+ .page.mappage.runhud>.parch{position:absolute;left:0;right:0;top:var(--topbar-h);bottom:0;width:100%!important;max-width:none;margin:0!important;min-height:0!important;height:auto;overflow-x:hidden;overflow-y:auto;scroll-padding-top:8px;box-sizing:border-box}
+}
+/* Still backgrounds (Wrack Terraces v-new2g, Spencer 10-14): solids never move (no drift / slide / camera sway); painted living layers only (ui/env-living.js) */
+#env[data-still] .envL,#env-front[data-still] .envL{animation:none!important;transform:none!important}
+#env .envlv i{position:absolute;display:block}
+#env .envlv .envlv-a{will-change:transform}
+#env[data-q="off"] .envlv-a,#env.gov-off .envlv-a,#env[data-q="reduced"] .envlv-part,#env.gov-reduced .envlv-part{display:none}
+#env .envlv-combat{display:none}body.env-combat #env .envlv-combat{display:block}
+@media (prefers-reduced-motion:reduce){#env .envlv,#env .envlv *{animation:none!important}}
+.reduce-motion #env .envlv,.reduce-motion #env .envlv *{animation:none!important}
+/* Wrack Terraces is a pale wet stage: contact shadows read stronger so feet never float (Spencer flagged twice; matches v-new2g mock cores) */
+body[data-still-env] .combat .shadow{opacity:.88}
+body[data-still-env] .combat .shadow::before{left:16%;right:16%;top:calc(50% - 2px);height:4px}

@@ -75,6 +75,7 @@ export const ASSETS={
  ui:{'intent-attack':ui('intent-attack'),'intent-attack-debuff':ui('intent-attack-debuff'),'intent-buff':ui('intent-buff'),'intent-debuff':ui('intent-debuff'),
   'intent-defend':ui('intent-defend'),'intent-unknown':ui('intent-unknown'),'energy-orb-full':ui('energy-orb-full'),'energy-orb-empty':ui('energy-orb-empty'),
   'end-turn':ui('end-turn'),'end-turn-pressed':ui('end-turn-pressed'),
+  'end-turn-c2':ui('end-turn-c2'),'end-turn-c2-burst':ui('end-turn-c2-burst'),
   'node-fight':ui('node-combat'),'node-elite':ui('node-elite'),'node-rest':ui('node-rest'),'node-shop':ui('node-shop'),'node-event':ui('node-unknown'),'node-unknown':ui('node-unknown'),'node-treasure':ui('node-treasure'),'node-boss':ui('node-boss')},
  textures:{parchment:V+'textures/parchment.webp','parchment-dark':V+'textures/parchment-dark.webp',stone:V+'textures/stone-panel.webp',leather:V+'textures/leather-panel.webp'}
 };

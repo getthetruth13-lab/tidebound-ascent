@@ -2,8 +2,8 @@
 import {ENV,CARDS} from '../core/registry.js';
 import {W} from '../core/state.js';
 import {observeEvents} from '../core/bus.js';
-import {envKeyFor,quality,govQuality,FEET} from './env.js';
-export {FEET};
+import {envKeyFor,quality,govQuality,FEET,fightFeet} from './env.js';
+export {FEET,fightFeet};
 import {settings} from '../save.js';
 import {motionOn} from './vfx.js';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -22,7 +22,7 @@ export function syncStage(){const scene=document.querySelector('.combat .scene')
  scene.style.setProperty('--stage-grade',p.grade);scene.style.setProperty('--stage-rim',p.rim);scene.style.setProperty('--stage-air',p.air);scene.style.setProperty('--stage-haze',p.haze);scene.style.setProperty('--stage-light',p.light+'px');
  scene.classList.toggle('stage-still',reduced.matches||settings.reduceMotion||quality()!=='full');scene.classList.toggle('stage-off',quality()==='off');}
 let camera=[];
-function pushCamera(){if(!motionOn()||govQuality()!=='full')return;
+function pushCamera(){if(document.querySelector('#env[data-still]'))return;if(!motionOn()||govQuality()!=='full')return;
  camera.forEach(a=>a.cancel());camera=[];
  // Animate only painted layers (via each layer's .envSh wrapper: env.js owns the layer's own transform, drift and slide-in), leaving text, targets and mechanic controls stationary.
  document.querySelectorAll('#env .envL,#env-front .envL').forEach(layer=>{const el=layer.firstElementChild;if(!el)return;const f={sky:.25,far:.4,mid:.65,ground:.85,fg:1}[layer.dataset.l]||.5;
@@ -32,6 +32,6 @@ observeEvents((event,c)=>{if(W.S.screen!=='combat')return;
  if((event==='damageDealt'&&c.hpLoss>=c.target?.max*.25)||(event==='playerHit'&&c.amount>=W.run.max*.15))shakeLayers();
 });
 
-export function shakeLayers(){if(!motionOn()||govQuality()!=='full')return;
+export function shakeLayers(){if(document.querySelector('#env[data-still]'))return;if(!motionOn()||govQuality()!=='full')return;
  document.querySelectorAll('#env .envL,#env-front .envL').forEach(layer=>{const el=layer.firstElementChild;if(!el)return;const f={sky:.2,far:.35,mid:.6,ground:.8,fg:1}[layer.dataset.l]||.5;el.animate([{translate:'0px'},{translate:`${2*f}px -1px`,offset:.2},{translate:`${-f}px 0px`,offset:.5},{translate:'0px'}],{duration:260,easing:'ease-out'});});}
 reduced.addEventListener('change',()=>{camera.forEach(a=>a.cancel());camera=[];syncStage()});

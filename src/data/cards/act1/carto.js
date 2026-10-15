@@ -34,15 +34,15 @@ function chartSafe(f,n,then){f.chart(n,then);const cb=W.cb;if(!cb||!cb.mode||cb.
 const decampAt=i=>removeWp(i,'decamp');
 
 // ---------------- Starters ----------------
-R('signal',{e:'🔥',d:'At the start of your turn, deal {3|4} to a random enemy. Decamp: deal {6|8} to a random enemy.',
- wp:f=>f.dmgRandom(f.v(3,4)),decamp:f=>{f.dmgRandom(f.v(6,8));log('🔥 Decamp: Signal Fire')}});
-R('bivouac',{e:'🏕️',d:'Gain {5|7} Guard, +{2|3} for each Waypoint. Expedition.',p:f=>f.blk(f.v(5,7)+f.v(2,3)*f.wpCount())});
-R('cairn',{e:'🪨',d:'Enters at Rank 1. Does nothing while it stands. Decamp: draw {1|2}.',wp:f=>{},
+R('signal',{e:'🔥',rk:{max:5},d:'At the start of your turn, deal {3|4|+1,1,0,0} to a random enemy. Decamp: deal {6|8|+} to a random enemy.',
+ wp:f=>f.dmgRandom(f.r(3,4,'1,1,0,0')),decamp:f=>{f.dmgRandom(f.r(6,8));log('🔥 Decamp: Signal Fire')}});
+R('bivouac',{e:'🏕️',rk:{max:5},d:'Gain {5|7|+} Guard, +{2|3} for each Waypoint. Expedition.',p:f=>f.blk(f.r(5,7)+f.v(2,3)*f.wpCount())});
+R('cairn',{e:'🪨',rk:{max:5},d:'Enters at Rank 1. Does nothing while it stands. Decamp: draw {1|2}.{@2| Gain [0|0|+] Guard.}',wp:f=>{},
  on:{waypointPlaced(inst,ctx){if(ctx.wp===inst&&(inst.rank||0)<1)inst.rank=1}},
- decamp:f=>{drawCards(f.v(1,2));log('🪨 Decamp: Cairn, draw '+f.v(1,2))}});
+ decamp:f=>{drawCards(f.v(1,2));if(f.lvl>=2)f.blk(f.r(0,0));log('🪨 Decamp: Cairn, draw '+f.v(1,2))}});
 // ---------------- Common ----------------
 R('trail',{e:'🥾',d:'Deal {7|10}. Advance a Waypoint.',p:f=>{f.dmg(f.v(7,10));cardAdvance(f,'Trailblaze')}});
-R('cache',{e:'📦',d:'At the start of your turn, gain {3|4} Guard. Decamp: gain {6|8} Guard.',wp:f=>f.blk(f.v(3,4)),decamp:f=>{f.blk(f.v(6,8));log('📦 Decamp: Supply Cache')}});
+R('cache',{e:'📦',rk:{max:5},d:'At the start of your turn, gain {3|4|+1^8} Guard. Decamp: gain {6|8|+2} Guard.',wp:f=>f.blk(f.r(3,4,1,8)),decamp:f=>{f.blk(f.r(6,8,2));log('📦 Decamp: Supply Cache')}});
 R('stake',{e:'📍',d:'At the start of your turn, deal {2|3} to ALL. Decamp: deal 6 to ALL.',wp:f=>zapAll(f.v(2,3),f),decamp:f=>{zapAll(6,f);log('📍 Decamp: Survey Stake, 6 to ALL')}});
 R('lookout',{e:'🗼',d:'At the start of your turn, draw 1. Decamp: Chart 3.',wp:f=>cartoPassiveDraw(1,{startOfTurn:true}),decamp:f=>chartSafe(f,3)});
 R('waymarker',{e:'🪧',d:'Turn start: if your top draw card is an Attack, deal {4|5} to a random enemy; if a Skill, gain {4|5} Guard. Decamp: Chart 3, gain 4 Guard.',
@@ -79,7 +79,7 @@ N('clearbrush',{e:'🌿',d:'Chart {3|4}. You may Sink one of them. Sink.',p:f=>{
  ask(f,'Clear the Brush: Sink one?',[{l:'Sink nothing',f:()=>{}},...seen.map(ci=>({l:'Sink '+(CARDS[ci.id].e||'')+' '+cname(ci),card:{id:ci.id,up:ci.up},f:()=>{const i=cb.draw.indexOf(ci);if(i<0)return;cb.draw.splice(i,1);sinkCard(ci,'clearbrush');log('🌿 '+cname(ci)+' Sunk')}}))])})}});
 R('foreknow',{e:'🔮',tg:1,d:'Fleeting. If the top card of your draw pile is an Attack, deal {6|8}. If it is a Skill, gain {6|8} Guard. Then draw it. Sink.',
  p:f=>{refill(1);const t=topType();if(!t)return;if(t==='A')f.dmg(f.v(6,8));else if(t==='S')f.blk(f.v(6,8));drawCards(1)}});
-R('longshot',{e:'🏹',moor:1,d:'Moor. Deal {16|19}. Bearing (Attack): deal {24|28} instead.',p:f=>{const b=bearing('A');if(b)floatText('p','🧭 Bearing!','');f.dmg(b?f.v(24,28):f.v(16,19))}});
+R('longshot',{e:'🏹',moor:1,rk:{max:5},d:'Moor. Deal {16|19|+2,2,1,1}. Bearing (Attack): deal {24|28|+3,3,2,1} instead.',p:f=>{const b=bearing('A');if(b)floatText('p','🧭 Bearing!','');f.dmg(b?f.r(24,28,'3,3,2,1'):f.r(16,19,'2,2,1,1'))}});
 R('burn',{e:'🔥',d:'Whenever one of your Waypoints leaves a slot, draw 1 and deal {5|6} to a random enemy (max 3 a turn).',
  power:{on:{decamp(inst,ctx){const cb=W.cb;if(!cb)return;if(inst.pcT!==cb.turn){inst.pcT=cb.turn;inst.pcN=0}if(inst.pcN>=3)return;inst.pcN++;
   cartoPassiveDraw(1);zap(randAlive(),inst.up?6:5,null);floatText('p','🔥 Planned Collapse','')}}}});

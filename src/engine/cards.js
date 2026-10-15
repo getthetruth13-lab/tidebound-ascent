@@ -7,8 +7,21 @@ import {W,nextId} from '../core/state.js';
 // Type display names (ids stay P/C/T): the redesign vocabulary, FUN-REDESIGN 5.0.
 TYPEN.P='Vigil';TYPEN.C='Burden';TYPEN.T='Flotsam';
 // ================= card helpers =================
-export function mk(id,up,o){return Object.assign({id,uid:nextId(),up:!!up},o||{})}
-export const isUp=ci=>!!(ci.up||ci.tmpUp);
+// up: false | true | a level number. Multi-level Temper (rk:{max}): lvl 0..max, `up` stays lvl>0 so every older reader keeps working.
+export function mk(id,up,o){const lvl=typeof up==='number'?up:up?1:0;return Object.assign({id,uid:nextId(),up:lvl>0,lvl},o||{})}
+export const rkMax=ci=>{const d=CARDS[ci.id];return d&&d.rk?d.rk.max:1};
+// Current level: saved lvl (old saves: up:true = 1), plus 1 for the fight under Temper Oil (tmpUp), never past the card's max.
+export const rawLvl=ci=>Math.max(ci.lvl||0,ci.up?1:0); // tolerant: code or tests that only set up:true still mean level 1
+export const lvlOf=ci=>{const m=rkMax(ci);let l=rawLvl(ci);if(ci.tmpUp&&l<m)l++;return Math.min(l,m)};
+export const isUp=ci=>lvlOf(ci)>0;
+// One Temper: +1 level (max 1 for cards without rk).
+export function upgradeCard(ci){ci.lvl=Math.min(rkMax(ci),rawLvl(ci)+1);ci.up=ci.lvl>0;return ci}
+export const canTemper=ci=>rawLvl(ci)<rkMax(ci);
+// Per-level value: a at level 0, b at level 1, then b + the running sum of `step` (a number, a "2,2,1,1" list, or the default taper 2,2,1,1),
+// never above max. Steps past the end of a list add 0.
+const TAPER=[2,2,1,1];
+export function rv(a,b,step,lvl,max){if(lvl<=0)return a;let s=step==null||step===''?TAPER:typeof step==='string'?step.split(',').map(Number):step;if(Array.isArray(s)&&s.length===1)s=s[0];let v=b;
+ for(let i=0;i<lvl-1;i++)v+=typeof s==='number'?s:(s[i]||0);return max!=null?Math.min(v,max):v}
 export const isX=ci=>CARDS[ci.id].c==='X';
 // Cost pipeline (content-impl-plan §4.2 modifyCost): base/upgraded -> X -> set-to-0 (tmp0) -> modifiers ('cost': Low Note, Survey Flags,
 // Barnacled...) -> clamp >= 0. "Next card" discounts are consumed in onCardPlayed, not when the cost is read.
@@ -23,9 +36,14 @@ export function costSurcharge(ci){const cb=W.cb,out=[];if(!cb||CARDS[ci.id].c===
  if(named&&extra<0){out.length=0} // a discount on the same card cancels it out; the gem already shows the true cost
  return out}
 export function isEx(ci){const d=CARDS[ci.id];return (isUp(ci)&&d.xu!=null)?!!d.xu:!!d.x}
-export function fmt(s,u){return s.replace(/\{([^|}]*)\|([^}]*)\}/g,(m,a,b)=>u?(b?`<span class="upv">${b}</span>`:''):a)}
-export function cname(ci){return CARDS[ci.id].n+(isUp(ci)?'+':'')}
-export function desc(ci){const d=CARDS[ci.id];let s=fmt(d.d,isUp(ci));if(ci.open&&!d.open)s+=' <b>Opening.</b>';return s}
+// Template slots: {base|up} (as ever), {base|up|+2,2,1,1^max} (number that keeps growing per level), {@3|text with [b|b|+1] slots} (text from level 3 on).
+export function fmt(s,u,lvl){const L=lvl!=null?lvl:u?1:0;
+ const num=(a,b,st,mx,wrap)=>{if(!L)return a;const v=st!=null?rv(0,+b,st,L,mx?+mx:null):b;return v===''?'':wrap?`<span class="upv">${v}</span>`:String(v)};
+ s=s.replace(/\{@(\d)\|([^}]*)\}/g,(m,n,body)=>L>=+n?`<span class="upv">${body.replace(/\[([^|\]]*)\|([^|\]]*)(?:\|\+([\d,]*)(?:\^(\d+))?)?\]/g,(q,a,b,st,mx)=>num(a,b,st,mx,false))}</span>`:'');
+ return s.replace(/\{([^|}]*)\|([^|}]*)(?:\|\+([\d,]*)(?:\^(\d+))?)?\}/g,(m,a,b,st,mx)=>num(a,b,st,mx,true))}
+export function cname(ci){const l=lvlOf(ci);return CARDS[ci.id].n+(l>1?'+'+l:l?'+':'')}
+export const lvlLabel=ci=>{const l=lvlOf(ci);return l>1?'+'+l:l?'+':''};
+export function desc(ci){const d=CARDS[ci.id];let s=fmt(d.d,isUp(ci),lvlOf(ci));if(ci.open&&!d.open)s+=' <b>Opening.</b>';return s}
 export const plain=s=>s.replace(/<[^>]+>/g,'');
 // Glossary entries for every keyword that appears in the card's text (word match), plus its type keyword.
 export function kwList(ci){const d=CARDS[ci.id];const t=plain(desc(ci));if(!KM)KM=buildMatcher(KW);const found=new Set([...t.matchAll(KM.re)].map(KM.canon));return Object.keys(KW).filter(k=>{const w=k.replace(/ X$/,'');return new RegExp('\\b'+w.replace(/[()]/g,'\\$&')+'\\b').test(t)||found.has(w)||(k==='Waypoint'&&d.t==='W')})}

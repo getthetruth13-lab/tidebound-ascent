@@ -3,7 +3,7 @@
 // All rolls use the 'events' stream. Charms (Saltwife's Loom) are registered here too.
 import {registerEvents,registerCharm,RELICS,CARDS,POTIONS,CHARMS} from '../core/registry.js';
 import {W,pick,rng,R,rnd,shuffle} from '../core/state.js';
-import {cname,mk} from '../engine/cards.js';
+import {cname,mk,upgradeCard} from '../engine/cards.js';
 import {isLocked,goMap,heal,hurt,msg,openPick,randomCard,gainCard,gainCurse,gainGold,gainRelic,loseRelic,randomRelic,randomPotion,addPotion,addPotionSlot,
  loseMaxHp,gainMaxHp,eventFight,toast,pickable,gainArtifact,artifactFree} from '../engine/run.js';
 import {mod} from '../core/bus.js';
@@ -40,6 +40,8 @@ const pct=()=>run().hp/run().max;
 const takeArt=(id,text,pay)=>{cur=W.S.ev;gainArtifact(id,ok=>{if(ok&&pay)pay();done(ok?`${text} You gain <b>${CARDS[id].e} ${CARDS[id].n}</b>.`:'You leave it where it lies.',ok?'good':'mixed',ok?undefined:'Left Behind')})};
 // A card pick that applies after you confirm, with Cancel returning to the scene.
 const pickThen=(mode,title,after,filter)=>{const S=W.S;cur=S.ev;openPick(mode,title,ci=>{if(!ci)return goMap();after(ci)},()=>{W.S=S;render()},filter)};
+// Random event upgrades prefer cards not yet Tempered; multi-level cards only when nothing fresh is left.
+const upPool=()=>{const a=pickable('upgrade'),z=a.filter(c=>!c.up);return z.length?z:a};
 const randomRemovable=()=>{const c=pickable('remove');return c.length?pick(c,'events'):null};
 registerEvents([
  // ================= shrines (any act; once per act) =================
@@ -52,13 +54,13 @@ registerEvents([
    if(d===5){gainCurse('dread');return done(lbl+'A cold dread settles on you. (Curse: Dread)','bad')}
    const l=Math.max(1,Math.floor(run().max*.1));hurt(l);return done(lbl+`The wheel bites. Lose ${l} HP.`,'bad')}}),
   O('Spin it backwards','50%: upgrade 2 cards, else Dread and lose 5 HP',{risk:.5,ok:()=>run().hp>5,why:'Needs more than 5 HP',d:'Fight the current. 50%: two random cards are upgraded. 50%: a Dread curse and you lose 5 HP.',f:()=>{
-   if(roll(.5)){const c=shuffle(pickable('upgrade'),'events').slice(0,2);if(c.length){c.forEach(x=>x.up=true);return done(`The wheel groans and turns your way. <b>${c.map(cname).join('</b> and <b>')}</b> shine.`)}const g=gainGold(60);return done(`The wheel turns your way, but you have nothing to polish. +${g} gold.`)}
+   if(roll(.5)){const c=shuffle(upPool(),'events').slice(0,2);if(c.length){c.forEach(upgradeCard);return done(`The wheel groans and turns your way. <b>${c.map(cname).join('</b> and <b>')}</b> shine.`)}const g=gainGold(60);return done(`The wheel turns your way, but you have nothing to polish. +${g} gold.`)}
    hurt(5);gainCurse('dread');done('The wheel spins on you. Lose 5 HP and gain a Dread curse.','bad')}}),
   LEAVE]},
  {id:'anvil',pool:'shrine',n:'Barnacle Anvil',e:'⚒️',t:'An anvil crusted with shells, still warm.',req:()=>pickable('upgrade').length>0,o:[
   O('Strike true','lose 5 HP, upgrade a card of your choice',{ok:()=>run().hp>5,why:'Needs more than 5 HP',d:'Hammer a card of your choice into better shape. The anvil is hot: you lose 5 HP.',f:()=>pickThen('upgrade','⚒️ Barnacle Anvil: upgrade a card',ci=>{hurt(5);done(`Sparks and brine. <b>${cname(ci)}</b> is tempered. Lose 5 HP.`,'mixed','Tempered')})}),
   O('Strike with all your might','60%: upgrade 2 random cards, else Barnacled and lose 4 HP',{risk:.6,ok:()=>run().hp>4,why:'Needs more than 4 HP',d:'Two blows at once. 60%: two random cards are upgraded. 40%: the anvil cracks: a Barnacled curse and you lose 4 HP.',f:()=>{
-   if(roll(.6)){const c=shuffle(pickable('upgrade'),'events').slice(0,2);c.forEach(x=>x.up=true);return done(`The ring carries across the water. <b>${c.map(cname).join('</b> and <b>')}</b> are tempered.`)}
+   if(roll(.6)){const c=shuffle(upPool(),'events').slice(0,2);c.forEach(upgradeCard);return done(`The ring carries across the water. <b>${c.map(cname).join('</b> and <b>')}</b> are tempered.`)}
    hurt(4);gainCurse('barnacled');done('The anvil cracks and shells crawl over your pack. Lose 4 HP, gain a Barnacled curse.','bad')}}),
   LEAVE]},
  {id:'spring',pool:'shrine',n:'Cleansing Spring',e:'⛲',t:'Fresh water bubbling up through salt.',req:()=>pickable('remove').length>0,o:[
@@ -125,7 +127,7 @@ registerEvents([
   O('Rest by the fire','80%: heal 15 HP, else he picks your pocket',{risk:.8,d:'80%: heal 15 HP. 20%: you wake lighter: lose 30 gold (or 4 HP if your purse is empty).',f:()=>{
    if(roll(.8)){heal(15);return done('You sleep soundly by the small fire. Heal 15 HP.')}
    if(run().gold>=10){const l=loseGold(30);return done(`You wake to a cold fire and a lighter purse. Lose ${l} gold.`,'bad','Robbed')}hurt(4);done('You wake to a cold fire and a sore head. Lose 4 HP.','bad','Robbed')}}),
-  O('Let him sharpen','pay 20 gold, upgrade a random card',{ok:()=>run().gold>=20&&pickable('upgrade').length>0,why:()=>run().gold<20?'Needs 20 gold':'Nothing left to upgrade',d:'He asks for coin and works a random card on his whetstone.',f:()=>{run().gold-=20;const x=pick(pickable('upgrade'),'events');x.up=true;done(`The stranger improves ${B(cname(x))}. Pay 20 gold.`,'mixed','Honed')}}),
+  O('Let him sharpen','pay 20 gold, upgrade a random card',{ok:()=>run().gold>=20&&pickable('upgrade').length>0,why:()=>run().gold<20?'Needs 20 gold':'Nothing left to upgrade',d:'He asks for coin and works a random card on his whetstone.',f:()=>{run().gold-=20;const x=pick(upPool(),'events');upgradeCard(x);done(`The stranger improves ${B(cname(x))}. Pay 20 gold.`,'mixed','Honed')}}),
   O('Trade stories','50%: a random potion, else Dread',{risk:.5,d:'50%: he presses a random potion on you (or 25 gold if your belt is full). 50%: his tale is cold and stays with you: a Dread curse.',f:()=>{
    if(roll(.5)){if(freeSlot()){const p=randomPotion('events');addPotion(p);return done(`A good story earns a good drink: ${B(POTIONS[p].e+' '+POTIONS[p].n)}.`)}const g=gainGold(25);return done(`A good story earns coin. +${g} gold.`)}
    gainCurse('dread');done('His story is about a drowned lighthouse. You do not sleep well. (Curse: Dread)','bad')}})]},
@@ -154,7 +156,7 @@ registerEvents([
    const c=randomRemovable();if(!c)return done('The ink finds nothing to take.','mixed');run().deck.splice(run().deck.indexOf(c),1);done(`The ink swallows <b>${cname(c)}</b>.`,'bad','Forgotten')}}),
   LEAVE]},
  {id:'sailor',pool:'act',act:1,n:'Shipwrecked Sailor',e:'🧔',t:'A sailor clings to a broken mast, a fine whetstone and a fat purse beside him. He counts under his breath: "Nine to climb and nine to shine..."',o:[
-  O('Pay for his whetstone','pay 25 gold, he upgrades 2 random cards',{ok:()=>run().gold>=25&&pickable('upgrade').length>0,why:()=>run().gold<25?'Needs 25 gold':'Nothing left to upgrade',d:'Pay 25 gold. He sharpens two random cards.',f:()=>{run().gold-=25;const c=shuffle(pickable('upgrade'),'events').slice(0,2);c.forEach(x=>x.up=true);done(`He sharpens <b>${c.map(cname).join('</b> and <b>')}</b>. Pay 25 gold.`,'mixed','Sharpened')}}),
+  O('Pay for his whetstone','pay 25 gold, he upgrades 2 random cards',{ok:()=>run().gold>=25&&pickable('upgrade').length>0,why:()=>run().gold<25?'Needs 25 gold':'Nothing left to upgrade',d:'Pay 25 gold. He sharpens two random cards.',f:()=>{run().gold-=25;const c=shuffle(upPool(),'events').slice(0,2);c.forEach(upgradeCard);done(`He sharpens <b>${c.map(cname).join('</b> and <b>')}</b>. Pay 25 gold.`,'mixed','Sharpened')}}),
   O('Rob him','60%: +60 gold, else lose 8 HP and Brine Rot',{risk:.6,ok:()=>run().hp>8,why:'Needs more than 8 HP',d:'60%: you take his purse: +60 gold. 40%: he fights back: lose 8 HP and a Brine Rot curse.',f:()=>{
    if(roll(.6)){const g=gainGold(60);return done(`You take his purse and he does not stop you. +${g} gold.`)}
    hurt(8);gainCurse('brinerot');done('He is stronger than he looks, and the purse is rotten. Lose 8 HP, gain a Brine Rot curse.','bad','He Fights Back')}}),
@@ -171,7 +173,7 @@ registerEvents([
    f:()=>{loseMaxHp(6);const id=RULEBENDER[run().cls];gainRelic(id);done(`${rel(id)}: ${RELICS[id].d} Lose 6 Max HP.`,'mixed','A Rule Bent')}}),
   O('Weave a Charm','pay 35 gold, a charm for the whole run',{ok:()=>run().gold>=35,why:'Needs 35 gold',d:'Pay 35 gold and choose one of three Charms that lasts the whole run.',f:()=>{run().gold-=35;choice('Choose a Charm',"\"Pick one. It'll stay with you.\"",['springcurrent','salvagersluck','lightpurse'].map(id=>({l:`${CHARMS[id].e} ${CHARMS[id].n}: ${CHARMS[id].d}`,f:()=>{gainCharm(id);done(`She ties it off. <b>${CHARMS[id].e} ${CHARMS[id].n}</b>: ${CHARMS[id].d} Pay 35 gold.`,'mixed','Woven')}})))}}),
   O('Pull a loose thread','50%: upgrade a card and heal 8, else lose 6 HP',{risk:.5,ok:()=>run().hp>6,why:'Needs more than 6 HP',d:'50%: a random card is upgraded and you heal 8 HP. 50%: the net tangles and cuts: lose 6 HP.',f:()=>{
-   if(roll(.5)){const c=pickable('upgrade');if(c.length){const x=pick(c,'events');x.up=true;heal(8);return done(`The thread comes loose in your hand. <b>${cname(x)}</b> is improved. Heal 8 HP.`)}heal(8);return done('The thread comes loose and warm. Heal 8 HP.')}
+   if(roll(.5)){const c=upPool();if(c.length){const x=pick(c,'events');upgradeCard(x);heal(8);return done(`The thread comes loose in your hand. <b>${cname(x)}</b> is improved. Heal 8 HP.`)}heal(8);return done('The thread comes loose and warm. Heal 8 HP.')}
    hurt(6);done('The net closes round your hand. Lose 6 HP.','bad','Tangled')}}),
   LEAVE]},
  // ================= Artifact sources (Act 1): each offers one shared Artifact card, once per run =================

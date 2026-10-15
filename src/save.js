@@ -10,7 +10,9 @@ export function saveSettings(){safeSet(SET_KEY,settings)}
 const actions=new Map();let checkpoint=null,journal=[],depth=0;
 export function registerSaveActions(mod){for(const [name,fn] of Object.entries(mod))if(typeof fn==='function')actions.set(name,fn)}
 const clone=v=>JSON.parse(JSON.stringify(v));
-function write(){if(checkpoint&&W.run&&!W.run.won&&W.run.hp>0)safeSet(RUN_KEY,{v:3,t:Date.now(),run:W.run,checkpoint,journal})}
+// v4: card instances carry lvl (multi-level Temper). Older saves have only up:true, which is level 1.
+export const migrateRun=run=>{for(const c of (run&&run.deck)||[])if(c.lvl==null)c.lvl=c.up?1:0;return run};
+function write(){if(checkpoint&&W.run&&!W.run.won&&W.run.hp>0)safeSet(RUN_KEY,{v:4,t:Date.now(),run:W.run,checkpoint,journal})}
 export function saveRun(){
  if(W.replaying||W.previewing||depth||!W.run||W.S.screen==='end'||W.S.screen==='title')return;
  if(W.S.screen==='map'||W.S.screen==='travel'){
@@ -26,14 +28,14 @@ export function savedAction(name,args,fn){
  journal.push({name,args:clone(recorded),context,t:Date.now()});write();depth++;
  try{return fn()}finally{depth--;saveRun()}
 }
-export function loadRunData(){const d=safeGet(RUN_KEY);return d&&(d.v===2||d.v===3)&&d.run&&!d.run.won&&d.run.hp>0?d:null}
+export function loadRunData(){const d=safeGet(RUN_KEY);return d&&(d.v===2||d.v===3||d.v===4)&&d.run&&!d.run.won&&d.run.hp>0?d:null}
 export function clearRun(){if(W.previewing)return;checkpoint=null;journal=[];try{localStorage.removeItem(RUN_KEY)}catch(_){}}
 export function continueRun(){
  const d=loadRunData();if(!d)return false;
  const oldFast=window.FAST,clock=Date.now,old={run:W.run,cb:W.cb,S:W.S,uid:W.uid};
  try{
-  const base=d.v===3?d.checkpoint:{run:d.run,uid:d.uid};
-  W.run=clone(base.run);W.uid=base.uid||1;W.cb=null;W.S={screen:'map'};
+  const base=d.v>=3?d.checkpoint:{run:d.run,uid:d.uid};
+  migrateRun(base.run);W.run=clone(base.run);W.uid=base.uid||1;W.cb=null;W.S={screen:'map'};
   W.replaying=true;window.FAST=1;
   for(const action of d.journal||[]){
    const fn=actions.get(action.name);if(!fn)throw Error('Unknown saved action '+action.name);

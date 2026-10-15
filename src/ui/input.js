@@ -2,8 +2,10 @@ import {showOutcome,clearOutcome,outcomeLayout} from './outcome.js';
 // ui/input.js
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
+import {observeEvents} from '../core/bus.js';
 import {needsTarget} from '../engine/cards.js';
 import {alive,canPlay,playCard} from '../engine/combat.js';
+import {flashNoAfford} from './hud-panel.js';
 import {layoutHand,render,openInspect,closeInspect,inspecting} from './render.js';
 // ================= pointer / touch input: tap-to-select, drag-to-play =================
 export let drag=null;
@@ -19,8 +21,8 @@ let hh=0,holdTouch=false;
 // preview on the LEFT, cards left of centre preview on the RIGHT. Outside the hand, fall back to the press point.
 function handSide(el,point){const cs=el&&el.closest?.('.hand')?[...el.closest('.hand').querySelectorAll('.card')]:[],i=cs.indexOf(el);
  if(i>=0)return i>=Math.floor(cs.length/2)?'left':'right';return point.x>=innerWidth/2?'left':'right'}
-function inspectNow(el,touch,point){const side=touch?handSide(el,point):null;clearPeek();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
-document.addEventListener('pointerdown',ev=>{eatClick=false;eatUntil=0;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest&&ev.target.closest('.card');if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected)any=peek;if(!any||any.closest('#inspect'))return;
+function inspectNow(el,touch,point){const side=touch?handSide(el,point):null;clearArm();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
+document.addEventListener('pointerdown',ev=>{eatClick=false;eatUntil=0;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest?.('.card')||handCardFrom(ev.target);if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected&&peek.contains?.(ev.target))any=peek;if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,true,{x:ev.clientX,y:ev.clientY})},LONGPRESS_MS)}},true);
 document.addEventListener('pointermove',ev=>{if(lp&&Math.hypot(ev.clientX-lp.x0,ev.clientY-lp.y0)>10){clearTimeout(lp.t);lp=null}},true);
@@ -44,7 +46,8 @@ document.addEventListener('click',ev=>{if(eatClick&&eatUntil&&performance.now()>
 // Android Chrome fires its own long-press 'contextmenu' while a card is already held; it used to reopen the preview
 // with no point/side, which snapped the held preview to the screen centre. While a hold is open, just swallow it.
 document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(holdTouch||lp||ev.pointerType==='touch'||ev.sourceCapabilities?.firesTouchEvents){ev.preventDefault();return}if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
-document.addEventListener('pointerdown',ev=>{const hit=ev.target.closest&&ev.target.closest('.hand .card');const c=ev.pointerType==='mouse'&&hit&&peek?.isConnected?peek:hit;if(!c||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;
+document.addEventListener('pointerdown',ev=>{const raw=handCardFrom(ev.target);if(!raw||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;let c=raw;
+ if(ev.pointerType==='mouse'&&peek?.isConnected&&peek!==raw){const pr=peek.getBoundingClientRect();if(ev.clientX>=pr.left&&ev.clientX<=pr.right&&ev.clientY>=pr.top&&ev.clientY<=pr.bottom)c=peek}
  if(ev.button!=null&&ev.button>0)return;
  // A second finger (multi-touch) supersedes the first press instead of leaving its card lifted.
  if(drag&&drag.id!==ev.pointerId){if(drag.raf)cancelAnimationFrame(drag.raf);if(drag.moved)drag.el.style.removeProperty('transform');drag.el.classList.remove('drag','armed');drag=null;clearTargets()}
@@ -75,7 +78,7 @@ document.addEventListener('pointerup',()=>{heldDrag=null},true);
 function holdToDrag(d){holdTouch=false;closeInspect();const el=document.querySelector(`.hand .card[data-i="${d.i}"]`);if(el){d.el=el;try{el.setPointerCapture(d.id)}catch(_){}}}
 export function dragMove(d,ev){const dy=ev.clientY-d.y0;
  d.x=ev.clientX;d.y=ev.clientY;
- if(!d.moved){if(dy>-32){if(dy>-10&&(d.scrubbing||Math.abs(ev.clientX-d.x0)>12)){d.scrubbing=true;scrubAt(ev.clientX,d.touch)}return}clearPeek();cancelLongPress();d.moved=true;d.el.classList.remove('sel');d.el.classList.add('drag');layoutHand(true);W.cb.sel=null;W.cb.insp=null;const t=document.getElementById('detail');if(t)t.remove();
+ if(!d.moved){if(dy>-32){if(dy>-10&&(d.scrubbing||Math.abs(ev.clientX-d.x0)>12)){d.scrubbing=true;scrubAt(ev.clientX,d.touch)}return}arm=null;clearPeek();cancelLongPress();d.moved=true;d.el.classList.remove('sel','tap-armed');d.el.classList.add('drag');layoutHand(true);W.cb.sel=null;W.cb.insp=null;const t=document.getElementById('detail');if(t)t.remove();
  const hand=document.getElementById('hand').getBoundingClientRect(),cw=d.el.offsetWidth,ch=d.el.offsetHeight;
  d.geometry={hand,cw,ch,scale:Math.max(1.12,(+d.el.dataset.zl||1.2)*.75),baseY:hand.bottom-(parseFloat(getComputedStyle(d.el).bottom)||0)-ch/2,
  hero:document.querySelector('.hero').getBoundingClientRect(),enemies:new Map([...document.querySelectorAll('.en')].map(e=>[e,e.getBoundingClientRect()])),outcome:outcomeLayout()};}
@@ -96,7 +99,9 @@ export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)retur
  if(d.raf)cancelAnimationFrame(d.raf);
  // Pointer release can arrive before the queued animation-frame move.
  if(!cancel&&rafPending&&rafPending.pointerId===d.id)dragMove(d,rafPending);
- drag=null;rafPending=null;if(!d.moved&&!cancel)releasePeek();else clearPeek();dropSel();d.el.classList.remove('drag','armed');d.el.style.removeProperty('transform');clearTargets();eatClick=true;eatUntil=performance.now()+350;
+ drag=null;rafPending=null;dropSel();d.el.classList.remove('drag','armed');d.el.style.removeProperty('transform');
+ if(!d.moved&&!cancel)commitArm(d.el);else clearArm();
+ eatClick=true;eatUntil=performance.now()+350;
  if(cancel||!W.cb){if(W.cb){W.cb.sel=null;render()}return}
  if(!d.moved){W.cb.sel=null;W.cb.insp=null;layoutHand();return}
  const ci=W.cb.hand[d.i],target=ci&&canPlay(ci)?dropTarget(ci,ev.clientX,ev.clientY):null;
@@ -106,7 +111,7 @@ export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)retur
 document.addEventListener('pointerup',ev=>endDrag(ev,false));
 document.addEventListener('pointercancel',ev=>endDrag(ev,true));
 document.addEventListener('lostpointercapture',ev=>endDrag(ev,true));
-addEventListener('blur',()=>{cancelLongPress();heldDrag=null;if(drag)endDrag({pointerId:drag.id},true);clearPeek();dropSel();if(holdTouch){holdTouch=false;closeInspect()}});
+addEventListener('blur',()=>{cancelLongPress();heldDrag=null;if(drag)endDrag({pointerId:drag.id},true);else clearArm();dropSel();if(holdTouch){holdTouch=false;closeInspect()}});
 addEventListener('resize',()=>{hc=null;if(W.S.screen==='combat'&&!drag)requestAnimationFrame(()=>render())});// figure positions are viewport px
 
 
@@ -124,9 +129,7 @@ let relT=0,hc=null,leanX=null,leanDir=0,lastBuzz=0;
 // 12 ms is long enough for a phone motor to register (4 ms was easy to miss). No sound (UI tap sounds were removed on purpose).
 function buzz(){if(settings.handHaptic===false||!navigator.vibrate)return;const t=performance.now();if(t-lastBuzz<50)return;lastBuzz=t;try{navigator.vibrate(12)}catch(_){}}
 const NB_SHIFT=[16,6,2]; // px pushed from the lifted card: neighbour, next, then the third card out
-// Soft release (Task 43): an undragged tap keeps the lifted card ~150 ms, then lowers.
-function releasePeek(){const p=peek;if(!p)return;clearTimeout(relT);relT=setTimeout(()=>{relT=0;if(peek===p)clearPeek(true)},150)}
-function clearPeek(soft){clearTimeout(relT);relT=0;peek=null;leanDir=0;document.querySelectorAll('.hand .card.peek,.hand .card.peek-neighbour').forEach(c=>{c.classList.remove('peek','peek-neighbour','peek-fast');for(const v of ['--roll','--pn','--nl','--nr'])c.style.removeProperty(v);if(c.dataset.x!=null)c.style.setProperty('--x',c.dataset.x+'px');else c.style.removeProperty('--x')});if(W.S.screen==='combat')layoutHand();if(!soft)clearOutcome()}
+function clearPeek(soft){clearTimeout(relT);relT=0;peek=null;leanDir=0;document.querySelectorAll('.hand .card.peek,.hand .card.peek-neighbour,.hand .card.tap-armed').forEach(c=>{c.classList.remove('peek','peek-neighbour','peek-fast','tap-armed');for(const v of ['--roll','--pn','--nl','--nr'])c.style.removeProperty(v);if(c.dataset.x!=null)c.style.setProperty('--x',c.dataset.x+'px');else c.style.removeProperty('--x')});if(W.S.screen==='combat')layoutHand();if(!soft)clearOutcome()}
 // The finger's sweep direction leans the lifted card (roll) and slides it a little away so the thumb does not cover the art.
 function lean(c,dir){if(leanDir===dir)return;leanDir=dir;c.style.setProperty('--roll',dir*3+'deg');c.style.setProperty('--pn',(-dir*.2*c.offsetWidth).toFixed(1)+'px')}
 function peekCard(c,dir=0,fast=false,haptic=false){clearTimeout(relT);relT=0;if(peek===c){lean(c,dir);return}clearPeek();peek=c;c.classList.add('peek');if(fast)c.classList.add('peek-fast');
@@ -152,8 +155,39 @@ function scrubAt(x,haptic){const h=handCache();if(!h)return;const {cards,xs,cx,c
  if(drag){drag.el=c;drag.i=+c.dataset.i;drag.bx=+c.dataset.x;drag.by=+c.dataset.y}
 }
 let leanSign=0;
-document.addEventListener('pointermove',ev=>{if(ev.pointerType!=='mouse'||drag)return;const hand=document.getElementById('hand');if(!hand)return;const r=hand.getBoundingClientRect();const m=peek?peek.offsetWidth*.5:0; // a pointer just past either end keeps the end card lifted
- if(ev.clientY>=innerHeight*.65&&ev.clientX>=r.left-m&&ev.clientX<=r.right+m&&W.cb&&!W.cb.busy&&!W.cb.mode){const hit=ev.target.closest?.('.hand .card');if(hit)peekCard(hit);else scrubAt(ev.clientX);}else if(peek)clearPeek()});
+// A tap leaves the same peek raised ("armed") until it is played, switched or cancelled. Hover peek stays momentary.
+let arm=null;
+function handCardFrom(node){if(!node?.closest)return null;const hit=node.closest('.hand-hit');if(hit)return document.querySelector(`#hand .card[data-i="${hit.dataset.i}"]`);return node.closest('.hand .card')}
+function clearArm(){arm=null;document.querySelectorAll('.hand .card.tap-armed').forEach(c=>c.classList.remove('tap-armed'));clearTargets();clearPeek()}
+function enemyLive(el){const en=W.cb?.ens[+el.dataset.en];return !!(en&&en.hp>0&&!en.fled)}
+function showArmTargets(){clearTargets(false);if(!arm||!W.cb)return;const el=document.querySelector(`#hand .card[data-i="${arm.i}"]`),ci=W.cb.hand[arm.i];
+ if(!el||!ci||ci.uid!==arm.uid){arm=null;return}el.classList.add('tap-armed');if(!canPlay(ci))return;const nt=needsTarget(ci);
+ if(nt){document.querySelectorAll('.combat .en').forEach(e=>{if(!enemyLive(e))return;e.classList.add('drop-valid','hot');if(arm.confirm===+e.dataset.en)e.classList.add('drop-over')});
+  showOutcome(arm.i,typeof arm.confirm==='number'?arm.confirm:W.cb.tgt)}
+ else{const hero=document.querySelector('.hero');if(hero){hero.classList.add('drop-valid');if(arm.confirm==='hero'||arm.confirm==='area')hero.classList.add('drop-over')}showOutcome(arm.i)}}
+function commitArm(el){if(!el||!W.cb||W.cb.busy||W.cb.mode){if(arm)clearArm();return}const i=+el.dataset.i,ci=W.cb.hand[i];if(!ci){clearArm();return}
+ const same=arm&&arm.uid===ci.uid;arm={i,uid:ci.uid,confirm:same?arm.confirm:null};if(!el.classList.contains('peek'))peekCard(el,0,false,false);showArmTargets()}
+function tryTapPlay(spot){if(!arm||!W.cb||W.cb.busy||W.cb.mode)return false;const ci=W.cb.hand[arm.i];if(!ci||ci.uid!==arm.uid){clearArm();return true}
+ const nt=needsTarget(ci);
+ if(nt){if(typeof spot!=='number')return false;const en=W.cb.ens[spot];if(!en||en.hp<=0||en.fled)return true}
+ else if(spot!=='hero'&&spot!=='area')return false;
+ if(!canPlay(ci)){flashNoAfford(document.querySelector(`#hand .card[data-i="${arm.i}"]`));return true}
+ if(settings.tapConfirm&&arm.confirm!==spot){arm.confirm=spot;showArmTargets();return true}
+ const i=arm.i;if(typeof spot==='number')W.cb.tgt=spot;clearArm();playCard(i);return true}
+function tapSpot(ev){const t=ev.target;if(!t?.closest||t.closest('.topbar,.dais,.ctl,.ov,.pop,#orb,.hand,.bottom,button'))return null;
+ const en=t.closest('.en');if(en&&en.dataset.en!=null)return +en.dataset.en;if(t.closest('.hero'))return 'hero';if(t.closest('.scene'))return 'area';return null}
+function isCancelTap(ev){const t=ev.target;if(!t?.closest)return false;if(t.closest('.hand .card,.hand-hit,button,a,#orb,.pile,.endbtn,.ov,.pop,.topbar,.dais,.en,.hero'))return false;
+ if(t.closest('#hand,.bottom'))return true;return ev.clientY>innerHeight*.82}
+export function syncTapArm(){if(!arm)return;if(!W.cb||W.S.screen!=='combat'||W.cb.mode){arm=null;return}
+ const el=[...document.querySelectorAll('#hand .card')].find(c=>+c.dataset.uid===arm.uid);if(!el){arm=null;return}arm.i=+el.dataset.i;
+ if(!el.classList.contains('peek'))peekCard(el,0,true,false);showArmTargets()}
+document.addEventListener('pointerup',ev=>{if(drag||(ev.button!=null&&ev.button>0)||!arm||!W.cb||W.S.screen!=='combat'||W.S.ov||W.cb.busy||W.cb.mode)return;
+ if(handCardFrom(ev.target))return; // a card tap arms or switches; it never plays
+ if(isCancelTap(ev)){clearArm();eatClick=true;eatUntil=performance.now()+350;return}
+ const spot=tapSpot(ev);if(spot==null)return;tryTapPlay(spot);eatClick=true;eatUntil=performance.now()+350});
+observeEvents(ev=>{if((ev==='turnStart'||ev==='turnEnd')&&arm)clearArm()});
+document.addEventListener('pointermove',ev=>{if(ev.pointerType!=='mouse'||drag||arm)return;const hand=document.getElementById('hand');if(!hand)return;const r=hand.getBoundingClientRect();const m=peek?peek.offsetWidth*.5:0; // a pointer just past either end keeps the end card lifted
+ if(ev.clientY>=innerHeight*.65&&ev.clientX>=r.left-m&&ev.clientX<=r.right+m&&W.cb&&!W.cb.busy&&!W.cb.mode){const hit=handCardFrom(ev.target);if(hit)peekCard(hit);else scrubAt(ev.clientX);}else if(peek)clearPeek()});
 
 // t472: names are hidden in combat; a small name tip shows only while a mouse hovers or a finger holds a figure (flavour after a longer hold).
 {let nmEl=null,nmT=0;const off=()=>{clearTimeout(nmT);if(nmEl){nmEl.classList.remove('nameon','namelong');nmEl=null}};
