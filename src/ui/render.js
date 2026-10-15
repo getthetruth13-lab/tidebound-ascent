@@ -260,9 +260,14 @@ export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==
  if(m&&m.k==='chart'){const n=m.n;const cards=Array.from({length:n},(_,i)=>{const ci=cb.draw[i];return `<div class="cslot${i===0?' first':''}" data-i="${i}"><span class="cnum">${i===0?'<b>1</b> drawn first':'<b>'+(i+1)+'</b>'}</span>${cardHTML({...ci,uid:ci.uid},{})}<span class="cmv"><button class="cmvb" aria-label="Earlier" onclick="modeAct('up',${i})" ${i===0?'disabled':''}>◀</button><button class="cmvb" aria-label="Later" onclick="modeAct('dn',${i})" ${i===n-1?'disabled':''}>▶</button></span></div>`}).join('');
   h+=`<div class="ov battle"><div class="box chartbox" id="chartbox"><h2>🗺️ Chart: set the order of your next draws</h2><div class="muted csub">Drag cards left or right. The leftmost card is drawn first. Drop one in the Bottom slot to send it under the pile.</div>
   <div class="chartrow" style="--n:${n}"><div class="cards" id="chartcards">${cards}</div><div class="cright"><div class="cbottom${m.moved?' used':''}" id="chartbottom"><span class="cbi">⤓</span><b>Bottom</b><i>${m.moved?'Card sent down':'Drop 1 card here'}</i></div><button class="btn pri" id="chartdone" onclick="modeAct('done')">Done</button></div></div></div></div>`}
+ if(cb.endConfirm&&!cb.busy&&!cb.mode)h+=endConfirmDialog();
  return h+'</div>'}
+function endConfirmDialog(){return `<div class="ov end-confirm-ov" id="endconfirm" role="dialog" aria-modal="true" aria-labelledby="endconfirmq"><div class="box card-skip-box end-confirm-box"><h2 id="endconfirmq">You still have energy. End your turn anyway?</h2><div class="actions"><button class="btn" id="endcancel" onclick="endTurnConfirm(false)">Cancel</button><button class="btn pri" id="endyes" onclick="endTurnConfirm(true)">End Turn</button></div></div></div>`}
+export function endTurnConfirm(yes){const cb=W.cb;if(!cb||!cb.endConfirm)return;cb.endConfirm=false;if(yes)endTurnTap(true);else render()}
 // C2 sun seal: press scales the button; ending the turn plays the painted burst (transform/opacity only, never past 1.6x) on a layer that survives the re-render.
-export function endTurnTap(){const btn=document.getElementById('endbtn');
+export function endTurnTap(force){const btn=document.getElementById('endbtn');const cb0=W.cb;
+ // Spencer 10-15: pressing End with energy left AND a playable card asks first. Never at 0 energy, with nothing playable, mid-enemy-turn or in a pick mode.
+ if(cb0&&!cb0.busy&&!cb0.mode&&!force&&!cb0.endConfirm&&cb0.energy>0&&cb0.hand.some(ci=>canPlay(ci))){cb0.endConfirm=true;cb0.sel=null;render();return}
  const reduce=document.body.classList.contains('reduce-motion')||matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(btn&&!btn.disabled&&!reduce){const r=btn.getBoundingClientRect(),fx=document.createElement('img');
   fx.className='end-burst-fx';fx.alt='';fx.draggable=false;fx.src=assetSrc('ui','end-turn-c2-burst');
