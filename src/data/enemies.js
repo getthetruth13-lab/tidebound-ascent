@@ -42,6 +42,8 @@ const open=(e,l)=>{const x=l[((e.k||0))%l.length];return x.m?pk(e,[{w:1,m:x.m,wi
 function loop(e,seq,off=0){const i=((e.ci||0)+off)%seq.length;e.ci=(e.ci||0)+1;let m=seq[i];if(typeof m==='function')m=m(e);
  (e.hist||(e.hist=[])).push(m.lbl);if(e.hist.length>6)e.hist.shift();e.pk=e.hp;return m}
 const tend=()=>alive().filter(x=>x.key==='tendril');
+// Shared AI helpers for the later acts (data/act2/enemies.js, data/act3/enemies.js): same helpers, one definition.
+export {pk,loop,open,AI,hurt,half,allies,canWind,playerLow};
 registerEnemies({
  // ---- normal enemies ----
  slug:{n:'Brine Slug',e:'🐌',role:'attacker',hp:hp('slug'),ai:AI(e=>{const lash={a:11,b:5,lbl:'Lash'},spit={a:6,w:1,lbl:'Brine Spit'},wd={b:12,lbl:'Withdraw'},ooze={status:{id:'murk',n:1,pile:'disc'},lbl:'Slime Trail'};

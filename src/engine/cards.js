@@ -26,7 +26,8 @@ export const isX=ci=>CARDS[ci.id].c==='X';
 // Cost pipeline (content-impl-plan §4.2 modifyCost): base/upgraded -> X -> set-to-0 (tmp0) -> modifiers ('cost': Low Note, Survey Flags,
 // Barnacled...) -> clamp >= 0. "Next card" discounts are consumed in onCardPlayed, not when the cost is read.
 export function baseCost(ci){const d=CARDS[ci.id];return (isUp(ci)&&d.cu!=null)?d.cu:d.c}
-export function cost(ci){const d=CARDS[ci.id];if(d.c==='X')return 0;let c=baseCost(ci);if(W.cb){if(ci.tmp0)c=0;c=mod('cost',{card:ci,def:d},c)}return Math.max(0,c)}
+export function cost(ci){const d=CARDS[ci.id];if(d.c==='X')return 0;let c=baseCost(ci);if(W.cb){if(ci.tmp0)c=0;c=mod('cost',{card:ci,def:d},c);const cb=W.cb;if(cb.numbCard===ci)c+=1;if(cb.owed&&!cb.owedUsed&&!ci.tmp0&&owedMatch(d,cb.owed)&&cb.ens.some(x=>x.key==='grell'&&x.hp>0))c+=1}return Math.max(0,c)}
+const owedMatch=(d,t)=>(d.t==='A'?'A':d.t==='P'?'P':d.t==='S'||d.t==='W'?'S':null)===t; // R5 Owed: Waypoints count as Skills
 // Named cost surcharges ("first card each turn costs 1 more"), so the card can show its normal cost plus a "+1" badge that names the
 // source instead of silently raising every number in hand. Returns [{n, src, why}]; empty when nothing raises this card.
 export function costSurcharge(ci){const cb=W.cb,out=[];if(!cb||CARDS[ci.id].c==='X'||CARDS[ci.id].unplay)return out;

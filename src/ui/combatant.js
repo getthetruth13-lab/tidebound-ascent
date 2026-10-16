@@ -2,7 +2,7 @@
 // STATUS is the single icon map: each status has a name, kind (buff/debuff), rule text, duration rule and a placeholder SVG.
 // Painted art replaces a placeholder with no code change: add the status to art/v2/ui/icons.json (assets.js ST_ICON) and it is used first.
 import {KW,CARDS,RELICS} from '../core/registry.js';
-import {intentOf,CORE,eAtk,phasePlan} from '../engine/combat.js';
+import {intentOf,CORE,eAtk,phasePlan,poolOf,waterOn,waterLoss,alive} from '../engine/combat.js';
 import {W} from '../core/state.js';
 import {assetSrc} from '../assets.js';
 const S=(d,x='')=>`<svg class="sti" viewBox="0 0 24 24" aria-hidden="true"><g fill="currentColor" stroke="#05070b" stroke-width="1" stroke-linejoin="round">${d}</g>${x}</svg>`;
@@ -40,6 +40,14 @@ const ICON={
  grudge:S('<path d="M6 3h9l3 6v9a3 3 0 01-3 3H8a3 3 0 01-3-3V9z"/>'), // glove: Grudge
  breath:S('<circle cx="12" cy="12" r="8"/>','<circle cx="9" cy="9" r="2" fill="#fff6"/>'), // bubble: Breath
  crestUp:S('<path d="M2 20c4-10 9-14 16-16-3 4-3 8 4 10v6z"/>'), // wave crest: Crest Bonus
+ // Act 3 (ACT3-RULES): Charge pips, Tailwind, Submerged, Behind, Deep Shard (enemies); Water, Storm Tide (hero)
+ charge:S('<path d="M13 2L4 14h6l-1 8 9-12h-6z"/>'),
+ tailwind:S('<path d="M2 11h14a3 3 0 10-3-3M2 16h18a3 3 0 11-3 3M2 6h8"/>'),
+ submerged:S('<path d="M2 14c3-4 6 4 10 0s7 4 10 0v8H2z"/>'),
+ behind:S('<path d="M5 4h14v4H5zM8 10h8v4H8zM10 16h4v4h-4z" opacity=".8"/>'),
+ shard:S('<path d="M12 1l8 8-8 14L4 9z"/>','<path d="M4 9h16M12 1v22" fill="none" stroke="#05070b" stroke-width="1.2"/>'),
+ water:S('<path d="M12 2C6 10 5 13 5 16a7 7 0 0014 0c0-3-1-6-7-14z"/>'),
+ stormtide:S('<path d="M4 3h14a2 2 0 012 2v16H6a2 2 0 01-2-2z"/>','<path d="M8 12c2-3 4 3 8 0" fill="none" stroke="#05070b" stroke-width="1.6"/>'),
  rooted:S('<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10"/>','<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>')
 };
 const T=(n,kind,kw,dur,rule)=>({n,kind,kw,dur,rule});
@@ -79,7 +87,14 @@ const STATUS={
  drawLess:T('Fewer Cards Next Turn','debuff',null,'Next turn.','Draw this many fewer cards next turn.'),
  grudge:T('Grudge','debuff',null,'Lasts all combat.','Takes this much more damage from your Attacks.'),
  breath:T('Breath','buff',null,'Until your next Crest or Undertow.','Your next Crest or Undertow is stronger for each Breath.'),
- crestUp:T('Crest Bonus','buff',null,'Until your next Crest.','Your next Crest deals this much more damage to ALL.')
+ crestUp:T('Crest Bonus','buff',null,'Until your next Crest.','Your next Crest deals this much more damage to ALL.'),
+ charge:T('Charge','debuff',null,'Builds each turn.','At 3 Charge it discharges and adds a Static to your draw pile. Hurting it hard knocks a pip off.'),
+ tailwind:T('Tailwind','buff',null,'Until its next attack.','Its next attack hits this much harder on the first hit.'),
+ submerged:T('Submerged','buff',null,'Until it surfaces.','Only area damage, Bleed and Drenched reach it. It surfaces with a heavy hit.'),
+ behind:T('Behind','buff',null,'Until the twins swap.','Single-target cards can only hit the front twin. AoE and Bleed reach both.'),
+ shard:T('Deep Shard','buff',null,'Until it is passed or dropped.','Takes half damage and its attacks hit 4 harder. Hurt it badly, or kill the next holder, and the pass fails.'),
+ water:T('Water','debuff',null,'While Thalassa is in her second phase.','At the end of your turn you lose 1 HP per 5 Guard you hold.'),
+ stormtide:T('Storm Tide','debuff',null,'This turn.','Your Surge and Recede are 1 weaker, or your first Guard card gives 1 less.')
 };
 const ORDER=Object.keys(STATUS);
 export const GUARD_SVG='<svg class="sti" viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1.5L2.5 5v8c0 6.5 4 11 9.5 13.5C17.500 24 21.500 19.500 21.500 13V5z" fill="currentColor" stroke="#05070b" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 4.5v19M5 9h14" fill="none" stroke="#05070b66" stroke-width="1"/></svg>';
@@ -95,9 +110,9 @@ const turns=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
 const atkVal=(e,a,vuln,pl)=>eAtk(e,a,{str:((pl||{})[e.uid]||{}).str||0,vuln});
 // What the enemies' shown Attacks would deal to you, with and without your Exposed.
 function incoming(){const cb=W.cb;let a=0,b=0;if(!cb)return null;const pl=phasePlan();
- for(const e of cb.ens){if(e.hp<=0||e.fled)continue;const m=intentOf(e);if(!m||!m.a)continue;const h=m.h||1;a+=atkVal(e,m.a,true,pl)*h;b+=atkVal(e,m.a,false,pl)*h}
+ for(const e of cb.ens){if(e.hp<=0||e.fled)continue;const m=intentOf(e);if(!m||!m.a||m.fog)continue;const h=m.h||1;a+=atkVal(e,m.a,true,pl)*h;b+=atkVal(e,m.a,false,pl)*h}
  return a?{with:a,without:b}:null}
-function enemyAtk(e,drop){const m=intentOf(e);if(!m||!m.a)return null;const h=m.h||1;
+function enemyAtk(e,drop){const m=intentOf(e);if(!m||!m.a||m.fog)return null;const h=m.h||1;
  const pe=phasePlan()[e.uid]||{},base=m.a+(e.st.str||0)+(e.st.mightTmp||0)+(pe.str||0),vu=pe.vuln;
  const f=(d,w)=>Math.max(0,Math.floor(w?Math.floor(d*.75):d)*(vu?1.5:1));
  const cur=Math.floor(f(base,!!e.st.weak)),alt=Math.floor(f(base,drop==='weak'?false:!!e.st.weak));return {cur:cur*h,alt:alt*h}}
@@ -133,6 +148,14 @@ export function statusText(k,v,who,extraText){const d=STATUS[k];if(!d)return '';
 const plain=t=>String(t||'').replace(/<[^>]+>/g,'').replace(/\{([^|}]*)\|([^}]*)\}/g,'$1');
 // Listener ids registered through thisTurn()/forCombat() (cards and potions) with the rule shown on their badge.
 export const LISTENER_INFO={
+ rubbing:['Rubbing','This copy Sinks if it is still in your hand at the end of the turn.'],
+ triang:['Triangulate','Every Waypoint triggers once now at half strength.'],
+ whettededge:['Whetted Edge','Your Attacks deal extra damage this turn.'],
+ tolast:['To the Last','You and the chosen enemy stay Exposed for the rest of the fight.'],
+ grandpause:['Grand Pause','Your Marked cards ring with +3 this turn.'],
+ shatternote:['Shattered Note','Guard you gain from rings is stored and dealt to ALL enemies at end of turn.'],
+ strongcurrent:['Strong Current','Each Surge and Recede on your cards moves the Tide 2 further this turn.'],
+ waveonwave:['Wave on Wave','Your next Crest this turn applies 2 Drenched to ALL enemies and draws cards.'],
  countedbreaths:['Counted Breaths','Your next Flourish this turn needs 1 less Momentum.'],
  coastward:['Coastal Ward','Whenever a Tideturn happens this turn, gain Guard.'],
  ovation:['Standing Ovation','Your next Attacks this turn are free Flourishes.'],
@@ -157,7 +180,7 @@ export const LISTENER_INFO={
 const INTERNAL_LISTENERS=new Set(['afterPlay','chartClamp']); // plumbing that finishes a card's own text, not a separate effect
 // Everything the player has pending or armed that is NOT in cb.p.st: [{k,v,n?,t?}] (k = STATUS key; n / t override name / rule text).
 // Lasting effects on an enemy that live outside e.st (your Powers' per-enemy marks): merged into its status row.
-export function enemyExtraSt(e){const o={};for(const p of (W.cb&&W.cb.powers)||[])if(p.id==='grudge'&&p.g&&p.g[e.uid])o.grudge=(o.grudge||0)+p.g[e.uid];return o}
+export function enemyExtraSt(e){const o={};if(e.passive&&e.passive.charge){const n=W.cb?poolOf(e):0;if(n)o.charge=n}if(e.tailwind)o.tailwind=e.tailwind;if(e.sub)o.submerged=1;if(e.back)o.behind=1;if(e.holds)o.shard=1;for(const p of (W.cb&&W.cb.powers)||[])if(p.id==='grudge'&&p.g&&p.g[e.uid])o.grudge=(o.grudge||0)+p.g[e.uid];return o}
 export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
  const add=(k,v,n,t,ico)=>{if(v)out.push({k,v,n,t,ico})};
  if(cb.keepMom)add('keepMom',1);
@@ -166,6 +189,7 @@ export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
  for(const r of W.run.relics)if(r.carry>0)ne+=r.carry;
  add('nextEnergy',ne);add('nextMom',nm);add('drained',cb.drainE||0);
  if(cb.holdDrift)add('moonlock',1);
+ if(waterOn())add('water',waterLoss());if(cb.storm&&alive().some(x=>x.key==='magus'))add('stormtide',1);
  if(cb.mimic)add('mimic',1);
  add('cairn',cb.cairn||0);
  if(cb.retortOk)add('retort',1);

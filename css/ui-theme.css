@@ -532,3 +532,19 @@ body.env-still #envfx{visibility:hidden}
 .tb-loading .ld-skip{margin-top:8px;opacity:0;pointer-events:none;transition:opacity .4s}
 .tb-loading .ld-skip.on{opacity:1;pointer-events:auto}
 .tb-loading .ld-box,.tb-loading .tm-emb{animation:none}
+
+/* Acts 2 and 3 map looks (ACT2_BUILD, D-A2-06/13): placeholder paint until map_a2 / map_a3 plates land. */
+.mapwrap.a2{background:linear-gradient(180deg,#3a4247,#2b3236 55%,#23292d);border:2px solid #6b6f6a;box-shadow:inset 0 0 40px #0008}
+.mapwrap.a3{background:radial-gradient(ellipse at 50% 40%,#d9dcea,#b9bfd4 60%,#9aa3bf);border:2px solid #6c7596;box-shadow:inset 0 0 40px #3a4a7a55}
+.mapwrap .ward{position:absolute;right:6px;z-index:0;pointer-events:none;font:600 10px var(--font-display);letter-spacing:.16em;text-transform:uppercase;padding:2px 8px;border-radius:2px}
+.mapwrap .ward2{color:#e8d9b8;background:#4a5a5f;border:1px solid #b08a4a}.mapwrap .ward3{color:#2a3350;background:#e6e9f4;border:1px solid #6c7596}
+.mapwrap .rowmark{position:absolute;left:6px;z-index:0;pointer-events:none;transform:translateY(-50%)}
+.mapwrap .sigil{display:block;width:26px;height:26px;border-radius:50%;border:3px double #b08a4a;background:radial-gradient(#3a4247 40%,#b08a4a55)}
+.mapwrap .eye{display:block;width:30px;height:18px;border-radius:50%;border:2px solid #4a5688;background:radial-gradient(#fff 25%,#aab4d6 60%,transparent 62%)}
+.parch:has(.mapwrap.a2) .maplore,.parch:has(.mapwrap.a2) .mapact{color:#e8d9b8}
+/* Act 3 Updraft: a small feather mark on the dashed wind-arrow (map.js html_up) */
+.mapwrap .updraft{position:absolute;z-index:1;width:16px;height:16px;margin:-8px 0 0 -8px;pointer-events:none;background:radial-gradient(circle at 50% 50%,#fff7d6 0 30%,transparent 32%),conic-gradient(from 200deg,#f2dc9b,#8fa3c7,#f2dc9b);clip-path:polygon(50% 0,100% 55%,62% 48%,58% 100%,42% 100%,38% 48%,0 55%);opacity:.9}
+/* Act 3 enemy states: submerged (Cloud Dive), behind (Twin Squalls back rank), Shard holder (Navigator) */
+.en.sub .fig{opacity:.38;filter:saturate(.5) blur(1.2px) brightness(.8);transform:translateY(8%)}
+.en.back .fig{opacity:.72;filter:brightness(.72) saturate(.8)}
+.en.holder .fig{filter:drop-shadow(0 0 7px #b8e6d0cc)}

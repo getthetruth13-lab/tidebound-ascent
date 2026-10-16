@@ -52,4 +52,37 @@ Object.assign(kw,{
  'Flourish':'Spend all Momentum to multiply an Attack.',
  'Big Moment':'Your hero\'s signature event.',
 });
+// Act 2 rule words (ACT2-RULES tutorial lines): plain, one line each. They only appear once an Act 2 enemy or card names them.
+Object.assign(kw,{
+ 'Gunnery':'Aiming: it fires next turn and only half your Guard blocks.',
+ 'Hold the Line':'While it has Guard, single-target attacks on its allies hit it instead. AoE and Bleed ignore the wall.',
+ 'Armoured':'The first Attack each turn bounces off. Hit twice.',
+ 'Muffled':'Your most expensive card is silenced this turn.',
+ 'Owed':'The first card of the type you played first costs 1 more next turn.',
+ 'Scald':'Unplayable. If it is in your hand at turn end, take 2 damage.',
+ 'Pull':'Drags your Tide down, or strips Guard.',
+ 'Pressure':'The dial fills each turn. At 4 it vents. Hit hard to bleed it.',
+ 'Chorus':'Each hymn is stronger for every other singer alive.',
+ 'Seize':'Takes your cheapest card until the seizer dies.',
+ 'Jam':'Enough damage in one turn jams it for an action.',
+ 'Swivel':'The gun turns every three turns. A big hit jams the turntable.',
+});
+// Act 3 rule words (ACT3-RULES tutorial lines).
+Object.assign(kw,{
+ 'Charge':'Builds each turn. At 3 it discharges and adds a Static to your draw pile.',
+ 'Static':'Unplayable. When drawn, you lose 1 Energy this turn. Sinks at turn end.',
+ 'Gust':'Sends your last drawn cards back on top of your draw pile.',
+ 'Numbed':'Your cheapest card costs 1 more this turn.',
+ 'Cloud Dive':'Submerged: only area damage and Bleed reach it. It surfaces with a heavy hit.',
+ 'Storm Tide':'Your Surge and Recede are 1 weaker this turn, or your first Guard card gives 1 less.',
+ 'Veiled':'You see what it will do, not how much. It never exceeds 26.',
+ 'Link':'While both twins live, each hit is 2 stronger. Only the front twin can be hit.',
+ 'Overclock':'Its blast grows with every ring still spinning. Break a ring to lose its rule.',
+ 'Water':'At the end of your turn you lose 1 HP for every 5 Guard you hold.',
+ 'Tailwind':"An ally's next attack hits 4 harder on its first hit.",
+ 'Refract':'Your first Attack card each turn deals 3 damage back to you.',
+ 'Siphon':'When you gain Guard from a card, it gains half (up to 8 a turn).',
+ 'Shard':'The Shard holder takes half damage and hits 4 harder. Hurt it badly, or kill the next holder, and the pass fails.',
+ 'Pelt':'Many small hits. The last one makes you Brittle.',
+});
 registerKeywords(kw);

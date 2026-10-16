@@ -10,9 +10,10 @@ export function saveSettings(){safeSet(SET_KEY,settings)}
 const actions=new Map();let checkpoint=null,journal=[],depth=0;
 export function registerSaveActions(mod){for(const [name,fn] of Object.entries(mod))if(typeof fn==='function')actions.set(name,fn)}
 const clone=v=>JSON.parse(JSON.stringify(v));
+// v5: later acts (run.act 1-3, run.bosses, per-act map). Older saves are Act 1 and load unchanged.
 // v4: card instances carry lvl (multi-level Temper). Older saves have only up:true, which is level 1.
 export const migrateRun=run=>{for(const c of (run&&run.deck)||[])if(c.lvl==null)c.lvl=c.up?1:0;return run};
-function write(){if(checkpoint&&W.run&&!W.run.won&&W.run.hp>0)safeSet(RUN_KEY,{v:4,t:Date.now(),run:W.run,checkpoint,journal})}
+function write(){if(checkpoint&&W.run&&!W.run.won&&W.run.hp>0)safeSet(RUN_KEY,{v:5,t:Date.now(),run:W.run,checkpoint,journal})}
 export function saveRun(){
  if(W.replaying||W.previewing||depth||!W.run||W.S.screen==='end'||W.S.screen==='title')return;
  if(W.S.screen==='map'||W.S.screen==='travel'){
@@ -28,7 +29,7 @@ export function savedAction(name,args,fn){
  journal.push({name,args:clone(recorded),context,t:Date.now()});write();depth++;
  try{return fn()}finally{depth--;saveRun()}
 }
-export function loadRunData(){const d=safeGet(RUN_KEY);return d&&(d.v===2||d.v===3||d.v===4)&&d.run&&!d.run.won&&d.run.hp>0?d:null}
+export function loadRunData(){const d=safeGet(RUN_KEY);return d&&(d.v===2||d.v===3||d.v===4||d.v===5)&&d.run&&!d.run.won&&d.run.hp>0?d:null}
 export function clearRun(){if(W.previewing)return;checkpoint=null;journal=[];try{localStorage.removeItem(RUN_KEY)}catch(_){}}
 export function continueRun(){
  const d=loadRunData();if(!d)return false;

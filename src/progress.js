@@ -1,14 +1,15 @@
 // progress.js: the Lamplight profile (meta-progression that outlives runs). Stored under its own key, versioned, and loaded
 // defensively so a missing, old or damaged save never breaks the game. No DOM or engine imports: usable from tests and bots.
-import {LAMP_XP,CLIMB_XP,CLASS_ORDER,LOCK_CARDS,LOCK_HERO_RELICS,LOCK_CLASS_RELICS,LAMP_PER_RUN,LOCK_SHARED_RELICS,LOCK_POTIONS,LAMP_PLAN,CLIMB_PLAN} from './data/lamplight.js';
+import {LAMP_XP,CLIMB_XP,CLASS_ORDER,LOCK_CARDS,lockCards,SPOIL_CARDS,LOCK_HERO_RELICS,LOCK_CLASS_RELICS,LAMP_PER_RUN,LOCK_SHARED_RELICS,LOCK_POTIONS,LAMP_PLAN,CLIMB_PLAN} from './data/lamplight.js';
 export const PROFILE_KEY='tidebound.profile.v1',PROFILE_V=1;
 export const ENDING_IDS=['light','lens','cut'];
 let mem=null; // fallback when localStorage is unavailable (private mode, Node)
-const blank=()=>({v:PROFILE_V,xp:{},climb:0,claimed:{},climbClaimed:0,runs:{},wins:{},unlocked:{cards:[],relics:[],potions:[]},seen:{enemy:{},event:{},relic:{},card:{},potion:{}},tasks:0,best:{},twistSeen:false,endings:{},lastEnding:'',tutSeen:{}});
+const blank=()=>({v:PROFILE_V,xp:{},climb:0,claimed:{},climbClaimed:0,runs:{},wins:{},unlocked:{cards:[],relics:[],potions:[]},spoils:{},seen:{enemy:{},event:{},relic:{},card:{},potion:{}},tasks:0,best:{},twistSeen:false,endings:{},lastEnding:'',tutSeen:{}});
 function norm(p){const b=blank();if(!p||typeof p!=='object'||Array.isArray(p))return b;
  const num=x=>Number.isFinite(+x)&&+x>0?Math.floor(+x):0,map=o=>{const r={};if(o&&typeof o==='object')for(const k of Object.keys(o))r[k]=num(o[k]);return r};
  b.xp=map(p.xp);b.climb=num(p.climb);b.claimed=map(p.claimed);b.climbClaimed=num(p.climbClaimed);b.runs=map(p.runs);b.wins=map(p.wins);b.tasks=num(p.tasks);b.best=map(p.best);
  // Lore (design/lore/LORE-BIBLE.md §14): twistSeen gates the S3 tier; endings / lastEnding drive the title-screen variants. Old saves load with safe defaults.
+ b.spoils={};if(p.spoils&&typeof p.spoils==='object')for(const k of Object.keys(p.spoils))if(p.spoils[k])b.spoils[k]=1;
  b.tutSeen={};if(p.tutSeen&&typeof p.tutSeen==='object')for(const k of CLASS_ORDER)if(p.tutSeen[k])b.tutSeen[k]=1;
  b.twistSeen=p.twistSeen===true;b.endings=map(p.endings);b.lastEnding=ENDING_IDS.includes(p.lastEnding)?p.lastEnding:'';
  for(const k of ['cards','relics','potions'])b.unlocked[k]=Array.isArray(p.unlocked&&p.unlocked[k])?[...new Set(p.unlocked[k].filter(x=>typeof x==='string'))]:[];
@@ -35,9 +36,11 @@ export const totalPending=p=>CLASS_ORDER.reduce((n,c)=>n+lampPending(p,c),0)+cli
 export function barOf(xp,table){const lvl=levelOf(xp,table),max=lvl>=table.length,lo=lvl?table[lvl-1]:0,hi=max?lo:table[lvl];return {lvl,max,into:xp-lo,span:hi-lo,pct:max?100:Math.max(0,Math.min(100,100*(xp-lo)/Math.max(1,hi-lo)))}}
 // ---------- locks ----------
 export const classRelicIds=cls=>{const r=LOCK_CLASS_RELICS[cls];return r?[r.shop,r.rare,...(LOCK_HERO_RELICS[cls]||[])]:[]};
-export const allLocked=()=>({cards:CLASS_ORDER.flatMap(c=>LOCK_CARDS[c]),relics:[...CLASS_ORDER.flatMap(classRelicIds),...LOCK_SHARED_RELICS],potions:[...LOCK_POTIONS]});
+export const allLocked=()=>({cards:CLASS_ORDER.flatMap(c=>lockCards(c)),relics:[...CLASS_ORDER.flatMap(classRelicIds),...LOCK_SHARED_RELICS],potions:[...LOCK_POTIONS]});
 // The ids that are still locked for this profile: {cards:{id:1},relics:{id:1},potions:{id:1}} (copied into each run, see engine/run.js).
-export function lockedFor(p){const out={cards:{},relics:{},potions:{}},A=allLocked();for(const k of Object.keys(A)){const u=new Set(p.unlocked[k]);for(const id of A[k])if(!u.has(id))out[k][id]=1}return out}
+export function lockedFor(p){const out={cards:{},relics:{},potions:{}},A=allLocked();for(const k of Object.keys(A)){const u=new Set(p.unlocked[k]);for(const id of A[k])if(!u.has(id))out[k][id]=1}
+ for(const id of Object.keys(SPOIL_CARDS))if(!(p.spoils&&p.spoils[id]))out.cards[id]=1; // Spoils stay out of every pool until taken once
+ return out}
 // ---------- level-up offers ----------
 // {track,level,final,items:[{kind,id}]}; null if nothing is waiting. The three offered are the first eligible locked items in list order,
 // so nothing repeats, nothing is skipped, and the two you don't take come back in the next offer.
@@ -45,7 +48,7 @@ const rarityOf=(CARDS,id)=>CARDS&&CARDS[id]?CARDS[id].r:'u';
 export function remaining(p,track,CARDS){const u=k=>new Set(p.unlocked[k]);
  if(track==='climb'){const r=u('relics'),po=u('potions');return {relics:LOCK_SHARED_RELICS.filter(x=>!r.has(x)),potions:LOCK_POTIONS.filter(x=>!po.has(x))}}
  const cls=track,uc=u('cards'),ur=u('relics'),R=LOCK_CLASS_RELICS[cls]||{};
- return {relics:(LOCK_HERO_RELICS[cls]||[]).filter(x=>!ur.has(x)),cards:(LOCK_CARDS[cls]||[]).filter(x=>!uc.has(x)&&!(CARDS&&CARDS[x]&&(CARDS[x].cut||CARDS[x].stub))),shop:R.shop&&!ur.has(R.shop)?R.shop:null,rare:R.rare&&!ur.has(R.rare)?R.rare:null}}
+ return {relics:(LOCK_HERO_RELICS[cls]||[]).filter(x=>!ur.has(x)),cards:lockCards(cls).filter(x=>!uc.has(x)&&!(CARDS&&CARDS[x]&&(CARDS[x].cut||CARDS[x].stub))),shop:R.shop&&!ur.has(R.shop)?R.shop:null,rare:R.rare&&!ur.has(R.rare)?R.rare:null}}
 export function offerFor(p,track,CARDS){
  const climb=track==='climb',claimed=climb?p.climbClaimed:(p.claimed[track]||0),pending=climb?climbPending(p):lampPending(p,track);if(pending<=0)return null;
  const plan=(climb?CLIMB_PLAN:LAMP_PLAN)[claimed];if(!plan)return null;const rem=remaining(p,track,CARDS);const items=[];

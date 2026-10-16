@@ -14,7 +14,7 @@ import {CARD_ART,assetEntry,assetSrc,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_B
 import {syncAudio} from '../audio.js';
 import {syncEnv,envFxSettingLabel} from './env.js';
 import {fightFeet,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
-import {deathLine} from '../data/places.js';
+import {deathLine,ACT_NAMES} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
 import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
 import {loadProfile,saveProfile,tutSeen,markTutSeen} from '../progress.js';
@@ -29,7 +29,7 @@ export {toggleHitLog} from './hero-plate.js';
 import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,lvlLabel,rkMax,baseCost,costSurcharge} from '../engine/cards.js';
 import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,canTakeMove,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
-import {ECON,campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
+import {ECON,isLastAct,campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
 import {anim,syncCombatAnimations} from './fx.js';
 import {screenChange,motionEnabled} from './anim.js';
 import {deathStyleOf,DEATH_STYLES,DEATH_DRAIN} from './deathstyles.js';
@@ -46,7 +46,7 @@ import {pkScreen,pkBtn} from './pk.js';
 import {glyph,stripEmoji,iconize} from './glyphs.js';
 import {lampSummaryHTML,tasksHTML,lampBtnLabel} from './screens/lamp.js';
 import {lampPreview} from '../engine/lamplight.js';
-import {relicFlavour,ferrymanLine,bellCount,wrenLine,WREN_SIDE,currentTier,ENEMY_FLAVOUR,BOSS_DEFEAT} from '../data/lore.js';
+import {relicFlavour,ferrymanLine,bellCount,wrenLine,WREN_SIDE,currentTier,ENEMY_FLAVOUR,BOSS_DEFEAT,CROWN_HOLDS} from '../data/lore.js';
 export const TH={tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist',status:'',curse:'',colorless:''};
 const RARN={s:'Starter',c:'Common',u:'Uncommon',r:'Rare',x:'Special'};
 const esc=s=>String(s).replace(/"/g,'&quot;');
@@ -80,7 +80,7 @@ export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const ba
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
-export function topBar(){const K=CLASSES[W.run.cls];return `<div class="topbar sts theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act I</small></span></span>
+export function topBar(){const K=CLASSES[W.run.cls];return `<div class="topbar sts theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act ${['','I','II','III'][W.run.act||1]}</small></span></span>
  <span class="stat hp" style="color:var(--status-damage)">${iconHTML('hud','heart','❤️')} ${Math.max(0,W.run.hp)}/${W.run.max}</span><span class="stat gold" style="color:var(--rarity-rare)">${iconHTML('hud','gold','💰')} ${W.run.gold}</span><span class="stat floor">${iconHTML('hud','floor','🏔️')} ${W.run.floor}/15</span>${potionSlots()}${relicBar()}<span class="sp"></span>
  ${W.run.lamp?`<button class="mini" id="lampbtn" onclick="openOv('tasks')" title="Lantern Tasks">${LANTERN_SVG} ${lampBtnLabel()}</button>`:''}<button class="mini" id="deckbtn" onclick="openOv('deck')" title="Deck">${iconHTML('hud','deck','🂠')} <span class="deck-count">${W.run.deck.length}</span></button><button class="mini" id="mapbtn" onclick="openOv('map')" title="Map">${iconHTML('hud','map','🗺️')}</button><button class="mini" id="setbtn" onclick="openOv('settings')" title="Settings">${iconHTML('hud','settings','⚙️')}</button></div>${toastsHTML()}`}
 export function potionSlots(){const ps=W.run.potions;return `<span class="potions" id="potions">${ps.map((id,i)=>{const p=id&&POTIONS[id];
@@ -187,7 +187,7 @@ export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,multi:(n||1)>1,ene
  const flav=ENEMY_FLAVOUR[e.key],nm0=flav?`${e.n}<i class="nmfl">${esc(flav)}</i>`:e.n;
  const name=`${nm0}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}`;const pasH=e.passive?`<span class="pas" title="${esc(e.passive.n+': '+e.passive.text)}">${e.passive.n==='Rooted'?iconHTML('status','rooted','🌿'):'🌿'}${e.passive.n}</span>`:'';
  return figureHTML({sp:spriteFor('enemies',e.key,e.sv!=null?e.sv:vi),role,ph:e.e,g,x:enemyX(k==null?i:k,n||1,g),shake:sh,intent:intentHTML(e),name,hp:hpbar(e.hp,e.max,e.block,e.blkT,'e'+e.uid),
-  badgesH:(e.passive?.n==='Rooted'?'':pasH)+badges(0,0,{...e.st,...enemyExtraSt(e),...(e.passive?.n==='Rooted'?{rooted:1}:{}),...(W.cb&&W.cb.parries&&W.cb.parries[e.uid]?{parry:W.cb.parries[e.uid]}:{})},undefined,e),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
+  badgesH:(e.passive?.n==='Rooted'?'':pasH)+badges(0,0,{...e.st,...enemyExtraSt(e),...(e.passive?.n==='Rooted'?{rooted:1}:{}),...(W.cb&&W.cb.parries&&W.cb.parries[e.uid]?{parry:W.cb.parries[e.uid]}:{})},undefined,e),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}${e.sub?' sub':''}${e.back?' back':''}${e.holds?' holder':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
 export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const cb=W.cb||{p:{st:{}}}; // after the win (reward screen) there is no combat: the hero stands in the same spot with no statuses
  const sh=motionEnabled()||!W.cb?null:anim(cb.pshake,400);
  return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*570/2340),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:heroBarHeal(hpbar(W.run.hp,W.run.max,cb.p.block,cb.p.blkT,'p')),
@@ -244,7 +244,7 @@ const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.sl
 // End Turn sun: dim while you can still act, burning once energy is 0, burning through the whole enemy turn (cb.enemyTurn, set by endTurn, cleared in finish/win/lose), dim again on your next turn.
 export const sunState=cb=>cb.enemyTurn?'work':(cb.energy<=0?'ready':'dim');
 export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==enemyPace())setEnemyPace(settings.enemyPace);
- const incoming=cb.ens.filter(e=>e.hp>0&&!e.fled).reduce((a,e)=>{const m=intentOf(e);return a+(m.a?eAtk(e,m.a)*(m.h||1):0)},0);let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
+ const incoming=cb.ens.filter(e=>e.hp>0&&!e.fled).reduce((a,e)=>{const m=intentOf(e);return a+(m.a&&!m.fog?eAtk(e,m.a)*(m.h||1):0)},0);let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
  h+=daisHTML();
  const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>!e.fled); // the fallen stay in their slot as remains. victory-sweep: a dead summoned foe keeps its slot as an empty gap (drawn as nothing), so its death never re-spaces the others (they used to slide, and the survivors jumped again at victory)
  h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>e.hp>0?enemyHTML(e,i,k,live.length,g):e.summoned?'':remainsHTML(e,k,live.length,g,cb.ens.slice(0,i).filter(x=>x.key===e.key).length)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${(()=>{const c=coachHTML(),hh=hintHTML();if(hh&&!cb.hhRe){cb.hhRe=1;setTimeout(()=>{if(W.cb===cb&&!drag)render()},HINT_MS+120)}return c+hh+ctxHintHTML(cb,W.run.cls,!!c||!!hh)})()}`;
@@ -373,7 +373,7 @@ const TC_A1_DEFAULT={src:'art/v2/bg/tc-a1-plate@2x.webp',w:1870,h:761,panel:[109
 // Plate rect + text panel from the Artist's manifests (tc-a1-rects.json -> ENV.envs.tc_a1.art.mid, tc-a1-spec.json -> .spec), panel made plate-relative.
 function tcA1(){const e=ENV.envs.tc_a1;const m=e&&e.art&&e.art.mid&&e.art.mid[0];const sp=e&&e.spec;if(!m||!sp||!sp.text_panel)return TC_A1_DEFAULT;const [x,y,w,h]=m.r,[px,py,pw,ph]=sp.text_panel.rect;
  return {src:m.f,w,h,panel:[px-x,py-y,pw,ph],title:sp.title||TC_A1_DEFAULT.title,sub:sp.subtitle||TC_A1_DEFAULT.sub}}
-function travelScr(){const ok=Date.now()-(W.S.t||0)>1000;const T=tcA1(),[px,py,pw,ph]=T.panel,pc=(a,b)=>(a/b*100).toFixed(2)+'%';
+function travelScr(){const ok=Date.now()-(W.S.t||0)>1000;const T={...tcA1()},AN=W.S.kind==='act'&&ACT_NAMES[W.S.to];if(AN){T.title='Act '+['','I','II','III'][W.S.to]+': '+AN.n;T.sub=AN.sub+'.'}const [px,py,pw,ph]=T.panel,pc=(a,b)=>(a/b*100).toFixed(2)+'%';
  return `<div class="page travel" onclick="skipTravel()"><div class="tcard tcplate" style="aspect-ratio:${T.w}/${T.h}"><img class="tcimg" src="${T.src}" alt="" draggable="false" onerror="this.parentNode.classList.add('noimg');this.remove()">
  <div class="tcpanel" style="left:${pc(px,T.w)};top:${pc(py,T.h)};width:${pc(pw,T.w)};height:${pc(ph,T.h)}"><h1>${T.title}</h1><div class="sub">${T.sub}</div></div></div>
  <div class="boss muted tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>
@@ -413,8 +413,8 @@ function rewardScr(){const S=W.S,title=stripEmoji(S.title||'');
  if(S.bossPick){const took=S.bossTook;
   return (S.scene?victorySceneHTML(S):'')+topBar()+pkScreen({cls:'pk-rewards pk-bossrelic'+(S.scene?' vic':''),title:`<span class="reward-banner">Boss relic</span>`,sub:took?'':'Choose one. The others sink with the boss.',
    body:tilesRow(S.bossPick.map((id,j)=>relicTile(id,{click:took?'':`bossRelicPick(${j})`,done:took===id,disabled:!!took&&took!==id,sum:RELICS[id].d})),'rewtiles bossrelics'),
-   right:took?pkBtn(W.run.act===1?'Finish the act':'Proceed','rewDone()',{pri:1,id:'proceed',icon:'arrowright'}):pkBtn('Skip','bossRelicPick(-1)',{id:'skiprelic'})})}
- const none=S.rows.length>0&&!S.rows.some(r=>r.done),last=S.kind==='boss'&&W.run.act===1;
+   right:took?pkBtn(isLastAct()?'Finish the act':'Proceed','rewDone()',{pri:1,id:'proceed',icon:'arrowright'}):pkBtn('Skip','bossRelicPick(-1)',{id:'skiprelic'})})}
+ const none=S.rows.length>0&&!S.rows.some(r=>r.done),last=S.kind==='boss'&&isLastAct();
  return (S.scene?victorySceneHTML(S):'')+topBar()+boss+pkScreen({cls:'pk-rewards'+(boss?' hasboss':'')+(S.scene?' vic':''),title:`<span class="reward-banner">${title}</span>`,sub:(S.kind==='boss'?'':'Take what you want. Anything left behind is lost.')+vicLampHTML(),body:tilesRow(S.rows.map((r,i)=>rowHTML(r,i,'claimRow')),'rewtiles'),
   right:pkBtn(last?'Finish the act':none?'Skip':'Proceed',none?'rewLeave()':'rewDone()',{pri:1,id:'proceed',icon:'arrowright'}),after:S.leaveConfirm?leaveDialog():''})}
 export {leaveDialog};
@@ -462,7 +462,7 @@ export function updateCardSelection(){const S=W.S;
 function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;return topBar()+pkScreen({cls:'pk-potpick',title:stripEmoji(S.title),sub:`Pick up to ${Math.min(3,free)} (free slots: ${free}).`,body:tilesRow(S.ids.map((id,j)=>potionTile(id,{click:`potPickToggle(${j})`,on:S.chosen.includes(j)})),'pottiles'),right:pkBtn('Done','potPickDone()',{pri:1,id:'potpickdone'})})}
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
  const stat=(k,v,g)=>`<span class="es" title="${k}" aria-label="${k}: ${v}">${glyph(g)}<b>${v}</b></span>`;
- return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?'Act 1 cleared!':'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.`:`${K.n} fell on floor ${run.floor} of 15. ${deathLine(run.floor,run.boss)}`}</p>
+ return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?`Act ${run.act||1} cleared!`:'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.${(run.act||1)>=3?' '+CROWN_HOLDS:''}`:`${K.n} fell on floor ${run.floor} of ${(run.act||1)>1?16:15}. ${deathLine(run.floor,run.boss,run.act||1)}`}</p>
  <div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}${stat('Deck',run.deck.length,'book')}${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
  <button class="endlink" id="restart" onclick="W.S={screen:'title'};render()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
 // Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing

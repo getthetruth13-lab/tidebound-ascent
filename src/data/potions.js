@@ -9,6 +9,8 @@ import {ICONS} from './icons.js';
 import {addSt,alive,addCard,chart,choose,gainBlock,gainEnergy,gainMom,heal,log,callout,placeWp,escape,setTide} from '../engine/combat.js';
 import {randomPotion} from '../engine/run.js';
 import {mk,cname} from '../engine/cards.js';
+import {ACT23_ITEMS} from './generated/act2-items.js';
+import {POTIONS_B} from './act2/potions-b.js';
 const RAR={Common:'c',Uncommon:'u',Rare:'r'};
 const ICON={salttonic:'🧂',inkvial:'🦑',urchin:'🦔',barnacledraught:'🍺',sprayflask:'💦',quickwater:'💧',coraldust:'🪸',sparkphial:'⚡',kelpbroth:'🥣',moondraught:'🌙',resvial:'🔔',chartwater:'🗺️',adrenalsalt:'🧂',mimicink:'🖋️',driftglass:'🫙',temperoil:'🛢️',secondtide:'🌊',tidalflask:'⚗️',abyssaloil:'🛢️',mistbomb:'💨',squallbottle:'⛈️',duetdraught:'🎶',cairndust:'🪨',redsalt:'🧂'};
 const COL={salttonic:'#9fd3e6',inkvial:'#4b3d6e',urchin:'#7a4a8a',barnacledraught:'#a8743c',sprayflask:'#6fc3df',quickwater:'#64c8ff',coraldust:'#ff8a7a',sparkphial:'#ffd84a',kelpbroth:'#5aa36a',moondraught:'#c9c6ff',resvial:'#c07aff',chartwater:'#7ac6a0',adrenalsalt:'#ff6a5a',mimicink:'#3a3a52',driftglass:'#9fe6d6',temperoil:'#d9a54a',secondtide:'#3fa8d8',tidalflask:'#5ad6c0',abyssaloil:'#2a1f3a',mistbomb:'#b8c0cc',squallbottle:'#4aa3c8',duetdraught:'#b38cff',cairndust:'#c8b27a',redsalt:'#d94a4a'};
@@ -43,4 +45,7 @@ const B={
 };
 for(const m of DATA.potions){const b=B[m.id];if(!b)throw new Error('No behaviour for potion '+m.id);
  registerPotion(m.id,Object.assign({n:m.name,rarity:RAR[m.rarity]||'c',cls:m.cls==='any'?null:m.cls,target:m.target==='enemy'?'enemy':'no',d:m.effect,flavour:m.flavour,e:ICONS.potion[m.id]?`<img class="pot-ic" src="${ICONS.potion[m.id]}" alt="" draggable="false">`:(ICON[m.id]||'🧪'),col:COL[m.id]||'#8ad'},b))}
+// Act 2 / Act 3 potions (task ACT2_BUILD): meta from generated/act2-items.js, behaviour from act2/potions-b.js; no behaviour = stub (never rolls).
+for(const m of ACT23_ITEMS.potions){const b=POTIONS_B[m.id]||{stub:true,use:f=>{}};
+ registerPotion(m.id,Object.assign({n:m.name,rarity:m.rarity,cls:m.cls,target:m.target,d:m.effect,flavour:m.flavour,e:'🧪',col:'#8ad',act:m.act,iconBrief:m.icon},b))}
 export {POTIONS};

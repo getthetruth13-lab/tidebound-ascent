@@ -3,14 +3,16 @@ import {savedAction,settings,saveSettings} from '../save.js';
 // Numbers: design-v2 §1.1–§1.8. Every random roll uses a named seeded stream (core/state.js), so the same seed and the
 // same choices give the same maps, rewards and enemy rolls (§1.10).
 import {ACT1_SET} from '../data/act1.js';
-import {CARDS,CLASSES,ENCOUNTERS,EVENTS,RELICS,POTIONS,CHARMS,EN} from '../core/registry.js';
+import {cardAct} from '../data/act2.js';
+import {CARDS,CLASSES,ENCOUNTERS,encountersFor,EVENTS,RELICS,POTIONS,CHARMS,EN} from '../core/registry.js';
 import {R,W,pick,rng,shuffle,wpick,rnd,seedStreams} from '../core/state.js';
 import {mk,cname,canTemper,upgradeCard,rawLvl} from './cards.js';
 import {startCombat,heal as cHeal} from './combat.js';
 import {fire,mod} from '../core/bus.js';
 import {saveRun,clearRun} from '../save.js';
 import {initRun as lampInit,noteSeen,settleRun} from './lamplight.js';
-import {loadProfile,lockedFor} from '../progress.js';
+import {loadProfile,saveProfile,lockedFor} from '../progress.js';
+import {SPOIL_CARDS} from '../data/lamplight.js';
 import {eventText} from '../data/lore.js';
 import {render,markCardsSeen,updateCardSelection} from '../ui/render.js';
 // ================= economy tables (design-v2 §1.1, §1.4, §1.5) =================
@@ -44,6 +46,8 @@ export function newRun(cls,o={}){const K=CLASSES[cls];
  // Lamplight (design/progression-proposal.md): the run keeps a snapshot of what is still locked, so rolls and saved runs stay stable. Daily / full-pool runs and old saves have no lock.
  W.run.lock=o.fullPool||o.daily?null:lockedFor(loadProfile());if(o.daily)W.run.daily=true;lampInit(W.run);
  W.run.boss=wpick(ENCOUNTERS.boss.map(x=>[x.e[0],x.w]),'map');
+ // Later-act bosses are drawn on their own 'acts' stream, so Act 1's map/rolls stay identical (golden test). bosses[act] = that act's boss id.
+ W.run.bosses={1:W.run.boss};for(const a of [2,3]){const t=encountersFor(a).boss;if(t&&t.length)W.run.bosses[a]=wpick(t.map(x=>[x.e[0],x.w]),'acts')}
  W.run.map=genMap();
  if(K.relic)gainRelic(K.relic,{silent:true});
  W.cb=null;
@@ -54,7 +58,49 @@ export function nodeType(f){if(f===1)return'fight';if(f===8)return'treasure';if(
  const w=ECON.map.weights;const l=[['fight',w.fight],['unknown',w.unknown]];if(f!==13)l.push(['rest',w.rest]);if(f>=5)l.push(['elite',w.elite]);if(f>=3)l.push(['shop',w.shop]);return wpick(l,'map')}
 // Run variety (CLAUDE_TASK_3): every map gets a random "shape" (pinch rows where the paths squeeze to 2 nodes, and link density), and a
 // finished map must pass variety rules: a real choice on every row, early AND late camps, 2+ elites on different floors, enough ? rooms.
-export function genMap(){let m,best=null;for(let t=0;t<400;t++){m=tryMap();fixPathRules(m);if(!hasShop(m))continue;const r=eliteRange(m);if(!(r[0]<=1&&r[1]>=3))continue;best=best||m;if(varietyOK(m))return m}return best||m}
+export function genMap(act=1){if(act>1)return genMapLater(act);let m,best=null;for(let t=0;t<400;t++){m=tryMap();fixPathRules(m);if(!hasShop(m))continue;const r=eliteRange(m);if(!(r[0]<=1&&r[1]>=3))continue;best=best||m;if(varietyOK(m))return m}return best||m}
+// ---- Acts 2 and 3 (ACT2-DESIGN s3, ACT3-ROSTER-SKELETON): 16 rows (15 node rows + boss), pinned rows, single-node Gate rows (Act 2) or one Eye camp (Act 3).
+// Row index r = floor-1. `pin` rows keep their type; `gate` rows hold ONE centre node that every path squeezes through.
+const MAP_ACT={
+ 2:{pin:{0:'fight',4:'rest',8:'treasure',9:'shop',14:'rest'},gate:[4,9],pinch:[1,2,6,7,11,12],noElite:[0,1,2,4,9,14],restRows:[2,6,7,10,11,12],w:{fight:42,unknown:24,rest:10,elite:12,shop:6}},
+ // Act 3 (ACT3-DESIGN s3): the Eye at floor 8 (row 7, one node), pinch rows at floors 4 and 11, shops only on floors 11-14, no Gate rows besides the Eye, Updrafts added after the rows.
+ 3:{pin:{0:'fight',7:'rest',11:'treasure',14:'rest'},gate:[7],pinch:[3,10],pinchN:2,noElite:[0,1,2,7,11,14],restRows:[2,3,4,5,9,10,12],shopRows:[10,12,13],w:{fight:40,unknown:24,rest:9,elite:13,shop:6},up:true}};
+function nodeTypeLater(P,r){if(P.pin[r])return P.pin[r];const f=r+1;const l=[['fight',P.w.fight],['unknown',P.w.unknown]];if(P.restRows.includes(r))l.push(['rest',P.w.rest]);if(!P.noElite.includes(r))l.push(['elite',P.w.elite]);if(P.shopRows?P.shopRows.includes(r):(f>=3&&r!==13))l.push(['shop',P.w.shop]);return wpick(l,'map')}
+function tryMapLater(P){const rows=[];const pinch=new Set(shuffle(P.pinch,'map').slice(0,P.pinchN||4)),link=[.3,.45,.6][R(3,'map')];
+ for(let r=0;r<15;r++){if(P.gate.includes(r)){rows.push([{c:1.5,t:nodeTypeLater(P,r),to:[]}]);continue}
+  const cnt=r===0?3:pinch.has(r)?2:3+R(2,'map');const cols=shuffle([0,1,2,3],'map').slice(0,cnt).sort((a,b)=>a-b);rows.push(cols.map(c=>({c,t:nodeTypeLater(P,r),to:[]})))}
+ rows.push([{c:1.5,t:'boss',to:[]}]);
+ for(let r=0;r<15;r++){const nx=rows[r+1],cur=rows[r];
+  cur.forEach(n=>{let b=0;nx.forEach((m,j)=>{if(Math.abs(m.c-n.c)<Math.abs(nx[b].c-n.c))b=j});n.to.push(b);
+   if(nx.length===1)return;nx.forEach((m,j)=>{if(j!==b&&n.to.length<2&&Math.abs(m.c-n.c)<=1&&rnd('map')<link)n.to.push(j)})});
+  nx.forEach((m,j)=>{if(!cur.some(n=>n.to.includes(j))){let b=0;cur.forEach((n,i)=>{if(Math.abs(n.c-m.c)<Math.abs(cur[b].c-m.c))b=i});cur[b].to.push(j)}})}
+ // a gate's row fans out to every node of the next row (the squeeze, then the spread)
+ P.gate.forEach(r=>{rows[r][0].to=rows[r+1].map((_,j)=>j)});
+ return rows}
+export function genMapLater(act){const P=MAP_ACT[act];let best=null;
+ for(let t=0;t<600;t++){const m=tryMapLater(P);
+  for(let r=1;r<15;r++)m[r].forEach((n,j)=>{if(P.pin[r])return;let g=0;while(NOREPEAT.has(n.t)&&parents(m,r,j).some(p=>p.t===n.t)&&g++<30)n.t=nodeTypeLater(P,r);if(NOREPEAT.has(n.t)&&parents(m,r,j).some(p=>p.t===n.t))n.t='fight'});
+  const all=m.flat(),er=eliteRange(m);if(!(er[0]<=1&&er[1]>=3))continue;best=best||m;
+  if(P.up){if(er[0]>0)continue;const sh=all.filter(n=>n.t==='shop').length;if(sh<1||sh>2)continue;if(!addUpdrafts(m,P))continue}
+  if(all.filter(n=>n.t==='unknown').length>=4&&all.filter(n=>n.t==='elite').length>=3&&all.filter(n=>n.t==='elite').length<=7&&all.filter(n=>n.t==='shop').length>=1)return m}
+ return best}
+// ---- Act 3 Updrafts (ACT3-DESIGN s3): a node's `up` lists nodes two rows ahead (skipping one row). 4-6 per map, 1-2 per band, never over a pinned row, lane distance <= 1,
+// no crossings, at most 1 lands on an elite, none on a Rest or Shop, no path uses more than 2. Act 1 and 2 maps have no `up`, so they stay byte-identical.
+const segX=(a,b,c,d)=>{const o=(p,q,r)=>(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]);const same=(p,q)=>p[0]===q[0]&&p[1]===q[1];if(same(a,c)||same(a,d)||same(b,c)||same(b,d))return false;
+ const d1=o(a,b,c),d2=o(a,b,d),d3=o(c,d,a),d4=o(c,d,b);return d1*d2<0&&d3*d4<0};
+export function addUpdrafts(m,P){const banSkip=new Set([0,7,11,14]),cand=[];
+ for(let r=0;r<=12;r++){if(banSkip.has(r+1))continue;m[r].forEach((n,i)=>m[r+2].forEach((t,j)=>{if(Math.abs(n.c-t.c)>1||t.t==='rest'||t.t==='shop'||t.t==='boss')return;cand.push({r,i,j})}))}
+ const want=4+R(3,'map'),pick_=[],band=r=>r<5?0:r<10?1:2,bc=[0,0,0];let elites=0;
+ const pt=(r,i)=>[m[r][i].c,r];
+ const crosses=(a,b)=>{const A=[pt(a.r,a.i),pt(a.r+2,a.j)],B=[pt(b.r,b.i),pt(b.r+2,b.j)];return segX(A[0],A[1],B[0],B[1])};
+ const crossesEdge=a=>{const A=[pt(a.r,a.i),pt(a.r+2,a.j)];for(let r=a.r;r<=a.r+1;r++)for(let i=0;i<m[r].length;i++)for(const j of m[r][i].to)if(segX(A[0],A[1],pt(r,i),pt(r+1,j)))return true;return false};
+ for(const c of shuffle(cand,'map')){if(pick_.length>=want)break;if(bc[band(c.r)]>=2||crossesEdge(c)||pick_.some(p=>crosses(p,c)||(p.r===c.r&&p.i===c.i)))continue;
+  const el=m[c.r+2][c.j].t==='elite';if(el&&elites>=1)continue;
+  (m[c.r][c.i].up=m[c.r][c.i].up||[]).push(c.j);pick_.push(c);bc[band(c.r)]++;if(el)elites++;
+  if(maxUps(m)>2){m[c.r][c.i].up.pop();if(!m[c.r][c.i].up.length)delete m[c.r][c.i].up;pick_.pop();bc[band(c.r)]--;if(el)elites--}}
+ if(pick_.length<4||bc.some(x=>x<1)){m.flat().forEach(n=>{delete n.up});return false}
+ return true}
+function maxUps(m){const best=m.map(row=>row.map(()=>0));for(let r=m.length-1;r>=0;r--)m[r].forEach((n,i)=>{let b=0;n.to.forEach(j=>{b=Math.max(b,best[r+1][j])});(n.up||[]).forEach(j=>{b=Math.max(b,1+best[r+2][j])});best[r][i]=b});return Math.max(...best[0])}
 const FIXED_ROWS=new Set([0,7,13,14]); // floors 1, 8 (treasure), 14 (camp) and the boss floor never vary
 export function varietyOK(m){const all=m.flat(),has=(t,a,b)=>m.some((row,r)=>r>=a&&r<=b&&row.some(n=>n.t===t));
  if(all.filter(n=>n.t==='unknown').length<4)return false;
@@ -86,26 +132,29 @@ export function hasShop(m){for(let r=2;r<12;r++)if(m[r].some(n=>n.t==='shop'))re
 export function pathViolations(m){const v=[];for(let r=1;r<m.length;r++)m[r].forEach((n,j)=>{if(NOREPEAT.has(n.t)&&parents(m,r,j).some(p=>p.t===n.t))v.push(r+':'+j)});return v}
 export function eliteRange(rows){const mn=[],mx=[];for(let r=rows.length-1;r>=0;r--){mn[r]=[];mx[r]=[];rows[r].forEach((n,i)=>{const e=n.t==='elite'?1:0;if(!n.to.length){mn[r][i]=e;mx[r][i]=e}else{mn[r][i]=e+Math.min(...n.to.map(j=>mn[r+1][j]));mx[r][i]=e+Math.max(...n.to.map(j=>mx[r+1][j]))}})}
  return [Math.min(...mn[0]),Math.max(...mx[0])]}
+export function reachableUp(){const run=W.run;if(run.pos.r<0)return [];const row=run.map[run.pos.r];return row&&row[run.pos.i].up||[]}
 export function reachable(){const run=W.run;if(run.pos.r<0)return run.map[0].map((_,i)=>i);const row=run.map[run.pos.r];return row?row[run.pos.i].to:[]}
 // Tidewalker Boots: 3 times per run, move to ANY node on the next floor.
 export function bootsLeft(){const b=W.run.relics.find(r=>r.id==='boots');return b?b.n||0:0}
-function goNodeImpl(r,i){const run=W.run;if(W.S.screen!=='map'||W.S.ov)return;if(r!==run.pos.r+1||!run.map[r]||!run.map[r][i])return;
- if(!reachable().includes(i)){if((run.cut||0)>0)run.cut--;else{if(bootsLeft()<=0)return;const b=run.relics.find(x=>x.id==='boots');b.n--;b.flashT=Date.now()}}
+function goNodeImpl(r,i){const run=W.run;if(W.S.screen!=='map'||W.S.ov)return;const viaUp=r===run.pos.r+2&&reachableUp().includes(i); // Act 3 Updraft: skips one row
+ if((!viaUp&&r!==run.pos.r+1)||!run.map[r]||!run.map[r][i])return;
+ if(!viaUp&&!reachable().includes(i)){if((run.cut||0)>0)run.cut--;else{if(bootsLeft()<=0)return;const b=run.relics.find(x=>x.id==='boots');b.n--;b.flashT=Date.now()}}
  const n=run.map[r][i];run.pos={r,i};run.vis[r+':'+i]=1;run.floor=r+1;run.stats.floors=run.floor;run.stats.path.push(n.t);
  if(n.t==='boss'){run.stats.relicsAtBoss=run.relics.length;run.stats.potionsAtBoss=run.potions.filter(Boolean).length}
+ if(viaUp)fire('updraft',{node:n}); // Act 3 hook: mapMove (updraft)
  enterNode(n.t)}
 function enterNodeImpl(t){const run=W.run;fire('enterRoom',{type:t});
  if(t==='unknown')return resolveUnknown();
  if(t==='fight')return fight();
  if(t==='elite'){const e=pickEncounter('elite');return startCombat('elite',e)}
  if(t==='boss')return startCombat('boss',[run.boss]);
- if(t==='rest'){W.S={screen:'rest'};return render()}
+ if(t==='rest'){if((run.act||1)===3&&run.floor===8){run.eyeLeft=1;run.eyeUsed=[]}else{run.eyeLeft=0;run.eyeUsed=[]}W.S={screen:'rest'};return render()}
  if(t==='shop')return openShop();
  if(t==='treasure')return openChest();
  goMap()}
 function encKey(e){return e.join('+')}
 // Encounter pools (§1.7): first 3 fights each act are easy; no repeat of the same encounter within 2 fights.
-export function pickEncounter(pool){const run=W.run;const list=ENCOUNTERS[pool];const recent=run.encHist.slice(-2),last=(run.encHist[run.encHist.length-1]||'').split('+');
+export function pickEncounter(pool){const run=W.run;const list=encountersFor(run.act||1)[pool];const recent=run.encHist.slice(-2),last=(run.encHist[run.encHist.length-1]||'').split('+');
  const seen=run.encSeen||(run.encSeen={});const sk=x=>pool+':'+encKey(x.e);
  let cand=list.filter(x=>!recent.includes(encKey(x.e))&&(!x.fl||(run.floor>=x.fl[0]&&run.floor<=x.fl[1])));if(!cand.length)cand=list;
  // no encounter repeats in a run until the whole pool has been used; then the pool starts over
@@ -138,7 +187,8 @@ function evOptImpl(i){const S=W.S;if(S.screen!=='event')return;const o=S.ev.o[i]
 // Act 1 rewards and the merchant are gated to the Act 1 card set (design/act1-complete.md §(a), data/act1.js); later acts use the full pool.
 // A locked id (Lamplight) never rolls in rewards, shops, events or potions: every pool below goes through isLocked.
 export function isLocked(kind,id){const l=W.run&&W.run.lock;return !!(l&&l[kind]&&l[kind][id])}
-export const inActSet=c=>!c.cut&&!c.stub&&((W.run.act||1)!==1||ACT1_SET.has(c.id))&&!isLocked('cards',c.id);
+// Act N cards (act field, data/act2.js) roll only once run.act >= N; Act 1 rolls only the Act 1 set; cards in no act set (colourless) are free after Act 1.
+export const inActSet=c=>{if(c.cut||c.stub||isLocked('cards',c.id))return false;const act=W.run.act||1;if(act===1)return ACT1_SET.has(c.id);const a=cardAct(c.id);return a===0||a<=act};
 export function cardPool(r){return Object.values(CARDS).filter(c=>c.cls===W.run.cls&&c.r===r&&inActSet(c))}
 // Rarity roll with the Swell counter: added to the rare chance; a negative counter shrinks Rare first, then Uncommon.
 export function cardOdds(src,swell){const b=ECON.cardOdds[src];if(src==='boss')return {...b};let r=b.r+swell,u=b.u;if(r<0){u=Math.max(0,u+r);r=0}r=Math.min(100,r);u=Math.min(u,100-r);return {c:100-r-u,u,r}}
@@ -158,13 +208,18 @@ export function rollCards(n,src,{stream='cards',forceR=null,type=null,exclude=[]
   if(fresh(pool).length)pool=fresh(pool);
   const c=pickOffer(pool,stream,src);if(out.includes(c.id)||exclude.includes(c.id))continue;out.push(c.id);
   if(src!=='shop'&&!forceR){if(c.r==='c')run.swell=Math.min(ECON.swellMax,run.swell+1);else if(c.r==='r')run.swell=ECON.swellStart}}
+ // Fresh slot (plan 7.4): from Act 2 on, every reward offer carries at least one card of the current act's own pool, so the new cards are seen.
+ if(!forceR&&!type&&(run.act||1)>=2&&src!=='shop'&&out.length>=3&&!out.some(id=>CARDS[id].act===run.act)){
+  const fp=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.act===run.act&&inActSet(c)&&!out.includes(c.id)&&!exclude.includes(c.id));if(fp.length)out[out.length-1]=pick(fp,stream).id}
  return out}
 export function rewardCardCount(){return mod('rewardCards',{},3)}
 export function rollGold(kind){const g=ECON.gold[kind]||ECON.gold.fight;return rng(g[0],g[1],'cards')}
-export function potionRoll(kind){const run=W.run,P=ECON.potion;const ch=run.potionChance+(kind==='elite'?P.eliteBonus:0);const hit=rnd('potions')*100<ch;
+export function potionRoll(kind){const run=W.run,P=ECON.potion;const ch=run.potionChance+(kind==='elite'?P.eliteBonus:0);const hit=mod('potionDrop',{kind},rnd('potions')*100<ch); /* Act 3 hook: potionDrop (Vial Belt) */
  run.potionChance=Math.max(P.min,Math.min(P.max,run.potionChance+(hit?-P.step:P.step)));return hit?randomPotion():null}
+// Items (relics, potions, cards) carry an `act` field: nothing rolls before its act (Act 2/3 build, plan 6.5). Items without a field are Act 1.
+export const actOK=x=>(x.act||1)<=((W.run&&W.run.act)||1);
 export function randomPotion(stream='potions'){const run=W.run;const x=rnd(stream)*100,P=ECON.potion.rarity;const rar=x<P.c?'c':x<P.c+P.u?'u':'r';
- const open=p=>(!p.cls||p.cls===run.cls)&&!isLocked('potions',p.id);
+ const open=p=>(!p.cls||p.cls===run.cls)&&!p.stub&&actOK(p)&&!isLocked('potions',p.id);
  let pool=Object.values(POTIONS).filter(p=>p.rarity===rar&&open(p));if(!pool.length)pool=Object.values(POTIONS).filter(open);
  // not the same potion as one of the last 2 offered (drops, shop, events), unless nothing else is left
  const h=run.potHist||(run.potHist=[]),f=pool.filter(p=>!h.slice(-2).includes(p.id));const id=pick(f.length?f:pool,stream).id;h.push(id);if(h.length>8)h.shift();return id}
@@ -179,7 +234,9 @@ export function combatRewards(kind,{allFled,opts={},cb}={}){const run=W.run;cons
   if(kind==='boss')cards=rollCards(rewardCardCount(),'boss',{forceR:'r'});
   else if(run.rareNext){run.rareNext=false;cards=rollCards(rewardCardCount(),kind,{forceR:'r'})}
   else cards=rollCards(rewardCardCount(),kind==='elite'?'elite':'fight');
-  remember('offerHist',cards);rows.push({k:'cards',cards})}
+  // Spoils (D-A2-12): beating the named boss/elite adds a FOURTH card to the offer while that Spoil is still locked on the account; taking it unlocks it for good.
+  const killed=new Set(((cb&&cb.ens)||[]).map(e=>e.key));const spoil=Object.entries(SPOIL_CARDS).find(([id,from])=>CARDS[id]&&CARDS[id].cls===run.cls&&(killed.has(from)||(from==='choir'&&killed.has('cantor')))&&!loadProfile().spoils[id]&&!cards.includes(id));
+  remember('offerHist',cards);rows.push({k:'cards',cards:spoil?[...cards,spoil[0]]:cards,spoil:spoil?spoil[0]:undefined})}
  const scene=cb&&cb.ens?{foes:cb.ens.map((e,i)=>({e,i})).filter(({e})=>!e.fled).map(({e,i})=>({gap:!!e.summoned||undefined,key:e.key,sv:e.sv,vi:cb.ens.slice(0,i).filter(x=>x.key===e.key).length,boss:e.boss,elite:e.elite,ph:e.ph,remT:e.remT}))}:null; // the fallen stay on screen behind the rewards
  W.S={screen:'reward',kind,rows,scene,boss:kind==='boss'?(cb&&cb.bossKey)||run.boss:null,title:kind==='boss'?'Boss defeated!':kind==='elite'?'Elite defeated!':allFled?'They fled with your gold…':'Victory!',t:Date.now()};
  // Keep the map checkpoint; the save journal reconstructs this room and its
@@ -196,6 +253,7 @@ function rewCardImpl(j){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==nu
  S.cardSelected=S.cardSelected===j?null:j;updateCardSelection()}
 function rewConfirmCardsImpl(confirm=settings.confirmCardSkip!==false){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done||S.skipConfirm)return;
  const j=S.cardSelected;if(j==null)return rewSkipCardsImpl(confirm);if(!row.cards[j])return;
+ if(row.spoil&&row.cards[j]===row.spoil){const p=loadProfile();p.spoils[row.spoil]=1;saveProfile(p)}
  markCardsSeen(row.cards);gainCard(row.cards[j]);row.done=true;row.took=row.cards[j];S.cardsOpen=null;S.cardSelected=null;render()}
 function rewCloseCardsImpl(){W.S.cardsOpen=null;W.S.cardSelected=null;W.S.skipConfirm=false;render()}
 function rewSkipCardsImpl(confirm=settings.confirmCardSkip!==false){const S=W.S,row=S.rows?.[S.cardsOpen];if(S.cardsOpen==null||!row||row.done)return;
@@ -215,14 +273,21 @@ function rewDoneImpl(){const S=W.S;if(S.screen!=='reward')return;S.leaveConfirm=
 
  // Boss relic (P3): after the boss reward rows, offer 1 of 3 boss relics (like Slay the Spire's boss chest), then finish the act.
  if(S.kind==='boss'&&!S.bossPick&&hasNextAct()){const ids=bossRelicChoices();if(ids.length){S.bossPick=ids;S.bossTook=null;S.t=Date.now();return render()}}
- if(S.kind==='boss'&&W.run.act===1)return endRun(true);goMap()}
-// Acts that exist. Only Act 1 ships, so the boss relic pick stays hidden (Spencer 10-13) until Act 2 is added here.
-let ACT_COUNT=1;
+ if(S.kind==='boss'){if(hasNextAct())return startNextAct();return endRun(true)}goMap()}
+// Acts that exist. Only Act 1 ships live, so the boss relic pick stays hidden (Spencer 10-13) until Act 2 goes live.
+// Act 2 ships behind the live flag (?act=2 preview, plan 12.3); ACT_COUNT is raised to 2 / 3 when each act is approved.
+let ACT_COUNT=(typeof location!=='undefined'&&+new URLSearchParams(location.search).get('act'))||1;
 export const actCount=()=>ACT_COUNT;
 export function setActCount(n){ACT_COUNT=n} // tests / future acts only
 export const hasNextAct=()=>!!W.run&&(W.run.act||1)<ACT_COUNT;
+export const isLastAct=()=>!hasNextAct();
+// Next act (plan 5/7): full heal (StS lesson 14), a fresh map, that act's boss, the shrine/seen tallies reset, then the travel plate and the map. Autosaves on entry.
+export function startNextAct(){const run=W.run;const from=run.act||1,to=from+1;
+ run.act=to;run.boss=(run.bosses&&run.bosses[to])||run.boss;run.hp=run.max;run.floor=0;run.pos={r:-1,i:-1};run.vis={};run.shrinesThisAct={};run.wrenTally=0;run.fights=0;run.encHist=[];run.cut=0;
+ run.map=genMap(to);run.stats.bossesByAct=(run.stats.bossesByAct||[]);W.cb=null;
+ fire('actStart',{act:to});W.S={screen:'travel',kind:'act',from,to,t:Date.now()};saveRun();render()}
 // Boss relics the hero can use (class-locked ones only for their class), not already held; 3 at random from the relics stream.
-export function bossRelicChoices(n=3){const run=W.run;const c=Object.values(RELICS).filter(r=>r.tier==='b'&&!r.stub&&(!r.cls||r.cls===run.cls)&&!isLocked('relics',r.id)&&!run.relics.some(x=>x.id===r.id));
+export function bossRelicChoices(n=3){const run=W.run;const c=Object.values(RELICS).filter(r=>r.tier==='b'&&!r.stub&&actOK(r)&&(!r.cls||r.cls===run.cls)&&!isLocked('relics',r.id)&&!run.relics.some(x=>x.id===r.id));
  const out=[];const pool=c.slice();while(out.length<n&&pool.length){const r=pick(pool,'relics');pool.splice(pool.indexOf(r),1);out.push(r.id);run.seenRelics[r.id]=1}return out}
 function bossRelicPickImpl(j){const S=W.S;if(S.screen!=='reward'||!S.bossPick||S.bossTook)return;
  if(j<0){S.bossTook='skip';return rewDoneImpl()}const id=S.bossPick[j];if(!id)return;S.bossTook=id;gainRelic(id);if(W.S!==S)return;rewDoneImpl()}
@@ -230,7 +295,7 @@ export function bossRelicPick(...args){return savedAction('bossRelicPick',args,(
 // ================= relics =================
 export const campfireRelic=id=>!!(RELICS[id]&&RELICS[id].campfire);
 export function relicCandidates(tier){const run=W.run;const nCamp=run.relics.filter(r=>campfireRelic(r.id)).length;
- return Object.values(RELICS).filter(r=>r.tier===tier&&r.phase==='P1'&&!r.stub&&!ECON.relicPulled.includes(r.id)&&(!r.cls||r.cls===run.cls)&&!isLocked('relics',r.id)&&!run.seenRelics[r.id]&&!run.relics.some(x=>x.id===r.id)&&!(r.campfire&&nCamp>=2))}
+ return Object.values(RELICS).filter(r=>r.tier===tier&&r.phase==='P1'&&!r.stub&&actOK(r)&&!ECON.relicPulled.includes(r.id)&&(!r.cls||r.cls===run.cls)&&!isLocked('relics',r.id)&&!run.seenRelics[r.id]&&!run.relics.some(x=>x.id===r.id)&&!(r.campfire&&nCamp>=2))}
 // Relic rarity roll (C/U/R); an empty tier rolls the next tier up; all empty → null (caller gives 50 gold).
 // Apply ECON.heroHp to the class table (hero select and new runs read CLASSES[cls].hp).
 export function applyHeroHp(){for(const k in ECON.heroHp)if(CLASSES[k])CLASSES[k].hp=ECON.heroHp[k]}
@@ -316,17 +381,26 @@ function openChestLidImpl(){if(W.S.screen!=='chest')return;W.S.opened=true;W.S.o
 // ================= camps (§1.8) =================
 export function campOptions(){const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${Math.floor(W.run.max*mod('mendFrac',{},ECON.mend))} HP (${Math.round(mod('mendFrac',{},ECON.mend)*100)}% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
  for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.camp)o.push({k:d.camp,l:{cook:'Cook',scour:'🪨 Scour',trawl:'Trawl',annotate:'📘 Annotate'}[d.camp],d:{cook:'Gain 4 Max HP (Galley Pot)',scour:'Remove a card (Pumice Stone)',trawl:'Gain a random Common or Uncommon relic (Grapnel Hook)',annotate:'Give a card Opening (Ship\'s Rutter)'}[d.camp],relic:r.id})}
- return mod('campOptions',{},o)}
+ // Act 3 (ACT3-DESIGN s7): Ground the Deck removes a Static, Dread or other curse / status card. The Stormeye (floor 8) lets you pick TWO different options.
+ if((W.run.act||1)===3&&pickable('remove',isJunkCard).length)o.push({k:'ground',l:'⚡ Ground the Deck',d:'Remove a Static, a curse or a status card from your deck'});
+ const used=W.run.eyeUsed||[];return mod('campOptions',{},o.filter(x=>!used.includes(x.k)))}
+const isJunkCard=c=>{const d=CARDS[c.id];return !!d&&(d.cls==='status'||d.cls==='curse'||!!d.curse)};
 function campDoImpl(k){if(W.S.screen!=='rest')return;
+ const eye=W.run.eyeLeft>0;if(eye)(W.run.eyeUsed=W.run.eyeUsed||[]).push(k);
+ // backing out of a card pick returns to the camp with the option still unspent (the Stormeye counts only finished actions)
+ const back=()=>{if(eye){const u=W.run.eyeUsed||[],i=u.lastIndexOf(k);if(i>=0)u.splice(i,1)}W.S={screen:'rest'};render()};
+ if(k==='ground')return openPick('remove','Ground the Deck: choose a Static, curse or status card to remove',goMap,back,isJunkCard);
  if(k==='mend'){heal(Math.floor(W.run.max*mod('mendFrac',{},ECON.mend)));return goMap()}
- if(k==='temper')return openPick('upgrade','Temper: choose a card to upgrade',goMap,()=>{W.S={screen:'rest'};render()});
+ if(k==='temper')return openPick('upgrade','Temper: choose a card to upgrade',goMap,back);
  if(k==='cook'){gainMaxHp(4);return msg('Cook','A hearty stew. +4 Max HP.')}
- if(k==='scour')return openPick('remove','Scour: choose a card to remove',goMap,()=>{W.S={screen:'rest'};render()});
+ if(k==='scour')return openPick('remove','Scour: choose a card to remove',goMap,back);
  if(k==='trawl'){const id=randomRelic({c:60,u:40,r:0},'relics',{noCampfire:true});if(id){gainRelic(id);return msg('Trawl','Your hook brings up <b>'+RELICS[id].e+' '+RELICS[id].n+'</b>.')}gainGold(50);return msg('Trawl','Only gold this time. +50 gold.')}
- if(k==='annotate')return openPick('annotate','Annotate: give a card Opening (it starts in your opening hand)',goMap,()=>{W.S={screen:'rest'};render()})}
+ if(k==='annotate')return openPick('annotate','Annotate: give a card Opening (it starts in your opening hand)',goMap,back)}
 export const restHeal=()=>campDo('mend');
 // ================= merchant (§1.4) =================
-export const price=(v,kind)=>Math.max(0,Math.round(mod('price',{kind},v)));
+// Later acts charge more (D-A2-17): Act 2 +25%, Act 3 +50%; Wren's Cairn adds 10% per bundle taken this act. Act 1 is untouched.
+export const actPriceMult=()=>{const r=W.run;if(!r)return 1;return ([1,1,1.25,1.5][r.act||1]||1)*(1+.1*(r.wrenTally||0))};
+export const price=(v,kind)=>Math.max(0,Math.round(mod('price',{kind},v)*(kind==='shop'?actPriceMult():1)));
 export function scrubPrice(){return Math.max(0,Math.round(mod('scrubPrice',{},ECON.shop.removal.base+ECON.shop.removal.step*W.run.removals)))}
 // Colourless extras come from the colourless pool when it has Act-set cards of that rarity, else from the class pool (rollCards).
 function shopExtra(r,used){const run=W.run;const pool=Object.values(CARDS).filter(c=>c.cls==='colorless'&&c.r===r&&inActSet(c)&&!used.includes(c.id));
@@ -353,9 +427,11 @@ function buyImpl(shelf,i){const S=W.S;if(S.screen!=='shop')return;const it=S[she
  if(shelf==='cards'||shelf==='colorless')gainCard(it.id);else if(shelf==='relics'){gainRelic(it.id);if(W.S!==S)return}else if(shelf==='potions')addPotion(it.id);
  render()}
 function shopRemoveImpl(){const S=W.S;if(S.screen!=='shop'||S.scrubbed||(S.scrubUses||0)>=ECON.shop.removal.perVisit||!pickable('remove').length)return;const p=scrubPrice();if(W.run.gold<p)return;
- openPick('remove',`Scrub: remove a card (${p} gold)`,()=>{W.run.gold-=p;W.run.removals++;S.scrubUses=(S.scrubUses||0)+1;S.scrubbed=S.scrubUses>=ECON.shop.removal.perVisit;W.S=S;render()},()=>{W.S=S;render()})}
+ openPick('remove',`Scrub: remove a card (${p} gold)`,()=>{W.run.gold-=p;W.run.removals++;fire('cardRemoved',{shop:true}); /* Act 3 hook: onCardRemoved */S.scrubUses=(S.scrubUses||0)+1;S.scrubbed=S.scrubUses>=ECON.shop.removal.perVisit;W.S=S;render()},()=>{W.S=S;render()})}
 // ================= flow =================
-function goMapImpl(){W.cb=null;if(W.run&&W.run.hp<=0)return endRun(false);W.S={screen:'map'};fire('mapEnter',{});saveRun();render()}
+function goMapImpl(){W.cb=null;if(W.run&&W.run.hp<=0)return endRun(false);
+ if(W.run&&W.run.eyeLeft>0){W.run.eyeLeft--;if(campOptions().length){W.S={screen:'rest'};render();return}} // the Stormeye: a second camp action
+W.S={screen:'map'};fire('mapEnter',{});saveRun();render()}
 export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;clearRun();settleRun(run,won);W.S={screen:'end'};render()}
 // Event fights (Sunken Chest crab, Gull Nest gulls): normal fight rules + options.
 export function eventFight(enc,opts={}){return startCombat('fight',enc,opts)}

@@ -10,6 +10,8 @@ import {DATA} from './generated/data-v2.js';
 import {addCard,addSt,alive,choose,dmgEnemy,drawCards,flash,gainBlock,gainEnergy,bonusEnergy,gainMom,heal,log,callout,curTgt} from '../engine/combat.js';
 import {gainGold,gainCurse,openPick,pickPotions,gainMaxHp,addPotionSlot,revealRows,loseRelic,gainRelic,randomRelic} from '../engine/run.js';
 import {render} from '../ui/render.js';
+import {ACT23_ITEMS} from './generated/act2-items.js';
+import {RELICS_B} from './act2/relics-b.js';
 const TIER={Starter:'s',Common:'c',Uncommon:'u',Rare:'r',Boss:'b',Shop:'shop',Event:'e'};
 export const RELIC_ICON={moonshell:'🐚',tuningfork:'🎐',sextant:'🧭',glove:'🧤',barnaclecharm:'🦪',kelpwrap:'🌿',coral:'🪸',whaletooth:'🦷',biscuit:'🍪',oysterpurse:'👛',starfish:'⭐',bandolier:'🎽',foghorn:'📯',galleypot:'🍲',
  wetsand:'🏖️',tuningpeg:'🎚️',pocketcompass:'🧭',griptape:'🎗️',totem:'🗿',coralspur:'🦴',earring:'🦪',lens:'🔆',conch:'🐚',scale:'⚖️',chargedcoral:'⚡',pumice:'🪨',anklet:'📿',echochamber:'🕳️',flags:'🚩',fencermask:'🥽',
@@ -117,5 +119,8 @@ export const ACT1_PULL=new Set(['wetsand','echochamber','fencermask','rapier']);
 for(const m of DATA.relics){const b=B[m.id]||{stub:true};
  registerRelic(m.id,Object.assign({n:m.name,tier:TIER[m.tier]||'c',tierName:m.tier,cls:m.cls==='any'?null:m.cls,d:m.effect,flavour:m.flavour,hooks:m.hooks,phase:ACT1_PULL.has(m.id)?'P1':m.phase,e:RELIC_ICON[m.id]||'💠'},b))}
 // Relics that roll in Phase 1 pools (elite drops, chests, merchant, Trawl, Wishing Undertow).
+// Act 2 / Act 3 relics (task ACT2_BUILD): meta from generated/act2-items.js, behaviour from act2/relics-b.js. `act` gates every roll path (actOK in engine/run.js).
+for(const m of ACT23_ITEMS.relics){const b=RELICS_B[m.id]||{stub:true};
+ registerRelic(m.id,Object.assign({n:m.name,tier:m.tier,tierName:m.tierName,cls:m.cls,d:m.effect,flavour:m.flavour,hooks:m.hooks,phase:'P1',act:m.act,e:'💠',iconBrief:m.icon},b))}
 export const inPool=r=>r.phase==='P1'&&!r.stub&&r.tier!=='s'&&r.tier!=='b'&&r.tier!=='e';
 export {RELICS};

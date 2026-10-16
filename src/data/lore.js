@@ -122,11 +122,24 @@ export const TENANT_LINES={phase2:'The door splinters. He does not seem to notic
 export const BOSS_DEFEAT={
  tenant:TENANT_LINES.defeat+' The house settles around him. Something is left on the step for you.',
  bell:'The Bell goes quiet. For the first time in a long while, nothing is counting.',
- matriarch:'The kelp lets go of the stone. The green moon in the water goes dark, and the beds are empty.'};
+ matriarch:'The kelp lets go of the stone. The green moon in the water goes dark, and the beds are empty.',
+ // Acts 2 and 3 (ACT2/ACT3-ENEMIES, CROSS-ACT-BIBLE voice rules)
+ colossus:'The gate sighs open. Behind it, the stair keeps climbing.',
+ wreckqueen:'The golden lights gutter, one by one. The fleet goes down a second time.',
+ battery:'The turntable stops. Both faces point at the sky.',
+ engine:'The rings spin down and stop. The count, at last, is read.',
+ thalassa:'The hanging sea sags, and holds. "They held," she says. "I buried. Neither was enough."',
+ navigator:'The Shard slips out of the brass. It lands without a sound, and waits.'};
 export const BOSS_OPEN={
  bell:n=>bellOpening(n),
  tenant:()=>'"This is my house. You are standing in my doorway."',
- matriarch:()=>'"You are late. The beds are ready for you."'};
+ matriarch:()=>'"You are late. The beds are ready for you."',
+ colossus:()=>'"The gate was shut. That is all I was told. Stand back from the hinge."',
+ wreckqueen:()=>'"Come aboard. The lamps are lit for you."',
+ battery:()=>'"Which way are you facing? It does not matter. Both of mine are loaded."',
+ engine:()=>'The rings begin to turn. Somewhere inside, a count that nobody reads.',
+ thalassa:()=>'"They held. I buried. You will not be the one who lights it."',
+ navigator:()=>'"Keep the line taut. The courier has not arrived yet." The brass chimes, once.'};
 // Gull Nest and the Court share the gull clue at Tier 1 (F06).
 
 // ---------------------------------------------------------------- event clue text by tier (bible §14.3). Tier 0 is the shipped text, unchanged.

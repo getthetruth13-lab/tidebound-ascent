@@ -19,9 +19,10 @@ const DU=CORE.duel,TI=CORE.tide,EC=CORE.echo,CA=CORE.carto;
 const cs='combat'; // RNG stream for everything in combat
 // ================= queries =================
 export function alive(){return W.cb?W.cb.ens.filter(e=>e.hp>0&&!e.fled):[]}
-export function randAlive(){const a=alive();return a.length?pick(a,cs):null}
+export function randAlive(){const a=alive();if(!a.length)return null;const b=a.filter(x=>!x.sub&&!x.back);return pick(b.length?b:a,cs)} // Act 3: submerged / back-rank enemies are not picked at random
 export function strongest(){return alive().sort((a,b)=>b.hp-a.hp)[0]}
-export function curTgt(){let t=W.cb.ens[W.cb.tgt];if(!t||t.hp<=0||t.fled){t=alive()[0];W.cb.tgt=W.cb.ens.indexOf(t)}return t}
+// Act 3 (R4 Cloud Dive, R7 Twin Squalls): a submerged or back-rank enemy cannot be the single target while another one can.
+export function curTgt(){let t=W.cb.ens[W.cb.tgt];if(!t||t.hp<=0||t.fled||t.sub||t.back){const a=alive();t=a.find(x=>!x.sub&&!x.back)||a.find(x=>!x.back)||a[0];W.cb.tgt=W.cb.ens.indexOf(t)}return t}
 export const might=()=>W.cb?(W.cb.p.st.str||0):0;
 export function log(s){if(W.cb){W.cb.log.unshift(s);W.cb.log.length=Math.min(W.cb.log.length,6)}}
 // Floating combat text (damage/Guard numbers). Visual only; kept separate from the bus's turn-scoped W.cb.fx.
@@ -63,7 +64,7 @@ function startCombatImpl(kind,enc,opts={}){
  // Opening cards go to the top of the draw pile (design §2.1).
  const open=cb.draw.filter(c=>c.open||CARDS[c.id].open||(CARDS[c.id].openU&&isUp(c)));if(open.length){cb.draw=open.concat(cb.draw.filter(c=>!open.includes(c)))}
  enc.forEach(k=>spawn(k));cb.bossKey=(cb.ens.find(e=>e.boss)||{}).key||null;
- {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':cb.bossKey==='tenant'?'🏚️ ':'🪸 ')+t);const be=cb.ens.find(x=>x.boss);bossBeat('intro',EN[cb.bossKey].n,t,be)}} // lore: the boss speaks first (bible §16 items 7-9)
+ {const open=BOSS_OPEN[cb.bossKey];if(open){const t=open(bellCount(W.run.seed));log((cb.bossKey==='bell'?'🔔 ':cb.bossKey==='tenant'?'🏚️ ':cb.bossKey==='matriarch'?'🪸 ':(EN[cb.bossKey].e||'')+' ')+t);const be=cb.ens.find(x=>x.boss);bossBeat('intro',EN[cb.bossKey].n,t,be)}} // lore: the boss speaks first (bible §16 items 7-9)
  const cls=W.run.cls;
  if(cls==='carto'&&hasRelic('celestial'))cb.nslots=4; // Celestial Sextant (boss relic)
  if(cls==='duel')cb.mom=DU.start_mom;
@@ -76,8 +77,14 @@ function startCombatImpl(kind,enc,opts={}){
  }
  if(cls==='carto'&&W.run.preWp){const p=W.run.preWp;W.run.preWp=null;if(CARDS[p.id]&&cb.slots.length<cb.nslots)placeStartWp(p.id,p.up,p.rank)}
  fire('combatStart',{cb,kind,enemies:cb.ens});
+ // Event leftovers (Act 2 Warden Stone, Act 3 Hail Shelter / Weathervane): a few fights open with Guard or Might.
+ for(const k of ['holdStone','hailStone']){if(W.run[k]>0){W.run[k]--;startQ6(cb)}}
+ if(W.run.weatherVane>0){W.run.weatherVane--;addSt(cb.p,'str',1)}
+ // First sight of an enemy with a rule (ACT2-RULES tutorial line): one hint per rule per run.
+ {const seen=W.run.tipsSeen||(W.run.tipsSeen={});const t=cb.ens.map(e=>EN[e.key].tip).find(x=>x&&!seen[x]);if(t){seen[t]=1;cb.hint={t:Date.now(),txt:t}}}
  W.S={screen:'combat'};
  nextStart()}
+const startQ6=cb=>cb.startQ.push(()=>gainBlock(6));
 function placeStartWp(id,up,rank){const w=mk(id,up,{temp:true,rank});W.cb.slots.push(w);log('🧭 Starting Waypoint: '+cname(w)+(rank?' (Rank '+rank+')':''))}
 // Start-of-combat choices (Moon Shell's Tide, Brass Sextant's Waypoint) open one at a time before the first draw.
 function nextStart(){const cb=W.cb;if(!cb)return;if(cb.startQ.length){const q=cb.startQ.shift();q();if(cb.mode){cb.mode.thenStart=true;return render()}return nextStart()}startTurn()}
@@ -86,7 +93,12 @@ export const relic=id=>W.run&&W.run.relics&&W.run.relics.find(r=>r.id===id);
 // ================= Guard =================
 // Guard pipeline (§4.2 modifyGuard): base(+Sustain) -> +Poise -> x0.75 Brittle (card Guard only) -> 'guard' modifiers -> floor.
 export function gainBlock(n,o={}){const cb=W.cb;if(!cb)return 0;if(o.fromCard){n+=cb.p.st.dex||0;if(cb.p.st.brittle)n*=.75}
- n=Math.floor(mod('guard',{fromCard:!!o.fromCard},n));if(n<=0)return 0;cb.p.block+=n;cb.p.blkT=Date.now();floatText('p','+'+n+'🛡','b');fire('guardGained',{amount:n});return n}
+ n=Math.floor(mod('guard',{fromCard:!!o.fromCard},n));
+ // Act 3 R5 Storm Tide: a non-Tide hero's first Guard card is 1 weaker (a live Magus). R12 Siphon: each Anchorite takes half of card Guard (max 8 per turn).
+ if(o.fromCard&&!o.echo&&cb.storm&&!cb.stormUsed&&W.run.cls!=='tide'&&alive().some(x=>x.key==='magus')){cb.stormUsed=true;n=Math.max(0,n-1);floatText('p','Storm Tide','b')}
+ if(n<=0)return 0;cb.p.block+=n;cb.p.blkT=Date.now();floatText('p','+'+n+'🛡','b');fire('guardGained',{amount:n});
+ if(o.fromCard)alive().filter(x=>x.key==='anchorite').forEach(x=>{let t=Math.floor(n/2);t=Math.max(0,Math.min(Math.floor(mod('siphon',{enemy:x},t)),8-(x.siph||0)));if(t>0){x.siph=(x.siph||0)+t;x.block+=t;x.blkT=Date.now();floatText(x.uid,'+'+t+'🛡','b');log('⛓️ '+x.n+' siphons '+t+' Guard')}});
+ return n}
 export function gainMom(n){const cb=W.cb;const mx=mod('momMax',{},DU.mom_max);const was=cb.mom;cb.mom=Math.max(0,Math.min(mx,cb.mom+n));return cb.mom-was}
 export function gainEnergy(n){if(!W.cb)return;W.cb.energy+=n;if(n>0)floatText('p','+'+n+'⚡','e')}
 // cards-act1 rule 22/23 caps (per turn, reset in startTurn). bonusEnergy: family ('tide'|'echo'|'carto'|'duel', null = no family) max 2,
@@ -99,7 +111,7 @@ export function passiveDraw(n,fam,o={}){const cb=W.cb;if(!cb||n<=0)return 0;capT
 // ================= piles =================
 export function refill(k){const cb=W.cb;if(cb.draw.length<k&&cb.disc.length){cb.draw=cb.draw.concat(shuffle(cb.disc,cs));cb.disc=[];fire('shuffle',{})}}
 export const handLimit=()=>mod('handLimit',{},10);
-export function drawCards(n){const cb=W.cb;let k=0;for(let i=0;i<n;i++){if(!W.cb)return k;if(cb.hand.length>=handLimit())break;refill(1);if(!cb.draw.length)break;const c=cb.draw.shift();cb.hand.push(c);k++;
+export function drawCards(n){const cb=W.cb;let k=0;for(let i=0;i<n;i++){if(!W.cb)return k;if(cb.hand.length>=handLimit())break;refill(1);if(!cb.draw.length)break;const c=cb.draw.shift();if(c.id==='static'){const sx=fire('staticDrawn',{card:c});if(sx.sink){sinkCard(c,'static');continue}} /* Act 3 hook: onStaticDrawn */ cb.hand.push(c);k++;
   const d=CARDS[c.id];if(d.onDrawSelf)d.onDrawSelf(F(c,{}),c);fire('draw',{card:c})}return k}
 // Add a created card (token, status, Kelp...) respecting the hand limit (overflow goes to the discard pile).
 export function addCard(id,pile='hand',o={}){const cb=W.cb;const ci=mk(id,o.up,{temp:!!o.temp,tmp0:!!o.cost0Turn});
@@ -111,7 +123,9 @@ export function sinkCard(ci,reason){W.cb.exh.push(ci);fire('sink',{card:ci,reaso
 //   base (+Sustain, half for an unmarked Echo, +Mark bonus)  -> +Might, +Duel Focus, 'damageAdd' modifiers (Whale Tooth...)
 //   -> x Flourish (<=3.5) -> x Echo doubling (once) -> Soaked x0.75 -> Exposed x1.5 -> 'damage' modifiers -> floor.
 // Bleed triggers before the hit (HP loss, ignores Guard), once per Attack per enemy.
-export function hit(e,base,f,o={}){if(!e||e.hp<=0||e.fled)return 0;const cb=W.cb;const atk=!o.raw&&!!(f&&f.def&&f.def.t==='A'&&!f.potion);let d=base;
+export function hit(e,base,f,o={}){if(!e||e.hp<=0||e.fled)return 0;const cb=W.cb;
+ if(e.sub&&!o.aoe&&!o.raw&&f&&f.def&&!f.potion&&!f.wp){floatText(e.uid,'Submerged','b');return 0} /* R4: only area damage, Bleed and Drenched reach a submerged enemy */
+ const atk=!o.raw&&!!(f&&f.def&&f.def.t==='A'&&!f.potion);let d=base;
  if(atk){d+=might();if(W.run.cls==='duel'){const top=Math.max(...alive().map(x=>x.hp));if(e.hp===top)d+=mod('focus',{target:e,f},DU.focus)}{const pre=d;d=mod('damageAdd',{target:e,f,attack:true},d);if(f.echo&&d>pre)d=pre+Math.min(d-pre,Math.max(0,EC_BONUS_MAX-(f.bonus||0)))}if(f.echo&&e.st.reson)d+=e.st.reson;
   if(f.flourish)d=Math.floor(d*f.fmult);if(f.mult>1)d*=f.mult;if(cb.p.st.weak)d=Math.floor(d*.75)}
  else if(f&&f.mult>1)d*=f.mult;
@@ -119,19 +133,23 @@ export function hit(e,base,f,o={}){if(!e||e.hp<=0||e.fled)return 0;const cb=W.cb
  if(o.cap!=null)d=Math.min(d,o.cap); // a card's "max N" applies after relic doubling (Tuning Fork, Landmark)
  if(e.st.vuln)d=Math.floor(d*1.5);
  d=Math.max(0,Math.floor(mod('damage',{target:e,f,attack:atk,raw:!!o.raw},d)));
+ const pa=EN[e.key].passive||{};
+ if(atk&&pa.armour&&!e.armSpent){e.armSpent=true;d=0;floatText(e.uid,'Armoured','b');fire('armourAbsorb',{target:e,f})} // R3: the first Attack hit each turn bounces off
+ {const dm=EN[e.key].dmgMod;if(dm&&d>0)d=dm(e,d)} // Act 3: Spindrift (Engine ring), the Shard holder's half
+ if(atk&&pa.mantlet&&e.block>d&&f&&!f.mantled){f.mantled=true;floatText('p','-'+pa.mantlet,'');loseHp(pa.mantlet)} // Spiked Mantlet: not on the hit that breaks the Guard
  if(atk&&e.st.bleed&&!(f.bled||(f.bled=new Set())).has(e)){f.bled.add(e);const b=Math.ceil(mod('bleedDamage',{target:e},e.st.bleed));loseHpEnemy(e,b,'bleed');if(!mod('keepBleed',{target:e},false)){e.st.bleed--;if(!e.st.bleed)delete e.st.bleed}if(e.hp<=0)return 0}
  const dealt=dmgEnemy(e,d,{f,attack:atk});
  if(atk&&e.st.barbs&&alive().length){loseHp(e.st.barbs,{source:'barbs',guard:true})}
  if(f){f.lastDealt=dealt}
  if(W.run.stats&&dealt>W.run.stats.maxHit)W.run.stats.maxHit=dealt;
  return dealt}
-export function loseHpEnemy(e,n,why){if(e.hp<=0)return;e.hp-=n;floatText(e.uid,'-'+n,why==='bleed'?'bleed':'');e.shake=Date.now();afterEnemyDamage(e,null)}
+export function loseHpEnemy(e,n,why){if(e.hp<=0)return;{const dm=EN[e.key].dmgMod;if(dm&&n>0)n=dm(e,n)}e.hp-=n;floatText(e.uid,'-'+n,why==='bleed'?'bleed':'');e.shake=Date.now();afterEnemyDamage(e,null)}
 export function dmgEnemy(e,d,o={}){if(e.hp<=0)return 0;const b=Math.min(e.block,d);e.block-=b;d-=b;e.hp-=d;const tb=EN[e.key];if(b>0&&e.block===0&&tb.onGuardBroken&&e.hp>0)tb.onGuardBroken(e);floatText(e.uid,d>0?'-'+d:(b?'🛡'+b:'0'),d>0?'':'b');e.shake=Date.now();
  fire('damageDealt',{target:e,amount:d+b,hpLoss:d,f:o.f});afterEnemyDamage(e,o.f);return d}
 function afterEnemyDamage(e,f){const t=EN[e.key];if(e.hp>0&&t.onDamaged)t.onDamaged(e);
  if(e.hp<=0){e.hp=0;W.run.kills++;if(W.run.stats)W.run.stats.kills++;log('💥 '+e.n+' defeated');if(f)f.killed=true;if(t.onDeath)t.onDeath(e);fire('enemyKilled',{enemy:e,summon:e.summoned,f})}}
 // Unblockable self HP loss (Brine Rot, Reckless...). guard:true lets Guard absorb it (Scald, Barbs).
-export function loseHp(n,o={}){const cb=W.cb;if(o.guard&&cb){const b=Math.min(cb.p.block,n);cb.p.block-=b;n-=b}if(n<=0)return;W.run.hp=Math.max(0,W.run.hp-n);if(cb){floatText('p','-'+n);cb.pshake=Date.now()}if(W.run.hp<=0)cheatDeath()}
+export function loseHp(n,o={}){const cb=W.cb;if(o.guard&&cb){const b=Math.min(cb.p.block,n);cb.p.block-=b;n-=b;if(n>0)n=Math.max(0,Math.floor(mod('damageTaken',{source:o.source},n))) /* Act 3 hook: modifyDamageTaken */}if(n<=0)return;W.run.hp=Math.max(0,W.run.hp-n);if(cb){floatText('p','-'+n);cb.pshake=Date.now()}if(W.run.hp<=0)cheatDeath();if(cb&&W.run.hp>0&&W.run.hp<=W.run.max*.3)fire('hpLow',{hp:W.run.hp}) /* Act 3 hook: onHpLow */}
 export function heal(n){W.run.hp=Math.min(W.run.max,W.run.hp+Math.max(0,Math.floor(n)));if(W.cb&&n>0)floatText('p','+'+Math.floor(n)+'❤','h')}
 // onPlayerDeath (§4.2): relics first (Tidewrack Scale), then potions (Second Tide). Returns true if the death was cancelled.
 export function cheatDeath(){if(W.run.hp>0)return true;const ctx=fire('playerDeath',{});if(ctx.cancel&&W.run.hp>0){return true}return false}
@@ -140,7 +158,9 @@ export const isHigh=()=>W.cb.tide>=TI.high, isLow=()=>W.cb.tide<=TI.low;
 export function setTide(v,cause){const cb=W.cb;const from=cb.tide;const to=Math.max(0,Math.min(10,v));const dir=Math.sign(to-from);
  if(dir){noteDir(dir,cause)}cb.tide=to;fire('tideChange',{from,to,delta:to-from,cause:cause||'set'});checkTide(cause);return to}
 // Returns the Tide reached by the move (before a Crest/Undertow resets it to 5), so cards can check "if now at Low/High Tide".
-export function tideShift(n,cause){const cb=W.cb;if(!n)return cb.tide;if(cb.slack&&cause!=='drift')return cb.tide;const from=cb.tide,dir=Math.sign(n);
+export function tideShift(n,cause){const cb=W.cb;if(!n)return cb.tide;
+ if(cb.storm&&cause==='card'&&alive().some(x=>x.key==='magus')){const m=Math.max(0,Math.abs(n)-1);n=Math.sign(n)*m;if(!n){floatText('p','Storm Tide','b');return cb.tide}} /* R5 Storm Tide: Surge and Recede are 1 weaker */
+ if(cb.slack&&cause!=='drift')return cb.tide;const from=cb.tide,dir=Math.sign(n);
  const wasHigh=isHigh();noteDir(dir,cause);const to=Math.max(0,Math.min(10,from+n));cb.tide=to;
  fire(dir>0?'surge':'recede',{n:Math.abs(n),wasHigh,cause});fire('tideChange',{from,to,delta:to-from,cause:cause||'card'});checkTide(cause);return to}
 function noteDir(dir,cause){const cb=W.cb;if(cb.tideDir&&dir!==cb.tideDir){cb.stat.tideturnsTurn++;cb.stat.tideturnsCombat++;fire('tideTurn',{nThisTurn:cb.stat.tideturnsTurn,nThisCombat:cb.stat.tideturnsCombat,cause});drenchTrigger('turn')}cb.tideDir=dir;cb.stat.lastTideDir=dir}
@@ -185,10 +205,10 @@ export function F(ci,o={}){const cb=W.cb;const def=o.def||CARDS[ci.id];const u=i
   get tg(){let t=o.tgt;if(!t||t.hp<=0||t.fled)t=o.echo?randAlive():curTgt();return t},
   get low(){return f._low}, get high(){return f._high}, lowNow:()=>isLow(), highNow:()=>isHigh(),
   num(n){n+=(ci&&ci.sus)||0;if(f.half)n=Math.floor(n*(EC.unmarked_fallback||.5));if(f.scale<1)n=Math.floor(n*f.scale);return n+f.bonus}, // unmarked Echo fallback: v2.2 = 1/4
-  dmg(n,h=1){if(f.allTargets)return f.all(n,h);for(let i=0;i<h;i++){const t=f.tg;if(!t)return;hit(t,f.num(n),f)}},
-  all(n,h=1){for(let i=0;i<h;i++)alive().forEach(e=>hit(e,f.num(n),f))},
+  dmg(n,h=1){if(f.allTargets)return f.all(n,h);for(let i=0;i<h;i++){const t=holdRedirect(f.tg);if(!t)return;hit(t,f.num(n),f)}},
+  all(n,h=1){for(let i=0;i<h;i++)alive().forEach(e=>hit(e,f.num(n),f,{aoe:true}))},
   dmgRandom(n){const t=randAlive();if(t)hit(t,n+f.rankDmg,f,{raw:true})},
-  blk(n,cap){let g=f.num(n)*f.mult*(f.lm?2:1);if(!f.lm&&f.ramp>1)g=Math.floor(g*f.ramp);if(cap!=null)g=Math.min(g,cap);return gainBlock(g,{fromCard:!f.potion&&!f.wp})},
+  blk(n,cap){let g=f.num(n)*f.mult*(f.lm?2:1);if(!f.lm&&f.ramp>1)g=Math.floor(g*f.ramp);if(cap!=null)g=Math.min(g,cap);return gainBlock(g,{fromCard:!f.potion&&!f.wp,echo:f.echo})},
   draw(n){return drawCards(n)},
   weak(n,t){t=t||f.tg;if(t)addSt(t,'weak',n*f.mult)},vuln(n,t){t=t||f.tg;if(t)addSt(t,'vuln',n*f.mult)},
   applyStatus(t,k,n){addSt(t,k,n)},
@@ -244,6 +264,7 @@ export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;cb.enemyTurn=f
  if(cb.turn>1&&!mod('retainGuard',{},false))cb.p.block=0;
  Object.assign(cb,{parry:0,parryUsed:false,parries:{},advUsed:0,decUsed:0,breaks:0,markType:null,mark2Type:null,lastType:null,mark:null,markTgt:null,afterMark:0,armMark:false,armFlourish:false,mark2:null,markTgt2:null,after2:0,mark2Scale:1,extraMarks:0,lastNF:null,lastNFTgt:null,last:null,sel:null,insp:null,slack:false,keepMom:false,tideBtnUsed:false,wheelUsed:false});
  cb.stat.wpLeftLast=cb.stat.wpLeftTurn||0;cb.stat.echoesLast=cb.stat.echoesTurn||0;Object.assign(cb.stat,{typesTurn:{},playedTurn:0,attacksTurn:0,tideturnsTurn:0,echoesTurn:0,bigTurn:0,wpLeftTurn:0});cb.bitter={};
+ cb.ens.forEach(x=>{x.armSpent=false;x.base=x.hp;x.siph=0;x.intr=false});cb.numbCard=null;cb.refracted=false;cb.stormUsed=false;cb.storm=!!cb.stormNext&&mod('stormTide',{},true) /* Act 3 hook: onStormTide */;cb.stormNext=false;cb.owedRec=false;cb.locked=null;cb.owed=cb.owedNext||null;cb.owedNext=null;cb.owedUsed=false;
  cb.energy=cb.maxE;if(cb.drainE){cb.energy=Math.max(0,cb.energy-cb.drainE);log(`⚡ Drained: −${cb.drainE} Energy`);cb.drainE=0}
  cb.banner={txt:'Player Turn',t:Date.now()};
  const q=cb.nextTurnQ;cb.nextTurnQ=[];q.forEach(fn=>fn());
@@ -254,7 +275,7 @@ export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;cb.enemyTurn=f
  const n=mod('drawCount',{},(W.run.cls==='carto'?4:5))+(ts.draw||0)+cb.wpDraw+cb.nextDraw;cb.wpDraw=0;cb.nextDraw=0;
  // v0.6.2 interim: say why the Cartographer opens with 4 cards (once per run), and pop the Tuning Fork's turn-1 bonus card.
  const fork=cb.turn===1&&hasRelic('tuningfork'),cartoHint=cb.turn===1&&W.run.cls==='carto'&&n===4&&!W.run.cartoHint;
- const drawn=()=>{if(!W.cb)return;drawCards(n);if(fork){const pop=()=>{if(W.cb!==cb)return;flash(relic('tuningfork'));callout('+1 card · Tuning Fork','relic');render()};if(window.FAST)pop();else setTimeout(pop,T(780))}if(cartoHint){W.run.cartoHint=1;cb.hint={t:Date.now(),txt:'<b>4 cards</b> is by design: the Cartographer plans ahead and draws more from <b>Waypoints</b>.'}}if(cb.pendingE){gainEnergy(cb.pendingE);cb.pendingE=0}fire('afterDraw',{turn:cb.turn});drift();after()};
+ const drawn=()=>{if(!W.cb)return;drawCards(n);applyMuffle();applyGust();applyNumb();if(fork){const pop=()=>{if(W.cb!==cb)return;flash(relic('tuningfork'));callout('+1 card · Tuning Fork','relic');render()};if(window.FAST)pop();else setTimeout(pop,T(780))}if(cartoHint){W.run.cartoHint=1;cb.hint={t:Date.now(),txt:'<b>4 cards</b> is by design: the Cartographer plans ahead and draws more from <b>Waypoints</b>.'}}if(cb.pendingE){gainEnergy(cb.pendingE);cb.pendingE=0}fire('afterDraw',{turn:cb.turn});drift();after()};
  if(cb.chartQ){const k=cb.chartQ;cb.chartQ=0;chart(k,drawn);render()}else drawn()}
 // Tidecaller Drift (v2.1): from turn 2, the Tide moves `drift` in the direction of its last move. After the Guard reset and draw.
 function drift(){const cb=W.cb;if(W.run.cls!=='tide'||cb.turn<2||!cb.tideDir)return;
@@ -265,7 +286,7 @@ function drift(){const cb=W.cb;if(W.run.cls!=='tide'||cb.turn<2||!cb.tideDir)ret
 function tideActImpl(a){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  if((a==='up'||a==='down')&&hasRelic('tidetable')&&!cb.tideBtnUsed){cb.tideBtnUsed=true;flash(relic('tidetable'));tideShift(a==='up'?1:-1,'relic');return after()}
  if(a==='flip'&&hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir){cb.wheelUsed=true;cb.tideDir=-cb.tideDir;flash(relic('helmwheel'));log('☸️ Helmsman\'s Wheel: drift arrow flipped');return after()}}
-export function canPlay(ci){const cb=W.cb;const d=CARDS[ci.id];if(!d||cb.busy||cb.mode)return false;if(d.unplay&&!mod('playUnplayable',{card:ci},false))return false;if(cost(ci)>cb.energy)return false;if(d.req&&!d.req(F(ci,{})))return false;return mod('canPlay',{card:ci},true)}
+export function canPlay(ci){const cb=W.cb;const d=CARDS[ci.id];if(!d||cb.busy||cb.mode)return false;if(d.unplay&&!mod('playUnplayable',{card:ci},false))return false;if(cb.locked===ci)return false;if(cost(ci)>cb.energy)return false;if(d.req&&!d.req(F(ci,{})))return false;return mod('canPlay',{card:ci},true)}
 function tapCardImpl(i){const cb=W.cb;if(cb.busy||cb.mode)return;cb.sel=i;cb.insp=null;render()}
 // Retained for old debug callers; only the drag release UI commits a card.
 export function playSel(){}
@@ -285,7 +306,9 @@ export const canMark=()=>{const cb=W.cb;return !!cb&&!cb.busy&&!cb.mode&&!!(cb.m
 function playCardImpl(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)return;if(!canPlay(ci)){cb.sel=i;return render()}const d=CARDS[ci.id];
  if(opts.flourish==null)opts.flourish=cb.armFlourish;if(opts.mark==null)opts.mark=cb.armMark;if(opts.mark&&W.run.cls==='echo'&&!canTakeMove(ci))opts.mark=false; // same check as the highlight
  if(!W.previewing&&!W.replaying)flyCard(ci,needsTarget(ci)?curTgt():null);
- const c=cost(ci);const x=isX(ci)?cb.energy:0;cb.energy-=isX(ci)?x:c;cb.hand.splice(i,1);ci.tmp0=false;cb.sel=null;
+ const c=cost(ci);const x=isX(ci)?cb.energy:0;{const ot=owedType(d);if(ot&&alive().some(z=>z.key==='grell')){if(!cb.owedRec){cb.owedRec=true;cb.owedNext=ot}if(cb.owed===ot&&!cb.owedUsed)cb.owedUsed=true}}
+ cb.energy-=isX(ci)?x:c;cb.hand.splice(i,1);ci.tmp0=false;cb.sel=null;
+ if(cb.numbCard===ci){cb.numbCard=null;fire('numbedCardPlayed',{card:ci})} // Act 3 hook: onNumbedCardPlayed
  const tg=curTgt();Object.defineProperty(ci,'_tgt',{value:tg,writable:true,configurable:true,enumerable:false}); // non-enumerable: stays out of saves/clones
  const f=F(ci,{tgt:tg,x});cb.curF=f;
  // Flourish (Duelist, v2.1): optional, spends all Momentum, x(1 + 0.5 per Momentum), capped at x3.5.
@@ -305,6 +328,8 @@ function playCardImpl(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)return
  runCard(d,f);
  if(cb.mimic){cb.mimic=false;const f2=F(ci,{tgt:tg,x});f2.flourish=f.flourish;f2.fmult=f.fmult;log('🖋️ Mimic Ink: '+cname(ci)+' again');runCard(d,f2)}
  if(!W.cb)return;
+ // R11 Refract: the first Attack CARD each turn hurts you for 3 (Guard absorbs it) while a Lens-Wright lives. Echo repeats never trigger it.
+ if(d.t==='A'&&!cb.refracted&&alive().some(x=>x.key==='lenswright')){cb.refracted=true;if(mod('refract',{},true)){floatText('p','Refract -3','');loseHp(3,{guard:true});log('🔆 Refract: 3 damage back to you')}}
  if(W.run.cls==='duel'&&d.t==='A'){if(f.flourish)cb.mom=f.freeFlourish?f.savedMom:mod('momAfterFlourish',{f},0);else gainMom(1)}
  cb.lastType=d.t==='A'?'A':d.t==='P'?'P':'S';
  {cb.last=d.t==='P'?null:ci;cb.lastTgt=tg;if(d.t!=='P'&&!d.faint){cb.lastNF=ci;cb.lastNFTgt=tg}}
@@ -332,7 +357,7 @@ export function echoPlan(preview=true,slot=1){const cb=W.cb;let ci=cb.mark,tgt=c
  if(slot===2){ci=cb.mark2;tgt=cb.markTgt2;if(!ci)return null;bonus=markBonus(cb.after2);scale=cb.mark2Scale}
  else if(ci)bonus=markBonus();else return null; // Twin Tines: no unmarked fallback
  const plan=mod('echoPlan',{card:ci,marked:!half,preview,slot},{card:ci,tgt,half,bonus,scale,repeats:1,mult:1,allTargets:false,marked:!half,slot});
- plan.bonus=Math.min(EC_BONUS_MAX,plan.bonus||0);plan.capped=Math.max(0,plan.repeats-(EC.cap-cb.stat.echoesTurn));plan.repeats=Math.max(0,Math.min(plan.repeats,EC.cap-cb.stat.echoesTurn));return plan}
+ plan.bonus=Math.min(EC_BONUS_MAX,plan.bonus||0);plan.capped=Math.max(0,plan.repeats-(mod('echoCap',{},EC.cap)-cb.stat.echoesTurn));plan.repeats=Math.max(0,Math.min(plan.repeats,mod('echoCap',{},EC.cap)-cb.stat.echoesTurn)) /* Act 3 hook: modifyEchoCap */;return plan}
 // Predicted number of a plan's card (for the live Echo preview): reads the first "Deal N" / "Gain N Guard" of the card text (Resound text when it has one).
 export function echoPreview(plan){if(!plan)return null;const ci=plan.card,d=CARDS[ci.id];let t=plain(desc(ci));const rs=/Resound:\s*([^.]*)\./.exec(t);
  if(rs&&/(deal|gain)\s+\d+/i.test(rs[1]))t=rs[1];
@@ -359,7 +384,7 @@ export function doEcho(){const cb=W.cb;if(W.run.cls!=='echo')return;
 // endTurn: onTurnEnd -> Echo -> onTurnEndInHand -> Fleeting sink / Moor keep / discard -> Momentum fade -> expire turn fx -> enemy phase
 function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  fire('turnEnd',{turn:cb.turn});if(!W.cb)return;
- const held=cb.hand.slice();cb.ending=true;doEcho();cb.ending=false;if(W.previewing)return;if(!W.cb)return;if(!alive().length)return win();
+ cb.locked=null;const held=cb.hand.slice();cb.ending=true;doEcho();cb.ending=false;if(W.previewing)return;if(!W.cb)return;if(!alive().length)return win();
  for(const ci of held){const d=CARDS[ci.id];if(cb.hand.includes(ci)&&d.endInHand)d.endInHand(F(ci,{}),ci)}
  fire('turnEndInHand',{});
  if(W.run.hp<=0&&!cheatDeath())return lose();
@@ -369,17 +394,26 @@ function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  cb.hand=keep;cb.sel=null;cb.insp=null;
  if(W.run.cls==='duel'&&!cb.keepMom&&!mod('keepMomentum',{},false))cb.mom=Math.max(0,cb.mom-DU.decay);cb.keepMom=false;
  cb.fx=cb.fx.filter(l=>l.combat||(l.turns&&--l.turns>0));
+ // R9 Water (Thalassa, phase 2): 1 HP per 5 Guard held, lost at the end of YOUR turn. HP loss, not damage: Guard does not block it.
+ {const n=waterLoss();if(n>0){loseHp(n);log('🌊 Water: −'+n+' HP');callout('WATER −'+n,'boss');if(W.run.hp<=0&&!cheatDeath())return lose()}}
  cb.busy=true;cb.enemyTurn=true;cb.banner={txt:'Enemy Turn',t:Date.now(),en:1};render();
  // A curse that fired in hand (Dread) pops over the hand first; hold the enemy turn so its notice can be read.
  const popT=(cb.cursePops||[]).some(x=>Date.now()-x.t<200)?CURSE_POP:0;
  if(window.FAST)enemyPhase();else setTimeout(enemyPhase,T(EB().pause+popT))}
+export const waterOn=()=>!!W.cb&&mod('waterOn',{},alive().some(x=>x.key==='thalassa'&&x.ph>=2)); // Act 3 hook: modifyWaterOn (Sluice Heart)
+export const waterLoss=()=>{if(!waterOn())return 0;return Math.max(0,Math.floor(mod('water',{guard:W.cb.p.block},Math.floor(W.cb.p.block/5))))};
 export const CURSE_POP=900;
 export const EC_BONUS_MAX=12; // rule 30: total Echo bonus per ring
 // eAtk(e,a) is the per-hit damage of a move's attack `a`. Without `o` it is the SHOWN value: it includes Might and Exposed that
 // land earlier in this enemy phase (the enemy's own Might from the move, ally buffs like Bark Orders / Grow, and Exposed from
 // enemies acting before it), so shown == taken. With o={str,vuln} it is computed from those exact values (used by act()).
-export function eAtk(e,a,o){if(!o)o=phasePlanFor(e);let d=a+(e.st.str||0)+(e.st.mightTmp||0)+(o.str||0);if(e.elite&&d>0){const m=(ECON.eliteDmgByKey||{})[e.key]??ECON.eliteDmg??1;d=Math.max(1,Math.round(d*m))} // R1b elite damage (ECON)
- if(e.st.weak)d=Math.floor(d*.75);if(o.vuln)d=Math.floor(d*1.5);return Math.max(0,d)}
+export function eAtk(e,a,o,raw){if(!o)o=phasePlanFor(e);let d=a+(e.st.str||0)+(e.st.mightTmp||0)+(o.str||0);if(e.elite&&d>0){const m=(ECON.eliteDmgByKey||{})[e.key]??ECON.eliteDmg??1;d=Math.max(1,Math.round(d*m))} // R1b elite damage (ECON)
+ if(e.st.weak)d=Math.floor(d*.75);if(o.vuln)d=Math.floor(d*1.5);d=Math.max(0,d);
+ if(d>0&&e.holds)d+=4; // R13: the Shard holder's attacks gain +4
+ if(d>0&&!raw&&e.tailwind)d+=e.tailwind; // R10 Tailwind: the SHOWN first hit includes it (act() adds it to hit 1 only)
+ // Gunnery (ACT2-RULES R1): only part of your Guard blocks, so the SHOWN number is what you will take at your current Guard. act() asks for the raw value and blocks in enemyHitPlayer.
+ if(!raw&&W.cb&&!W.cb.acting){const m=EN[e.key].intent?EN[e.key].intent(e):e.next;if(m&&m.ignoreG&&m.a===a)d=Math.max(0,d-Math.min(Math.floor(W.cb.p.block*m.ignoreG),d))}
+ return d}
 // Predict the coming enemy phase in acting order: extra Might each enemy will have when it swings, and whether the player is Exposed then.
 export function phasePlan(){const cb=W.cb;const out={};if(!cb)return out;let vuln=!!cb.p.st.vuln;const extra={};
  for(const x of cb.ens){if(x.hp<=0||x.fled)continue;const m=intentOf(x)||{};const own=(extra[x.uid]||0)+(m.s||0);out[x.uid]={str:own,vuln};
@@ -391,13 +425,14 @@ function phasePlanFor(e){const cb=W.cb;if(!cb)return {str:0,vuln:false};if(cb.ac
  return phasePlan()[e.uid]||{str:0,vuln:!!cb.p.st.vuln}}
 export function intentOf(e){const t=EN[e.key];const m=t.intent?t.intent(e):e.next;return mod('intentDisplay',{enemy:e},m)||{none:1}}
 // Enemy Attack on the player: Parry first (reduce the first Attack, reflect half, once per turn), then Guard, then HP.
-export function enemyHitPlayer(e,d){const cb=W.cb;
+export function enemyHitPlayer(e,d,o={}){const cb=W.cb;
  if(d>0&&cb.parries&&cb.parries[e.uid]>0&&!cb.parryHit[e.uid])d=answerParry(e,d);
  if(d>0&&cb.parry>0&&!cb.parryUsed){cb.parryUsed=true;const red=Math.min(cb.parry,d);d-=red;const back=Math.floor(cb.parry*mod('parryReflect',{enemy:e},DU.parry_back_frac));
   log(`⚔️ Parry! −${red}, ${back} back to ${e.n}`);callout('PARRY! ↩ '+back,'parry');if(back)dmgEnemy(e,back);cb.retort=true;fire('parry',{enemy:e,reflected:back,reduced:red})}
- const b=Math.min(cb.p.block,d);cb.p.block-=b;const rest=d-b;W.run.hp=Math.max(0,W.run.hp-rest);floatText('p',rest>0?'-'+rest:'🛡'+b,rest>0?'':'b');cb.pshake=Date.now();fire('playerHit',{enemy:e,amount:rest,blocked:b});
+ const b=Math.min(o.ignoreG?Math.floor(cb.p.block*o.ignoreG):cb.p.block,d);cb.p.block-=b;let rest=d-b;if(rest>0)rest=Math.max(0,Math.floor(mod('damageTaken',{enemy:e,amount:rest},rest))); /* Act 3 hook: modifyDamageTaken */W.run.hp=Math.max(0,W.run.hp-rest);floatText('p',rest>0?'-'+rest:'🛡'+b,rest>0?'':'b');cb.pshake=Date.now();fire('playerHit',{enemy:e,amount:rest,blocked:b});
  if(rest>0&&W.run.cls==='duel'&&cb.mom>0&&!cb.momLostPhase){cb.momLostPhase=true;const lose=mod('momLoss',{},DU.lose_on_unblocked);cb.mom=Math.max(0,cb.mom-lose);log('💢 Hit: −'+lose+' Momentum')}
  if(rest>0)fire('playerDamaged',{enemy:e,amount:rest});
+ if(rest>0&&W.run.hp>0&&W.run.hp<=W.run.max*.3)fire('hpLow',{hp:W.run.hp}); // Act 3 hook: onHpLow
  if(W.run.hp<=0)cheatDeath()}
 // ---- cards-act1: called Parry (rule 32). Pools per enemy uid; the enemy's FIRST damaging hit next enemy phase is reduced by the pool
 // (before Guard), half of what was stopped is reflected ('parryReflect' modifier), a pool >= the hit is a Clean Answer (+1 Momentum,
@@ -411,8 +446,18 @@ function answerParry(e,d){const cb=W.cb;const p=cb.parries[e.uid];const red=Math
  if(clean&&!cb.cleanDone[e.uid]){cb.cleanDone[e.uid]=true;const m=mod('cleanMom',{enemy:e},1);if(W.run.cls==='duel')gainMom(m);fire('cleanAnswer',{enemy:e,reduced:red});bigMoment('clean',{enemy:e})}
  cb.retort=true;fire('parry',{enemy:e,reflected:back,reduced:red,clean});return d-red}
 export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=intentOf(e);e.lastAct=m;fire('enemyAct',{enemy:e,intent:m});if(m.b)e.blkT=Date.now();if(m.lbl)log(`${e.e} ${e.n}: ${m.lbl}`);
+ if(m.pull)pullPlayer(m.pull); // Pull resolves before the same move's damage (ACT2-RULES R7)
+ if(m.seize)seizeCard(e);
+ if(m.muffle)cb.muffleNext=true;
+ if(m.gust)cb.gustNext=(cb.gustNext||0)+m.gust; // Act 3 R2: applied after your next draw
+ if(m.numb)cb.numbNext=true; // R3
+ if(m.tide)cb.stormNext=true; // R5 Storm Tide
+ if(m.dive)e.diveNext=true; // R4: submerges at the end of its turn
+ if(m.surface)e.sub=false;
+ if(m.discharge)dischargeReset(e); // R1
+ if(m.vent)e.press=0;
  if(m.b)e.block+=m.b;if(m.s)addSt(e,'str',m.s);
- if(m.a){e.atkT=Date.now();for(let h=0;h<(m.h||1);h++){if(W.run.hp<=0||e.hp<=0||!W.cb)break;enemyHitPlayer(e,eAtk(e,m.a,{str:0,vuln:!!cb.p.st.vuln}))}fire('playerAttacked',{enemy:e})}
+ if(m.a){e.atkT=Date.now();for(let h=0;h<(m.h||1);h++){if(W.run.hp<=0||e.hp<=0||!W.cb)break;enemyHitPlayer(e,mod('hitDamage',{enemy:e,hits:m.h||1,hit:h},eAtk(e,m.a,{str:0,vuln:!!cb.p.st.vuln},true)+(h===0&&e.tailwind?e.tailwind:0)) /* Act 3 hook: modifyHitDamage */,m.ignoreG?{ignoreG:m.ignoreG}:undefined)}if(m.brittleLast&&W.cb&&W.run.hp>0)addSt(cb.p,'brittle',1);e.tailwind=0;fire('playerAttacked',{enemy:e})}
  if(!W.cb||e.hp<=0&&!m.boom)return;
  if(m.healAlly){let t=alive().find(x=>x.uid===m.tgt&&x!==e),n=m.healAlly;if(!t){t=e;n=5}const h=Math.min(n,t.max-t.hp);t.hp+=h;if(h)floatText(t.uid,'+'+h,'h');log(`🪡 ${e.n} stitches ${t===e?'herself':t.n} (+${h})`)}
  if(m.allyB||m.allyS){alive().filter(x=>x!==e).forEach(x=>{if(m.allyB){x.block+=m.allyB;x.blkT=Date.now()}if(m.allyS)addSt(x,'str',m.allyS)});log(`📯 ${e.n} rallies its allies`)}
@@ -425,8 +470,45 @@ export function act(e){const cb=W.cb;cb.acting=e;const t=EN[e.key];const m=inten
  if(m.summon){const n=m.n||1;for(let i=0;i<n;i++){if(m.max&&countAlive(m.summon)>=m.max)break;spawn(m.summon,{summoned:true});log(`📯 ${EN[m.summon].n} joins the fight`)}}
  if(m.steal){const g=Math.min(m.steal,W.run.gold);W.run.gold-=g;e.fled=true;e.stole=g;log(`🐦 ${e.n} stole ${g} gold and flew off!`)}
  if(m.ring){for(let i=0;i<m.ring;i++)addCard('ringing','disc');log(`🔔 ${m.ring} Ringing added to your discard`)}
+ if(m.lure)goldenLure(e);
+ if(m.cleanse){const al=alive().filter(x=>x!==e).sort((a,b)=>Object.keys(b.st).length-Object.keys(a.st).length)[0];if(al){['weak','vuln','bleed','brittle','drench','reson'].forEach(k=>delete al.st[k]);log(`🏮 ${e.n} snuffs the burning on ${al.n}`)}}
  if(m.fx)m.fx(e)}
-function endOfEnemyTurn(e){const t=EN[e.key];if(t.passive&&t.passive.endTurn)t.passive.endTurn(e);
+// ---- Act 2 rules (studio/design/ACT2-RULES.md) ----
+// R7 Pull: Tidecaller loses Tide, everyone else loses Guard (up to N).
+export function pullPlayer(n){const cb=W.cb;if(W.run.cls==='tide'){const to=Math.max(0,cb.tide-n);if(to!==cb.tide){const from=cb.tide;cb.tide=to;fire('tideChange',{from,to,delta:to-from,cause:'pull'});log(`⛓️ Pull: Tide drops to ${to}`)}}else{const g=Math.min(n,cb.p.block);if(g>0){cb.p.block-=g;floatText('p','-'+g+'🛡','');log(`⛓️ Pull: −${g} Guard`)}}}
+// ---- Act 3 rules (studio/design/ACT3-RULES.md) ----
+// R1 Static Charge: a discharge resets the Charge (polyps share ONE pool kept on the combat object).
+export const poolOf=e=>e.key==='polyp'?(W.cb.pool||0):(e.charge||0);
+export function setPool(e,n){n=Math.max(0,Math.min(3,n));if(e.key==='polyp')W.cb.pool=n;else e.charge=n}
+function dischargeReset(e){setPool(e,0);callout('DISCHARGE','boss')}
+// R2 Gust: the N rightmost cards of the hand go back on top of the draw pile (deterministic), once, after the draw.
+function applyGust(){const cb=W.cb;let n=cb&&cb.gustNext||0;if(!cb)return;cb.gustNext=0;let k=0;
+ while(n-->0&&cb.hand.length){const ci=cb.hand.pop();cb.draw.unshift(ci);k++}
+ if(k){log('🌬️ Gust: '+k+' card'+(k>1?'s':'')+' blown back onto your draw pile');callout('GUST','boss');fire('gust',{n:k})}}
+// R3 Numbed: the cheapest playable card in hand (leftmost on ties) costs 1 more this turn.
+function applyNumb(){const cb=W.cb;if(!cb||!cb.numbNext)return;cb.numbNext=false;if(!alive().some(x=>x.key==='automaton'))return;if(!mod('numb',{},true))return;
+ let best=null,bc=99;for(const ci of cb.hand){if(CARDS[ci.id].unplay)continue;const c=cost(ci);if(c<bc){bc=c;best=ci}}
+ if(best){cb.numbCard=best;log('🥶 Numbed: '+cname(best)+' costs 1 more this turn');callout('NUMBED','boss')}}
+// R7 Twin Squalls: the twins trade places after every enemy round.
+function swapTwins(){const t=alive().filter(x=>x.key==='squallwest'||x.key==='squalleast');if(t.length===2){t.forEach(x=>x.back=!x.back);log('🌀 The twins trade places')}}
+// R4 Cloud Dive / R9 Water: end-of-enemy-turn hook
+// R4 Muffled: the highest-cost card in hand (leftmost on ties) is locked for the player's turn. Zero-cost hands lock nothing.
+const cardCost=ci=>cost(ci);
+function applyMuffle(){const cb=W.cb;if(!cb||!cb.muffleNext)return;cb.muffleNext=false;if(!alive().some(x=>x.key==='bellnun'))return;
+ let best=null,bc=0;for(const ci of cb.hand){const c=cardCost(ci);if(c>bc){bc=c;best=ci}}
+ if(best){cb.locked=best;log('🔕 Muffled: '+cname(best)+' is silenced this turn');callout('MUFFLED','boss')}}
+// R8 Seize: the Bosun keeps your lowest-cost card (leftmost on ties) until he dies. A card stays in run.deck, so combat end needs no return.
+function seizeCard(e){const cb=W.cb;if(e.seized||!cb.hand.length)return;let best=null,bc=99;for(const ci of cb.hand){const c=cardCost(ci);if(c<bc){bc=c;best=ci}}
+ if(best){cb.hand.splice(cb.hand.indexOf(best),1);e.seized=best;log('⚓ '+e.n+' seizes '+cname(best));callout('SEIZED','boss')}}
+// Golden Lure (Wreck Queen): a real choice.
+function goldenLure(e){const cb=W.cb;cb.nextTurnQ.push(()=>choose('Golden Light',[{l:'Follow the light',cap:'+12 Guard, −6 HP',f:()=>{gainBlock(12);loseHp(6)}},{l:'Look away',cap:'The Queen gains 6 Guard',f:()=>{e.block+=6;e.blkT=Date.now()}}]))}
+// R2 Hold the Line: a single-target card aimed at an ally of a Guarded holder hits the holder instead.
+export function holdRedirect(t){if(t&&t.back){const f=alive().find(x=>!x.back&&x!==t&&EN[x.key].passive&&EN[x.key].passive.twin);if(f)return f} // R7: single-target cards can only reach the front twin
+ const h=alive().find(x=>x!==t&&x.block>0&&EN[x.key].passive&&EN[x.key].passive.hold);return h&&t&&!(EN[t.key].passive&&EN[t.key].passive.hold)?h:t}
+export const lockedCard=()=>W.cb&&W.cb.locked||null;
+// R5 Owed: the card TYPE (Waypoints count as Skills) of the first card played each turn while Grell lives.
+export const owedType=d=>d.t==='A'?'A':d.t==='P'?'P':d.t==='S'||d.t==='W'?'S':null;
+function endOfEnemyTurn(e){const t=EN[e.key];if(e.diveNext){e.diveNext=false;e.sub=true;floatText(e.uid,'Submerged','b');fire('enemyDive',{enemy:e}) /* Act 3 hook: onEnemyDive */}if(t.passive&&t.passive.endTurn)t.passive.endTurn(e);
  if(e.st.shell)e.block+=e.st.shell;if(e.st.mending&&e.hp>0){const h=Math.min(e.st.mending,e.max-e.hp);e.hp+=h;if(h)floatText(e.uid,'+'+h,'h')}}
 // Enemy beats (telegraph crouch, gap between enemies, pause after End Turn) come from the ENEMY_BEATS table in core/timing.js (skipped when FAST).
 export function enemyPhase(){const cb=W.cb;if(!cb)return;cb.breaks=0;cb.parryHit={};cb.cleanDone={};cb.momLostPhase=false;
@@ -449,7 +531,7 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;cb.breaks=0;cb.parryHit
   if(W.run.hp<=0&&!cheatDeath())return lose();
   if(!alive().length)return finish();
   if(window.FAST)return step();render();setTimeout(step,T(B.lead>0?B.hitstop+B.recover+Math.max(0,B.hits-1)*B.hitGap+B.gap:B.gap))};
- const finish=()=>{if(!W.cb)return;['weak','vuln','brittle','drench','reson'].forEach(k=>{if(preSt[k]&&cb.p.st[k]){cb.p.st[k]--;if(!cb.p.st[k])delete cb.p.st[k]}});cb.tele=null;fire('roundEnd',{});cb.busy=false;cb.enemyTurn=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
+ const finish=()=>{if(!W.cb)return;['weak','vuln','brittle','drench','reson'].forEach(k=>{if(preSt[k]&&cb.p.st[k]){cb.p.st[k]--;if(!cb.p.st[k])delete cb.p.st[k]}});cb.tele=null;swapTwins();fire('roundEnd',{});cb.busy=false;cb.enemyTurn=false;cb.retortOk=cb.retort;cb.retort=false;if(!alive().length)return win();startTurn()};
  step()}
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
  const allFled=cb.ens.some(e=>e.fled)&&cb.ens.every(e=>e.fled||e.summoned);

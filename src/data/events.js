@@ -5,7 +5,7 @@ import {registerEvents,registerCharm,RELICS,CARDS,POTIONS,CHARMS} from '../core/
 import {W,pick,rng,R,rnd,shuffle} from '../core/state.js';
 import {cname,mk,upgradeCard} from '../engine/cards.js';
 import {isLocked,goMap,heal,hurt,msg,openPick,randomCard,gainCard,gainCurse,gainGold,gainRelic,loseRelic,randomRelic,randomPotion,addPotion,addPotionSlot,
- loseMaxHp,gainMaxHp,eventFight,toast,pickable,gainArtifact,artifactFree} from '../engine/run.js';
+ loseMaxHp,gainMaxHp,eventFight,toast,pickable,gainArtifact,artifactFree,actOK} from '../engine/run.js';
 import {mod} from '../core/bus.js';
 import {eventText} from './lore.js';
 import {render} from '../ui/render.js';
@@ -149,7 +149,7 @@ registerEvents([
  {id:'inkgrotto',pool:'act',act:1,n:'Ink Grotto',e:'🖋️',t:'Black ink pools in a cave. It moves when you look away.',o:[
   O('Bathe in the ink','gain Lampblack and a Dread curse',{d:'A sure relic with a sure price: gain Lampblack (enemies start weakened) and a Dread curse.',f:()=>{gainRelic('krakenink');gainCurse('dread');done(`You come out stained and uneasy. ${rel('krakenink')} and a Dread curse.`,'mixed','Stained')}}),
   O('Bottle some','65%: a random Uncommon potion, else lose 5 HP',{risk:.65,ok:()=>freeSlot()&&run().hp>5,why:()=>freeSlot()?'Needs more than 5 HP':'Your potion belt is full',d:'65%: a random Uncommon potion. 35%: it spills and burns: lose 5 HP.',f:()=>{
-   if(roll(.65)){const pool=Object.values(POTIONS).filter(p=>p.rarity==='u'&&(!p.cls||p.cls===run().cls)&&!isLocked('potions',p.id));const p=pick(pool,'events').id;addPotion(p);return done(`You bottle ${B(POTIONS[p].e+' '+POTIONS[p].n)}.`)}
+   if(roll(.65)){const pool=Object.values(POTIONS).filter(p=>p.rarity==='u'&&(!p.cls||p.cls===run().cls)&&!p.stub&&actOK(p)&&!isLocked('potions',p.id));const p=pick(pool,'events').id;addPotion(p);return done(`You bottle ${B(POTIONS[p].e+' '+POTIONS[p].n)}.`)}
    hurt(5);done('The ink slips through your fingers and burns. Lose 5 HP.','bad','Spilled')}}),
   O('Read the ink','50%: a random Uncommon card, else it swallows a card',{risk:.5,ok:()=>run().deck.length>=8&&pickable('remove').length>0,why:'Your deck is too small to risk',d:'The ink writes on your deck. 50%: a random Uncommon card. 50%: it swallows a random card.',f:()=>{
    if(roll(.5)){const id=randomCard('u');gainCard(id);return done(`New words in black ink: ${B(CARDS[id].n)}.`)}
@@ -193,5 +193,7 @@ registerEvents([
   O('Take the flask','gain the Ampoule of Lamp-Oil Artifact',{d:'Gain Ampoule of Lamp-Oil, an Artifact card (Skill, Sink): lose 4 HP, gain 2 Energy.',f:()=>takeArt('ampoule','The fingers open. The oil is warm.')}),
   O('Sit with them','heal 5 HP',{d:'Stay a while. Heal 5 HP.',f:()=>{heal(5);done('You stay until the tide turns. Heal 5 HP.')}}),LEAVE]},
 ]);
+// Helpers shared with data/act2/events.js and data/act3/events.js (same option style, same reveal screen).
+export {O,LEAVE,roll,done,B,rel,loseGold,takeArt,choice,pickThen,upPool,randomRemovable,freeSlot,run,pct};
 import {EVENTS} from '../core/registry.js';
 function EV(id){const e=EVENTS.find(e=>e.id===id);return e&&{...e,t:eventText(e.id,e.t)}}

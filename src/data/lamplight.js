@@ -28,3 +28,11 @@ export const CLIMB_PLAN=[{k:'relics'},{k:'potions'},{k:'relics'},{k:'mixed'},{k:
 
 // Later-act (Act 2 / Act 3) hero card counts from design/FULL-CARD-POOL. The cards are designed but not in play yet; the Ledger shows one dark placeholder per card so players see the true total.
 export const LATER_ACT_CARDS={tide:{2:20,3:19},echo:{2:20,3:19},carto:{2:21,3:18},duel:{2:19,3:19}};
+
+// ---- Later acts (D-A2-12): `lamp`-gated later-act cards are appended to each hero's locked list AFTER the 4 Act 1 locks (offered in order, all open at level 10);
+// `spoil`-gated cards are unlocked by taking them once (profile.spoils). Both stay out of the Lamp ladder until the later acts are live (?act=2 preview, or LATER.live=true at release).
+import {ACT23_POOL} from './generated/act2-pool.js';
+export const LATER={live:typeof location!=='undefined'&&(+new URLSearchParams(location.search).get('act')||0)>=2};
+export const LOCK_CARDS_LATER=Object.fromEntries(CLASS_ORDER.map(c=>[c,(ACT23_POOL[c]||[]).filter(x=>x.lampGate==='lamp').map(x=>x.id)]));
+export const SPOIL_CARDS=Object.fromEntries(CLASS_ORDER.flatMap(c=>(ACT23_POOL[c]||[]).filter(x=>x.lampGate==='spoil').map(x=>[x.id,x.spoilFrom])));
+export const lockCards=cls=>[...(LOCK_CARDS[cls]||[]),...(LATER.live?LOCK_CARDS_LATER[cls]||[]:[])];
