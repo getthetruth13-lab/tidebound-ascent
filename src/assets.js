@@ -64,7 +64,9 @@ export const ASSETS={
   enemies:{slug:'brine-slug',gull:'gull-thief',knight:'rust-knight',pod:'spore-pod',wisp:'glimmer-wisp',crab:'coral-crab',captain:'drowned-captain',
    warden:'mirror-warden',eel:['twin-eels-a','twin-eels-b'],bell:['knell-a','knell-b'],leech:'tide-leech',lurker:'kelp-lurker',tendril:'kelp-tendril',matriarch:'kelp-matriarch',
    // Task 21 delivery sprites: all six passed technical and game-fit art review.
-   penitent:'penitent',mender:'mender',heap:'heap',limpet:'limpet',novice:'novice',tenant:'tenant'}},
+   penitent:'penitent',mender:'mender',heap:'heap',limpet:'limpet',novice:'novice',tenant:'tenant',
+   // Act 2 sprites that passed the independent 9.0 gate (art review enemies-round6): Riveted Diver, Shellback Guard, Kettleman, Lice.
+   diver:'diver',shellguard:'shellguard',kettleman:'kettleman',lice:'lice'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.

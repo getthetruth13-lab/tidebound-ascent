@@ -359,6 +359,62 @@
    },
    "screenHeightPct": 44,
    "hoverPx": 0
+  },
+  "diver": {
+   "file": "sprites/diver.webp",
+   "w": 1057,
+   "h": 1372,
+   "bytes": 1110204,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.494,
+    "y": 1.0
+   },
+   "screenHeightPct": 50,
+   "hoverPx": 0
+  },
+  "shellguard": {
+   "file": "sprites/shellguard.webp",
+   "w": 876,
+   "h": 1203,
+   "bytes": 734974,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.477,
+    "y": 1.0
+   },
+   "screenHeightPct": 46,
+   "hoverPx": 0
+  },
+  "kettleman": {
+   "file": "sprites/kettleman.webp",
+   "w": 1589,
+   "h": 1270,
+   "bytes": 889996,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.442,
+    "y": 1.0
+   },
+   "screenHeightPct": 40,
+   "hoverPx": 0
+  },
+  "lice": {
+   "file": "sprites/lice.webp",
+   "w": 2214,
+   "h": 907,
+   "bytes": 1042606,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.546,
+    "y": 1.0
+   },
+   "screenHeightPct": 32,
+   "hoverPx": 0
   }
  }
 }
