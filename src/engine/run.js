@@ -11,6 +11,7 @@ import {startCombat,heal as cHeal} from './combat.js';
 import {fire,mod} from '../core/bus.js';
 import {saveRun,clearRun} from '../save.js';
 import {initRun as lampInit,noteSeen,settleRun} from './lamplight.js';
+import {warmActPack} from '../assets.js';
 import {loadProfile,saveProfile,lockedFor} from '../progress.js';
 import {SPOIL_CARDS} from '../data/lamplight.js';
 import {eventText} from '../data/lore.js';
@@ -285,7 +286,7 @@ export const isLastAct=()=>!hasNextAct();
 export function startNextAct(){const run=W.run;const from=run.act||1,to=from+1;
  run.act=to;run.boss=(run.bosses&&run.bosses[to])||run.boss;run.hp=run.max;run.floor=0;run.pos={r:-1,i:-1};run.vis={};run.shrinesThisAct={};run.wrenTally=0;run.fights=0;run.encHist=[];run.cut=0;
  run.map=genMap(to);run.stats.bossesByAct=(run.stats.bossesByAct||[]);W.cb=null;
- fire('actStart',{act:to});W.S={screen:'travel',kind:'act',from,to,t:Date.now()};saveRun();render()}
+ try{warmActPack(to)}catch(_){} fire('actStart',{act:to});W.S={screen:'travel',kind:'act',from,to,t:Date.now()};saveRun();render()}
 // Boss relics the hero can use (class-locked ones only for their class), not already held; 3 at random from the relics stream.
 export function bossRelicChoices(n=3){const run=W.run;const c=Object.values(RELICS).filter(r=>r.tier==='b'&&!r.stub&&actOK(r)&&(!r.cls||r.cls===run.cls)&&!isLocked('relics',r.id)&&!run.relics.some(x=>x.id===r.id));
  const out=[];const pool=c.slice();while(out.length<n&&pool.length){const r=pick(pool,'relics');pool.splice(pool.indexOf(r),1);out.push(r.id);run.seenRelics[r.id]=1}return out}

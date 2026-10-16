@@ -65,5 +65,7 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
  navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(reg=>{
   const urls=performance.getEntriesByType('resource').map(e=>e.name).filter(u=>u.startsWith(location.origin)).concat([...assets.assetURLs(),...env.envURLs(1),...tileUrls()].map(u=>new URL(u,location.href).href));
   (reg.active||navigator.serviceWorker.controller)&&reg.active.postMessage({type:'precache',urls});
+  // Act 2/3 art is not installed up front: fetch it only when a later act is requested (?act=N) or a saved run is already in one.
+  assets.warmActPack(Math.max(+new URLSearchParams(location.search).get('act')||1,(W.run&&W.run.act)||1));
  }).catch(e=>{console.warn('SW registration failed',e);loading.loadingFail()});
 }

@@ -555,6 +555,118 @@
    },
    "screenHeightPct": 44,
    "hoverPx": 0
+  },
+  "bellnun": {
+   "file": "sprites/bellnun.webp",
+   "w": 946,
+   "h": 1324,
+   "bytes": 501454,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.555,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
+   "hoverPx": 0
+  },
+  "dummy": {
+   "file": "sprites/dummy.webp",
+   "w": 1308,
+   "h": 1147,
+   "bytes": 399574,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.5,
+    "y": 1.0
+   },
+   "screenHeightPct": 34,
+   "hoverPx": 0
+  },
+  "hauler": {
+   "file": "sprites/hauler.webp",
+   "w": 1941,
+   "h": 825,
+   "bytes": 685794,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.55,
+    "y": 1.0
+   },
+   "screenHeightPct": 30,
+   "hoverPx": 0
+  },
+  "grell": {
+   "file": "sprites/grell.webp",
+   "w": 921,
+   "h": 1386,
+   "bytes": 654204,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.65,
+    "y": 1.0
+   },
+   "screenHeightPct": 48,
+   "hoverPx": 0
+  },
+  "hgunner": {
+   "file": "sprites/hgunner.webp",
+   "w": 1434,
+   "h": 1338,
+   "bytes": 620816,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.56,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "cantor": {
+   "file": "sprites/cantor.webp",
+   "w": 1142,
+   "h": 1339,
+   "bytes": 475088,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.65,
+    "y": 1.0
+   },
+   "screenHeightPct": 48,
+   "hoverPx": 0
+  },
+  "chorister": {
+   "file": "sprites/chorister.webp",
+   "w": 904,
+   "h": 1252,
+   "bytes": 649372,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.51,
+    "y": 1.0
+   },
+   "screenHeightPct": 38,
+   "hoverPx": 0
+  },
+  "basso": {
+   "file": "sprites/basso.webp",
+   "w": 1156,
+   "h": 1326,
+   "bytes": 949610,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.48,
+    "y": 1.0
+   },
+   "screenHeightPct": 40,
+   "hoverPx": 0
   }
  }
 }

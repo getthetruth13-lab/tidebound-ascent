@@ -68,7 +68,9 @@ export const ASSETS={
    // Act 2 sprites that passed the independent 9.0 gate (art review enemies-round6): Riveted Diver, Shellback Guard, Kettleman, Lice.
    diver:'diver',shellguard:'shellguard',kettleman:'kettleman',lice:'lice',
    // v0.6.35: Press-Gang Bosun passed the 9.0 gate (art review enemies-round16).
-   bosun:'bosun',gateplate:'gateplate',salthusk:'salthusk',lamplighter:'lamplighter',pylon:'pylon',pumper:'pumper',sluiceeng:'sluiceeng',ghostcannon:'ghostcannon',mortar:'mortar',deckshade:'deckshade'}},
+   bosun:'bosun',gateplate:'gateplate',salthusk:'salthusk',lamplighter:'lamplighter',pylon:'pylon',pumper:'pumper',sluiceeng:'sluiceeng',ghostcannon:'ghostcannon',mortar:'mortar',deckshade:'deckshade',
+   // v0.6.36: second batch, all at 9.0 (art reviews enemies-round25/29/31/33/34/35). Lowest sole = image bottom (8-10 px pad), so the runtime shadow sits on the lowest foot.
+   bellnun:'bellnun',dummy:'dummy',hauler:'hauler',grell:'grell',hgunner:'hgunner',cantor:'cantor',chorister:'chorister',basso:'basso'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.
@@ -101,7 +103,17 @@ export function iconHTML(group,key,fallback,cls){const s=assetSrc(group,key);ret
 export function assetSrc(group,key){const a=assetEntry(group,key);return a?a.src:''}
 export function assetFail(img){const s=img.parentNode;if(s)s.classList.remove('has-img','win');img.remove()}
 // Every URL in the map (used to pre-cache art for offline play). Backgrounds: current act only (ui/env.js envURLs()).
-export function assetURLs(){const out=Object.values(SPRITES).map(m=>m.f);for(const [gn,g] of Object.entries(ASSETS))for(const k in g){if(gn==='sprites')continue;const a=assetEntry(gn,k);if(!a)continue;out.push(a.src);if(a.srcset)a.srcset.split(',').forEach(s=>out.push(s.trim().split(/\s+/)[0]))}return [...new Set(out)].filter(u=>!/^(data:|blob:)/.test(u))}
+// ACT PACK (v0.6.36): sprites used only by Act 2/3 enemies (sprite id -> act). They are NOT in the install-time precache (tools/gen-precache.cjs puts them in
+// sw.js ACTPACK[act]); the worker fills them when ?act=N is used or an act opens (warmActPack), and on first use otherwise. Act 1 stays fully offline.
+// Add a sprite id here whenever a later-act enemy gets its sprite (tests/precache-coverage.cjs fails if one is missing).
+export const LATER_ACT_SPRITES={diver:2,shellguard:2,kettleman:2,lice:2,bosun:2,gateplate:2,salthusk:2,lamplighter:2,pylon:2,pumper:2,sluiceeng:2,ghostcannon:2,mortar:2,deckshade:2,
+ bellnun:2,dummy:2,hauler:2,grell:2,hgunner:2,cantor:2,chorister:2,basso:2};
+export function actPackFiles(){const o={};for(const [id,act] of Object.entries(LATER_ACT_SPRITES))if(SPRITES[id])o[SPRITES[id].f]=act;return o}
+export function actPackURLs(act=3){const f=actPackFiles();return Object.keys(f).filter(u=>f[u]<=act)}
+// Ask the worker to fetch the Act 2/3 pack (acts <= act). No-op for Act 1, without a worker, or on file://.
+export function warmActPack(act){if(!(act>=2)||typeof navigator==='undefined'||!navigator.serviceWorker)return;
+ navigator.serviceWorker.ready.then(reg=>{const w=navigator.serviceWorker.controller||reg.active;w&&w.postMessage({type:'actpack',act})}).catch(()=>{})}
+export function assetURLs(){const later=LATER_ACT_SPRITES;const out=Object.entries(SPRITES).filter(([id])=>!later[id]).map(([,m])=>m.f);for(const [gn,g] of Object.entries(ASSETS))for(const k in g){if(gn==='sprites')continue;const a=assetEntry(gn,k);if(!a)continue;out.push(a.src);if(a.srcset)a.srcset.split(',').forEach(s=>out.push(s.trim().split(/\s+/)[0]))}return [...new Set(out)].filter(u=>!/^(data:|blob:)/.test(u))}
 // Renders an image slot with fallback placeholder. ph = placeholder inner HTML (emoji)
 export function slotHTML(group,key,cls,ph){const a=assetEntry(group,key);
  const img=a?`<img src="${a.src}"${a.srcset?` srcset="${a.srcset}"`:''}${a.sizes?` sizes="${a.sizes}"`:''} alt="" draggable="false" decoding="async" style="object-fit:${a.fit}${a.pos?';object-position:'+a.pos:''}" onerror="assetFail(this)">`:'';
