@@ -415,6 +415,146 @@
    },
    "screenHeightPct": 32,
    "hoverPx": 0
+  },
+  "bosun": {
+   "file": "sprites/bosun.webp",
+   "w": 730,
+   "h": 1359,
+   "bytes": 490566,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.523,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
+   "hoverPx": 0
+  },
+  "gateplate": {
+   "file": "sprites/gateplate.webp",
+   "w": 1009,
+   "h": 998,
+   "bytes": 476254,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.51,
+    "y": 1.0
+   },
+   "screenHeightPct": 30,
+   "hoverPx": 0
+  },
+  "salthusk": {
+   "file": "sprites/salthusk.webp",
+   "w": 416,
+   "h": 1362,
+   "bytes": 363970,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.57,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
+   "hoverPx": 0
+  },
+  "lamplighter": {
+   "file": "sprites/lamplighter.webp",
+   "w": 1604,
+   "h": 1399,
+   "bytes": 790438,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.64,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
+   "hoverPx": 0
+  },
+  "pylon": {
+   "file": "sprites/pylon.webp",
+   "w": 451,
+   "h": 1379,
+   "bytes": 259694,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.548,
+    "y": 1.0
+   },
+   "screenHeightPct": 40,
+   "hoverPx": 0
+  },
+  "pumper": {
+   "file": "sprites/pumper.webp",
+   "w": 1640,
+   "h": 1094,
+   "bytes": 741634,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.585,
+    "y": 1.0
+   },
+   "screenHeightPct": 36,
+   "hoverPx": 0
+  },
+  "sluiceeng": {
+   "file": "sprites/sluiceeng.webp",
+   "w": 1273,
+   "h": 1340,
+   "bytes": 776930,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.368,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
+   "hoverPx": 0
+  },
+  "ghostcannon": {
+   "file": "sprites/ghostcannon.webp",
+   "w": 1706,
+   "h": 511,
+   "bytes": 499880,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.485,
+    "y": 1.0
+   },
+   "screenHeightPct": 34,
+   "hoverPx": 0
+  },
+  "mortar": {
+   "file": "sprites/mortar.webp",
+   "w": 1149,
+   "h": 948,
+   "bytes": 437420,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.504,
+    "y": 1.0
+   },
+   "screenHeightPct": 30,
+   "hoverPx": 0
+  },
+  "deckshade": {
+   "file": "sprites/deckshade.webp",
+   "w": 742,
+   "h": 1224,
+   "bytes": 329460,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.473,
+    "y": 1.0
+   },
+   "screenHeightPct": 44,
+   "hoverPx": 0
   }
  }
 }

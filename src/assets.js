@@ -66,7 +66,9 @@ export const ASSETS={
    // Task 21 delivery sprites: all six passed technical and game-fit art review.
    penitent:'penitent',mender:'mender',heap:'heap',limpet:'limpet',novice:'novice',tenant:'tenant',
    // Act 2 sprites that passed the independent 9.0 gate (art review enemies-round6): Riveted Diver, Shellback Guard, Kettleman, Lice.
-   diver:'diver',shellguard:'shellguard',kettleman:'kettleman',lice:'lice'}},
+   diver:'diver',shellguard:'shellguard',kettleman:'kettleman',lice:'lice',
+   // v0.6.35: Press-Gang Bosun passed the 9.0 gate (art review enemies-round16).
+   bosun:'bosun',gateplate:'gateplate',salthusk:'salthusk',lamplighter:'lamplighter',pylon:'pylon',pumper:'pumper',sluiceeng:'sluiceeng',ghostcannon:'ghostcannon',mortar:'mortar',deckshade:'deckshade'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.
