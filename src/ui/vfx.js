@@ -5,6 +5,7 @@
 //  • shakeFrames  decaying screen shake keyframes; slowmo; snapshot crossfade; flyIcon (reward -> HUD)
 // Everything is transform / opacity (canvas for particles). Quality follows the Effects option (env.quality()).
 import {settings} from '../save.js';
+import {rigFreeze} from './rig.js';
 import {quality,envWillChange} from './env.js';
 import {T,U} from '../core/timing.js';
 const mq=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
@@ -83,7 +84,7 @@ export function shakeFrames(amp){const n=7,f=[];for(let i=0;i<=n;i++){const k=1-
 export function slowmo(ms=400,rate=.5){if(!motionOn()||!document.getAnimations)return;ms=T(ms);const list=document.getAnimations();
  list.forEach(a=>{try{a.updatePlaybackRate(rate)}catch(_){}});setTimeout(()=>list.forEach(a=>{try{a.updatePlaybackRate(1)}catch(_){}}),ms)}
 // ---------- hit-stop for idle loops: pause the CSS animations under `el` for `ms` ----------
-export function freezeIdle(el,ms){if(!el||!el.getAnimations)return;ms=T(ms);const as=el.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);
+export function freezeIdle(el,ms){if(!el||!el.getAnimations)return;ms=T(ms);rigFreeze(el,ms);const as=el.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);
  as.forEach(a=>a.pause());setTimeout(()=>as.forEach(a=>{try{a.play()}catch(_){}}),ms)}
 // ---------- impact timing: damage numbers and reactions land when the swing connects ----------
 let base=0,counts={};

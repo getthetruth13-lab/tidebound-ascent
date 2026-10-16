@@ -3,6 +3,7 @@
 //  (b) a timed ENTRY: {t0,total,apply(elapsed)} that syncCombatAnimations() re-applies to the new DOM with the elapsed time,
 //      so an animation resumes instead of restarting or vanishing when something re-renders mid-flight.
 import {shakeLayers} from './stage.js';
+import {syncRigs} from './rig.js';
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
 import {CARDS} from '../core/registry.js';
@@ -307,6 +308,7 @@ export function syncCombatAnimations(){
   if(!el.style.getPropertyValue('--idle-period'))el.style.setProperty('--idle-phase',`-${(Date.now()+hash*17+i*719)%(3800+hash%1700)}ms`);
   el.style.setProperty('--idle-period',`${3800+hash%1700}ms`);
  });
+ syncRigs();
  syncBars();syncResources();
  flush();
  const now=performance.now();entries=entries.filter(e=>now-e.t0<e.total);

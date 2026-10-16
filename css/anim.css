@@ -117,3 +117,11 @@ body.reduce-motion .combat .remains{animation:none;opacity:1}
  -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 72%,transparent 100%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 72%,transparent 100%)}
 
 .pfx.pfx-shard{-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 92%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 45%,transparent 92%)}
+/* v0.6.27 piece-rig idle (src/ui/rig.js): the rig replaces the single sprite inside .spr-slot; same box, same filters, transform-only motion */
+.spr-slot>.rig{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;contain:layout style}
+.rig-in{position:absolute;left:0;top:0;transform-origin:0 0}
+.rig-in>.rp{position:absolute;display:block;max-width:none;max-height:none;transform-origin:0 0;pointer-events:none;user-select:none;-webkit-user-drag:none;will-change:transform;backface-visibility:hidden}
+.rig-in>.rg{mix-blend-mode:plus-lighter}
+.spr-slot.rigged>img.spr{visibility:hidden;animation:none!important}
+.combat .en .spr-slot>.rig{filter:drop-shadow(-1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(0 0 5px color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent))}
+@media (orientation:landscape){.combat .fig>.slot.spr-slot>.rig{filter:var(--stage-grade) drop-shadow(var(--stage-light) -1px 1px color-mix(in srgb,var(--stage-rim) 38%,transparent)) drop-shadow(0 2px 2px #0008)}}
