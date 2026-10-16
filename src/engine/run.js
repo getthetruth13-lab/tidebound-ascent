@@ -296,12 +296,12 @@ export function bossRelicPick(...args){return savedAction('bossRelicPick',args,(
 export const campfireRelic=id=>!!(RELICS[id]&&RELICS[id].campfire);
 export function relicCandidates(tier){const run=W.run;const nCamp=run.relics.filter(r=>campfireRelic(r.id)).length;
  return Object.values(RELICS).filter(r=>r.tier===tier&&r.phase==='P1'&&!r.stub&&actOK(r)&&!ECON.relicPulled.includes(r.id)&&(!r.cls||r.cls===run.cls)&&!isLocked('relics',r.id)&&!run.seenRelics[r.id]&&!run.relics.some(x=>x.id===r.id)&&!(r.campfire&&nCamp>=2))}
-// Relic rarity roll (C/U/R); an empty tier rolls the next tier up; all empty → null (caller gives 50 gold).
+// Relic rarity roll (C/U/R); an empty tier rolls the next tier up, then down (r→u→c); all empty → null (caller gives 50 gold).
 // Apply ECON.heroHp to the class table (hero select and new runs read CLASSES[cls].hp).
 export function applyHeroHp(){for(const k in ECON.heroHp)if(CLASSES[k])CLASSES[k].hp=ECON.heroHp[k]}
 export function randomRelic(odds=ECON.relicOdds,stream='relics',{tier=null,noCampfire=false}={}){
  let t=tier;if(!t){const x=rnd(stream)*100;t=x<odds.c?'c':x<odds.c+odds.u?'u':'r'}
- const order=t==='shop'?['shop']:TIERS.slice(TIERS.indexOf(t));
+ const order=t==='shop'?['shop']:[...TIERS.slice(TIERS.indexOf(t)),...TIERS.slice(0,TIERS.indexOf(t)).reverse()];
  for(const k of order){const c=relicCandidates(k).filter(r=>!noCampfire||!r.campfire);if(c.length){const r=pick(c,stream);W.run.seenRelics[r.id]=1;return r.id}}
  return null}
 export function hasRelicR(id){return W.run.relics.some(r=>r.id===id)}
