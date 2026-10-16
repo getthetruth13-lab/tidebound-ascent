@@ -111,7 +111,7 @@ function popHTML(){const S=W.S;
  return ''}
 export function openOv(k){if(drag)return;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
 export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(blkT,T(700)),who)}
-export function badges(block,blkT,st,extra,who){const n=alive().length;const limit=who&&typeof who==='object'&&n>1?Math.max(1,Math.min(2,Math.floor((innerWidth*(.98-1720/2340)/(n-.5)+1)/23))):6;return statusRowHTML(st,extra,who,limit)}
+export function badges(block,blkT,st,extra,who){const n=alive().length;const limit=who&&typeof who==='object'&&n>1?Math.max(1,Math.min(2,Math.floor((laneOf(n,innerWidth).cell+1)/23))):6;return statusRowHTML(st,extra,who,limit)}
 // Floating numbers (R12): size scales with the amount (22-40 px), stacked numbers fan out, Guard uses its icon, and a number waits for the swing to connect (x.d).
 const FLN=/^([+-]?)(\d+)/;
 export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x.who===who&&now-x.t<T(x.cls==='curse'?1800:950)+(x.d||0));
@@ -172,7 +172,7 @@ export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:M
 // v0.6.2.1 (Spencer): every battle figure 15% taller; top = feet - H keeps the ground anchor fixed. Head-room and width clamps still apply.
 export const FIG_SCALE=1.15;
 function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const sc=figureScale(role==='boss')*FIG_SCALE;let H=Math.round(Math.min(sc*(role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(role==='hero'?g.heroTop:g.top+32)));
- if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*FIG_SCALE*sp.h/sp.w)); // sprites may grow into the cell gap; HP bars/intents keep the cell width (--bw)
+ if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor((g.spriteMaxWidth||g.enemyMaxWidth)*FIG_SCALE*sp.h/sp.w)); // sprites may grow into the cell gap; HP bars/intents keep the cell width (--bw)
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
  const top=g.feet-H-hov,L=Math.max(4,Math.min(g.vw-W-4,x-Math.round(W*(g.multi?.5:ax)))),fx0=Math.round(W*(g.multi?.5:ax));const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.min(g.vh*260/1080,g.multi?g.enemyMaxWidth:Infinity));
  const shW=Math.round(W*.7*(role==='boss'?1.3:1)*(hov?.55:1));const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px${role!=='hero'&&sp.facing==='right'?';scale:-1 1':''}" onerror="assetFail(this)">`:''}</div>`;
@@ -181,8 +181,11 @@ function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){
  <div class="fig ${shake?'shake':''}" style="width:${W}px;height:${H}px;left:0;top:0;${shake||''}">${img}</div>
  ${intent?`<div class="intentw" style="top:${it}px">${intent}</div>`:''}
  <div class="plate" style="top:${H+hov+2}px">${`<div class="nm">${name}</div>`}${hp}<div class="stw">${badgesH}</div></div>${fx}</div>`}
-function enemyX(i,n,g){if(n===1)return Math.round(g.vw*1720/2340);const a=1720/2340,cell=g.vw*(.98-a)/(n-.5);return Math.round(g.vw*a+cell*i)}
-export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,multi:(n||1)>1,enemyMaxWidth:(n||1)>1?g.vw*((.98-1720/2340)/((n||1)-.5)-.012):g.vw*.43};const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
+// Enemy lane (battle-room-v1): x of the first enemy centre (fraction of width), cell width, sprite width cap. 1-2 foes keep the old narrow lane; crowds start further left and sprites may overlap neighbours by up to ~30-45% (plates keep the cell width).
+const LANE_A=[0,1720/2340,1720/2340,.60,.53,.48,.44];
+export function laneOf(n,vw){n=n||1;const a=n===1?1720/2340:LANE_A[Math.min(n,6)],cell=n>1?vw*(.98-a)/(n-.5):vw*.43,ov=n>=3?1.3:1;return {a,cell,plate:n>1?cell-vw*.012:vw*.43,sprite:n>1?cell*ov-vw*.012:vw*.43}}
+function enemyX(i,n,g){if(n===1)return Math.round(g.vw*1720/2340);const L=laneOf(n,g.vw);return Math.round(g.vw*L.a+L.cell*i)}
+export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();{const L=laneOf(n,g.vw);g={...g,multi:(n||1)>1,enemyMaxWidth:L.plate,spriteMaxWidth:L.sprite}};const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
  const role=e.boss?'boss':e.elite?'elite':'normal';const vi=W.cb.ens.slice(0,i).filter(x=>x.key===e.key).length;
  const flav=ENEMY_FLAVOUR[e.key],nm0=flav?`${e.n}<i class="nmfl">${esc(flav)}</i>`:e.n;
  const name=`${nm0}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}`;const pasH=e.passive?`<span class="pas" title="${esc(e.passive.n+': '+e.passive.text)}">${e.passive.n==='Rooted'?iconHTML('status','rooted','🌿'):'🌿'}${e.passive.n}</span>`:'';
@@ -194,7 +197,7 @@ export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const cb
   badgesH:W.cb?badges(0,0,{...cb.p.st,...(cb.parry&&!cb.parryUsed?{parry:cb.parry}:{})},playerStates(),'p'):'',fx:W.cb?fxHTML('p'):'',cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
 // Painted fallen-remains of a foe (B061): lies where it fell, same foot line and slot as the standing figure. e = a live enemy or a snapshot {key,sv,vi,boss,elite,ph,remT}.
 // It fades in as the death animation ends (CSS animation delay, resumed from remT so re-renders never restart it) and never blocks a tap.
-export function remainsHTML(e,k,n,g,vi){if(e.gap)return '';g=g||sceneGeom();const multi=(n||1)>1,mw=multi?g.vw*((.98-1720/2340)/((n||1)-.5)-.012):g.vw*.43;
+export function remainsHTML(e,k,n,g,vi){if(e.gap)return '';g=g||sceneGeom();const multi=(n||1)>1,mw=laneOf(n,g.vw).sprite;
  const sp=spriteFor('enemies',e.key,e.sv!=null?e.sv:vi||0),fa=fallenFor(sp,e);if(!fa)return '';
  const sc=figureScale(!!e.boss),H=Math.round(Math.min(sc*(e.boss?g.vh*.44:e.elite?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(g.top+32)));
  const x=enemyX(k,n||1,g);let w=Math.round(Math.max(H*(sp?sp.w/sp.h:.8),H*.9)*(e.boss?.92:.85));w=Math.min(w,Math.round(mw*.96),Math.round(g.vw*.4));const h=Math.round(w*fa.h/fa.w);
