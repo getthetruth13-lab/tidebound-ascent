@@ -25,10 +25,13 @@ export const miniGauge=v=>`<span class="mg" aria-hidden="true"><i class="mg-tube
 // o.over = extra overlay HTML (mini gauge, sigil). Relic / potion art sits on a painted ledge (cls k-relic / k-potion).
 export function tileHTML(o){const info=o.info?esc(o.info):'';const cat=catOf(o.id,o.cls);
  const itemKind=o.art&&/\bk-(relic|potion)\b/.exec(o.cls||'');
- const ledge=itemKind&&TILES['tile-ledge']?.ready?TILES['tile-ledge']:null;
- const art=itemKind?emblemHTML('reward-'+itemKind[1],'')+(ledge?`<img class="ledgeimg" src="${ledge.path}" alt="" draggable="false">`:'')+o.art:o.art||emblemHTML(o.id,o.emoji);
+ // Relic / potion tiles: the painted pedestal scene (reward-relic / reward-potion) fills the art area, and the item's own painted icon
+ // stands on it, large and centred, as an in-flow block that takes all the room above the name plate (so it can never shrink to a
+ // corner or leave a black void). The full 256px icon is used (the 64px HUD file is the fallback).
+ const big=itemKind?o.art.replace(/src="([^"]+)-64\.webp"/,'src="$1.webp" data-sm="$1-64.webp"').replace(/onerror="assetFail\(this\)"/,`onerror="if(this.dataset.sm){this.src=this.dataset.sm;this.dataset.sm=''}else assetFail(this)"`):'';
+ const art=itemKind?emblemHTML('reward-'+itemKind[1],''):o.art||emblemHTML(o.id,o.emoji);
  return `<button ${o.eid?`id="${o.eid}" `:''}class="tile sp cat-${cat} ${o.cls||''}${o.on?' on':''}${o.done?' done':''}" ${o.click&&!o.disabled?`onclick="${o.click}"`:''} ${o.disabled?'disabled':''} ${info?`data-info="${info}"`:''}${o.tid?` data-tid="${esc(o.tid)}"`:''}>
- <span class="tart${ledge?' has-ledge':''}">${art}</span><i class="tglow"></i>${o.over||''}${o.tag?`<i class="ttag">${o.tag}</i>`:''}<span class="tname">${o.name}</span><span class="tsum">${o.sum||''}</span>${o.done?'<span class="tck">✔</span>':''}</button>`}
+ <span class="tart">${art}</span><i class="tglow"></i>${o.over||''}${o.tag?`<i class="ttag">${o.tag}</i>`:''}${itemKind?`<span class="ticon">${big}</span>`:''}<span class="tname">${o.name}</span><span class="tsum">${o.sum||''}</span>${o.done?'<span class="tck">✔</span>':''}</button>`}
 export const tilesRow=(tiles,cls='')=>`<div class="tiles ${cls}${tiles.length>4?' many':''}" style="--n:${tiles.length}">${tiles.join('')}</div>`;
 // ---- label parsing for text options ("🎲 Spin the wheel (roll 1d6)", "🌙 Moon Shell: Tide 5") ----
 const EMO=/^((?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:️|‍\p{Extended_Pictographic}|\p{Emoji_Modifier})*)\s*/u;
@@ -58,7 +61,11 @@ export function optionHTML(o,click,extra={}){const label=typeof o.l==='function'
 export function fitTileNames(root=document){for(const el of root.querySelectorAll('.tile .tname')){if(!el.isConnected||!el.offsetWidth)continue;el.style.fontSize='';el.classList.remove('fit');
  const tile=el.closest('.tile');const max=()=>Math.min(el.parentElement.clientWidth,tile?tile.clientWidth:1e9);
  let fs=parseFloat(getComputedStyle(el).fontSize),n=0;const over=()=>el.scrollWidth>el.clientWidth+1||el.offsetWidth>max()+1||el.scrollHeight>fs*2.6;
- if(!over())continue;el.classList.add('fit');while(over()&&fs>7&&n++<20){fs-=0.5;el.style.fontSize=fs+'px'}}}
+ if(!over())continue;el.classList.add('fit');while(over()&&fs>7&&n++<20){fs-=0.5;el.style.fontSize=fs+'px'}}
+ fitTileSums(root)}
+// Tile summaries never end in a clipped line: when the text needs more lines than the tile allows, shrink it until it all shows.
+export function fitTileSums(root=document){for(const el of root.querySelectorAll('.tile.sp .tsum')){if(!el.isConnected||!el.offsetWidth||!el.textContent)continue;el.style.fontSize='';
+ let fs=parseFloat(getComputedStyle(el).fontSize),n=0;const over=()=>el.scrollHeight>el.clientHeight+1;while(over()&&fs>8&&n++<24){fs-=0.5;el.style.fontSize=fs+'px'}}}
 if(typeof window!=='undefined'&&typeof MutationObserver!=='undefined'){let q=0;const run=()=>{q=0;try{fitTileNames()}catch{}};
  const go=()=>new MutationObserver(()=>{if(!q)q=requestAnimationFrame(run)}).observe(document.body,{childList:true,subtree:true});
  if(document.body)go();else addEventListener('DOMContentLoaded',go);addEventListener('resize',()=>{if(!q)q=requestAnimationFrame(run)})}

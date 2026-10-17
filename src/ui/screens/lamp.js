@@ -129,9 +129,9 @@ export function lampSummaryHTML(sum){if(!sum)return '';const K=CLASSES[sum.cls],
 // ---------- Lantern Tasks overlay (opened from the 🏮 button): one illustrated card per task, with progress ----------
 export function tasksHTML(){const L=W.run&&W.run.lamp;if(!L)return '';
  const card=t=>{const T=TASKS[t.id],pr=!t.done&&taskProgress(t.id),who=T.cls==='any'?'Any climb':CLASSES[T.cls].n;
-  return `<div class="lp-task tile sp cat-dusk static${t.done?' done lit':''}" data-task="${t.id}"><span class="tart">${emblemHTML(t.done?'lamp-task-lit':'lamp-task-dark',t.done?'🏮':'🕯️')}</span><i class="tglow"></i><span class="tsig" data-info="${tesc(who)}">${emblemHTML('lamp-class-'+T.cls,T.cls==='any'?'🧭':CLASSES[T.cls].e,'sig')}</span><span class="tname">${who}</span><span class="tsum">${T.n}</span>
-  ${pr?`<span class="lp-pg"><i style="width:${Math.round(pr[0]/pr[1]*100)}%"></i><em>${pr[0]} / ${pr[1]}</em></span>`:`<span class="lp-st">${t.done?glyph('check')+' Lit · +15':'Unlit'}</span>`}</div>`};
- return `<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box tilebox lp-taskbox"><h2>🏮 Lantern Tasks</h2><div class="muted csub">Optional. Each lantern lit is +15 Lamplight when the run ends. Missing them costs nothing.</div>
+  return `<div class="lp-task tile sp cat-dusk static${t.done?' done lit':''}" data-task="${t.id}"><span class="tart">${emblemHTML(TILES['lamp-task-'+t.id]?.ready?'lamp-task-'+t.id:(t.done?'lamp-task-lit':'lamp-task-dark'),'')}</span><i class="tglow"></i><span class="tsig" data-info="${tesc(who)}">${emblemHTML('lamp-class-'+T.cls,T.cls==='any'?'🧭':CLASSES[T.cls].e,'sig')}</span><span class="tname">${who}</span><span class="tsum">${T.n}</span>
+  ${pr?`<span class="lp-pg"><i style="width:${Math.round(pr[0]/pr[1]*100)}%"></i><em>${pr[0]} / ${pr[1]}</em></span>`:t.done?`<span class="lp-st">${glyph('check')} Lit · +15</span>`:''}</div>`};
+ return `<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box tilebox lp-taskbox"><h2>Lantern Tasks</h2><div class="muted csub">Optional. Each lantern lit is +15 Lamplight when the run ends. Missing them costs nothing.</div>
  <div class="tiles lp-tasktiles" style="--n:${L.tasks.length}">${L.tasks.map(card).join('')}</div><button class="btn full">Close</button></div></div>`}
 export const lampBtnLabel=()=>{const L=W.run&&W.run.lamp;return L?L.tasks.filter(t=>t.done).length+'/'+L.tasks.length:''};
 // ---------- title lighthouse + layered menu scene (design/lore/LORE-BIBLE.md §17.4) ----------

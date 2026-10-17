@@ -381,7 +381,7 @@ function pickCancelImpl(){const S=W.S;if(S.cancel)S.cancel();else S.then(null)}
 function openChestImpl(){const run=W.run;const c=wpick(ECON.chest.map(x=>[x,x.w]),'relics');const rows=[];
  const id=randomRelic(c.rel);rows.push(id?{k:'relic',id}:{k:'gold',n:50,note:'(no relics left)'});
  if(rnd('relics')*100<c.gold[0])rows.push({k:'gold',n:rng(c.gold[1],c.gold[2],'relics')});
- W.S={screen:'chest',chest:c.k,name:c.n,rows,opened:false,t:Date.now()};render()}
+ W.S={screen:'chest',chest:c.k,name:(c.k==='small'&&(run.act||1)>1)?'Weathered Chest':c.n,rows,opened:false,t:Date.now()};render()}
 function openChestLidImpl(){if(W.S.screen!=='chest')return;W.S.opened=true;W.S.openT=Date.now();render()}
 // ================= camps (§1.8) =================
 export function campOptions(){const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${Math.floor(W.run.max*mod('mendFrac',{},ECON.mend))} HP (${Math.round(mod('mendFrac',{},ECON.mend)*100)}% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];

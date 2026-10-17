@@ -35,12 +35,7 @@
 .hplate .hp-logbtn{top:-64px;height:48px;min-height:48px;width:48px;min-width:48px}
 /* Cartographer "4 cards" hint: sits left of the enemy intent row, never over it. */
 .coach.hero-hint{left:38%;max-width:min(42vw,340px);text-align:center}
-/* Reward tiles over the battle scene (compact row): no hard-cropped ledge strip behind the name. The potion / relic is shown as
-   its own painted icon with a soft shadow, and the POTION / RARE tag sits clear of it. */
-.pk-rewards.vic .rewtiles .tile.sp:is(.k-potion,.k-relic) .tart>.emb,.pk-rewards.vic .rewtiles .tile.sp .tart .ledgeimg{display:none}
-.pk-rewards.vic .rewtiles .tile.sp:is(.k-potion,.k-relic) .tart{background:none}
-.pk-rewards.vic .rewtiles .tile.sp:is(.k-potion,.k-relic) .tart .tslot{top:3px!important;left:calc(50% - 12px)!important;width:24px!important;height:24px!important;filter:drop-shadow(0 2px 3px #000) drop-shadow(0 0 8px #000a)}
-.pk-rewards.vic .rewtiles .tile.sp .ttag{top:5px;left:8px;font-size:9.5px;background:none;border:0}
+/* (reward tile relic/potion art: moved to ui-frames.css section 6, reward-tiles fix 2026-10-13) */
 /* A defeated foe's leftover element never takes taps meant for the reward rows behind it. */
 .en.gone,.en.gone *{pointer-events:none!important}
 /* The boss's death plays on behind the reward rows, never over them. */

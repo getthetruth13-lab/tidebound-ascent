@@ -101,14 +101,16 @@ export function toastsHTML(){const now=Date.now();const t=(W.toasts||[]).filter(
 export function potionTap(i){if(drag)return;const id=W.run.potions[i];if(!id){W.S.potion=null;return render()}W.S.potion=W.S.potion===i?null:i;W.S.relicView=null;render()}
 export function relicTap(id){if(drag)return;W.S.relicView=W.S.relicView===id?null:id;W.S.potion=null;render()}
 export function closePop(){W.S.potion=null;W.S.relicView=null;render()}
+// ui-fix-a #13/#14: popups show the 256px painting, not the 64px HUD icon.
+const bigArt=h=>h.replace(/-64\.webp/g,'.webp').replace(/ srcset="[^"]*"/,'');
 function popHTML(){const S=W.S;
  if(S.potion!=null&&W.run.potions[S.potion]){const id=W.run.potions[S.potion],p=POTIONS[id];const can=canDrink(id);const tg=potionNeedsTarget(id);
   const why=!W.cb&&!p.outside?'Use it in combat':p.passive?'Works automatically when you would die':W.cb&&(W.cb.busy||W.cb.mode)?'Wait for your turn':!can?'Can\'t use this here':'';
-  return `<div class="pop potpop" id="potpop" onclick="event.stopPropagation()"><div class="itemhead">${slotHTML('potions',id,'itemart',p.e)}<div><b>${p.n}</b> <span class="muted">${RARN[p.rarity]}${p.cls?' · '+CLASSES[p.cls].n:''}</span><div>${p.d}</div></div></div>
-  ${tg&&can&&W.cb?`<div class="muted">Targets: ${curTgt()?curTgt().n:'—'} (tap an enemy first to change)</div>`:''}<div class="row"><button class="btn pri" id="drinkbtn" ${can?'':'disabled'} onclick="drinkPotion(${S.potion});W.S.potion=null;render()">${can?'Drink':why}</button><button class="btn" id="discardpot" onclick="discardPotion(${S.potion})">Discard</button><button class="btn" onclick="closePop()">✕</button></div></div>`}
+  return `<div class="pop potpop" id="potpop" onclick="event.stopPropagation()"><div class="itemhead">${bigArt(slotHTML('potions',id,'itemart',p.e))}<div><b>${p.n}</b> <span class="muted">${RARN[p.rarity]}${p.cls?' · '+CLASSES[p.cls].n:''}</span><div>${p.d}</div></div></div>
+  ${tg&&can&&W.cb?`<div class="muted">Targets: ${curTgt()?curTgt().n:'—'} (tap an enemy first to change)</div>`:''}<div class="row">${can?`<button class="btn pri" id="drinkbtn" onclick="drinkPotion(${S.potion});W.S.potion=null;render()">Drink</button>`:`<span class="pop-hint" id="drinkwhy">${why}</span>`}<button class="btn" id="discardpot" onclick="discardPotion(${S.potion})">Discard</button></div><button class="pop-x" onclick="closePop()" aria-label="Close">×</button></div>`}
  if(S.relicView==='__all')return `<div class="pop relpop relic-collection" id="relpop"><button class="relic-close" onclick="closePop()" aria-label="Close relics">×</button><h2>Relics</h2>${relicCollectionHTML()}</div>`;
  if(S.relicView){const ch=S.relicView.startsWith('charm:');const d=ch?CHARMS[S.relicView.slice(6)]:RELICS[S.relicView];const r=!ch&&W.run.relics.find(x=>x.id===S.relicView);
-  if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${slotHTML('relics',S.relicView,'itemart',d.e)}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${relicFlavour(d.id||S.relicView,d.flavour)}</div>`:''}</div>`}
+  if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${bigArt(slotHTML('relics',S.relicView,'itemart',d.e))}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${relicFlavour(d.id||S.relicView,d.flavour)}</div>`:''}</div>`}
  return ''}
 export function openOv(k){if(drag)return;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
 export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(blkT,T(700)),who)}
@@ -349,11 +351,11 @@ const sxSeg=(id,label,vals,cur,fn)=>`<div class="sx-row"><span class="sx-t">${la
 const sxRange=(id,label,key,val)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-rng" id="${id}" aria-label="${label} volume" type="range" min="0" max="1" step="0.01" value="${val}" style="--p:${Math.round(val*100)}%" oninput="this.style.setProperty('--p',this.value*100+'%');setAudioSetting('${key}',this.value)"></label>`;
 export function settingsHTML(){return `<div class="settings sx">
  <div class="sx-row sx-howto"><span class="sx-t">Rules, heroes and tips</span><button type="button" class="btn sm" id="howtobtn" onclick="openHowTo()">How to Play</button></div>
- ${sxSeg('setanimspeed','Animation speed',Object.keys(SPEEDS).map(v=>[v,SPEED_LABEL[v]]),settings.animSpeed||'normal','setAnimSpeed')}
+ ${sxSeg('setanimspeed','Animation speed',[...Object.keys(SPEEDS).map(v=>[v,SPEED_LABEL[v]]),['instant','Instant']],settings.fastAnim?'instant':settings.animSpeed||'normal','setAnimSpeed')}
  ${sxSeg('setenemypace','Enemy turns',[['measured','Measured'],['classic','Fast']],settings.enemyPace||'measured','setEnemyPaceMode')}
  ${sxSeg('setenvfx','Effects',['full','reduced','off'].map(v=>[v,envFxSettingLabel(v)]),settings.envFx,'setEnvFx')}
  ${sxRange('setmusic','Music','musicVolume',settings.musicVolume)}${sxRange('setsfx','SFX','sfxVolume',settings.sfxVolume)}
- ${sxSw('setfast','Fast animations',settings.fastAnim,'setFast')}${sxSw('setmute','Mute audio',settings.audioMuted,'setMute')}
+ ${sxSw('setmute','Mute audio',settings.audioMuted,'setMute')}
  ${sxSw('sethints','First-fight hints',settings.coach!==false,'setCoach')}${sxSw('setctxhints','Hero and rules hints',settings.hints!==false,'setCtxHints')}${sxSw('setcardskip','Confirm skipping card rewards',settings.confirmCardSkip!==false,'setConfirmCardSkip')}
  ${sxSw('setshake','Screen shake',settings.screenShake!==false,'setScreenShake')}${sxSw('sethaptic','Hand vibration',settings.handHaptic!==false,'setHandHaptic')}
  ${sxSw('settaptwice','Tap twice to confirm',!!settings.tapConfirm,'setTapConfirm')}
@@ -374,7 +376,8 @@ export function setHandHaptic(on){settings.handHaptic=!!on;saveSettings()}
 export function setTapConfirm(on){settings.tapConfirm=!!on;saveSettings()}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
 export function setEnemyPaceMode(v){settings.enemyPace=v==='classic'?'classic':'measured';setEnemyPace(settings.enemyPace);saveSettings()}
-export function setAnimSpeed(v){settings.animSpeed=SPEEDS[v]?v:'normal';setAnimSpeedValue(settings.animSpeed);saveSettings()}
+// ui-fix-a: the old separate "Fast animations" switch (skip animations) is the Instant step of Animation speed; other steps turn it off.
+export function setAnimSpeed(v){if(v==='instant'){setFast(true);settings.animSpeed='fast'}else{setFast(false);settings.animSpeed=SPEEDS[v]?v:'normal'}setAnimSpeedValue(settings.animSpeed);saveSettings()}
 export function setEnvFx(v){settings.envFx=v;saveSettings();render()}
 // Act I title card (design-v2 §W.5, art/v2/bg/_src/tc-a1-spec.json): the painted plate (frame + emblem, 60% of the screen width, centred) fades in
 // at 0.8 s over the tr_start travel scene; title + subtitle are HTML text inside the plate's dark panel (text_panel rect). Text fallback if the file fails.
@@ -398,7 +401,8 @@ function rowHTML(r,i,click){const done=!!r.done,c=done?'':`${click}(${i})`;
  if(r.k==='gold')return tileHTML({id:'reward-gold',emoji:'💰',name:`${r.n} gold`,sum:r.note||'Into your purse.',cls:'k-gold',click:c,done,disabled:done,tid:'row'+i,info:`${r.n} gold: spend it at the merchant.`});
  if(r.k==='relic')return relicTile(r.id,{click:c,done,disabled:done,sum:RELICS[r.id].d});
  if(r.k==='potion')return potionTile(r.id,{click:c,done,disabled:done});
- if(r.k==='artifact'){const artifactShort=t=>{t=String(t||'').replace(/<[^>]+>/g,'').trim();return t.length>80?t.slice(0,t.lastIndexOf(' ',77)).replace(/[.,;:]+$/,'')+'…':t};const d=CARDS[r.id];return tileHTML({id:'reward-artifact',emoji:d.e,art:cardArtHTML(r.id,d,false),name:d.n,sum:r.done?'taken':artifactShort(d.text),cls:'k-artifact',click:c,done,disabled:done,tid:'row'+i,info:d.n+' (Artifact, '+TYPEN[d.t]+'): '+d.text+' Artifacts are shared rare cards; you can carry 3.'})}
+ if(r.k==='artifact'){const artifactShort=t=>String(t||'').replace(/<[^>]+>/g,'').trim(); // full text; fitTileSums shrinks it to fit (no ellipsis)
+const d=CARDS[r.id];return tileHTML({id:'reward-artifact',emoji:d.e,art:cardArtHTML(r.id,d,false),name:d.n,sum:r.done?'taken':artifactShort(d.text),cls:'k-artifact',click:c,done,disabled:done,tid:'row'+i,info:d.n+' (Artifact, '+TYPEN[d.t]+'): '+d.text+' Artifacts are shared rare cards; you can carry 3.'})}
  return tileHTML({id:'reward-cards',emoji:'🂠',name:r.took?`Took ${CARDS[r.took].n}`:r.skipped?'Skipped':'Choose a card',sum:r.took||r.skipped?'':`Add 1 of ${r.cards.length} to your deck.`,cls:'k-cards',click:c,done,disabled:done,tid:'row'+i,info:'Card reward: pick one card for your deck, or skip.'})}
 // The battle scene stays behind the reward tiles (B061): the hero, the fallen foes' remains, a soft dim. No separate victory screen.
 function victorySceneHTML(S){const g=sceneGeom(),f=S.scene.foes;
@@ -549,7 +553,7 @@ export function render(){if(W.previewing||W.replaying)return;tutSync();if(drag||
  else if(W.S.ov==='settings'){h+=`<div class="ov" id="ovl" onclick="if(event.target===this){W.S.ov=null;render()}"><div class="box plain"><h2>Settings</h2>${settingsHTML()}<button class="btn full" onclick="W.S.ov=null;render()">Close</button></div></div>`}
  else if(W.S.ov&&W.run){const cb=W.cb;const list=W.S.ov==='deck'?W.run.deck:cb?(W.S.ov==='draw'?(W.run.cls==='carto'?cb.draw:cb.draw.slice().sort((a,b)=>a.id<b.id?-1:1)):W.S.ov==='disc'?cb.disc:cb.exh):[];
   const t={deck:'Your deck',draw:W.run.cls==='carto'?'Draw pile (in order: face up)':'Draw pile (order hidden)',disc:'Discard pile',exh:'Sunk this combat'}[W.S.ov];
-  h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><h2>${t} (${list.length})</h2><div class="grid small">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div><button class="btn full">Close</button></div></div>`}
+  h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><div class="dk-head"><h2>${t} (${list.length})</h2><button class="btn dk-close">Close</button></div><div class="grid small dk-grid">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div></div></div>`}
  if(inspecting)h+=inspectHTML();
  const prev=a.dataset.screen;const changed=prev!==s;
  if(changed){a.dataset.screen=s;runScreenCleanups();screenChange(a,prev,s)}
@@ -561,7 +565,10 @@ export function render(){if(W.previewing||W.replaying)return;tutSync();if(drag||
  fitRelics();decorateCardRefs(a);decorateKeywords(a);fitCards(a);if(inspecting)placeHeldInspect();if(s==='pick')updateCardSelection();
  if(s==='combat'){layoutHand();placeDetail();syncTapArm()}
  syncEnv();syncStage();syncAudio();syncCombatAnimations();
- if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
+ if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}
+ // ui-fix-a #3: the map overlay opens on the current floor, not on the lighthouse at the top.
+ if(W.S.ov==='map'&&mapOvShown!==W.run){mapOvShown=W.run;const box=a.querySelector('.mapbox'),n=box&&(box.querySelector('.node.cur')||box.querySelector('.node.av')||box.querySelector('.node[data-r="0"]'));if(n){const br=box.getBoundingClientRect(),nr=n.getBoundingClientRect();box.scrollTop+=nr.top-br.top-box.clientHeight/2}}else if(W.S.ov!=='map'&&mapOvShown){mapOvShown=null;const bx=a.querySelector('.ov .box');if(bx)bx.scrollTop=0}}
+let mapOvShown=null;
 // Fit text within the printed frame areas; never grow a panel into the illustration.
 const fittedCards=new WeakMap(),fitCache=new Map();let fitEpoch=0;
 function fitSignature(c){return [fitEpoch,innerWidth,innerHeight,devicePixelRatio,c.dataset.id,c.dataset.up,

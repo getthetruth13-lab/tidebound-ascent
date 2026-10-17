@@ -51,7 +51,7 @@ function heroHTML(k,i,foc){const S=STAGE[k],K=CLASSES[k],lk=lockedK(k)||beating.
  <span class="st-slab cs-name"><b data-n="${K.n}">${K.n}</b><i>${lk?'Locked':HEROES[k].epithet}</i></span></button>`}
 function loreHTML(k){const K=CLASSES[k],C=CHARSEL[k],S=STAGE[k];
  if(lockedK(k))return `<div class="cs-lore locked" data-cls="${k}" style="--x:${S.x}"><p class="cs-epi">Locked</p><p class="cs-l" style="--l:0">${HERO_LOCKS[k]?.hint||'Not yet.'}</p><i class="cs-thread"></i></div>`;
- return `<div class="cs-lore theme-${TH[k]}" data-cls="${k}" style="--x:${S.x};--tint:${S.tint}" role="note" aria-label="About ${K.n}"><p class="cs-epi">${HEROES[k].epithet}</p>${C.lore.map((l,j)=>`<p class="cs-l" style="--l:${j}">${l}</p>`).join('')}
+ return `<div class="cs-lore theme-${TH[k]}" data-cls="${k}" style="--x:${S.x};--tint:${S.tint}" role="note" aria-label="About ${K.n}">${C.lore.map((l,j)=>`<p class="cs-l" style="--l:${j}">${l}</p>`).join('')}
  <div class="cs-tags">${C.tags.map(([ic,w],j)=>`<span style="--l:${j+2}">${icon(CS_ICON[ic])}<b>${w}</b></span>`).join('')}</div><i class="cs-thread"><i class="cs-link"></i></i></div>`}
 export function selectScr(){for(const k of takeHeroNews()){beating.add(k);setTimeout(()=>{beating.delete(k);charselUnlockBeat(k)},U(700))}
  const S=W.S,foc=S.hero&&CLASSES[S.hero]?S.hero:null,sel=foc&&!lockedK(foc);

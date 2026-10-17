@@ -1,0 +1,96 @@
+/* ===== ui-fix-a (UI audit group A, 2026-10-13). Loaded last. ===== */
+/* A1/A4: the map parchment fills every aspect ratio: no black side voids, no band under the shore, no stepped seam.
+   The page spans the full viewport, the painted mid strip covers the whole width (oversized so the ink splat stays off the edge),
+   and the calibrated top/bottom plates feather into that strip on their left/right edges instead of ending in a hard step. */
+html:has(.page.mappage){min-height:100%;background:url("../art/v2/bg/map-a1-mid@2x.webp") center top/max(118vw,1100px) auto repeat-y,#e6d6b0!important}
+.page.mappage{max-width:none!important;width:100%;margin:0;padding-left:0;padding-right:0;padding-bottom:0}
+.mappage .parch{width:100vw!important;margin:8px 0 0 calc(50% - 50vw)!important;background:transparent!important;box-shadow:none!important;border:0!important;padding-bottom:24px}
+.mappage .parch::before,.mappage .parch::after{display:none!important}
+.mapwrap.a1 .a1art{-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+/* A6: nodes never sit half-hidden under the top bar: denser painted dusk backing behind bar + relic row, and scroll padding so
+   auto-scroll keeps the reachable row clear of the HUD. */
+html:has(.page.mappage){scroll-padding-top:calc(160*var(--hud-unit,1px))}
+@media(orientation:landscape){.page.mappage.runhud::before{background:linear-gradient(#0b0e14f5,#0b0e14e0 62%,#0b0e1400)!important}}
+html:has(.page.mappage) #env,html:has(.page.mappage) #env-front{visibility:hidden}
+/* A10: each Lantern Task has its own painting; an unlit task shows that painting dimmed and cold (no "Unlit" text), a lit one at full warmth. */
+.lp-task:not(.done) .tart img{filter:grayscale(.6) brightness(.62) contrast(1.05)}
+.lp-task.done .tart img{filter:saturate(1.1) brightness(1.08)}
+/* A8: settings controls are painted art matching the bronze window frame (art/v2/ui/controls: Grok Imagine, same pipeline as ui-frames).
+   Toggle = carved bronze slot + gold knob (off: knob left, dulled; on: knob right, lit). Slider = engraved bronze rail + the same knob.
+   Selector = the painted tarnished-gold button plate for the chosen step; other steps sit on the dark plate, engraved text only. */
+.sx-sw{width:54px!important;height:26px!important;border:0!important;border-radius:0!important;background:url(../art/v2/ui/controls/toggle-track.webp) center/100% 100% no-repeat!important;box-shadow:none!important}
+.sx-sw::before{top:50%!important;left:3px!important;width:22px!important;height:22px!important;margin-top:-11px;background:url(../art/v2/ui/controls/knob.webp) center/100% 100% no-repeat!important;box-shadow:0 1px 3px #000c!important;filter:grayscale(.75) brightness(.6)}
+.sx-sw:checked::before{transform:translateX(26px)!important;filter:none}
+.sx-rng{height:26px!important}
+.sx-rng::-webkit-slider-runnable-track{height:12px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(90deg,#d9b46aaa var(--p,50%),transparent var(--p,50%)) 8px 50%/calc(100% - 16px) 3px no-repeat,url(../art/v2/ui/controls/slider-track.webp) center/100% 100% no-repeat!important}
+.sx-rng::-webkit-slider-thumb{width:22px!important;height:22px!important;margin-top:-5px!important;border:0!important;border-radius:50%;background:url(../art/v2/ui/controls/knob.webp) center/100% 100% no-repeat!important;box-shadow:0 1px 4px #000c!important}
+.sx-rng::-moz-range-track{height:12px;border:0;background:url(../art/v2/ui/controls/slider-track.webp) center/100% 100% no-repeat}
+.sx-rng::-moz-range-progress{height:3px;background:#d9b46aaa}
+.sx-rng::-moz-range-thumb{width:22px;height:22px;border:0;background:url(../art/v2/ui/controls/knob.webp) center/100% 100% no-repeat}
+.sx-seg{border:0!important;border-radius:0!important;background:none!important;overflow:visible!important;gap:2px}
+.sx-seg button{position:relative;isolation:isolate;border:0!important;background:none!important;color:#d9c79a!important;text-shadow:0 1px 2px #000!important;padding:0 10px!important}
+.sx-seg button::before{content:'';position:absolute;inset:0;z-index:-1;border-style:solid;border-width:7px 9px;border-image:url(../art/v2/ui/frames/btn-plate.webp) 26 28 fill / 7px 9px stretch;filter:grayscale(.8) brightness(.32)}
+.sx-seg button.on{color:#2a1a08!important;text-shadow:0 1px 0 #f3d99a88!important}
+.sx-seg button.on::before{filter:none}
+.settings.sx .sx-t{white-space:nowrap}
+.sx-seg button{padding:0 7px!important;min-width:0!important}
+/* A7: title Options rows keep the 44px tap-target minimum (settings-f7 test; FINISH_NONART_3 merge kept v0.6.44 behaviour over the 29px squeeze). */
+@media (max-height:440px){
+ .tb-frame.tb-opt .settings.sx .sx-row{min-height:44px!important;padding-top:0!important;padding-bottom:0!important}
+ .tb-frame.tb-opt .settings label{min-height:44px!important}
+ .tb-frame.tb-opt h2{margin-bottom:2px}
+ .tb-opt .tb-actions{margin-top:2px}
+ .tb-opt .tb-actions .tb-btn{min-height:38px}
+}
+/* A9: card-list windows (deck, draw, discard, sunk): Close is a small painted plate top-right on the title row, the card grid gets the
+   whole area below and scrolls, with a soft fade along its bottom edge so it reads as scrollable. Smaller cards: 6 per row on the phone. */
+.deckbox .dk-head{position:relative;display:flex;align-items:center;justify-content:center;min-height:34px;flex:none;margin:0 0 4px}
+.deckbox .dk-head h2{margin:0!important;padding:0 96px}
+.deckbox .dk-close{position:absolute!important;right:0;top:50%;transform:translateY(-50%);width:auto!important;min-width:0!important;min-height:30px!important;height:30px;padding:0 10px!important;font-size:12px!important;margin:0!important}
+.deckbox .dk-grid{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:22px;
+ -webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent);mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}
+@media (max-height:440px){.deckbox .dk-grid.grid.small{--gw:calc((100% - 52px)/6);gap:8px;padding-top:2px}}
+/* A3: map overlay: the legend wraps inside the box, the header is one act line + legend (flavour line dropped here), and the box
+   opens scrolled to the current floor (render.js). */
+.mapbox .legend{flex-wrap:wrap!important;max-width:100%;box-sizing:border-box;padding:0 8px;row-gap:2px}
+.mapbox .legend>span{white-space:nowrap}
+.mapbox .maplore{display:none}
+.mapbox .parch h2{margin:2px 0 0;font-size:18px}
+.mapbox>.btn.full{position:sticky;bottom:0;z-index:5;width:auto!important;margin:4px auto 0!important;display:block;min-width:180px}
+/* A5: top bar: potions read as bottles (24px), the deck count sits in a painted plate at a readable size; the "Act I" line is gone. */
+.topbar.sts .potions{gap:3px!important;height:auto!important}
+.topbar.sts .potions .potion{width:24px!important;height:24px!important;min-width:24px!important}
+.topbar.sts .potions .potion>*,.topbar.sts .potions .potion img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important}
+.topbar.sts .potions .potion.empty{opacity:.55}
+.topbar.sts #deckbtn{position:relative}
+.topbar.sts .deck-count{position:absolute;right:-6px;bottom:-5px;min-width:16px;height:15px;padding:0 3px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+ font:700 10.5px var(--font-display)!important;color:#2a1a08!important;text-shadow:0 1px 0 #f3d99a88;border-style:solid;border-width:3px 4px;border-image:url(../art/v2/ui/frames/btn-plate.webp) 26 28 fill / 3px 4px stretch}
+/* A12: potion popup: a small painted close knob in the frame corner instead of a full gold slab; "can't drink here" is a one-line hint, not a dead button. */
+.potpop{position:relative}
+.pop-x{position:absolute;top:8px;right:10px;z-index:8;width:30px;height:28px;padding:0;cursor:pointer;background:none;
+ border-style:solid;border-width:6px 7px;border-image:url(../art/v2/ui/frames/btn-plate.webp) 26 28 fill / 6px 7px stretch;filter:drop-shadow(0 1px 3px #000c);
+ font:700 20px/14px var(--font-display)!important;color:#2a1a08!important;text-shadow:0 1px 0 #f3d99a99}
+.pop-x::after{content:'';position:absolute;inset:-7px}
+.potpop .pop-hint{flex:1 1 auto;align-self:center;font:italic 400 14px var(--serif);color:#c9b98e;text-align:center}
+/* A13/A14: big painting in popups (256px source); give the relic name room so it doesn't wrap in a cramped column. */
+.relpop .itemhead,.potpop .itemhead{align-items:center}
+.relpop .itemhead>div:last-child,.potpop .itemhead>div:last-child{min-width:min(300px,52vw);padding-right:30px}
+.relpop .itemhead b,.potpop .itemhead b{white-space:nowrap}
+/* A16: character select: the epithet isn't repeated in the lore page (it's under the name), the header has room above it,
+   and on big screens the lore page scales up instead of floating tiny in a corner. */
+.cs-title{top:14px!important}
+.cs-lore{top:40px}
+@media (min-width:1100px) and (min-height:600px){.cs-lore{zoom:1.35}}
+/* A17: brighter, readable "Choose your Lampbearer" header before a hero is picked. */
+.cs-title{color:#d9c79a!important;font-size:13px!important;text-shadow:0 0 8px #000,0 0 16px #000,0 1px 2px #000!important}
+/* A18: empty Load Game: Back sits centred under the centred message. */
+.tb-load .tb-actions:has(~ *),.tb-load:has(.tb-none) .tb-actions{justify-content:center!important}
+/* A19: disabled title menu entries (no save yet) read as clearly unavailable. */
+.tm-w.off{opacity:.2!important;filter:grayscale(1) brightness(.7)}
+.tb-mi.off,.tb-mi:disabled{opacity:.22!important}
+/* A21: Ledger: the next lamp is marked by a warm painted glow on its lantern (no dashed box); locked cards sit on the painted
+   locked card back instead of a dashed outline over CSS stripes. */
+.lp-node.next .lp-lan::after{display:none!important}
+.lp-node.next .lp-lan{filter:drop-shadow(0 0 6px #ffcf7aaa) drop-shadow(0 0 14px #ffb84a66)}
+.lp-lock:not(.lp-li){border:0!important;border-radius:6px!important;background:#0c1118 url(../art/v2/ui/tiles/lamp-cardback.webp) center/cover no-repeat!important;box-shadow:0 2px 6px #000a,inset 0 0 0 1px #8a744055}
+.lp-lock.lp-li{border:0!important;background:#10161f!important;box-shadow:0 2px 6px #000a,inset 0 0 0 1px #8a744055}

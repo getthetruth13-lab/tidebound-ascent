@@ -101,7 +101,7 @@ export function orbTap(){const cb=W.cb,cls=W.run?.cls;if(!cb||!cls||W.S.screen!=
  if(cb.busy||cb.enemyTurn||performance.now()-lastLand<250)return;
  const m=meterOf(cb,cls);if(!m.manual)return;
  if(cls==='duel'){if(!cb.armFlourish&&!m.ready)return fizzle(cls,`Needs ${flourishMin()} Momentum`);playSound(cb.armFlourish?'cancel':'steel',cb.armFlourish?1:1.4);window.armFlourish?.();return}
- if(cls==='echo'){if(!cb.armMark&&!canMark())return fizzle(cls,cb.mark||cb.mark2?'No card can take a mark':'Nothing marked yet');playSound(cb.armMark?'cancel':'bell',1.3);window.armMark?.();return}
+ if(cls==='echo'){if(!cb.armMark&&!canMark())return fizzle(cls,cb.mark||cb.mark2?'No card in hand can take the mark':'Play an Attack or Skill to mark it');playSound(cb.armMark?'cancel':'bell',1.3);window.armMark?.();return}
  if(cls==='carto'){if(cartoArmed===cb){cartoArmed=null;playSound('cancel');window.G?.render?.();return}if(!m.ready)return fizzle(cls,cb.advUsed?'Advance used this turn':'No Waypoint to Advance');cartoArmed=cb;playSound('flip',1.2);window.G?.render?.()}}
 function cartoAdvance(i){cartoArmed=null;const s=FX.get(W.cb);if(s)s.fx.fire=performance.now();playSound('rank',1);window.advance?.(i)}
 if(typeof document!=='undefined'){

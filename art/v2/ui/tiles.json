@@ -586,6 +586,168 @@
    "desc": "Card back for locked cards: dark lantern glyph on teal-black",
    "ready": true
   },
+  "lamp-task-nodmg": {
+   "path": "art/v2/ui/tiles/lamp-task-nodmg.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: nodmg",
+   "ready": true
+  },
+  "lamp-task-potions3": {
+   "path": "art/v2/ui/tiles/lamp-task-potions3.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: potions3",
+   "ready": true
+  },
+  "lamp-task-quick": {
+   "path": "art/v2/ui/tiles/lamp-task-quick.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: quick",
+   "ready": true
+  },
+  "lamp-task-bighit": {
+   "path": "art/v2/ui/tiles/lamp-task-bighit.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: bighit",
+   "ready": true
+  },
+  "lamp-task-cards7": {
+   "path": "art/v2/ui/tiles/lamp-task-cards7.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: cards7",
+   "ready": true
+  },
+  "lamp-task-crest3": {
+   "path": "art/v2/ui/tiles/lamp-task-crest3.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: crest3",
+   "ready": true
+  },
+  "lamp-task-lowtide": {
+   "path": "art/v2/ui/tiles/lamp-task-lowtide.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: lowtide",
+   "ready": true
+  },
+  "lamp-task-tideturn3": {
+   "path": "art/v2/ui/tiles/lamp-task-tideturn3.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: tideturn3",
+   "ready": true
+  },
+  "lamp-task-undertow2": {
+   "path": "art/v2/ui/tiles/lamp-task-undertow2.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: undertow2",
+   "ready": true
+  },
+  "lamp-task-echo3": {
+   "path": "art/v2/ui/tiles/lamp-task-echo3.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: echo3",
+   "ready": true
+  },
+  "lamp-task-echokill": {
+   "path": "art/v2/ui/tiles/lamp-task-echokill.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: echokill",
+   "ready": true
+  },
+  "lamp-task-echobig": {
+   "path": "art/v2/ui/tiles/lamp-task-echobig.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: echobig",
+   "ready": true
+  },
+  "lamp-task-wp3r2": {
+   "path": "art/v2/ui/tiles/lamp-task-wp3r2.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: wp3r2",
+   "ready": true
+  },
+  "lamp-task-landmark": {
+   "path": "art/v2/ui/tiles/lamp-task-landmark.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: landmark",
+   "ready": true
+  },
+  "lamp-task-noadv": {
+   "path": "art/v2/ui/tiles/lamp-task-noadv.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: noadv",
+   "ready": true
+  },
+  "lamp-task-flourish30": {
+   "path": "art/v2/ui/tiles/lamp-task-flourish30.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: flourish30",
+   "ready": true
+  },
+  "lamp-task-bleed10": {
+   "path": "art/v2/ui/tiles/lamp-task-bleed10.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: bleed10",
+   "ready": true
+  },
+  "lamp-task-parry3": {
+   "path": "art/v2/ui/tiles/lamp-task-parry3.webp",
+   "size": [
+    512,
+    384
+   ],
+   "desc": "Lantern Task tile: parry3",
+   "ready": true
+  },
   "lamp-task-lit": {
    "path": "art/v2/ui/tiles/lamp-task-lit.webp",
    "size": [

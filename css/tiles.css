@@ -248,8 +248,6 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 .tile.sp.k-relic .tart::after,.tile.sp.k-potion .tart::after{content:'';position:absolute;left:8%;right:8%;top:56%;height:13%;border-radius:50%/60%;background:radial-gradient(ellipse at 50% 30%,#6b6454,#2a261e 70%,#14110c);box-shadow:0 6px 8px #000c,inset 0 2px 0 #fff2}
 .tile.sp.k-potion{--c1:#14453f;--cg:#58d6c0}
 .tile.sp.k-relic .tart .slot,.tile.sp.k-potion .tart .slot{position:absolute;left:50%;top:15%;width:calc(var(--th)*.42);height:calc(var(--th)*.42);transform:translateX(-50%);z-index:1;border:0;filter:drop-shadow(0 6px 5px #000d) drop-shadow(0 0 14px color-mix(in srgb,var(--cg) 45%,transparent));--phs:calc(var(--th)*.3)}
-.tile.sp.k-relic .tart .ledgeimg,.tile.sp.k-potion .tart .ledgeimg{position:absolute;left:8%;top:35%;width:84%;height:26%;object-fit:fill;filter:drop-shadow(0 2px 2px #000c);pointer-events:none}
-.tile.sp.k-relic .tart.has-ledge::after,.tile.sp.k-potion .tart.has-ledge::after{display:none}
 /* Moon Shell: tiny live tide gauge as the tile art */
 .mg{position:absolute;left:50%;top:9%;height:46%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:7px;z-index:2;pointer-events:none}
 .mg-tube{position:relative;display:block;width:22px;height:100%;border:2px solid #9bdde0aa;border-radius:11px 11px 8px 8px;background:#041015c0;overflow:hidden;box-shadow:inset 0 0 6px #000,0 0 10px #2fb8c455}
