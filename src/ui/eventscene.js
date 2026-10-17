@@ -4,6 +4,7 @@
 import {RELICS,POTIONS} from '../core/registry.js';
 import {TILES,esc,emblemHTML,splitLabel,optIconId} from './tiles.js';
 import {U} from '../core/timing.js';
+import {a2EventEnv} from './env.js';
 // Per-event setting, chosen by looking at each painting: side = which side of the screen holds the words (the empty side);
 // fx 0..1 slides the (slightly oversized) painting so its subject moves away from the words (1 = push painting left);
 // fy 0..1 = vertical focal point of the cover crop.
@@ -59,6 +60,7 @@ export function eventSceneHTML(e){const sc={...DEF,...(SCENES[e.id]||{})};const 
  const scenePath=SCENES[e.id]?`art/v2/ui/scenes/task36-event-${e.id}.webp`:t?.path;
  const img=t&&t.ready?`<img src="${scenePath}" alt="" draggable="false">`:'';const out=e.out;
  const fresh=out&&Date.now()-(e.rt||0)<2500;
- return `<div class="evscene side-${sc.side}${out?' out out-'+out.tone:''}${fresh?' fresh':''}" data-ev="${e.id||''}" style="--sp:${U(1)};--fx:${sc.fx};--fy:${sc.fy*100}%;--z:${sc.z||1.2}">
+ const a2e=!!a2EventEnv();
+ return `<div class="evscene${a2e?' a2env':''} side-${sc.side}${out?' out out-'+out.tone:''}${fresh?' fresh':''}" data-ev="${e.id||''}" style="--sp:${U(1)};--fx:${sc.fx};--fy:${sc.fy*100}%;--z:${sc.z||1.2}">
  <div class="evbg">${img||`<b class="evph">${e.e||'◈'}</b>`}</div><div class="evfade"></div><div class="evflash"></div>
  <div class="evtext"><h2 class="evtitle">${out?out.title:(e.sub||e.n)}</h2><p class="evdesc">${hl(e.t||'')}</p><ol class="evopts">${e.o.map((o,i)=>optHTML(o,i,out)).join('')}</ol></div></div>`}

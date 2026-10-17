@@ -12,7 +12,7 @@ import {placeDetail} from './place.js';
 import {barHTML,statusRowHTML,playerStates,enemyExtraSt} from './combatant.js';
 import {CARD_ART,assetEntry,assetSrc,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE,fallenFor} from '../assets.js';
 import {syncAudio} from '../audio.js';
-import {syncEnv,envFxSettingLabel} from './env.js';
+import {syncEnv,envFxSettingLabel,a2TravelEnv} from './env.js';
 import {fightFeet,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
 import {deathLine,ACT_NAMES} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
@@ -382,12 +382,15 @@ const TC_A1_DEFAULT={src:'art/v2/bg/tc-a1-plate@2x.webp',w:1870,h:761,panel:[109
 // Plate rect + text panel from the Artist's manifests (tc-a1-rects.json -> ENV.envs.tc_a1.art.mid, tc-a1-spec.json -> .spec), panel made plate-relative.
 function tcA1(){const e=ENV.envs.tc_a1;const m=e&&e.art&&e.art.mid&&e.art.mid[0];const sp=e&&e.spec;if(!m||!sp||!sp.text_panel)return TC_A1_DEFAULT;const [x,y,w,h]=m.r,[px,py,pw,ph]=sp.text_panel.rect;
  return {src:m.f,w,h,panel:[px-x,py-y,pw,ph],title:sp.title||TC_A1_DEFAULT.title,sub:sp.subtitle||TC_A1_DEFAULT.sub}}
-function travelScr(){const ok=Date.now()-(W.S.t||0)>1000;const T={...tcA1()},AN=W.S.kind==='act'&&ACT_NAMES[W.S.to];if(AN){T.title='Act '+['','I','II','III'][W.S.to]+': '+AN.n;T.sub=AN.sub+'.'}const [px,py,pw,ph]=T.panel,pc=(a,b)=>(a/b*100).toFixed(2)+'%';
+function travelScrA2(){const ok=Date.now()-(W.S.t||0)>1000,card=!!W.S.card,AN=ACT_NAMES[2];
+ // v0.6.43 (wired as-is): tr_a1a2 travel scene first, tap, then the tc_a2 title card scene with the act name; both are env backdrops (no Act 1 plate)
+ return `<div class="page travel a2trav" onclick="skipTravel()">${card?`<div class="a2tcard"><div class="act">ACT II</div><h1>${AN.n}</h1><div class="sub">${AN.sub}.</div></div><div class="boss muted tcboss a2tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>`:`<div class="ferry win a2ferry" id="ferryman">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div>`}<div class="skip muted">${ok?(card?'Tap to begin':'Tap to continue'):'…'}</div></div>`}
+function travelScr(){if(a2TravelEnv())return travelScrA2();const ok=Date.now()-(W.S.t||0)>1000;const T={...tcA1()},AN=W.S.kind==='act'&&ACT_NAMES[W.S.to];if(AN){T.title='Act '+['','I','II','III'][W.S.to]+': '+AN.n;T.sub=AN.sub+'.'}const [px,py,pw,ph]=T.panel,pc=(a,b)=>(a/b*100).toFixed(2)+'%';
  return `<div class="page travel" onclick="skipTravel()"><div class="tcard tcplate" style="aspect-ratio:${T.w}/${T.h}"><img class="tcimg" src="${T.src}" alt="" draggable="false" onerror="this.parentNode.classList.add('noimg');this.remove()">
  <div class="tcpanel" style="left:${pc(px,T.w)};top:${pc(py,T.h)};width:${pc(pw,T.w)};height:${pc(ph,T.h)}"><h1>${T.title}</h1><div class="sub">${T.sub}</div></div></div>
  <div class="boss muted tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>
  <div class="ferry win" id="ferryman" data-info="${tesc('The Ferryman: He carries every Lampbearer to the Stair\'s foot, and never looks up.')}">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div><div class="skip muted">${ok?'Tap to begin':'…'}</div></div>`}
-export function skipTravel(){if(W.S.screen!=='travel')return;if(Date.now()-(W.S.t||0)<1000&&!window.FAST)return;W.S={screen:'map'};
+export function skipTravel(){if(W.S.screen!=='travel')return;if(Date.now()-(W.S.t||0)<1000&&!window.FAST)return;if(a2TravelEnv()&&!W.S.card&&!window.FAST){W.S.card=true;W.S.t=Date.now();render();return}W.S={screen:'map'};
  if(W.run&&W.run.lamp&&!W.run.lamp.shown&&W.run.floor===0){W.run.lamp.shown=true;W.S.ov='tasks'} // Lantern Tasks are shown once, when the climb begins
  render()}
 // ---------------- rewards / chests ----------------

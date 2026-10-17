@@ -70,7 +70,9 @@ export const ASSETS={
    // v0.6.35: Press-Gang Bosun passed the 9.0 gate (art review enemies-round16).
    bosun:'bosun',gateplate:'gateplate',salthusk:'salthusk',lamplighter:'lamplighter',pylon:'pylon',pumper:'pumper',sluiceeng:'sluiceeng',ghostcannon:'ghostcannon',mortar:'mortar',deckshade:'deckshade',
    // v0.6.36: second batch, all at 9.0 (art reviews enemies-round25/29/31/33/34/35). Lowest sole = image bottom (8-10 px pad), so the runtime shadow sits on the lowest foot.
-   bellnun:'bellnun',dummy:'dummy',hauler:'hauler',grell:'grell',hgunner:'hgunner',cantor:'cantor',chorister:'chorister',basso:'basso'}},
+   bellnun:'bellnun',dummy:'dummy',hauler:'hauler',grell:'grell',hgunner:'hgunner',cantor:'cantor',chorister:'chorister',basso:'basso',
+   // v0.6.43 (wired as-is, below the 9 review bar, to be improved): the three Act 2 bosses, latest files in studio/art/act2/enemies/
+   colossus:'colossus',wreckqueen:'wreckqueen',battery:'battery'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.
@@ -107,7 +109,7 @@ export function assetFail(img){const s=img.parentNode;if(s)s.classList.remove('h
 // sw.js ACTPACK[act]); the worker fills them when ?act=N is used or an act opens (warmActPack), and on first use otherwise. Act 1 stays fully offline.
 // Add a sprite id here whenever a later-act enemy gets its sprite (tests/precache-coverage.cjs fails if one is missing).
 export const LATER_ACT_SPRITES={diver:2,shellguard:2,kettleman:2,lice:2,bosun:2,gateplate:2,salthusk:2,lamplighter:2,pylon:2,pumper:2,sluiceeng:2,ghostcannon:2,mortar:2,deckshade:2,
- bellnun:2,dummy:2,hauler:2,grell:2,hgunner:2,cantor:2,chorister:2,basso:2};
+ bellnun:2,dummy:2,hauler:2,grell:2,hgunner:2,cantor:2,chorister:2,basso:2,colossus:2,wreckqueen:2,battery:2};
 export function actPackFiles(){const o={};for(const [id,act] of Object.entries(LATER_ACT_SPRITES))if(SPRITES[id])o[SPRITES[id].f]=act;return o}
 export function actPackURLs(act=3){const f=actPackFiles();return Object.keys(f).filter(u=>f[u]<=act)}
 // Ask the worker to fetch the Act 2/3 pack (acts <= act). No-op for Act 1, without a worker, or on file://.

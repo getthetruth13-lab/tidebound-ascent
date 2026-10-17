@@ -1369,3 +1369,11 @@ body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .c
 .end-confirm-box{text-align:center}.end-confirm-box .actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:6px}.end-confirm-box .actions .btn{min-width:130px;min-height:44px;margin:0}
 /* v0.6.17 Act 1 battle backgrounds: each painted layer is its own stacking context, so living plates in a lower layer (clouds in the sky, rain behind the hall) stay UNDER the solids above them. Wrack Terraces keeps the old stacking. */
 #env[data-sandwich] .envL{isolation:isolate}
+
+/* v0.6.43 Act 2 travel (tr_a1a2 scene, then tc_a2 title card scene), wired as-is */
+.page.a2trav{background:none}
+.a2tcard{padding:14px 28px;border-radius:6px;background:radial-gradient(ellipse at center,#04060acc 40%,#04060a00 100%);text-shadow:0 2px 10px #000,0 0 3px #000;animation:tcard 1.4s ease-out both}
+.a2tcard .act{font:700 14px var(--font-display);letter-spacing:.4em;color:#e0c48a}
+.a2tcard h1{font-size:clamp(26px,6vw,48px);margin:4px 0}
+.a2tcard .sub{font-size:15px;color:#d8cdb4}
+.a2trav .a2tcboss,.a2trav .a2ferry{text-shadow:0 2px 8px #000;background:#04060a99;border-radius:6px;padding:4px 12px}

@@ -63,9 +63,15 @@ const allL=()=>document.querySelectorAll('#env .envL,#env-front .envL');
 let forced=null;
 // B061: the reward tiles sit on the battle scene itself (hero + remains), so its background keeps the battle look with only a light dim
 const victoryView=S=>!!(S&&S.screen==='reward'&&S.scene&&S.cardsOpen==null&&S.swap==null);
+// v0.6.43 (as-is wiring, below the 9 review bar): Act 2 event scenes show a painted room env (ev_a2_*) instead of the last battle env + Act 1 painting.
+const A2_EV_ENV={chapel:['a2_tithebox','a2_brazier','a2_quietbell','a2_holdstone','a2_lanternlick'],armoury:['a2_armoury','a2_magazine','a2_drill','a2_oathanvil','a2_pressgang','a2_oilcask'],mess:['a2_mess','a2_surgeon','a2_qmgift','a2_grellread','a2_auction']};
+export function a2EventEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='event'||!run||(run.act||1)!==2||!S.ev||!/^a2_/.test(S.ev.id||''))return null;
+ let k='yard';for(const n in A2_EV_ENV)if(A2_EV_ENV[n].includes(S.ev.id))k=n;const id='ev_a2_'+k;const e=ENV.envs[id];return e&&e.art?id:null}
+export function a2TravelEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='travel'||S.kind!=='act'||S.to!==2)return null;const id=S.card?'tc_a2':'tr_a1a2';const e=ENV.envs[id];return e&&e.art?id:null}
 export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=W.run;
  if(!run||s==='title')return {id:'a1_shore',grade:'title',dim:.55};
- if(s==='travel')return {id:'tr_start',grade:'normal',dim:.15};
+ if(s==='travel'){const t2=a2TravelEnv();if(t2)return {id:t2,grade:'room',dim:0};return {id:'tr_start',grade:'normal',dim:.15}}
+ {const ev2=a2EventEnv();if(ev2)return {id:ev2,grade:'room',dim:0}}
  if(s==='map'&&ENV.envs.map_a1&&ENV.envs.map_a1.art&&(run.act||1)===1){const f=Math.max(1,run.floor||1);return {id:'map_a1',grade:'map',dim:.1,band:bandEnv(1,Math.min(14,f+(run.pos.r>=0?1:0)))}}
  const act=run.act||1,floor=Math.max(1,run.floor||1);
  if(s==='combat'&&W.cb){if(!W.cb.envKey){const boss=W.cb.ens.find(e=>e.boss);
@@ -82,7 +88,7 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
 // whether the backdrop changes at all. Must stay in step with the sig built in syncEnv().
 const nextSig=()=>{const k=envKeyFor();return `${k.id}|${k.band||''}|${k.grade}|${k.dim||0}|${quality()}`};
 // body.env-combat / body.scene-choice also restyle #env (stack position, blur + darken), so a flip of either counts as a backdrop change too
-const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'),'env-still':!!(W.S&&W.S.screen==='end')});
+const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'),'env-still':!!(W.S&&W.S.screen==='end'),'a2-room':!!a2EventEnv()});
 export function envWillChange(){if(!root)return false;if(nextSig()!==cur)return true;const c=sceneCls();return Object.keys(c).some(n=>document.body.classList.contains(n)!==c[n])}
 export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&W.S.view||'');if(scr!==lastScr){lastScr=scr;quiet(500);document.body.toggleAttribute('data-env-rest',['title','reward','event','pick','msg','potpick'].includes(W.S.screen));if(adaptive!=='full'&&lastP75<=panelMs()*1.25)govTo(adaptive==='off'?'reduced':'full');if(W.S.screen==='map')prewarmEnv(W.run?bandEnv(W.run.act||1,Math.min(14,Math.max(1,(W.run.floor||1)+1))):'a1_shore')} // next screen: one step back up if the last stretch ran smooth
  startLoop();const k=envKeyFor();const sig=nextSig();anchor();
