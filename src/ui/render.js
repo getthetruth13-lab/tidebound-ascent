@@ -30,7 +30,7 @@ export {toggleHitLog} from './hero-plate.js';
 import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,lvlLabel,rkMax,baseCost,costSurcharge} from '../engine/cards.js';
 import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,canTakeMove,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
-import {ECON,isLastAct,canContinueToAct2,campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
+import {ECON,isLastAct,canContinueToAct2,canContinueToAct3,campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
 import {anim,syncCombatAnimations} from './fx.js';
 import {screenChange,motionEnabled} from './anim.js';
 import {deathStyleOf,DEATH_STYLES,DEATH_DRAIN} from './deathstyles.js';
@@ -477,6 +477,7 @@ function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Mat
  return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?`Act ${run.act||1} cleared!`:'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.${(run.act||1)>=3?' '+CROWN_HOLDS:''}`:`${K.n} fell on floor ${Math.max(1,run.floor)} of ${(run.act||1)>1?16:15}. ${deathLine(run.floor,run.boss,run.act||1)}`}</p>
  ${pathStripHTML(st.path)}<div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}${stat('Deck',run.deck.length,'book')}${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
  ${canContinueToAct2()?`<button class="endlink endnext" id="act2go" onclick="continueToAct2()">${glyph('arrowright')}<span>Continue to Act 2</span><small class="prev">Act 2 preview</small></button>`:''}
+ ${canContinueToAct3()?`<button class="endlink endnext" id="act3go" onclick="continueToAct3()">${glyph('arrowright')}<span>Continue to Act 3</span><small class="prev">Act 3 preview</small></button>`:''}
  <button class="endlink" id="restart" onclick="W.S={screen:'title'};render()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
 // Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing
 // sources preserves fitted text, sprite animations and stage styles on unchanged nodes.

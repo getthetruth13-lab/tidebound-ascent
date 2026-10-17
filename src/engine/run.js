@@ -440,14 +440,25 @@ W.S={screen:'map'};fire('mapEnter',{});saveRun();render()}
 // Act 2 preview (Spencer 10-16): beating Act 1 on the normal build offers 'Continue to Act 2'. Act 2 is built but not fully polished, so the button is labelled a preview.
 // The run is snapshotted before clearRun so the same hero, deck, relics and gold carry over. Act 1 is settled (Lamplight credited) exactly as before.
 export const ACT2_PREVIEW=true;
+// Act 3 preview (Spencer 10-16): beating Act 2 offers 'Continue to Act 3' the same way, so Acts 1-3 play as one run. Act 3 win ends the run normally. Set false to hide.
+export const ACT3_PREVIEW=true;
 let nextActSnap=null;
-export const canContinueToAct2=()=>!!(ACT2_PREVIEW&&nextActSnap&&W.S&&W.S.screen==='end'&&W.run&&W.run.won&&(W.run.act||1)===1);
-export function continueToAct2(){if(!canContinueToAct2())return;const snap=nextActSnap;nextActSnap=null;
+const previewOn=a=>a===1?ACT2_PREVIEW:a===2?ACT3_PREVIEW:false;
+const canContinueTo=to=>!!(previewOn(to-1)&&nextActSnap&&nextActSnap.to===to&&W.S&&W.S.screen==='end'&&W.run&&W.run.won&&(W.run.act||1)===to-1);
+export const canContinueToAct2=()=>canContinueTo(2);
+export const canContinueToAct3=()=>canContinueTo(3);
+function continueToAct(to){if(!canContinueTo(to))return;const snap=nextActSnap;nextActSnap=null;
  W.run=JSON.parse(JSON.stringify(snap.run));W.uid=snap.uid;W.run.won=false;delete W.run.stats.endT;W.cb=null;
+ // Lamplight was credited once at the first win (Act 1); the carried run must never credit again.
+ if(W.run.lamp){W.run.lamp.settled=true;delete W.run.lamp.summary}
  if(W.run.act==null)W.run.act=1;startNextAct()}
-export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;
- nextActSnap=won&&ACT2_PREVIEW&&(run.act||1)===1&&!hasNextAct()?{run:JSON.parse(JSON.stringify(run)),uid:W.uid}:null;
- clearRun();settleRun(run,won);W.S={screen:'end'};render()}
+export const continueToAct2=()=>continueToAct(2);
+export const continueToAct3=()=>continueToAct(3);
+export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;const a=run.act||1;
+ nextActSnap=won&&previewOn(a)&&!hasNextAct()?{run:JSON.parse(JSON.stringify(run)),uid:W.uid,to:a+1}:null;
+ clearRun();settleRun(run,won);
+ if(nextActSnap&&run.lamp){nextActSnap.run.lamp=JSON.parse(JSON.stringify(run.lamp))} // carries settled:true
+ W.S={screen:'end'};render()}
 // Event fights (Sunken Chest crab, Gull Nest gulls): normal fight rules + options.
 export function eventFight(enc,opts={}){return startCombat('fight',enc,opts)}
 export {cHeal};
