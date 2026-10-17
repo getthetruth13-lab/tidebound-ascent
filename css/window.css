@@ -139,6 +139,7 @@
 .end .endlink{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:200px;min-height:48px;padding:0 18px;border:0;border-bottom:1px solid #d9b46a88;border-radius:0;background:none;box-shadow:none;color:#f0dcaa;font:700 17px var(--font-display);letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 3px #000,0 0 10px #d9b46a55;cursor:pointer}
 .end .endlink .gi{width:1.1em;height:1.1em}
 .end .endlink:hover,.end .endlink:focus-visible{color:#fff1c2;border-bottom-color:#ffd98a;outline:none}.end .endlink:active{transform:scale(.97)}
+.end .endnext{flex-direction:column;gap:2px;min-height:56px;border-bottom-color:#ffd98a;color:#fff1c2}.end .endnext .prev{font:600 11px var(--font-display);letter-spacing:.18em;color:#d9b46a;text-shadow:0 1px 2px #000}
 .end .lp-btns{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:6px}
 .end .lp-btns .btn{flex:1 1 0;min-width:0;min-height:44px;padding:4px 6px;white-space:normal;line-height:1.1;font-size:13px;letter-spacing:.06em;border:0;border-bottom:1px solid #d9b46a88;border-radius:0;background:none;box-shadow:none;color:#f0dcaa;text-shadow:0 1px 3px #000,0 0 10px #d9b46a55}
 .end .lp-btns .btn:hover,.end .lp-btns .btn:focus-visible{color:#fff1c2;border-bottom-color:#ffd98a;background:#d9b46a14}

@@ -433,7 +433,17 @@ function shopRemoveImpl(){const S=W.S;if(S.screen!=='shop'||S.scrubbed||(S.scrub
 function goMapImpl(){W.cb=null;if(W.run&&W.run.hp<=0)return endRun(false);
  if(W.run&&W.run.eyeLeft>0){W.run.eyeLeft--;if(campOptions().length){W.S={screen:'rest'};render();return}} // the Stormeye: a second camp action
 W.S={screen:'map'};fire('mapEnter',{});saveRun();render()}
-export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;clearRun();settleRun(run,won);W.S={screen:'end'};render()}
+// Act 2 preview (Spencer 10-16): beating Act 1 on the normal build offers 'Continue to Act 2'. Act 2 is built but not fully polished, so the button is labelled a preview.
+// The run is snapshotted before clearRun so the same hero, deck, relics and gold carry over. Act 1 is settled (Lamplight credited) exactly as before.
+export const ACT2_PREVIEW=true;
+let nextActSnap=null;
+export const canContinueToAct2=()=>!!(ACT2_PREVIEW&&nextActSnap&&W.S&&W.S.screen==='end'&&W.run&&W.run.won&&(W.run.act||1)===1);
+export function continueToAct2(){if(!canContinueToAct2())return;const snap=nextActSnap;nextActSnap=null;
+ W.run=JSON.parse(JSON.stringify(snap.run));W.uid=snap.uid;W.run.won=false;delete W.run.stats.endT;W.cb=null;
+ if(W.run.act==null)W.run.act=1;startNextAct()}
+export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;
+ nextActSnap=won&&ACT2_PREVIEW&&(run.act||1)===1&&!hasNextAct()?{run:JSON.parse(JSON.stringify(run)),uid:W.uid}:null;
+ clearRun();settleRun(run,won);W.S={screen:'end'};render()}
 // Event fights (Sunken Chest crab, Gull Nest gulls): normal fight rules + options.
 export function eventFight(enc,opts={}){return startCombat('fight',enc,opts)}
 export {cHeal};
