@@ -12,6 +12,8 @@ const level=k=>settings.audioMuted?0:Math.max(0,Math.min(1,Number(settings[k])||
 const indexURL=new URL('../audio/music/index.json',import.meta.url);
 fetch(indexURL).then(r=>{if(!r.ok)throw Error('Music index unavailable');return r.json()}).then(data=>{
  for(const k of ['map','fight','elite','boss','shop','rest','event'])manifest[k]=(data[k]||[]).filter(f=>new RegExp(`^${k}-act1-\\d+\\.mp3$`).test(f));
+ // Acts 2 and 3: own tracks when files named <kind>-act2-N.mp3 / -act3-N.mp3 exist; otherwise the Act 1 playlist keeps playing (no silence).
+ for(const a of [2,3])for(const k of ['map','fight','elite','boss','shop','rest','event'])manifest[`${k}@${a}`]=(data[k]||[]).filter(f=>new RegExp(`^${k}-act${a}-\\d+\\.mp3$`).test(f));
  manifest.intro=(data.intro||[]).filter(f=>/^intro-\d+\.mp3$/.test(f));
  manifest.menu=(data.menu||[]).filter(f=>/^menu-\d+\.mp3$/.test(f));
  startTrack();
@@ -43,8 +45,9 @@ const bossPhases=new WeakMap(),phaseHeard=new WeakSet();
 function syncBossPhases(){for(const e of W.cb?.ens||[]){if(!e.boss)continue;const phase=e.bloomed?2:e.ph||1,previous=bossPhases.get(e);bossPhases.set(e,phase);
  if(previous!==undefined&&phase>previous&&!phaseHeard.has(e)){phaseHeard.add(e);if(!document.hidden)playSound('bossPhase')}
 }}
+const actTrack=kind=>{const a=W.run.act||1;if(a>1&&manifest[`${kind}@${a}`]?.length)return `${kind}@${a}`;return kind};
 export function syncAudio(){syncUIState();syncBossPhases();const s=W.S.screen;
- const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:s==='shop'||s==='rest'||s==='event'?(manifest[s]?.length?s:'map'):'map'):null;
+ const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&s!=='title'&&s!=='end'?actTrack(s==='combat'&&W.cb?W.cb.kind:s==='shop'||s==='rest'||s==='event'?(manifest[s]?.length?s:'map'):'map'):null;
  if(next!==context){retire();context=next;startTrack();if(!current)releaseOutgoing()}
  if(s==='end'&&lastScreen!==s)playSound(W.run&&W.run.won?'victory':'defeat');lastScreen=s;
 }

@@ -181,3 +181,9 @@
  .page.fit-shop .pk-shop .shelf.relics,.page.fit-shop .pk-shop .shelf.potions{gap:6px}
  .page.fit-shop .pk-shop .shelfrow{gap:12px}
 }
+
+/* B-051 run summary path strip */
+.endpath{display:flex;flex-wrap:wrap;gap:3px 4px;justify-content:center;max-width:30em;margin:4px 0 2px}
+.endpath .ep{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;color:#a99a76;opacity:.85}
+.endpath .ep svg,.endpath .ep img{width:100%;height:100%}
+.endpath .ep-elite{color:#d98b6a}.endpath .ep-boss{color:#e8c872}.endpath .ep-rest{color:#8fc3a0}

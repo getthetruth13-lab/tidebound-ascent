@@ -183,9 +183,9 @@ export function checkTide(cause){const cb=W.cb;
  if(cb.tide<10)cb.capped=false;
  if(cb.tide>=10){
   if(bankOn()){if(!cb.capped){cb.capped=true;if(cb.banks<3){cb.banks++;log(`🏦 Crest banked (${cb.banks}/3)`);callout('CREST BANKED ×'+cb.banks,'crest')}cb.tide=10}else cb.tide=10;return}
-  const c=mod('crest',{cause},{dmg:TI.crest_dmg,resetTo:5});cb.tide=c.resetTo;if(TI.flip_after_reset)cb.tideDir=-1;fireCrest(c,cause)}
+  const c=mod('crest',{cause},{dmg:TI.crest_dmg,resetTo:5});cb.tide=c.resetTo;if(TI.flip_after_reset)cb.tideDir=-1;if(cause!=='drift'&&W.run.cls==='tide')cb.holdDrift=true;fireCrest(c,cause)} // R6: a break you cause pauses the next Drift
  else if(cb.tide<=0){const u=mod('undertow',{cause},{guard:TI.undertow_blk,draw:TI.undertow_draw,resetTo:5});const junk=cb.hand.filter(isJunk);const rb=noteBreak('undertow');
-  cb.tide=u.resetTo;if(TI.flip_after_reset)cb.tideDir=1;
+  cb.tide=u.resetTo;if(TI.flip_after_reset)cb.tideDir=1;if(cause!=='drift'&&W.run.cls==='tide')cb.holdDrift=true;
   junk.forEach(ci=>{const i=cb.hand.indexOf(ci);if(i>=0){cb.hand.splice(i,1);sinkCard(ci,'undertow')}});if(junk.length)log(`🌀 The Undertow carries off ${junk.length} junk`);
   const g=Math.floor(u.guard*rb);log(`🌀 UNDERTOW! +${g} Guard, draw ${u.draw}${rb>1?' (Rolling Break ×1.5)':''}`);callout('UNDERTOW! +'+g+' Guard','undertow');cb.undertowT=Date.now();
   gainBlock(g);{const base=Math.min(u.draw,TI.undertow_draw);drawCards(base);if(u.draw>base)passiveDraw(u.draw-base,'tide')}cb.stat.undertows++;if(cb.curF)cb.curF.causedUndertow=true;drenchTrigger('undertow');fire('undertow',{guard:g,draw:u.draw,cause,junk:junk.length,rolling:rb>1,breakN:cb.breaks});bigMoment('break',{what:'undertow'})}}
@@ -536,7 +536,7 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;cb.breaks=0;cb.parryHit
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
  const allFled=cb.ens.some(e=>e.fled)&&cb.ens.every(e=>e.fled||e.summoned);
  // R1b: heal after a won fight / elite (ECON.winHeal), shown as a heal pop + callout before the rewards.
- const wh=(ECON.winHeal||{})[k]||0;if(wh>0&&W.run.hp>0){const h=Math.min(wh,W.run.max-W.run.hp);if(h>0)W.run.hp+=h;W.run.lastWinHeal=h}
+ const wh=((ECON.winHeal||{})[k]||0)+((W.run.act||1)>1?((ECON.winHealLater||{})[k]||0):0);if(wh>0&&W.run.hp>0){const h=Math.min(wh,W.run.max-W.run.hp);if(h>0)W.run.hp+=h;W.run.lastWinHeal=h}
  W.cb=null;if(W.run.lastWinHeal>0)W.run.healPop={n:W.run.lastWinHeal,t:Date.now()};combatRewards(k,{allFled,opts:cb.opts,cb});if(W.run.lastWinHeal>0&&!window.FAST){const S1=W.S;setTimeout(()=>{if(W.S===S1)render()},1450)}}
 export function lose(){if(W.cb)fire('combatEnd',{kind:W.cb.kind,won:false});W.cb=null;endRun(false)}
 // Mist Bomb: escape a normal combat with no rewards.

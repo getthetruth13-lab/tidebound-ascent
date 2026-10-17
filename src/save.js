@@ -36,6 +36,7 @@ export function continueRun(){
  const oldFast=window.FAST,clock=Date.now,old={run:W.run,cb:W.cb,S:W.S,uid:W.uid};
  try{
   const base=d.v>=3?d.checkpoint:{run:d.run,uid:d.uid};
+  const R=base&&base.run;if(!R||typeof R.cls!=='string'||!Array.isArray(R.map)||!R.map.length||!Array.isArray(R.deck)||!Array.isArray(R.relics)||!R.pos||typeof R.pos!=='object')throw Error('Damaged save');
   migrateRun(base.run);W.run=clone(base.run);W.uid=base.uid||1;W.cb=null;W.S={screen:'map'};
   W.replaying=true;window.FAST=1;
   for(const action of d.journal||[]){
@@ -48,5 +49,6 @@ export function continueRun(){
  }catch(e){Object.assign(W,old);console.warn('Could not restore run:',e);return false}
  finally{Date.now=clock;window.FAST=oldFast;W.replaying=false}
  if(W.S.screen==='end')clearRun();
- render();return true;
+ try{render()}catch(e){Object.assign(W,old);console.warn('Could not draw the restored run:',e);return false}
+ return true;
 }

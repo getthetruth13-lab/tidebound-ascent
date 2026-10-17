@@ -121,7 +121,7 @@ registerEnemies({
    if(!e.t)return pk(e,[{w:1,m:ce}]);
    return pk(e,[{w:e.t>=3&&!e.foreclosed?100:0,m:fc},{w:45,m:ce,rep:2},{w:e.block>=14?0:30,m:ink,rep:1}])}),
   onSpawn:e=>{e.foreclosed=false}},
- // The Drowned Choir (3 bodies). Hymn = 7 + 2 per OTHER singer alive; one Hymn a turn, rotating cantor -> chorister -> basso.
+ // The Chapel Choir (3 bodies). Hymn = 7 + 2 per OTHER singer alive; one Hymn a turn, rotating cantor -> chorister -> basso.
  cantor:{n:'Cantor',e:'🎼',act:2,role:'attacker',hp:HP.cantor,elite:1,anim:A('raise','cast','pierce',{tier:'elite'}),
   passive:{n:'Chorus',text:'Each hymn is stronger for every other singer alive.',chorus:1},
   ai:e=>choirMove(e,['hymn','descant','drone']),intent:e=>liveHymn(e)},

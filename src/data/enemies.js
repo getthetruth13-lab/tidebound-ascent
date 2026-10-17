@@ -94,7 +94,7 @@ registerEnemies({
   if(!e.t)return open(e,[chime,hush]);
   return pk(e,[{w:40,m:{a:10,lbl:'Clapper'},rep:2},{w:38,m:chime,rep:2},{w:22,m:hush,rep:1},{w:canWind(e,2,4)?26:0,m:{b:6,lbl:'Raises the bell…'},wind:{a:14,ring:1,lbl:'Peal'}}])})},
  // ---- elites (v2.1) ----
- captain:{n:'Drowned Captain',e:'☠️',role:'support',hp:hp('captain'),elite:1,ai:AI(e=>{const slugs=countAlive('slug'),low=half(e);
+ captain:{n:'Barnacled Captain',e:'☠️',role:'support',hp:hp('captain'),elite:1,ai:AI(e=>{const slugs=countAlive('slug'),low=half(e);
   const crewWeak=allies(e).some(x=>(x.st.str||0)<4);
   return pk(e,[{w:low?45:35,m:{a:16,lbl:'Cutlass'},rep:2},{w:28,m:{a:8,h:2,v:1,lbl:'Boarding'},rep:2},{w:e.t&&slugs<2?(low?45:30):0,m:{summon:'slug',max:2,lbl:'Call the crew'},rep:1},
    {w:e.t&&slugs&&crewWeak?26:0,m:{b:8,allyS:2,lbl:'Bark Orders'},rep:1},

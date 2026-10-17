@@ -198,3 +198,11 @@
 .ov{animation:ov-in calc(.18s*var(--us,1)) ease-out both}
 .ov>.box,.potpop,.relpop,.msgp{animation:box-in calc(.2s*var(--us,1)) cubic-bezier(.2,.8,.3,1) both}
 .reduce-motion .ov,.reduce-motion .ov>.box,.reduce-motion .potpop,.reduce-motion .relpop,.reduce-motion .msgp{animation-duration:.01s}
+
+/* ===== FINISH_NONART F7 (Spencer 10-16): Options rows are the full 44px tap size; the list scrolls inside the window with a visible gold scrollbar (D-F-07) ===== */
+.tb-frame.tb-opt .settings.sx .sx-row,.ov .box .settings.sx .sx-row,.settings.sx .sx-row{min-height:44px}
+.settings.sx .sx-seg button,.settings.sx .sx-row .btn.sm{min-height:44px}
+.settings.sx{overflow-y:auto;scrollbar-width:auto;scrollbar-color:#b8923f #06080c;padding-right:6px;-webkit-overflow-scrolling:touch}
+.settings.sx::-webkit-scrollbar{width:8px}
+.settings.sx::-webkit-scrollbar-track{background:#06080c;border-radius:4px}
+.settings.sx::-webkit-scrollbar-thumb{background:#b8923f;border-radius:4px;border:1px solid #3a2a10}

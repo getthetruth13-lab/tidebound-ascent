@@ -6,7 +6,7 @@ import {alive,log,setTide,addSt} from '../../engine/combat.js';
 import {ask} from './kit.js';
 const T=(id,o)=>card('tide',id,o);
 T('splash',{e:'💦',rk:{max:5},d:'Deal {8|11|+}. Surge 1.',p:f=>{f.dmg(f.r(8,11));f.surge(1)}});
-T('brace',{e:'🪨',rk:{max:5},d:'Gain {6|9|+} Guard. Recede 1.',p:f=>{f.blk(f.r(6,9));f.recede(1)}});
+T('brace',{e:'🪨',rk:{max:5},d:'Gain {7|10|+} Guard. Recede 1.',p:f=>{f.blk(f.r(7,10));f.recede(1)}});
 T('riptide',{e:'🌀',d:'Deal {4|6}. <b>Low Tide:</b> deal {8|11} instead. Surge 2.',p:f=>{f.dmg(f.low?f.v(8,11):f.v(4,6));f.surge(2)}});
 T('still',{e:'🪷',d:'Gain {4|6} Guard. <b>High Tide:</b> gain {9|12} instead. Recede 2.',p:f=>{f.blk(f.high?f.v(9,12):f.v(4,6));f.recede(2)}});
 T('swell',{e:'🌊',d:'Choose: Surge {2|3}; or draw {1|2}.',p:f=>ask(f,'Swell',[{l:'Surge '+f.v(2,3),f:()=>f.surge(f.v(2,3))},{l:'Draw '+f.v(1,2),f:()=>f.draw(f.v(1,2))}])});

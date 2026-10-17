@@ -11,7 +11,7 @@ import {SPRITES} from '../../data/sprites.js';
 import {newRun} from '../../engine/run.js';
 import {render,TH} from '../render.js';
 import {HEROES,ORDER,SPRITE_OF,CHARSEL} from './heroes.js';
-import {loadProfile,heroUnlocked,HERO_LOCKS} from '../../progress.js';
+import {loadProfile,heroUnlocked,HERO_LOCKS,takeHeroNews} from '../../progress.js';
 import {settings} from '../../save.js';
 import {reducedMotion} from '../vfx.js';
 import * as SND from './charsel-audio.js';
@@ -43,7 +43,8 @@ const FX={
  duel:()=>`<span class="fx fx-duel"><i class="cs-glint"></i></span>`};
 const reduce=()=>reducedMotion()||document.body.classList.contains('reduce-motion');
 const lockedK=k=>!heroUnlocked(loadProfile(),k);
-function heroHTML(k,i,foc){const S=STAGE[k],K=CLASSES[k],lk=lockedK(k),on=foc===k&&!lk,a=ART+S.art;
+const beating=new Set(); // heroes drawn chained for one beat after they unlock (profile.heroSeen, takeHeroNews)
+function heroHTML(k,i,foc){const S=STAGE[k],K=CLASSES[k],lk=lockedK(k)||beating.has(k),on=foc===k&&!lk,a=ART+S.art;
  return `<button class="st-pick cs-hero theme-${TH[k]}${on?' on':''}${lk?' locked':''}" data-cls="${k}" data-i="${i}" style="--x:${S.x};--h:${S.h};--sun:${S.sun};--spr:url('${new URL(a+'-base.webp',document.baseURI).href}');--tint:${S.tint}" onclick="selectHero('${k}')" aria-label="${K.n}${lk?' (locked)':''}" aria-pressed="${on}">
  <span class="cs-floor"><i class="cs-shadow"></i><img class="cs-refl" src="${a}-refl.webp" alt="" draggable="false"></span>
  <span class="st-fig"><img class="cs-base" src="${a}-base.webp" alt="" draggable="false"><img class="cs-lit${LIT_ART[k]?'':' standin'}" src="${a}-lit.webp" alt="" draggable="false"><i class="cs-rim"></i>${S.lamp?`<i class="cs-lamp" style="--lx:${S.lamp[0]};--ly:${S.lamp[1]};--lc:${S.lampc}"><i></i></i>`:''}${lk?CHAINS:FX[k](k)}</span>
@@ -52,7 +53,8 @@ function loreHTML(k){const K=CLASSES[k],C=CHARSEL[k],S=STAGE[k];
  if(lockedK(k))return `<div class="cs-lore locked" data-cls="${k}" style="--x:${S.x}"><p class="cs-epi">Locked</p><p class="cs-l" style="--l:0">${HERO_LOCKS[k]?.hint||'Not yet.'}</p><i class="cs-thread"></i></div>`;
  return `<div class="cs-lore theme-${TH[k]}" data-cls="${k}" style="--x:${S.x};--tint:${S.tint}" role="note" aria-label="About ${K.n}"><p class="cs-epi">${HEROES[k].epithet}</p>${C.lore.map((l,j)=>`<p class="cs-l" style="--l:${j}">${l}</p>`).join('')}
  <div class="cs-tags">${C.tags.map(([ic,w],j)=>`<span style="--l:${j+2}">${icon(CS_ICON[ic])}<b>${w}</b></span>`).join('')}</div><i class="cs-thread"><i class="cs-link"></i></i></div>`}
-export function selectScr(){const S=W.S,foc=S.hero&&CLASSES[S.hero]?S.hero:null,sel=foc&&!lockedK(foc);
+export function selectScr(){for(const k of takeHeroNews()){beating.add(k);setTimeout(()=>{beating.delete(k);charselUnlockBeat(k)},U(700))}
+ const S=W.S,foc=S.hero&&CLASSES[S.hero]?S.hero:null,sel=foc&&!lockedK(foc);
  return `<div class="tb-scr tb-select tb-stair cs2${S.lifting?' lifting':''}${foc?' has-sel':''}" data-focus="${foc||''}" style="--fx:${foc?STAGE[foc].x:.5};--tint:${foc?STAGE[foc].tint:'#ffd27a'}">
  <div class="cs-world">
   <div class="cs-layer cs-back" data-depth="0.25"><img class="cs-plate" src="${ART}scene-back.webp" alt="" draggable="false"><i class="cs-streak"><i></i></i><i class="cs-sun"></i>

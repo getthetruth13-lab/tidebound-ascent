@@ -29,7 +29,8 @@ export const ECON={startGold:99,potionSlots:3,
  map:{rows:15,weights:{fight:45,unknown:22,rest:12,elite:10,shop:7}},
  mend:.3,
  // R1b (Spencer 2026-10-13, SIM-ACT1-R1): hero HP overrides, heal after a won fight, elite damage multipliers, relics pulled from the pool.
- heroHp:{tide:70,carto:64,duel:85},winHeal:{fight:3,elite:5},eliteDmg:.88,eliteDmgByKey:{eel:.82},relicPulled:['duetbell'],
+ heroHp:{tide:80,carto:64,duel:85},winHeal:{fight:3,elite:5},winHealLater:{fight:3,elite:5}, // R6: Acts 2 and 3 heal 6 / 10 after a won fight / elite (hero side)
+ eliteDmg:.88,eliteDmgByKey:{eel:.82},relicPulled:['duetbell'],
  // Elite Artifact (Spencer 2026-10-13): a roll per elite reward, not guaranteed.
  eliteArtifactChance:.35,
  // merchant stock (Task 65): slot lists, so the card redesign only changes data and pools
@@ -179,7 +180,10 @@ export function resolveUnknown(){const run=W.run,q=run.qOdds;const node=run.map[
  if(out==='rest'){W.S={screen:'rest'};return render()}
  const ev=pickEvent();if(!ev)return fight({fromQ:true});noteSeen('event',ev.id);
  if(ev.pool==='shrine')run.shrinesThisAct[ev.id]=1;else run.seenEvents[ev.id]=1;
- W.S={screen:'event',ev:{...ev,t:eventText(ev.id,ev.t)},t:Date.now()};render()}
+ W.S={screen:'event',ev:withVariant({...ev,t:eventText(ev.id,ev.t)}),t:Date.now()};render()}
+// Act 1 scene variants (data/events.js addVariant): ~half the time a scene opens in its second form (new text, one option swapped).
+export function withVariant(ev){const v=ev.vars&&ev.vars.length?ev.vars[Math.floor(rnd('events')*ev.vars.length)]:null;if(!v||rnd('events')>=.5)return ev;
+ const o=ev.o.slice();o[v.at]=v.o;return {...ev,t:v.t,o,variant:1}}
 export function eventOK(ev){const run=W.run;if(ev.pool==='shrine'?run.shrinesThisAct[ev.id]:run.seenEvents[ev.id])return false;if(ev.act&&ev.act!==run.act)return false;return !ev.req||ev.req()}
 export function pickEvent(){const act=EVENTS.filter(e=>e.pool!=='shrine'&&eventOK(e)),sh=EVENTS.filter(e=>e.pool==='shrine'&&eventOK(e));
  let list=rnd('events')<.75?act:sh;if(!list.length)list=list===act?sh:act;return list.length?pick(list,'events'):null}

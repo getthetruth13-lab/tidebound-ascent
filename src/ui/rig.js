@@ -7,6 +7,8 @@ import {prepare,loopU,glowAt,hash01} from './rig-math.js';
 const INDEX_URL='./art/v2/rigs/index.json';
 let index=null,indexP=null,off=false;
 try{off=/[?&]rig=0\b/.test(location.search)||localStorage.getItem('rig-off')==='1'}catch(_){}
+export const rigsOff=()=>off;
+export function setRigOff(v){off=!!v;try{localStorage.setItem('rig-off',v?'1':'0')}catch(_){}}   // Settings switch; ?rig=0 still wins for the session
 const rigs=new Map();          // spriteId -> {rig,prep,imgs:{id:HTMLImageElement},ok} | 'loading' | 'fail'
 const live=new Set();          // attached .rig elements being animated
 const state=new Map();         // figure key -> {skew,hold,at}  (hit-stop bookkeeping that survives re-renders)

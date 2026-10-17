@@ -19,3 +19,5 @@
 .lp-grid>*{content-visibility:auto;contain-intrinsic-size:auto 150px}
 .lp-grid .lp-sec,.lp-grid .lp-later{content-visibility:visible}
 .lp-later-card i{color:#8fa0b8}
+.lp-tab.herolocked{opacity:.55;filter:saturate(.4)}
+.lp-herolock{flex:0 1 auto;min-width:0;font:italic 600 11px var(--font-body);color:#c9b98c;letter-spacing:.02em}

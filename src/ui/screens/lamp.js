@@ -3,8 +3,8 @@
 import {W} from '../../core/state.js';
 import {CARDS,CLASSES,RELICS,POTIONS} from '../../core/registry.js';
 import {ACT1_CARDS} from '../../data/act1.js';
-import {LAMP_XP,CLIMB_XP,LAMP_PLAN,CLIMB_PLAN,CLASS_ORDER,LOCK_CARDS,LOCK_CLASS_RELICS,LOCK_SHARED_RELICS,LOCK_POTIONS,LATER_ACT_CARDS} from '../../data/lamplight.js';
-import {loadProfile,saveProfile,lampLevel,climbLevel,lampPending,climbPending,totalPending,barOf,offerFor,claim,lockedFor,firstLevel,lockHint,classRelicIds} from '../../progress.js';
+import {LAMP_XP,CLIMB_XP,LAMP_PLAN,CLIMB_PLAN,FIVE,LAMP5_CARDS,CLASS_ORDER,LOCK_CARDS,LOCK_CLASS_RELICS,LOCK_SHARED_RELICS,LOCK_POTIONS,LATER_ACT_CARDS} from '../../data/lamplight.js';
+import {loadProfile,saveProfile,lampLevel,climbLevel,lampPending,climbPending,totalPending,barOf,offerFor,claim,lockedFor,firstLevel,lockHint,classRelicIds,heroUnlocked,HERO_LOCKS} from '../../progress.js';
 import {glyph} from '../glyphs.js';
 import {slotHTML} from '../../assets.js';
 import {TASKS,taskProgress} from '../../engine/lamplight.js';
@@ -33,7 +33,7 @@ const lockItem=(kind,id,hint,name)=>{const d=kind==='relic'?RELICS[id]:POTIONS[i
 const KIND_ICON={card:'🂠',relic:'💠',potion:'🧪',mixed:'✨',all:'🏮'};
 export function planAt(track,lv){
  if(track==='climb'){const k=CLIMB_PLAN[lv-1].k;return {k:{relics:'relic',potions:'potion',mixed:'mixed',all:'all'}[k],label:{relics:'a relic',potions:'a potion',mixed:'a relic or a potion',all:'every lantern still dark'}[k]}}
- const q=LAMP_PLAN[lv-1];if(q.k==='cards')return {k:'card',label:q.pref==='r'?'a Rare card':q.pref==='u'?'an Uncommon card':'a card'};
+ const q=LAMP_PLAN[lv-1];if(q.k==='bundle')return {k:'card',label:'a bundle of 3: cards and relics'};if(q.k==='cards')return {k:'card',label:q.pref==='r'?'a Rare card':q.pref==='u'?'an Uncommon card':'a card'};
  if(q.k==='relics')return {k:'relic',label:'a hero relic or cards'};
  if(q.k==='shop')return {k:'relic',label:'a class relic or cards'};if(q.k==='rare')return {k:'relic',label:'a Rare class relic or cards'};return {k:'all',label:'every lantern still dark'}}
 export function trackHTML(track,lvl){const N=TRACK_LEVELS(track);let h='';
@@ -53,9 +53,9 @@ export function lampPickScr(){const S=W.S,p=loadProfile(),track=S.track,name=TRA
   <div class="tb-actions"><button class="tb-btn pri" id="lampnext" onclick="lampNext()">${left>0&&offerFor(p,track,CARDS)?`Next unlock (${left})`:'Done'}</button></div>`)}
  const o=offerFor(p,track,CARDS);if(!o)return framedLamp('lamppick',head+`<div class="lp-empty">${emptyArt()}<div class="tb-none">Nothing is waiting.</div><div class="lp-sub">Every lantern that has been lit is inked in the Ledger. Climb again to light the next.</div></div><div class="tb-actions"><button class="tb-btn pri" onclick="lampLeave()">Back</button></div>`);
  const left=track==='climb'?climbPending(p):lampPending(p,track);
- const sub=o.final?`Level ${o.level}: the ${track==='climb'?'whole stair':'Lamp'} blazes. Every lantern still dark is lit at once.`:`Level ${o.level}${left>1?` (${left} waiting)`:''}: a lantern is lit. Choose one. The others wait for the next level.`;
+ const sub=o.bundle?`Lamplight ${o.level} of ${LAMP_XP.length}${left>1?` (${left} waiting)`:''}: a bundle of ${o.items.length} is lit. Take them all.`:o.final?`Level ${o.level}: the ${track==='climb'?'whole stair':'Lamp'} blazes. Every lantern still dark is lit at once.`:`Level ${o.level}${left>1?` (${left} waiting)`:''}: a lantern is lit. Choose one. The others wait for the next level.`;
  return framedLamp('lamppick',head+`<div class="lp-sub">${sub}</div><div class="lp-offer${o.final?' final':''}">${o.items.map((i,n)=>itemTile(i.kind,i.id,{click:o.final?null:`lampChoose('${i.id}')`,i:n})).join('')}</div>
-  <div class="tb-actions">${o.final?`<button class="tb-btn pri" id="lampall" onclick="lampChoose('*')">Light them all</button>`:''}<button class="tb-btn" id="lamplater" onclick="lampLeave()">Later</button></div>`)}
+  <div class="tb-actions">${o.final?`<button class="tb-btn pri" id="lampall" onclick="lampChoose('*')">${o.bundle?'Take the bundle':'Light them all'}</button>`:''}<button class="tb-btn" id="lamplater" onclick="lampLeave()">Later</button></div>`)}
 // Empty Lamplight: an unlit lantern on a stair ledge. Placeholder svg until a painted 'lamp-empty' tile exists in the art manifest.
 const emptyArt=()=>{const t=TILES['lamp-empty'];return `<img class="lp-emptyart" decoding="async" src="${t&&t.ready?t.path:'art/v2/ui/lamp/lamp-empty.svg'}" alt="" draggable="false">`};
 function framedLamp(id,body){const S=W.S;return asy(`<div class="tb-scr tb-title tb-lampscr${S.track&&S.track!=='climb'?' theme-'+TH[S.track]:''}">${bgHTML()}<div class="tb-ov"><div class="tb-frame tb-lamp" id="${id}">${frameOpen()}${body}${frameClose()}</div></div></div>`)}
@@ -75,7 +75,7 @@ function hydrate(){const g=document.getElementById('ledgergrid'),q=W.ledgerQ;if(
  more();g.onscroll=()=>{if(g.scrollTop+g.clientHeight>g.scrollHeight-400)more()};q.more=more}
 export function ledgerMore(){const q=W.ledgerQ;if(q&&q.more)q.more()}
 export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=lockedFor(p),sec0=S.sec||'all';
- const tabs=['all',...CLASS_ORDER,'climb','pages'].map(t=>{const pend=t==='pages'||t==='all'?0:t==='climb'?climbPending(p):lampPending(p,t);return `<button class="lp-tab${t===tab?' on':''}" data-tab="${t}" onclick="ledgerTab('${t}')">${TAB_N[t]||CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
+ const tabs=['all',...CLASS_ORDER,'climb','pages'].map(t=>{const pend=t==='pages'||t==='all'?0:t==='climb'?climbPending(p):lampPending(p,t);const hl=CLASSES[t]&&!heroUnlocked(p,t);return `<button class="lp-tab${t===tab?' on':''}${hl?' herolocked':''}" data-tab="${t}"${hl?` data-info="${tesc(HERO_LOCKS[t].hint)}" aria-label="${CLASSES[t].n} (locked)"`:''} onclick="ledgerTab('${t}')">${TAB_N[t]||CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
  if(tab==='pages')return pagesScr(tabs,p);
  const all=tab==='all',climb=tab==='climb',heroes=all?CLASS_ORDER:[tab];
  const xp=climb?p.climb:all?0:(p.xp[tab]||0),table=climb?CLIMB_XP:LAMP_XP,b=barOf(xp,table),pend=all?0:climb?climbPending(p):lampPending(p,tab);
@@ -92,7 +92,11 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
     cardOwned++;const pip=earned.has(id)?'<i class="lp-earned" title="Earned with Lamplight"></i>':'';
     (d.r==='s'?sec.starter:sec.unlocked).push(`<div class="lp-cardwrap${d.r==='s'?' lp-starter':''}">${cardHTML({id,uid:-700-i,up:false},{})}${pip}</div>`)});
    if(!all)for(const id of classRelicIds(h))lock.relics[id]?sec.locked.push(lockItem('relic',id,hintOf('relic',id),on.has(id))):sec.unlocked.push(itemTile('relic',id));
-   for(const act of [2,3]){const n=(LATER_ACT_CARDS[h]||{})[act]||0;cardTot+=n;for(let i=0;i<n;i++)sec.later.push(laterTile(act))}}
+   // five-level mode: the 5 later-act cards in the bundles show for real (locked = silhouette + hint, owned = the card); the rest stay dark until their act is live
+   const bl=FIVE&&!all?LAMP5_CARDS[h].filter(x=>x.act>1&&CARDS[x.id]):[];
+   for(const x of bl){const d=CARDS[x.id];cardTot++;if(lock.cards[x.id])sec.locked.push(lockTile(d.r,TYPE_N[d.t],(on.has(x.id)?'On offer: choose it now':lockHint(p,h,'card',x.id,CARDS))+` Appears in Act ${x.act} once owned.`,on.has(x.id)?d.n:null));
+    else{cardOwned++;sec.unlocked.push(`<div class="lp-cardwrap">${cardHTML({id:x.id,uid:-900-cardTot,up:false},{})}<i class="lp-earned" title="Earned with Lamplight"></i></div>`)}}
+   for(const act of [2,3]){const n=Math.max(0,((LATER_ACT_CARDS[h]||{})[act]||0)-bl.filter(x=>x.act===act).length);cardTot+=n;for(let i=0;i<n;i++)sec.later.push(laterTile(act))}}
   for(const k of ['starter','unlocked','locked','later'])counts[k]=sec[k].length;
   const show=sec0==='all'?['starter','unlocked','locked','later']:[sec0];
   for(const k of show){if(!sec[k].length)continue;items.push(hd(k,SEC_N[k],sec[k].length));if(k==='later')items.push(`<p class="lp-later" data-sec-body="later">Cards for the acts beyond the Bell Gate. They are not in play yet and stay dark until their act arrives. Acts never lock anything.</p>`);items.push(...sec[k])}}
@@ -104,7 +108,7 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
  const cnt=climb?`<span class="lp-ucount" id="ledgercount">${(LOCK_SHARED_RELICS.length+LOCK_POTIONS.length)-Object.keys(lock.relics).filter(x=>LOCK_SHARED_RELICS.includes(x)).length-Object.keys(lock.potions).filter(x=>LOCK_POTIONS.includes(x)).length} of ${LOCK_SHARED_RELICS.length+LOCK_POTIONS.length} lit</span>`:`<span class="lp-ucount" id="ledgercount" data-owned="${cardOwned}" data-total="${cardTot}"><b>Unlocked ${cardOwned}</b> of ${cardTot}</span>`;
  const drawer=all?'':`<div class="lp-drawer" id="lpdrawer"><div class="lp-mid">${trackHTML(tab,b.lvl)}<div class="lp-prog">${barHTML(xp,table)}<span class="lp-nxt">${b.max?'Fully lit · '+xp+' Lamplight':`${b.into} / ${b.span} to level ${b.lvl+1}: <b>${nx.label}</b>`}</span></div></div></div>`;
  return asy(`<div class="tb-scr tb-ledger lp-compact${climb||all?'':' theme-'+TH[tab]}">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">${glyph('undo')}<span>Back</span></button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
-  <div class="lp-bar2"><div class="lp-tabs">${tabs}</div><div class="lp-row2">${lamp}${filt}${claim}<span class="tb-sp lp-spacer"></span>${cnt}</div>${drawer}</div><div class="lp-grid" id="ledgergrid"></div></div>`)}
+  <div class="lp-bar2"><div class="lp-tabs">${tabs}</div><div class="lp-row2">${lamp}${filt}${claim}<span class="tb-sp lp-spacer"></span>${!all&&!climb&&!heroUnlocked(p,tab)?`<span class="lp-herolock" id="ledgerherolock">Hero locked. ${HERO_LOCKS[tab].hint}</span>`:''}${cnt}</div>${drawer}</div><div class="lp-grid" id="ledgergrid"></div></div>`)}
 // ---------- the Keeper's Ledger pages: eight reveal stages, one per lit window (design/lore/LORE-BIBLE.md §14.2) ----------
 const pageHTML=(st,got)=>got
  ?`<article class="lp-page${st.cut?' cut':''}${st.twist?' deep':''}" data-stage="${st.n}">${st.cut?'<i class="lp-stub" aria-hidden="true"></i>':''}<span class="lp-pn">${st.n}</span><h3>${st.title}</h3>${st.lines.map(l=>`<p>${l}</p>`).join('')}</article>`

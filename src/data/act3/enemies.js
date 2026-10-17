@@ -161,8 +161,8 @@ registerEnemies({
   onDamaged:e=>{if(e.ph===1&&e.hp<=250){e.ph=2;['weak','vuln','bleed','brittle','drench','reson'].forEach(k=>delete e.st[k]);addSt(e,'str',1);e.ci=0;e.hist=[];e.queued=null;
    for(let i=0;i<2&&countAlive('hailorb')<3;i++){const o=spawn('hailorb',{summoned:true});o.age=1}
    e.next=EN.thalassa.ai(e);if(W.cb.acting===e)e.keepNext=true;log('👑 The sea comes down: Water begins');bossBeat('phase','The sea comes down','Water drains your Guard. Hit hard.',e)}}},
- // 4.3 The Drowned Navigator [SHARD]: one body holds the Deep Shard (half damage, +4 attacks); the pass fails if you hurt the holder or kill the next one.
- navigator:{n:'The Drowned Navigator',e:'🧭',act:3,role:'support',hp:HP.navigator,boss:1,anim:AB('read','drop','blast'),dmgMod:holdHalf,
+ // 4.3 The Chartless Navigator [SHARD]: one body holds the Deep Shard (half damage, +4 attacks); the pass fails if you hurt the holder or kill the next one.
+ navigator:{n:'The Chartless Navigator',e:'🧭',act:3,role:'support',hp:HP.navigator,boss:1,anim:AB('read','drop','blast'),dmgMod:holdHalf,
   passive:{n:'The Deep Shard',text:'The holder takes half damage. Hurt it badly, or kill the next holder, and the pass fails.',shard:1,
    endTurn:e=>{const cb=W.cb;if(cb.shardDropped||e.hp<=0)return;if(e.ph<2&&e.t%2)return;const h=holder();if(!h)return;
     const order=cb.shardOrder.filter(x=>x.hp>0);const i=order.indexOf(h),nxt=order[(i+1)%order.length];const thr=e.ph===2?12:15;

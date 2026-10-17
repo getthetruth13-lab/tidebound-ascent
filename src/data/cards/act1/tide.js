@@ -14,7 +14,7 @@ const turnCap=(inst,key,max)=>{const t=W.cb.turn;if(inst[key+'T']!==t){inst[key+
 N('drawback',{e:'🪣',rk:{max:5},d:'Spend up to 2 Tide. Draw 1 card for each Tide spent.{@1| Also gain [0|3|+] Guard.}',p:f=>{
  const n=spendTide(Math.min(2,W.cb.tide));if(!W.cb)return;if(n)f.draw(n);else log('🪣 Draw Back: no Tide to spend');if(f.u)f.blk(f.r(0,3))}});
 R('riptide',{e:'🌀',rk:{max:5},d:'Deal {7|10|+}. Surge 2. <b>Low Tide:</b> also gain {7|9|+} Guard.',p:f=>{f.dmg(f.r(7,10));if(!W.cb)return;f.surge(2);if(W.cb&&f.low)f.blk(f.r(7,9))}});
-R('still',{e:'🪷',rk:{max:5},d:'Gain {6|9|+} Guard. The Tide will not drift at the start of your next turn.',p:f=>{f.blk(f.r(6,9));W.cb.holdDrift=true;log('🪷 Still Water: the Tide holds next turn')}});
+R('still',{e:'🪷',rk:{max:5},d:'Gain {7|10|+} Guard. The Tide will not drift at the start of your next turn.',p:f=>{f.blk(f.r(7,10));W.cb.holdDrift=true;log('🪷 Still Water: the Tide holds next turn')}});
 // ---------------- Common ----------------
 R('swell',{e:'🌊',d:'Surge {3|4}. Sink.',p:f=>f.surge(f.v(3,4))});
 R('sinking',{e:'⚓',d:'Deal {5|7}. Recede 3. If this causes an Undertow, deal {5|7} to ALL.',p:f=>{f.dmg(f.v(5,7));if(!W.cb)return;

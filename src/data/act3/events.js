@@ -4,7 +4,7 @@ import {registerEvents,POTIONS,CARDS,RELICS} from '../../core/registry.js';
 import {W,pick,rnd} from '../../core/state.js';
 import {O,LEAVE,roll,done,B,rel,loseGold,takeArt,choice,pickThen,upPool,randomRemovable,freeSlot,run,pct} from '../events.js';
 import {cname,upgradeCard} from '../../engine/cards.js';
-import {heal,hurt,gainCard,gainCurse,gainGold,gainRelic,gainMaxHp,loseMaxHp,randomPotion,addPotion,addPotionSlot,relicCandidates,randomRelic,rollCards,pickable,artifactFree} from '../../engine/run.js';
+import {heal,hurt,gainCard,gainCurse,gainGold,gainRelic,isLocked,gainMaxHp,loseMaxHp,randomPotion,addPotion,addPotionSlot,relicCandidates,randomRelic,rollCards,pickable,artifactFree} from '../../engine/run.js';
 // A random relic of this tier, preferring Act 3's own new relics (falls back to any eligible relic).
 const actRelic=tier=>{const c=relicCandidates(tier).filter(r=>r.act===3);if(c.length){const r=pick(c,'events');run().seenRelics[r.id]=1;return r.id}return randomRelic(undefined,'events',{tier})};
 const giveRelic=(tier,text,tone)=>{const id=actRelic(tier);if(!id){const g=gainGold(50);return done(`${text} Nothing is left to find: +${g} gold.`,'mixed')}gainRelic(id);return done(`${text} You gain ${rel(id)}.`,tone||'good')};
@@ -16,15 +16,15 @@ const isJunk=c=>{const d=CARDS[c.id];return !!d&&(d.curse||d.cls==='status'||c.i
 const upOK=()=>pickable('upgrade').length>0;
 const upWhy='Nothing to upgrade';
 const rmOK=()=>pickable('remove').length>0;
-const uncommonCard=()=>pick(Object.values(CARDS).filter(c=>c.cls===run().cls&&c.r==='u'&&!c.cut&&!c.stub&&(c.act||1)<=3),'events');
+const uncommonCard=()=>pick(Object.values(CARDS).filter(c=>c.cls===run().cls&&c.r==='u'&&!c.cut&&!c.stub&&!isLocked('cards',c.id)&&(c.act||1)<=3),'events');
 registerEvents([
  // ================= events =================
  {id:'a3_frozenledge',pool:'act',act:3,n:'The Frozen Ledge',e:'🧊',t:'A cliff ledge in a bitter wind. Purses and a tin lamp-case are frozen into the ice. "a wick kept in a tin for the next night. there was no next night."',get o(){return [
   O('Chisel out the tin','lose 8 HP, gain the Banked Flame Artifact',{ok:()=>run().hp>8&&artifactFree('bankedflame'),why:()=>artifactFree('bankedflame')?'Needs more than 8 HP':'You already have it',d:'The ice fights the chisel: lose 8 HP. Gain Banked Flame (Artifact card): unspent Energy carries over to your next turn.',f:()=>takeArt('bankedflame','The tin comes free. Lose 8 HP.',()=>hurt(8))}),
   O('Strip the frozen purses','+70 gold, a Dread curse',{d:'+70 gold and a Dread curse.',f:()=>{const g=gainGold(70);gainCurse('dread');done(`The purses come away stiff and heavy. +${g} gold. (Curse: Dread)`,'mixed')}}),
   ...(cls('carto')?[O('[Cartographer] Chart the ledge','upgrade a random card, lose 5 HP',{ok:()=>run().hp>5&&upOK(),why:()=>run().hp>5?upWhy:'Needs more than 5 HP',d:'You take the ledge\'s measure in the wind. A random card is upgraded. Lose 5 HP.',f:()=>{hurt(5);const x=upgradeOne();done(x?`The chart holds. ${B(cname(x))} is improved. Lose 5 HP.`:'The wind takes the page. Lose 5 HP.','mixed')}})]:[]),LEAVE]}},
- {id:'a3_sailor',pool:'act',act:3,n:'The Drowned Sailor',e:'🧜',t:'A sailor sits in the lee of a rock, a long way from any sea, still buttoned to the chin. "the sea gave him back, still buttoned. it kept the rest."',get o(){return [
-  O('Take the coat','lose 6 HP, gain the Drowned Sailor\'s Coat Artifact',{ok:()=>run().hp>6&&artifactFree('sailorcoat'),why:()=>artifactFree('sailorcoat')?'Needs more than 6 HP':'You already have it',d:'The buttons will not give: lose 6 HP. Gain Drowned Sailor\'s Coat (Artifact card): once a fight, survive a killing blow at 1 HP with Guard.',f:()=>takeArt('sailorcoat','You work the coat off him. Lose 6 HP.',()=>hurt(6))}),
+ {id:'a3_sailor',pool:'act',act:3,n:'Mast-Lashed Sailor',e:'🧜',t:'A sailor sits in the lee of a rock, a long way from any sea, still buttoned to the chin. "the sea gave him back, still buttoned. it kept the rest."',get o(){return [
+  O('Take the coat','lose 6 HP, gain the Lashed Sailor\'s Coat Artifact',{ok:()=>run().hp>6&&artifactFree('sailorcoat'),why:()=>artifactFree('sailorcoat')?'Needs more than 6 HP':'You already have it',d:'The buttons will not give: lose 6 HP. Gain Lashed Sailor\'s Coat (Artifact card): once a fight, survive a killing blow at 1 HP with Guard.',f:()=>takeArt('sailorcoat','You work the coat off him. Lose 6 HP.',()=>hurt(6))}),
   O('Search the pockets','60%: +85 gold and a potion, else lose 9 HP',{risk:.6,ok:()=>run().hp>9,why:'Needs more than 9 HP',d:'60%: +85 gold and a random potion. 40%: the cold bites through your gloves: lose 9 HP.',f:()=>{
    if(roll(.6)){const g=gainGold(85);return done(`Wet silver and a stoppered vial: +${g} gold and ${potion()}.`)}hurt(9);done('The cold bites. Lose 9 HP.','bad')}}),
   ...(cls('tide')?[O('[Tidecaller] Listen to the water in his lungs','+6 Max HP, lose 8 HP',{ok:()=>run().hp>8,why:'Needs more than 8 HP',d:'You put your ear to his chest and the sea speaks. Gain 6 Max HP, lose 8 HP.',f:()=>{hurt(8);gainMaxHp(6);done('The sea tells you something about yourself. +6 Max HP. Lose 8 HP.','mixed')}})]:[]),LEAVE]}},

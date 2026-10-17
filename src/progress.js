@@ -1,10 +1,10 @@
 // progress.js: the Lamplight profile (meta-progression that outlives runs). Stored under its own key, versioned, and loaded
 // defensively so a missing, old or damaged save never breaks the game. No DOM or engine imports: usable from tests and bots.
-import {LAMP_XP,CLIMB_XP,CLASS_ORDER,LOCK_CARDS,lockCards,SPOIL_CARDS,LOCK_HERO_RELICS,LOCK_CLASS_RELICS,LAMP_PER_RUN,LOCK_SHARED_RELICS,LOCK_POTIONS,LAMP_PLAN,CLIMB_PLAN} from './data/lamplight.js';
+import {LAMP_XP,CLIMB_XP,CLASS_ORDER,LOCK_CARDS,lockCards,SPOIL_CARDS,LOCK_HERO_RELICS,LOCK_CLASS_RELICS,LAMP_PER_RUN,LOCK_SHARED_RELICS,LOCK_POTIONS,LAMP_PLAN,CLIMB_PLAN,LAMP_MODE,FIVE,LAMP5_BUNDLES} from './data/lamplight.js';
 export const PROFILE_KEY='tidebound.profile.v1',PROFILE_V=1;
 export const ENDING_IDS=['light','lens','cut'];
 let mem=null; // fallback when localStorage is unavailable (private mode, Node)
-const blank=()=>({v:PROFILE_V,xp:{},climb:0,claimed:{},climbClaimed:0,runs:{},wins:{},unlocked:{cards:[],relics:[],potions:[]},spoils:{},seen:{enemy:{},event:{},relic:{},card:{},potion:{}},tasks:0,best:{},twistSeen:false,endings:{},lastEnding:'',tutSeen:{}});
+const blank=()=>({v:PROFILE_V,xp:{},climb:0,claimed:{},climbClaimed:0,runs:{},wins:{},unlocked:{cards:[],relics:[],potions:[]},spoils:{},seen:{enemy:{},event:{},relic:{},card:{},potion:{}},tasks:0,best:{},twistSeen:false,endings:{},lastEnding:'',tutSeen:{},lampMode:LAMP_MODE,heroSeen:null});
 function norm(p){const b=blank();if(!p||typeof p!=='object'||Array.isArray(p))return b;
  const num=x=>Number.isFinite(+x)&&+x>0?Math.floor(+x):0,map=o=>{const r={};if(o&&typeof o==='object')for(const k of Object.keys(o))r[k]=num(o[k]);return r};
  b.xp=map(p.xp);b.climb=num(p.climb);b.claimed=map(p.claimed);b.climbClaimed=num(p.climbClaimed);b.runs=map(p.runs);b.wins=map(p.wins);b.tasks=num(p.tasks);b.best=map(p.best);
@@ -14,6 +14,9 @@ function norm(p){const b=blank();if(!p||typeof p!=='object'||Array.isArray(p))re
  b.twistSeen=p.twistSeen===true;b.endings=map(p.endings);b.lastEnding=ENDING_IDS.includes(p.lastEnding)?p.lastEnding:'';
  for(const k of ['cards','relics','potions'])b.unlocked[k]=Array.isArray(p.unlocked&&p.unlocked[k])?[...new Set(p.unlocked[k].filter(x=>typeof x==='string'))]:[];
  for(const k of Object.keys(b.seen))if(p.seen&&p.seen[k]&&typeof p.seen[k]==='object')for(const id of Object.keys(p.seen[k]))b.seen[k][id]=1;
+ // Ladder migration: a profile saved under the other LAMP_MODE keeps every unlock and all Lamplight; only the claimed-level counters restart so the new ladder offers what XP has earned (already-owned items are skipped).
+ b.heroSeen=null;if(p.heroSeen&&typeof p.heroSeen==='object'){b.heroSeen={};for(const k of CLASS_ORDER)if(p.heroSeen[k])b.heroSeen[k]=1}
+ b.lampMode=p.lampMode==='five'?'five':'ten';if(b.lampMode!==LAMP_MODE){b.claimed={};b.lampMode=LAMP_MODE}
  return b}
 export function loadProfile(){let raw=null;try{raw=JSON.parse(localStorage.getItem(PROFILE_KEY))}catch(_){raw=mem}return norm(raw)}
 export function saveProfile(p){mem=p;try{localStorage.setItem(PROFILE_KEY,JSON.stringify(p))}catch(_){}return p}
@@ -35,7 +38,7 @@ export const totalPending=p=>CLASS_ORDER.reduce((n,c)=>n+lampPending(p,c),0)+cli
 // progress inside the current level: {lvl,max,into,span,pct}
 export function barOf(xp,table){const lvl=levelOf(xp,table),max=lvl>=table.length,lo=lvl?table[lvl-1]:0,hi=max?lo:table[lvl];return {lvl,max,into:xp-lo,span:hi-lo,pct:max?100:Math.max(0,Math.min(100,100*(xp-lo)/Math.max(1,hi-lo)))}}
 // ---------- locks ----------
-export const classRelicIds=cls=>{const r=LOCK_CLASS_RELICS[cls];return r?[r.shop,r.rare,...(LOCK_HERO_RELICS[cls]||[])]:[]};
+export const classRelicIds=cls=>{const r=LOCK_CLASS_RELICS[cls];return r?[r.shop,r.rare,...(LOCK_HERO_RELICS[cls]||[])].filter(Boolean):[]};
 export const allLocked=()=>({cards:CLASS_ORDER.flatMap(c=>lockCards(c)),relics:[...CLASS_ORDER.flatMap(classRelicIds),...LOCK_SHARED_RELICS],potions:[...LOCK_POTIONS]});
 // The ids that are still locked for this profile: {cards:{id:1},relics:{id:1},potions:{id:1}} (copied into each run, see engine/run.js).
 export function lockedFor(p){const out={cards:{},relics:{},potions:{}},A=allLocked();for(const k of Object.keys(A)){const u=new Set(p.unlocked[k]);for(const id of A[k])if(!u.has(id))out[k][id]=1}
@@ -51,7 +54,9 @@ export function remaining(p,track,CARDS){const u=k=>new Set(p.unlocked[k]);
  return {relics:(LOCK_HERO_RELICS[cls]||[]).filter(x=>!ur.has(x)),cards:lockCards(cls).filter(x=>!uc.has(x)&&!(CARDS&&CARDS[x]&&(CARDS[x].cut||CARDS[x].stub))),shop:R.shop&&!ur.has(R.shop)?R.shop:null,rare:R.rare&&!ur.has(R.rare)?R.rare:null}}
 export function offerFor(p,track,CARDS){
  const climb=track==='climb',claimed=climb?p.climbClaimed:(p.claimed[track]||0),pending=climb?climbPending(p):lampPending(p,track);if(pending<=0)return null;
- const plan=(climb?CLIMB_PLAN:LAMP_PLAN)[claimed];if(!plan)return null;const rem=remaining(p,track,CARDS);const items=[];
+ const plan=(climb?CLIMB_PLAN:LAMP_PLAN)[claimed];if(!plan)return null;
+ if(plan.k==='bundle'){const un=k=>new Set(p.unlocked[k]),uc=un('cards'),ur=un('relics');const items=(LAMP5_BUNDLES[track]||[])[claimed].filter(i=>!(i.kind==='card'?uc:ur).has(i.id)).map(i=>({kind:i.kind,id:i.id}));return {track,level:claimed+1,final:true,bundle:true,items}}
+ const rem=remaining(p,track,CARDS);const items=[];
  const take=(kind,list,n)=>{for(const id of list){if(items.length>=n)break;if(!items.some(i=>i.id===id&&i.kind===kind))items.push({kind,id})}};
  const sorted=(list,pref)=>pref?[...list.filter(id=>rarityOf(CARDS,id)===pref),...list.filter(id=>rarityOf(CARDS,id)!==pref)]:list;
  if(plan.k==='all'){const all=climb?[...rem.relics.map(id=>({kind:'relic',id})),...rem.potions.map(id=>({kind:'potion',id}))]:[...rem.cards.map(id=>({kind:'card',id})),...[rem.shop,rem.rare,...rem.relics].filter(Boolean).map(id=>({kind:'relic',id}))];
@@ -71,7 +76,7 @@ export function claim(p,track,id,CARDS){const o=offerFor(p,track,CARDS);if(!o)re
  for(const it of got){const k=it.kind==='card'?'cards':it.kind==='relic'?'relics':'potions';if(!p.unlocked[k].includes(it.id))p.unlocked[k].push(it.id)}
  if(track==='climb')p.climbClaimed++;else p.claimed[track]=(p.claimed[track]||0)+1;
  // an offer with nothing left (everything already taken) is skipped so a level never stalls
- let g=0;while(g++<12){const n=offerFor(p,track,CARDS);if(!n||n.final||n.items.length)break;if(track==='climb')p.climbClaimed++;else p.claimed[track]++}
+ let g=0;while(g++<12){const n=offerFor(p,track,CARDS);if(!n||(n.final&&!n.bundle)||n.items.length)break;if(track==='climb')p.climbClaimed++;else p.claimed[track]++}
  return got}
 // The earliest Lamp level at which a locked item can be offered (for Ledger hints): found by replaying the offers for a fresh profile.
 const firstMemo={};
@@ -83,7 +88,7 @@ export function firstLevel(track,kind,id,CARDS){const key=track+'|'+kind+'|'+id;
 export function lockHint(p,track,kind,id,CARDS){const lv=firstLevel(track,kind,id,CARDS);
  if(track==='climb'){const need=Math.max(0,CLIMB_XP[lv-1]-(p.climb||0));return need?`Stair ${lv} of ${CLIMB_XP.length}. ${need} more Lamplight (about ${Math.max(1,Math.ceil(need/LAMP_PER_RUN))} runs).`:`Stair ${lv} of ${CLIMB_XP.length} is lit. It waits in your next Stair unlock.`}
  const need=Math.max(0,LAMP_XP[lv-1]-(p.xp[track]||0));
- return need?`Lamp ${lv} of ${LAMP_XP.length}. ${need} more Lamplight (about ${Math.max(1,Math.ceil(need/LAMP_PER_RUN))} run${need>LAMP_PER_RUN?'s':''}).`:`Lamp ${lv} of ${LAMP_XP.length} is lit. It can be offered at your next unlock.`}
+ const nm=FIVE?'Lamplight':'Lamp';return need?`${nm} ${lv} of ${LAMP_XP.length}. ${need} more Lamplight (about ${Math.max(1,Math.ceil(need/LAMP_PER_RUN))} run${need>LAMP_PER_RUN?'s':''}).`:`${nm} ${lv} of ${LAMP_XP.length} is lit. ${FIVE?'It unlocks when you claim your bundle.':'It can be offered at your next unlock.'}`}
 
 // ---- Hero locking (Task 30) ----
 // DEV FLAG: HERO_LOCK_DEFAULT=false keeps ALL four Lampbearers open while the game is in development. For release flip it to true (or test with
@@ -93,3 +98,9 @@ export const HERO_LOCK_DEFAULT=false;
 export function heroLockingOn(){try{const v=localStorage.getItem('tidebound.herolock');if(/[?&]herolock=1/.test(location.search)||v==='1')return true;if(v==='0')return false}catch(_){}return HERO_LOCK_DEFAULT}
 export const HERO_LOCKS={tide:{hint:'Raise any Lampbearer\'s Lamp to level 2.',test:p=>CLASS_ORDER.some(c=>lampLevel(p,c)>=2)},carto:{hint:'Climb the Stair to Stair level 2.',test:p=>climbLevel(p)>=2}};
 export const heroUnlocked=(p,cls)=>!heroLockingOn()||!HERO_LOCKS[cls]||HERO_LOCKS[cls].test(p);
+
+// Unlock beat bookkeeping: heroSeen[cls]=1 once the character screen has shown that hero open. The first visit records who is open silently;
+// after that, a hero that became open since the last visit is returned ONCE (the screen plays the chains-fall beat). Only while hero locking is on.
+export function takeHeroNews(){if(!heroLockingOn())return [];const p=loadProfile(),open=CLASS_ORDER.filter(k=>heroUnlocked(p,k));
+ if(p.heroSeen==null){p.heroSeen=Object.fromEntries(open.map(k=>[k,1]));saveProfile(p);return []}
+ const fresh=open.filter(k=>!p.heroSeen[k]);if(fresh.length){for(const k of fresh)p.heroSeen[k]=1;saveProfile(p)}return fresh}

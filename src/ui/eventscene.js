@@ -48,6 +48,7 @@ export function evKind(o,name,sum){const k=val(o.kind);if(k&&EV_KINDS.includes(k
 const N_RELIC=()=>new Set(Object.values(RELICS).map(r=>r.n));
 function optHTML(o,i,out){const dis=!!(o.ok&&!o.ok());let name,sum;
  if(o.n!=null){name=val(o.n);sum=val(o.s)||''}else{const l=optName(o);const k=l.indexOf(': ');name=k>0&&k<=40?l.slice(0,k):l;sum=k>0&&k<=40?l.slice(k+2):''}
+ sum=String(sum).replace(/^(<[^>]+>)*[a-z]/,m=>m.slice(0,-1)+m.slice(-1).toUpperCase()); // sentence case: every option sub-line starts with a capital (B-071)
  const rk=val(o.risk);const risk=rk!=null?`<i class="evrisk">Risky <u>${typeof rk==='string'?rk:Math.round(rk*100)+'% good'}</u></i>`:'';
  const why=dis&&o.why?`<i class="evwhy">${val(o.why)}</i>`:'';
  const info=[val(o.d)||'',rk!=null?(typeof rk==='number'?`Risky: ${Math.round(rk*100)}% good outcome, ${100-Math.round(rk*100)}% bad. Rolled with the run seed.`:`Risky: ${rk}.`):'',dis&&o.why?`Locked: ${val(o.why)}`:''].filter(Boolean).join(' ');

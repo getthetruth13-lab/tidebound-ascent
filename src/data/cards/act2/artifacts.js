@@ -78,7 +78,7 @@ N('bankedflame',{e:'🕯️',d:'Up to {1|2} unspent Energy carries over to your 
 
 N('sailorcoat',{e:'🧥',d:'The first time this fight you would be reduced to 0 HP, you survive with 1 HP and gain {10|15} Guard. Then Sink this.',power:{on:{
  playerDeath(inst,ctx){const cb=W.cb;if(!cb||inst.spent||W.run.hp>0)return;inst.spent=true;W.run.hp=1;ctx.cancel=true;gainBlock(inst.up?15:10);
-  const i=cb.powers.indexOf(inst);if(i>=0)cb.powers.splice(i,1);sinkCard(inst.ci||{id:inst.id,up:inst.up},'sailorcoat');log('🧥 Drowned Sailor\'s Coat: you live, at 1 HP')}}}});
+  const i=cb.powers.indexOf(inst);if(i>=0)cb.powers.splice(i,1);sinkCard(inst.ci||{id:inst.id,up:inst.up},'sailorcoat');log('🧥 Lashed Sailor\'s Coat: you live, at 1 HP')}}}});
 
 // ENGINE-NEEDS: randAlive() (combat.js) should read mod('randomTarget',{},picked) so "random enemy" effects pick the highest-HP enemy.
 N('lodestone',{e:'🧲',d:'Your effects that pick a random enemy pick the enemy with the most HP instead. Parries you call on that enemy are +2.',power:{

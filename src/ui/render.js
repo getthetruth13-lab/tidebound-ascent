@@ -16,7 +16,8 @@ import {syncEnv,envFxSettingLabel} from './env.js';
 import {fightFeet,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
 import {deathLine,ACT_NAMES} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
-import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
+import {loadRunData,settings,saveSettings,savedAction,clearRun} from '../save.js';
+import {rigsOff,setRigOff} from './rig.js';
 import {loadProfile,saveProfile,tutSeen,markTutSeen} from '../progress.js';
 import {ctxHintHTML} from './hints.js';
 import {openHowTo,learnOverlayHTML} from './screens/learn.js';
@@ -357,7 +358,12 @@ export function settingsHTML(){return `<div class="settings sx">
  ${sxSw('setshake','Screen shake',settings.screenShake!==false,'setScreenShake')}${sxSw('sethaptic','Hand vibration',settings.handHaptic!==false,'setHandHaptic')}
  ${sxSw('settaptwice','Tap twice to confirm',!!settings.tapConfirm,'setTapConfirm')}
  ${sxSw('setcharselpar','Hero select motion',settings.charselParallax!==false&&!settings.reduceMotion,'setCharselParallax',settings.reduceMotion)}${sxSw('setreduce','Reduced motion',settings.reduceMotion,'setReduceMotion')}
+ ${sxSw('setrigs','Animated heroes and enemies',!rigsOff(),'setRigs')}
+ <div class="sx-row"><span class="sx-t">Saved run</span><button type="button" class="btn sm${W.S.confirmErase?' danger':''}" id="eraserun" onclick="eraseRunSave()">${W.S.confirmErase?'Sure? Tap again':loadRunData()?'Erase saved run':'No saved run'}</button></div>
  </div>`}
+export function setRigs(on){setRigOff(!on)}
+// Two taps: the first asks, the second deletes the saved run (Lamplight and unlocks are never touched).
+export function eraseRunSave(){if(!loadRunData())return;if(!W.S.confirmErase){W.S={...W.S,confirmErase:true};return render()}clearRun();W.S={...W.S,confirmErase:false};render()}
 export function setMute(on){setAudioSetting('audioMuted',!!on)}
 export function setConfirmCardSkip(on){settings.confirmCardSkip=!!on;saveSettings()}
 export function setCtxHints(on){settings.hints=!!on;saveSettings();render()}
@@ -372,7 +378,7 @@ export function setAnimSpeed(v){settings.animSpeed=SPEEDS[v]?v:'normal';setAnimS
 export function setEnvFx(v){settings.envFx=v;saveSettings();render()}
 // Act I title card (design-v2 §W.5, art/v2/bg/_src/tc-a1-spec.json): the painted plate (frame + emblem, 60% of the screen width, centred) fades in
 // at 0.8 s over the tr_start travel scene; title + subtitle are HTML text inside the plate's dark panel (text_panel rect). Text fallback if the file fails.
-const TC_A1_DEFAULT={src:'art/v2/bg/tc-a1-plate@2x.webp',w:1870,h:761,panel:[1099-864,671-342,1401,260],title:'Act I: The Wrack Terraces',sub:'The foot of the Drowned Stair.'};
+const TC_A1_DEFAULT={src:'art/v2/bg/tc-a1-plate@2x.webp',w:1870,h:761,panel:[1099-864,671-342,1401,260],title:'Act I: The Wrack Terraces',sub:'The foot of the Ebb Stair.'};
 // Plate rect + text panel from the Artist's manifests (tc-a1-rects.json -> ENV.envs.tc_a1.art.mid, tc-a1-spec.json -> .spec), panel made plate-relative.
 function tcA1(){const e=ENV.envs.tc_a1;const m=e&&e.art&&e.art.mid&&e.art.mid[0];const sp=e&&e.spec;if(!m||!sp||!sp.text_panel)return TC_A1_DEFAULT;const [x,y,w,h]=m.r,[px,py,pw,ph]=sp.text_panel.rect;
  return {src:m.f,w,h,panel:[px-x,py-y,pw,ph],title:sp.title||TC_A1_DEFAULT.title,sub:sp.subtitle||TC_A1_DEFAULT.sub}}
@@ -463,10 +469,13 @@ export function updateCardSelection(){const S=W.S;
  if(ci&&S.mode==='upgrade'){for(const q of ['.cost','.text']){const old=box.querySelector(q),next=box.querySelector('.upgrade-after '+q);if(old?.textContent!==next?.textContent&&next){if(q==='.cost')next.classList.add('upgrade-change');else highlightUpgradeText(old,next)}}decorateKeywords(box);fitCards(box)}}}
 }
 function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;return topBar()+pkScreen({cls:'pk-potpick',title:stripEmoji(S.title),sub:`Pick up to ${Math.min(3,free)} (free slots: ${free}).`,body:tilesRow(S.ids.map((id,j)=>potionTile(id,{click:`potPickToggle(${j})`,on:S.chosen.includes(j)})),'pottiles'),right:pkBtn('Done','potPickDone()',{pri:1,id:'potpickdone'})})}
+const PATH_GLYPH={fight:['sword','Fight'],elite:['skull','Elite'],rest:['tent','Camp'],shop:['coin','Shop'],unknown:['question','Event'],treasure:['chest','Treasure'],boss:['crown','Boss']};
+// B-051 run summary: one painted glyph per floor climbed, in order.
+function pathStripHTML(path){if(!path||!path.length)return '';return `<div class="endpath" role="img" aria-label="Path: ${path.map(t=>(PATH_GLYPH[t]||['','Room'])[1]).join(', ')}">${path.map((t,i)=>{const g=PATH_GLYPH[t]||['sigil','Room'];return `<span class="ep ep-${t}" title="Floor ${i+1}: ${g[1]}">${glyph(g[0])}</span>`}).join('')}</div>`}
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
  const stat=(k,v,g)=>`<span class="es" title="${k}" aria-label="${k}: ${v}">${glyph(g)}<b>${v}</b></span>`;
- return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?`Act ${run.act||1} cleared!`:'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.${(run.act||1)>=3?' '+CROWN_HOLDS:''}`:`${K.n} fell on floor ${run.floor} of ${(run.act||1)>1?16:15}. ${deathLine(run.floor,run.boss,run.act||1)}`}</p>
- <div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}${stat('Deck',run.deck.length,'book')}${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
+ return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?`Act ${run.act||1} cleared!`:'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.${(run.act||1)>=3?' '+CROWN_HOLDS:''}`:`${K.n} fell on floor ${Math.max(1,run.floor)} of ${(run.act||1)>1?16:15}. ${deathLine(run.floor,run.boss,run.act||1)}`}</p>
+ ${pathStripHTML(st.path)}<div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}${stat('Deck',run.deck.length,'book')}${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
  ${canContinueToAct2()?`<button class="endlink endnext" id="act2go" onclick="continueToAct2()">${glyph('arrowright')}<span>Continue to Act 2</span><small class="prev">Act 2 preview</small></button>`:''}
  <button class="endlink" id="restart" onclick="W.S={screen:'title'};render()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
 // Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing

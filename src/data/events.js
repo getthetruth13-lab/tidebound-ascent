@@ -94,7 +94,7 @@ registerEvents([
     if(t==='r'){const a=randomRelic(null,'events',{tier:'r'}),b=randomRelic(null,'events',{tier:'r'});const ch=[a,b].filter(Boolean);if(!ch.length){const g=gainGold(50);return done(`The water gives back only gold. +${g}.`,'mixed')}
      return choice('Choose a Rare relic','The whirlpool offers two treasures.',ch.map(id=>({l:`${RELICS[id].e} ${RELICS[id].n}: ${RELICS[id].d}`,f:()=>{gainRelic(id);done(`The undertow gives up ${rel(id)}.`)}})))}
     const id=randomRelic(null,'events',{tier:up});if(id){gainRelic(id);return done(`It spits back ${rel(id)}.`)}const g=gainGold(50);done(`Only gold: +${g}.`,'mixed')}}));
-   choice('Throw in which relic?','',opts.concat([{l:'↩️ Back',f:()=>{W.S.ev=EV('wishing');render()}}]))}}),
+   choice('Throw in which relic?','',opts.concat([{l:'↩️ Back',f:()=>{W.S.ev={...cur,sub:null};render()}}]))}}),
   O('Throw in a card','lose 6 HP, remove it; your next card reward is all Rares',{ok:()=>pickable('remove').length>0&&run().hp>6,why:'Needs more than 6 HP',d:'The card is removed. The whirlpool bruises you (lose 6 HP) but your next card reward shows only Rares.',f:()=>pickThen('remove','🌀 Wishing Undertow: throw in a card',ci=>{hurt(6);run().rareNext=true;done(`<b>${cname(ci)}</b> spirals down. Lose 6 HP. Your next card reward will be all Rares.`,'mixed','The Water Churns')})}),
   O('Throw in 50 gold','50%: an Uncommon relic, else nothing',{risk:.5,ok:()=>run().gold>=50,why:'Needs 50 gold',d:'Pay 50 gold. 50%: the whirlpool returns a random Uncommon relic. 50%: gone.',f:()=>{run().gold-=50;
    if(roll(.5)){const id=randomRelic(null,'events',{tier:'u'});if(id){gainRelic(id);return done(`A glint rises from the dark: ${rel(id)}.`)}const g=gainGold(80);return done(`Coin comes back, and more. +${g} gold.`)}
@@ -133,7 +133,7 @@ registerEvents([
    gainCurse('dread');done('His story is about a drowned lighthouse. You do not sleep well. (Curse: Dread)','bad')}})]},
  {id:'crabmarket',pool:'act',act:1,n:'Crab Market',e:'🦀',t:'Crabs haggle over shiny things on a flat rock. One clacks at your potion belt.',o:[
   O('Sell a potion','+50 gold',{ok:()=>run().potions.some(Boolean),why:'You carry no potion',d:'Hand over a potion of your choice for 50 gold.',f:()=>{const opts=run().potions.map((p,i)=>p?{l:`${POTIONS[p].e} ${POTIONS[p].n}`,f:()=>{run().potions[i]=null;gainGold(50);done(`The crabs pay in old coins. +50 gold.`,'mixed','Sold')}}:null).filter(Boolean);
-   choice('Sell which potion?','',opts.concat([{l:'↩️ Back',f:()=>{W.S.ev=EV('crabmarket');render()}}]))}}),
+   choice('Sell which potion?','',opts.concat([{l:'↩️ Back',f:()=>{W.S.ev={...cur,sub:null};render()}}]))}}),
   O('Buy a mystery jar','pay 50 gold: 70% a random potion, else an angry eel',{risk:.7,ok:()=>run().gold>=50&&freeSlot(),why:()=>run().gold<50?'Needs 50 gold':'Your potion belt is full',d:'Pay 50 gold. 70%: a random potion. 30%: an eel in the jar: lose 5 HP and nothing else.',f:()=>{run().gold-=50;
    if(roll(.7)){const p=randomPotion('events');addPotion(p);return done(`Inside the jar: ${B(POTIONS[p].e+' '+POTIONS[p].n)}. Pay 50 gold.`)}
    hurt(5);done('The jar holds an eel, and it is very angry. Lose 5 HP and 50 gold.','bad','Swindled')}}),
@@ -169,7 +169,7 @@ registerEvents([
   O('Shatter it','lose 5 HP, remove a card, +25 gold',{ok:()=>run().hp>5&&pickable('remove').length>0,why:'Needs more than 5 HP',d:'Break the mirror. Remove a card of your choice, sell the shards for 25 gold and lose 5 HP to the glass.',f:()=>pickThen('remove','🪞 Shatter: remove a card (−5 HP)',ci=>{hurt(5);gainGold(25);done(`The glass shows <b>${cname(ci)}</b> once more, then it is gone. Lose 5 HP, +25 gold.`,'mixed','Seven Years of Silver')})}),
   LEAVE]},
  {id:'loom',pool:'act',act:1,n:"Saltwife's Loom",e:'🧶',t:'In a keeper\'s recess, an old woman weaves nets from salt and moonlight. "I can unpick a rule from you, or weave you a charm."',o:[
-  O('Unpick the Pattern',()=>{const id=RULEBENDER[run().cls];return `lose 6 Max HP, gain ${RELICS[id].n}`},{ok:()=>!run().relics.some(r=>r.id===RULEBENDER[run().cls])&&run().max>6,why:'You already carry it',d:()=>{const id=RULEBENDER[run().cls];return `Lose 6 Max HP and gain ${RELICS[id].n}, a relic made for your class: ${RELICS[id].d}`},
+  O('Unpick the Pattern',()=>{const id=RULEBENDER[run().cls];return `lose 6 Max HP, gain ${RELICS[id].n}`},{ok:()=>!run().relics.some(r=>r.id===RULEBENDER[run().cls])&&!isLocked('relics',RULEBENDER[run().cls])&&run().max>6,why:'You already carry it, or have not found it yet',d:()=>{const id=RULEBENDER[run().cls];return `Lose 6 Max HP and gain ${RELICS[id].n}, a relic made for your class: ${RELICS[id].d}`},
    f:()=>{loseMaxHp(6);const id=RULEBENDER[run().cls];gainRelic(id);done(`${rel(id)}: ${RELICS[id].d} Lose 6 Max HP.`,'mixed','A Rule Bent')}}),
   O('Weave a Charm','pay 35 gold, a charm for the whole run',{ok:()=>run().gold>=35,why:'Needs 35 gold',d:'Pay 35 gold and choose one of three Charms that lasts the whole run.',f:()=>{run().gold-=35;choice('Choose a Charm',"\"Pick one. It'll stay with you.\"",['springcurrent','salvagersluck','lightpurse'].map(id=>({l:`${CHARMS[id].e} ${CHARMS[id].n}: ${CHARMS[id].d}`,f:()=>{gainCharm(id);done(`She ties it off. <b>${CHARMS[id].e} ${CHARMS[id].n}</b>: ${CHARMS[id].d} Pay 35 gold.`,'mixed','Woven')}})))}}),
   O('Pull a loose thread','50%: upgrade a card and heal 8, else lose 6 HP',{risk:.5,ok:()=>run().hp>6,why:'Needs more than 6 HP',d:'50%: a random card is upgraded and you heal 8 HP. 50%: the net tangles and cuts: lose 6 HP.',f:()=>{
@@ -193,6 +193,41 @@ registerEvents([
   O('Take the flask','gain the Ampoule of Lamp-Oil Artifact',{d:'Gain Ampoule of Lamp-Oil, an Artifact card (Skill, Sink): lose 4 HP, gain 2 Energy.',f:()=>takeArt('ampoule','The fingers open. The oil is warm.')}),
   O('Sit with them','heal 5 HP',{d:'Stay a while. Heal 5 HP.',f:()=>{heal(5);done('You stay until the tide turns. Heal 5 HP.')}}),LEAVE]},
 ]);
+// ---- Act 1 scene variants (F7 item 21): about half the time a scene opens in a second form: new text and one option swapped for another
+// trade-off (a gain and a cost, or a gamble). Chosen in run.js resolveUnknown (withVariant) with the seeded 'events' stream.
+const addVariant=(id,at,t,opt)=>{const e=EVENTS.find(e=>e.id===id);if(e)(e.vars=e.vars||[]).push({at,t,o:opt})};
+const uncommonPotion=()=>{const pool=Object.values(POTIONS).filter(p=>p.rarity==='u'&&(!p.cls||p.cls===run().cls)&&!p.stub&&actOK(p)&&!isLocked('potions',p.id));return pool.length?pick(pool,'events').id:randomPotion('events')};
+addVariant('tidepool',2,'The shrine water has gone still and silver. Small bones lie in it like coins.',
+ O('Drop in 30 gold','70%: gain 5 Max HP, else lose 6 HP',{risk:.7,ok:()=>run().gold>=30&&run().hp>6,why:()=>run().gold<30?'Needs 30 gold':'Needs more than 6 HP',d:'Pay 30 gold. 70%: the water takes it kindly: +5 Max HP. 30%: it spits the coin back at you: lose 6 HP and the gold is gone.',f:()=>{run().gold-=30;
+  if(roll(.7)){gainMaxHp(5);return done('The silver warms and sinks into you. Gain 5 Max HP. Pay 30 gold.','mixed','A Fair Trade')}
+  hurt(6);done('The water spits the coin back, edge first. Lose 6 HP and 30 gold.','bad')}}));
+addVariant('cartomancer',2,'The Cartomancer sleeps over his cards. The top of his deck lies face up.',
+ O('Steal the top card','40%: a random Rare card, else lose 7 HP and a Seasick curse',{risk:.4,ok:()=>run().hp>7,why:'Needs more than 7 HP',d:'Quick fingers. 40%: a random Rare card. 60%: he wakes: lose 7 HP and gain a Seasick curse.',f:()=>{
+  if(roll(.4)){const id=randomCard('r');gainCard(id);return done(`He never stirs. You pocket ${B(CARDS[id].n)}.`)}
+  hurt(7);gainCurse('seasick');done('A hand closes on your wrist. Lose 7 HP, gain a Seasick curse.','bad','Caught Dealing')}}));
+addVariant('stranger',2,'The stranger sits by a cold fire, counting a few coins. "Company costs nothing. Luck costs a little."',
+ O('Share your rations','lose 4 HP; 75% a potion, else 15 gold',{risk:.75,ok:()=>run().hp>4,why:'Needs more than 4 HP',d:'Give up some food: lose 4 HP. 75%: he gives you a random Uncommon potion (or 30 gold if your belt is full). 25%: only 15 gold.',f:()=>{hurt(4);
+  if(roll(.75)){if(freeSlot()){const p=uncommonPotion();addPotion(p);return done(`He nods and hands over ${B(POTIONS[p].e+' '+POTIONS[p].n)}. Lose 4 HP.`,'mixed')}const g=gainGold(30);return done(`He presses coin on you. Lose 4 HP, +${g} gold.`,'mixed')}
+  const g=gainGold(15);done(`He thanks you with a few coins. Lose 4 HP, +${g} gold.`,'mixed','A Thin Reward')}}));
+addVariant('inkgrotto',1,'The ink lies flat as a table. Faint lines of writing rise and sink in it.',
+ O('Sketch in the ink','pay 25 gold: 60% upgrade a card, else Dread',{risk:.6,ok:()=>run().gold>=25&&pickable('upgrade').length>0,why:()=>run().gold<25?'Needs 25 gold':'Nothing left to upgrade',d:'Pay 25 gold for fine brushes. 60%: a random card is upgraded. 40%: the ink answers with a drawing of you drowning: a Dread curse.',f:()=>{run().gold-=25;
+  if(roll(.6)){const x=pick(upPool(),'events');upgradeCard(x);return done(`The lines cross and settle. ${B(cname(x))} is improved. Pay 25 gold.`,'mixed','Inked')}
+  gainCurse('dread');done('The ink draws you under the water, again and again. Pay 25 gold, gain a Dread curse.','bad')}}));
+addVariant('sailor',1,'The sailor sleeps against the mast. His purse hangs loose at his belt.',
+ O('Cut the purse quietly','70%: +45 gold, else lose 5 HP and 20 gold',{risk:.7,ok:()=>run().hp>5,why:'Needs more than 5 HP',d:'A careful knife. 70%: +45 gold. 30%: he wakes and clubs you: lose 5 HP and up to 20 gold.',f:()=>{
+  if(roll(.7)){const g=gainGold(45);return done(`The cord parts without a sound. +${g} gold.`)}
+  hurt(5);const l=loseGold(20);done(`He wakes with a roar. Lose 5 HP${l?` and ${l} gold`:''}.`,'bad','He Wakes')}}));
+addVariant('mirror',0,'The mirror shows the chamber behind you, with one door more than there should be.',
+ O('Step through','lose 6 HP; 60% an Uncommon relic, else Dread',{risk:.6,ok:()=>run().hp>6,why:'Needs more than 6 HP',d:'Walk into the glass. You lose 6 HP either way. 60%: you come out with a random Uncommon relic. 40%: you come out a little less than whole: a Dread curse.',f:()=>{hurt(6);
+  if(roll(.6)){const id=randomRelic(null,'events',{tier:'u'});if(id){gainRelic(id);return done(`Cold glass, then dry air. You carry out ${rel(id)}. Lose 6 HP.`,'mixed','Through the Glass')}const g=gainGold(60);return done(`The far side holds only coin. Lose 6 HP, +${g} gold.`,'mixed')}
+  gainCurse('dread');done('Something steps out of the glass beside you and stays. Lose 6 HP, gain a Dread curse.','bad')}}));
+addVariant('loom',2,'The old woman is unpicking a net, thread by thread. "Hold this end for me, would you?"',
+ O('Hold the end','60%: heal 12 HP and +20 gold, else lose 5 HP',{risk:.6,ok:()=>run().hp>5,why:'Needs more than 5 HP',d:'Stand still while she works. 60%: she is grateful: heal 12 HP and +20 gold. 40%: the net snaps back: lose 5 HP.',f:()=>{
+  if(roll(.6)){heal(12);const g=gainGold(20);return done(`She pats your hand. Heal 12 HP, +${g} gold.`)}
+  hurt(5);done('The line snaps tight across your palm. Lose 5 HP.','bad','Rope Burn')}}));
+addVariant('crabmarket',2,'The crabs have laid out a rack of dull trinkets. One of them taps a claw on the price rock.',
+ O('Haggle for a trinket','pay 60 gold: a random Common relic',{ok:()=>run().gold>=60,why:'Needs 60 gold',d:'Pay 60 gold. The crabs hand over a random Common relic. No gamble, but they never come down in price.',f:()=>{run().gold-=60;
+  const id=randomRelic(null,'events',{tier:'c'});if(id){gainRelic(id);return done(`A deal is a deal: ${rel(id)}. Pay 60 gold.`,'mixed','Haggled')}const g=gainGold(40);done(`The crabs return 40 of your coins and shrug. Net cost: ${60-g} gold.`,'mixed')}}));
 // Helpers shared with data/act2/events.js and data/act3/events.js (same option style, same reveal screen).
 export {O,LEAVE,roll,done,B,rel,loseGold,takeArt,choice,pickThen,upPool,randomRemovable,freeSlot,run,pct};
 import {EVENTS} from '../core/registry.js';
