@@ -44,7 +44,7 @@ N('patchedguard',{e:'🧵',tg:1,d:'Call a Parry of {5|7} on one enemy. Sink up t
  if(junk.length)log('🧵 Patched Guard: Sank '+junk.length);f.parry(f.v(5,7)+4*junk.length)}});
 // ---------------- Uncommon ----------------
 N('lacerate',{e:'🩸',d:'Deal {3|5}. Double the target\'s Bleed (max 20). Sink.',p:f=>{const t=f.tg;f.dmg(f.v(3,5));if(!W.cb||!t||t.hp<=0)return;const b=t.st.bleed||0;if(b>0){bleed(t,b);callout('LACERATE ×2','bleed')}}});
-N('saltedblade',{e:'🧂',power:{mod:{damageAdd(inst,ctx,v){if(!ctx.attack||!ctx.target||!ctx.target.st.bleed||!ctx.f)return v;const s=ctx.f._salted||(ctx.f._salted=new Set());
+N('saltedblade',{e:'🧂',d:'Your Attacks deal {2|3} more to enemies with Bleed (once per card).',power:{mod:{damageAdd(inst,ctx,v){if(!ctx.attack||!ctx.target||!ctx.target.st.bleed||!ctx.f)return v;const s=ctx.f._salted||(ctx.f._salted=new Set());
  if(s.has(ctx.target))return v;s.add(ctx.target);return v+(inst.up?3:2)}}}});
 N('buckler',{e:'🛡️',d:'Deal {4|6}, plus the total Parry you have called this turn (max +20). The Parry stays.',p:f=>{const tot=Object.values(W.cb.parries||{}).reduce((a,b)=>a+b,0);f.dmg(f.v(4,6)+Math.min(20,tot))}});
 N('unhand',{e:'✋',tg:1,d:'The target loses {2|3} Might for this fight. Sink.',p:f=>{const t=f.tg;if(t)addSt(t,'str',-f.v(2,3))}});

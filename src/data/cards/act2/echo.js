@@ -120,7 +120,7 @@ N('thirdtine',{e:'🔱',d:'Your second Attack each turn is Marked too (shares th
 N('growingpeal',{e:'🔔',cu:1,d:'Each turn something Echoed, your Echoes gain +1 (max +4 for the fight).',power:{mod:{echoPlan(inst,ctx,p){const c=W.cb;if(!c||p.repeats<1)return p;
  let g=inst.g||0;if(inst.t!==c.turn){g=Math.min(4,g+1);if(!ctx.preview){inst.t=c.turn;inst.g=g}}else g=inst.g||0;return {...p,bonus:(p.bonus||0)+g}}}}});
 // Canon: remembers the names played this turn; a repeat of one costs 0 (once a turn, twice upgraded). Full Flame (X) cards are exempt.
-N('canon',{e:'🎼',d:'Once a turn, a card you play that has the same name as a card you already played this turn costs 0.',power:{
+N('canon',{e:'🎼',d:'{Once|Twice} a turn, a card you play that has the same name as a card you already played this turn costs 0.',power:{
  mod:{cost(inst,ctx,v){const c=W.cb;if(!c||!ctx.card||v<=0||CARDS[ctx.card.id].c==='X'||!c.hand.includes(ctx.card))return v;const s=canonSt(inst);return s.names[CARDS[ctx.card.id].n]&&s.uses<(inst.up?2:1)?0:v}},
  on:{cardPlayed(inst,ctx){const s=canonSt(inst),d=CARDS[ctx.card.id];if(s.names[d.n]&&d.c!=='X'&&baseCost(ctx.card)>0&&s.uses<(inst.up?2:1)){s.uses++;callout('CANON: free','echo')}s.names[d.n]=1}}}});
 function canonSt(inst){const c=W.cb;if(inst.s&&inst.s.turn===c.turn)return inst.s;return inst.s={turn:c.turn,names:{},uses:0}}

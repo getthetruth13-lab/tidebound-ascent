@@ -23,7 +23,7 @@ E('secondverse',{e:'🎶',p:f=>{W.cb.extraMarks=1;log('🔔 Second Verse: you ma
 E('tuningstrike',{e:'🔔',p:f=>{f.dmg(f.v(7,8));const t=f.tg;if(t)addSt(t,'reson',f.v(2,3))}});
 E('struckbell',{e:'🛎️',p:f=>{f.all(f.v(7,10));alive().forEach(e=>addSt(e,'reson',f.v(2,3)))}});
 // ---------------- Cartographer ----------------
-K('scoutroad',{e:'🔭',p:f=>{revealRows(f.v(1,2));f.chart(f.v(2,3))}});
+K('scoutroad',{e:'🔭',d:'Chart {2|3}. Reveal every ? room on the next {floor|two floors}.',p:f=>{revealRows(f.v(1,2));f.chart(f.v(2,3))}});
 K('cutpath',{e:'✂️',p:f=>{f.blk(6);W.run.cut=(W.run.cut||0)+1;log('✂️ Cut a Path: after this fight you may travel to any room on the next floor');f.chart(2)}});
 K('stakenext',{e:'🚩',req:()=>W.cb.slots.length>0,p:f=>{const cb=W.cb;
  const set=i=>{const w=cb.slots[i];if(!w)return;W.run.preWp={id:w.id,up:lvlOf(w),rank:w.rank||0};log('🚩 Your next fight begins with a copy of '+cname(w)+(w.rank?' (Rank '+w.rank+')':''))};
