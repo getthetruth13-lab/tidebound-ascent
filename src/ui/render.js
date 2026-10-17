@@ -444,8 +444,9 @@ function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();const co
  const icon=(it,sh,i,def)=>`<button class="sh1-icon sh1-it${it.sold?' sold':''}${it.right?' right':''}${S.shopSelected===sh+':'+i?' reward-selected':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="selectShopCard('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}" ${pop()}>${slotHTML(sh,it.id,'',def.e)}<span class="inm">${def.n}</span>${price(it)}</button>`;
  const sel=S.shopSelected&&shopDef(S,S.shopSelected);
  const used=(S.scrubUses||0)>=ECON.shop.removal.perVisit;
- return `<div class="sh1-bg" aria-hidden="true"></div>`+topBar()+`<div class="sh1${shopFresh(S)?' fresh':''}" id="shop1" style="--sp:${U(1)}" onclick="if(this.classList.contains('fresh')){this.classList.remove('fresh');W.S.t=0}">
-  <h2 class="etitle sh1-title" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE+" "+wrenLine(bellCount(W.run.seed),currentTier()))}">Wren's Driftwood Bazaar</h2>
+ const a2Shop=(W.run.act||1)===2&&!!(ENV.envs.shop_a2&&ENV.envs.shop_a2.art); // Act 2: the painted shop_a2 environment shows through (no Act 1 .sh1-bg plate)
+ return (a2Shop?'':`<div class="sh1-bg" aria-hidden="true"></div>`)+topBar()+`<div class="sh1${shopFresh(S)?' fresh':''}" id="shop1" style="--sp:${U(1)}" onclick="if(this.classList.contains('fresh')){this.classList.remove('fresh');W.S.t=0}">
+  <h2 class="etitle sh1-title" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE+" "+wrenLine(bellCount(W.run.seed),currentTier()))}">${a2Shop?"Wren's Harbour Chandlery":"Wren's Driftwood Bazaar"}</h2>
   <div class="sh1-stage"><div class="sh1-in"><div class="sh1-cards" id="cardshelf">${S.cards.map((it,i)=>card(it,'cards',i)).join('')}</div>
    <div class="sh1-low"><div class="sh1-extra">${S.colorless.map((it,i)=>card(it,'colorless',i)).join('')}</div>
     <div class="sh1-rp"><div class="sh1-relics">${S.relics.map((it,i)=>icon(it,'relics',i,RELICS[it.id])).join('')}</div><div class="sh1-potions">${S.potions.map((it,i)=>icon(it,'potions',i,POTIONS[it.id])).join('')}</div></div>
