@@ -67,7 +67,9 @@ const victoryView=S=>!!(S&&S.screen==='reward'&&S.scene&&S.cardsOpen==null&&S.sw
 const A2_EV_ENV={chapel:['a2_tithebox','a2_brazier','a2_quietbell','a2_holdstone','a2_lanternlick'],armoury:['a2_armoury','a2_magazine','a2_drill','a2_oathanvil','a2_pressgang','a2_oilcask'],mess:['a2_mess','a2_surgeon','a2_qmgift','a2_grellread','a2_auction']};
 export function a2EventEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='event'||!run||(run.act||1)!==2||!S.ev||!/^a2_/.test(S.ev.id||''))return null;
  let k='yard';for(const n in A2_EV_ENV)if(A2_EV_ENV[n].includes(S.ev.id))k=n;const id='ev_a2_'+k;const e=ENV.envs[id];return e&&e.art?id:null}
-export function a2TravelEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='travel'||S.kind!=='act'||S.to!==2)return null;const id=S.card?'tc_a2':'tr_a1a2';const e=ENV.envs[id];return e&&e.art?id:null}
+// Later-act travel backdrops. Act 3 placeholders reuse the existing Act 3 battle paintings (no tr_a2a3 / tc_a3 art yet): cliffs for the crossing, spires for the title card.
+const LATER_TRAVEL={2:['tr_a1a2','tc_a2'],3:['a3_cliffs','a3_spires']};
+export function a2TravelEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='travel'||S.kind!=='act'||!LATER_TRAVEL[S.to])return null;const id=LATER_TRAVEL[S.to][S.card?1:0];const e=ENV.envs[id];return e&&e.art?id:null}
 export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=W.run;
  if(!run||s==='title')return {id:'a1_shore',grade:'title',dim:.55};
  if(s==='travel'){const t2=a2TravelEnv();if(t2)return {id:t2,grade:'room',dim:0};return {id:'tr_start',grade:'normal',dim:.15}}

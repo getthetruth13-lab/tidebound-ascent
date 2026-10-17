@@ -17,14 +17,13 @@ const GATE_A1=GATE.replace(/<path d="M146 94[^>]*\/>/,'').replace(/<path d="M161
 const BOAT='<svg class="boat" viewBox="0 0 70 34" aria-hidden="true"><g fill="none" stroke="#2f4a54" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h62Q60 30 46 30H24Q10 30 4 18z" fill="#6b5030aa"/><path d="M36 18V3L50 16z" fill="#efe3c6aa"/><path d="M36 3v15M18 12l22 14M54 8l12-4"/></g></svg>';
 const rubble=r=>`<svg class="deco collapsed" viewBox="0 0 60 30" aria-hidden="true"><g fill="none" stroke="#4a3417" stroke-width="1.4" stroke-linecap="round"><path d="M2 8h14l3 4h9M2 14h10l3 4h7M2 20h8l3 4"/><path d="M26 22l4-5 5 2 3-4 6 3 5-1" fill="#8a6a3a55"/><path d="M33 26l3 2M42 25l2 3M20 6l5-3M28 9l6-2" opacity=".6"/></g></svg>`;
 const flood=r=>`<svg class="deco flooded" viewBox="0 0 80 30" aria-hidden="true"><path d="M6 17Q4 7 22 6T58 7Q78 9 74 19T48 27Q14 29 6 17z" fill="#3f8fa0aa" stroke="#1f5560" stroke-width="1.5" opacity=".95"/><g fill="none" stroke="#2f6f7c" stroke-width="1.2" stroke-linecap="round" opacity=".8"><path d="M14 13q5-4 10 0t10 0t10 0M24 20q5-4 10 0t10 0t10 0"/></g></svg>`;
-// ---- Acts 2 and 3: the map is a different object (D-A2-06/13). Act 2 = riveted iron plate with ward banners and Gate sigils; Act 3 = a hand-inked weather chart with the Eye of the storm.
-// Cosmetic only; the painted plate (map_a2 / map_a3) replaces these when the art lands.
-function laterDeco(run,rows,X,Y,N,H){const act=run.act,rnd=rng((run.seed|0)^0x5eed^act);let svg='',html='';
+// ---- Acts 2 and 3: the map is a different object (D-A2-06/13). Act 2 = riveted iron plate with ward banners and Gate sigils; Act 3 = the Crown Terraces painting under a stormglass veil, with the Eye of the storm at each gate.
+// Cosmetic only; the painted plate map_a3 replaces the Act 3 placeholder when the art lands (Act 2 uses map-a2.js).
+function laterDeco(run,rows,X,Y,N,H){const act=run.act;let svg='',html='';
  const wards=BANDS[act]||[];
  wards.forEach((b,i)=>{const r=b.floors[0]-1;if(r<0||r>=N)return;html+=`<span class="ward ward${act}" style="top:${Y(r)-H/2+6}px">${b.n}</span>`});
  rows.forEach((row,r)=>{if(row.length===1&&r<N-1){const gate=act===2?'<i class="sigil"></i>':act===3?'<i class="eye"></i>':'';html+=`<span class="rowmark m${act}" style="top:${Y(r)}px">${gate}</span>`;
   svg+=`<path d="M60 ${Y(r)+20} H340" stroke="${act===2?'#b08a4a':'#8fa3c7'}" stroke-width="1.4" stroke-dasharray="${act===2?'':'3 6'}" opacity=".35" vector-effect="non-scaling-stroke" fill="none"/>`}});
- if(act===3)for(let i=0;i<7;i++){const cy=Y(Math.floor(rnd()*(N-2)))+(rnd()-.5)*H,cx=40+rnd()*320;svg+=`<circle cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="${(26+rnd()*60).toFixed(0)}" fill="none" stroke="#8fa3c7" stroke-width="1" opacity=".13" vector-effect="non-scaling-stroke"/>`}
  return {svg,html}}
 function mapDeco(run,rows,X,Y,N,H,a1){if((run.act||1)>1)return laterDeco(run,rows,X,Y,N,H);const W=400,full=N*H+30+TOP+BOT,rnd=rng((run.seed|0)^0x5eed);let svg='',html='';
  // terrace contour lines every other row gap, wandering a little
