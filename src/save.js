@@ -12,7 +12,15 @@ export function registerSaveActions(mod){for(const [name,fn] of Object.entries(m
 const clone=v=>JSON.parse(JSON.stringify(v));
 // v5: later acts (run.act 1-3, run.bosses, per-act map). Older saves are Act 1 and load unchanged.
 // v4: card instances carry lvl (multi-level Temper). Older saves have only up:true, which is level 1.
-export const migrateRun=run=>{for(const c of (run&&run.deck)||[])if(c.lvl==null)c.lvl=c.up?1:0;return run};
+// Fields older saves may lack get the same defaults newRun() gives (a missing one used to crash the next event / unknown room / map step).
+const RUN_DEFAULTS=()=>({seenEvents:{},shrinesThisAct:{},seenRelics:{},charms:[],encHist:[],vis:{},removals:0,fights:0,rareNext:false,kills:0,floor:0,act:1,potionChance:40,swell:-4,qOdds:{fight:12,shop:4,treasure:3}});
+const STAT_DEFAULTS=()=>({floors:0,kills:0,elites:[0,0,0],bosses:0,goldEarned:0,maxHit:0,maxCardsTurn:0,cardsPlayed:0,path:[],potionsUsed:0,relicsAtBoss:null,potionsAtBoss:null,startT:Date.now()});
+export const migrateRun=run=>{if(!run)return run;for(const c of run.deck||[])if(c.lvl==null)c.lvl=c.up?1:0;
+ const d=RUN_DEFAULTS();for(const k in d)if(run[k]==null)run[k]=d[k];
+ if(!run.qOdds||typeof run.qOdds!=='object')run.qOdds=d.qOdds;else for(const k in d.qOdds)if(run.qOdds[k]==null)run.qOdds[k]=d.qOdds[k];
+ if(!run.stats||typeof run.stats!=='object')run.stats={};const sd=STAT_DEFAULTS();for(const k in sd)if(run.stats[k]==null)run.stats[k]=sd[k];
+ if(!run.bosses&&run.boss)run.bosses={1:run.boss};
+ return run};
 function write(){if(checkpoint&&W.run&&!W.run.won&&W.run.hp>0)safeSet(RUN_KEY,{v:5,t:Date.now(),run:W.run,checkpoint,journal})}
 export function saveRun(){
  if(W.replaying||W.previewing||depth||!W.run||W.S.screen==='end'||W.S.screen==='title')return;
