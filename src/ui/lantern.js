@@ -7,7 +7,7 @@
 import {motionOn} from './vfx.js';
 import {U} from '../core/timing.js';
 export const LANTERN_SRC='art/v2/ui/glyphs/lantern.webp',GLOW_SRC='art/v2/ui/map/lantern-glow.webp';
-export const lanternHTML=(x,y)=>`<div class="mlan" aria-hidden="true" style="left:${x}%;top:${y}px"><i class="mlan-glow"><img src="${GLOW_SRC}" alt="" draggable="false"></i><img class="mlan-img" src="${LANTERN_SRC}" alt="" draggable="false"></div>`;
+export const lanternHTML=(x,y,act)=>act===2?`<div class="mlan a2" aria-hidden="true" style="left:${x}%;top:${y}px"><i class="mlan-glow"><img src="art/v2/map/map-a2-lamp-pole-glow.webp" alt="" draggable="false"></i><img class="mlan-img" src="art/v2/map/map-a2-lamp-pole.webp" alt="" draggable="false"></div>`:`<div class="mlan" aria-hidden="true" style="left:${x}%;top:${y}px"><i class="mlan-glow"><img src="${GLOW_SRC}" alt="" draggable="false"></i><img class="mlan-img" src="${LANTERN_SRC}" alt="" draggable="false"></div>`;
 let busy=false;
 export const lanternBusy=()=>busy;
 const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; // easeInOutCubic
