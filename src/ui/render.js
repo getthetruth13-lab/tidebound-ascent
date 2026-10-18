@@ -174,10 +174,13 @@ export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:M
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
 // v0.6.2.1 (Spencer): every battle figure 15% taller; top = feet - H keeps the ground anchor fixed. Head-room and width clamps still apply.
 export const FIG_SCALE=1.15;
+export const BOSS_SCALE=1.3; // Spencer 2026-10-18: every boss (Acts 1-3) is drawn 30% larger than its old on-screen size; minions/adds/elites/hero untouched. One number, change here.
+export const bossMul=boss=>boss?BOSS_SCALE:1;
 function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const sc=figureScale(role==='boss')*FIG_SCALE;let H=Math.round(Math.min(sc*(role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(role==='hero'?g.heroTop:g.top+32)));
  if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor((g.spriteMaxWidth||g.enemyMaxWidth)*FIG_SCALE*sp.h/sp.w)); // sprites may grow into the cell gap; HP bars/intents keep the cell width (--bw)
+ if(role==='boss')H=Math.round(H*BOSS_SCALE); // x1.3 of the size the old caps allowed; feet stay on the ground line (top = feet-H)
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
- const top=g.feet-H-hov,L=Math.max(4,Math.min(g.vw-W-4,x-Math.round(W*(g.multi?.5:ax)))),fx0=Math.round(W*(g.multi?.5:ax));const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.min(g.vh*260/1080,g.multi?g.enemyMaxWidth:Infinity));
+ const top=g.feet-H-hov,L=Math.max(4,Math.min(g.vw-W-4,x-Math.round(W*(g.multi?.5:ax)))),fx0=Math.round(W*(g.multi?.5:ax));const it=Math.max(role==='boss'?g.top-18:g.top,top-46)-top;const bw=Math.round(Math.min(g.vh*260/1080,g.multi?g.enemyMaxWidth:Infinity));
  const shW=Math.round(W*.7*(role==='boss'?1.3:1)*(hov?.55:1));const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px${role!=='hero'&&sp.facing==='right'?';scale:-1 1':''}" onerror="assetFail(this)">`:''}</div>`;
  return `<div class="${cls}" ${attrs} style="left:${L}px;top:${top}px;width:${W}px;height:${H+hov}px;--bw:${bw}px;--ax:${fx0}px">
  <i class="shadow${hov?' float':''}" style="left:${fx0}px;top:${H+hov}px;width:${shW}px;height:${Math.max(8,Math.round(shW*.17))}px"></i>
@@ -203,7 +206,7 @@ export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const cb
 export function remainsHTML(e,k,n,g,vi){if(e.gap)return '';g=g||sceneGeom();const multi=(n||1)>1,mw=laneOf(n,g.vw).sprite;
  const sp=spriteFor('enemies',e.key,e.sv!=null?e.sv:vi||0),fa=fallenFor(sp,e);if(!fa)return '';
  const sc=figureScale(!!e.boss),H=Math.round(Math.min(sc*(e.boss?g.vh*.44:e.elite?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(g.top+32)));
- const x=enemyX(k,n||1,g);let w=Math.round(Math.max(H*(sp?sp.w/sp.h:.8),H*.9)*(e.boss?.92:.85));w=Math.min(w,Math.round(mw*.96),Math.round(g.vw*.4));const h=Math.round(w*fa.h/fa.w);
+ const x=enemyX(k,n||1,g);let w=Math.round(Math.max(H*(sp?sp.w/sp.h:.8),H*.9)*(e.boss?.92:.85));w=Math.min(w,Math.round(mw*.96),Math.round(g.vw*.4));if(e.boss)w=Math.round(w*BOSS_SCALE);const h=Math.round(w*fa.h/fa.w);
  if(!e.remT)e.remT=Date.now();const d=remainsDelay(e),age=Date.now()-e.remT;
  const L=Math.max(4,Math.min(g.vw-w-4,x-Math.round(w/2)));
  return `<div class="remains${e.boss?' boss':''}" data-key="${e.key}" data-fallen="${fa.id}" style="left:${L}px;top:${g.feet-h+Math.round(h*.06)}px;width:${w}px;height:${h}px;--rd:${d-age}ms"><i class="shadow" style="left:${Math.round(w*.5)}px;top:${Math.round(h*.94)}px;width:${Math.round(w*.9)}px;height:${Math.max(8,Math.round(w*.1))}px"></i><img src="${fa.src}" alt="" draggable="false" decoding="async" width="${w}" height="${h}"></div>`}
