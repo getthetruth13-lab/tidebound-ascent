@@ -61,3 +61,7 @@ body.cb-shapes .bd.buff::after{content:"\25B2"}body.cb-shapes .bd.debuff::after{
 .sx-note .sx-t{opacity:.75;font-size:.9em}
 .cs-lore .cs-play{margin:4px 0 0;font-size:.82em;line-height:1.25;color:#e8dcc0;opacity:.95}
 .topbar .mini{position:relative}.topbar .mini::after{content:"";position:absolute;inset:-5px -3px}
+/* v0.6.55 */
+.sh1-tip .tipneed{color:#e0a79d;font-size:.85em;white-space:nowrap}.sh1-tip .tipneed.ok{color:#bfae85}
+.endstats button.esdeck{background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;min-height:32px}
+.endstats button.esdeck::after{content:'';display:block;height:1px;margin-top:1px;background:currentColor;opacity:.45}

@@ -45,7 +45,7 @@ export function loadingInit(){
 export const pct=()=>{if(LS.state==='done')return 100;if(LS.state==='old')return LS.p;
  const raw=LS.bytesTotal?100*LS.bytes/LS.bytesTotal:LS.total?100*LS.done/LS.total:0;return LS.p=Math.max(LS.p,Math.min(99,Math.floor(raw)))};
 const mb=n=>(n/1048576).toFixed(n<10485760?1:0);
-export const mbText=()=>LS.bytesTotal?mb(Math.min(LS.bytes,LS.bytesTotal))+' of '+mb(LS.bytesTotal)+' MB':'';
+export const mbText=()=>LS.bytesTotal?mb(Math.min(LS.bytes,LS.bytesTotal))+' of '+mb(LS.bytesTotal)+' MB':(LS.state==='error'?'Could not reach the network. You can still play; offline play needs the full download.':'Connecting. The first launch downloads the game once so it can run offline.');
 // Predicted time left (ms) from the speed measured since the first message, or null while unknown.
 export function remainMs(){const r=LS.r0,now=performance.now();if(!r||!LS.bytesTotal||now-r.t<4000||LS.bytes<=r.b)return null;
  return (LS.bytesTotal-LS.bytes)/((LS.bytes-r.b)/(now-r.t))}
@@ -57,7 +57,7 @@ function stalled(){const t=performance.now();if(LS.state==='error')return true;i
  const rem=remainMs();return rem!=null&&rem>longMs()||LS.ess&&LS.state!=='done'&&t-LS.t0>longMs()}
 function paint(){const v=document.getElementById('ldfill');if(!v)return;const p=pct();
  v.style.setProperty('--p',p);const n=document.getElementById('ldpct');if(n)n.textContent=p+'%';
- const m=document.getElementById('ldmb');if(m)m.textContent=mbText();const b=document.getElementById('ldbox');if(b)b.setAttribute('aria-valuenow',p);
+ const m=document.getElementById('ldmb');if(m)m.textContent=mbText()+(LS.bytesTotal&&stalled()&&LS.state!=='done'?' · You can play now; the rest keeps downloading for offline play.':'');const b=document.getElementById('ldbox');if(b)b.setAttribute('aria-valuenow',p);
  const s=document.getElementById('ldskip');if(s)s.classList.toggle('on',stalled())}
 // Small honest status for players who went on while the rest of the set downloads. Never blocks input.
 let chipHide=0;

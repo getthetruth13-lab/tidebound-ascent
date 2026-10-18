@@ -85,4 +85,17 @@ Object.assign(kw,{
  'Shard':'The Shard holder takes half damage and hits 4 harder. Hurt it badly, or kill the next holder, and the pass fails.',
  'Pelt':'Many small hits. The last one makes you Brittle.',
 });
+// v0.6.55 plain-words pass (review items 12/14): lead with the action, then the timing. Same rules, clearer wording.
+Object.assign(kw,{
+ 'Decamp':'A bonus that fires when this Waypoint leaves its slot. Tap a Waypoint once a turn to send it off.',
+ 'Chart X':'Look at the top X cards of your draw pile and put them in the order you want.',
+ 'Bearing':'Bonus if the top card of your draw pile is the matching type (Attack or Skill).',
+ 'Parry X':'Blunts that enemy\'s next hit and hits it back.',
+ 'Resound':'Bonus that fires only when Echo replays this card for free.',
+ 'Sink':'Takes this card out of the fight for good. It is back in your deck next fight.',
+ 'Tideturn':'The Tide reverses direction from its last move (rising becomes falling, and the other way round).',
+ 'Exposed':'Takes 50% more damage. Drops by 1 each turn.',
+ 'Expedition':'Gets stronger for every Waypoint you have in play. A Landmark counts as 2.',
+ 'Flotsam':'Junk cards added during a fight. They clog your hand; some cards Sink them for a bonus.',
+});
 registerKeywords(kw);
