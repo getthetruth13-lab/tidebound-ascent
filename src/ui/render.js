@@ -18,7 +18,7 @@ import {deathLine,ACT_NAMES,overallFloor,TOTAL_FLOORS} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
 import {loadRunData,settings,saveSettings,savedAction,clearRun} from '../save.js';
 import {rigsOff,setRigOff} from './rig.js';
-import {loadProfile,saveProfile,tutSeen,markTutSeen} from '../progress.js';
+import {loadProfile,saveProfile,tutSeen,markTutSeen,loadHistory,statsOf,ascUnlocked} from '../progress.js';
 import {ctxHintHTML} from './hints.js';
 import {openHowTo,learnOverlayHTML} from './screens/learn.js';
 import {TUTORIAL,snap as tutSnap} from '../data/tutorial.js';
@@ -30,7 +30,7 @@ export {toggleHitLog} from './hero-plate.js';
 import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,lvlLabel,rkMax,baseCost,costSurcharge} from '../engine/cards.js';
 import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,canTakeMove,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
-import {ECON,isLastAct,canContinueToAct2,canContinueToAct3,campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
+import {ECON,isLastAct,canContinueToAct2,canContinueToAct3,campOptions,toast,newRun,goNode,ascInfo,dailySeed,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
 import {anim,syncCombatAnimations} from './fx.js';
 import {screenChange,motionEnabled} from './anim.js';
 import {deathStyleOf,DEATH_STYLES,DEATH_DRAIN} from './deathstyles.js';
@@ -81,9 +81,10 @@ export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const ba
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
-export function topBar(){const K=CLASSES[W.run.cls];return `<div class="topbar sts theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act ${['','I','II','III'][W.run.act||1]}</small></span></span>
- <span class="stat hp" style="color:var(--status-damage)">${iconHTML('hud','heart','❤️')} ${Math.max(0,W.run.hp)}/${W.run.max}</span><span class="stat gold" style="color:var(--rarity-rare)">${iconHTML('hud','gold','💰')} ${W.run.gold}</span><span class="stat floor">${iconHTML('hud','floor','🏔️')} <span class="fl-n">${overallFloor(W.run.act,W.run.floor)}/${TOTAL_FLOORS}</span></span>${potionSlots()}${relicBar()}<span class="sp"></span>
- ${W.run.lamp?`<button class="mini" id="lampbtn" onclick="openOv('tasks')" title="Lantern Tasks">${LANTERN_SVG} ${lampBtnLabel()}</button>`:''}<button class="mini" id="deckbtn" onclick="openOv('deck')" title="Deck">${iconHTML('hud','deck','🂠')} <span class="deck-count">${W.run.deck.length}</span></button><button class="mini" id="mapbtn" onclick="openOv('map')" title="Map">${iconHTML('hud','map','🗺️')}</button><button class="mini" id="setbtn" onclick="openOv('settings')" title="Settings">${iconHTML('hud','settings','⚙️')}</button></div>${toastsHTML()}`}
+export function barTip(k){const of=overallFloor(W.run.act,W.run.floor);const t={floor:`Floor ${of} of ${TOTAL_FLOORS} across all three acts`,lamp:`Lantern Tasks finished this run: ${lampBtnLabel()}. Tap again to read them`}[k];if(t){toast(t);render()}}
+export function topBar(){const K=CLASSES[W.run.cls];if(!settings.barTipSeen&&W.run.floor>=1){settings.barTipSeen=true;try{saveSettings()}catch(_){}toast(`Top bar: floor ${overallFloor(W.run.act,W.run.floor)} of ${TOTAL_FLOORS} · lantern tasks ${lampBtnLabel()||'0/3'} (tap either for more)`)}return `<div class="topbar sts theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act ${['','I','II','III'][W.run.act||1]}</small></span></span>
+ <span class="stat hp" style="color:var(--status-damage)">${iconHTML('hud','heart','❤️')} ${Math.max(0,W.run.hp)}/${W.run.max}</span><span class="stat gold" style="color:var(--rarity-rare)">${iconHTML('hud','gold','💰')} ${W.run.gold}</span><span class="stat floor" onclick="barTip('floor')" title="Floor out of all three acts" aria-label="Floor ${overallFloor(W.run.act,W.run.floor)} of ${TOTAL_FLOORS}">${iconHTML('hud','floor','🏔️')} <span class="fl-n">${overallFloor(W.run.act,W.run.floor)}/${TOTAL_FLOORS}</span></span>${potionSlots()}${relicBar()}<span class="sp"></span>
+ ${W.run.lamp?`<button class="mini" id="lampbtn" onclick="openOv('tasks')" title="Lantern Tasks done this run" aria-label="Lantern Tasks ${lampBtnLabel()}">${LANTERN_SVG} ${lampBtnLabel()}</button>`:''}<button class="mini" id="deckbtn" onclick="openOv('deck')" title="Deck">${iconHTML('hud','deck','🂠')} <span class="deck-count">${W.run.deck.length}</span></button><button class="mini" id="mapbtn" onclick="openOv('map')" title="Map">${iconHTML('hud','map','🗺️')}</button><button class="mini" id="setbtn" onclick="openOv('settings')" title="Settings">${iconHTML('hud','settings','⚙️')}</button></div>${toastsHTML()}`}
 export function potionSlots(){const ps=W.run.potions;return `<span class="potions" id="potions">${ps.map((id,i)=>{const p=id&&POTIONS[id];
  return `<button class="potion${p?'':' empty'}${W.S.potion===i?' on':''}" data-potion="${i}" ${p?`style="--pcol:${p.col}"`:''} title="${p?esc(p.n+': '+p.d):'Empty potion slot.'}" onclick="potionTap(${i})">${p?slotHTML('potions',id,'',p.e):''}</button>`}).join('')}</span>`}
 export function relicBar(){const rs=W.run.relics;const now=Date.now();return `<div class="relics" id="relicbar">${rs.map(r=>{const d=RELICS[r.id];if(!d)return'';const fl=r.flashT&&now-r.flashT<900;
@@ -112,7 +113,7 @@ function popHTML(){const S=W.S;
  if(S.relicView){const ch=S.relicView.startsWith('charm:');const d=ch?CHARMS[S.relicView.slice(6)]:RELICS[S.relicView];const r=!ch&&W.run.relics.find(x=>x.id===S.relicView);
   if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${bigArt(slotHTML('relics',S.relicView,'itemart',d.e))}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${relicFlavour(d.id||S.relicView,d.flavour)}</div>`:''}</div>`}
  return ''}
-export function openOv(k){if(drag)return;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
+export function openOv(k){if(drag)return;W.S.dkTerms=false;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
 export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(blkT,T(700)),who)}
 export function badges(block,blkT,st,extra,who){const n=alive().length;const limit=who&&typeof who==='object'&&n>1?Math.max(1,Math.min(2,Math.floor((laneOf(n,innerWidth).cell+1)/23))):6;return statusRowHTML(st,extra,who,limit)}
 // Floating numbers (R12): size scales with the amount (22-40 px), stacked numbers fan out, Guard uses its icon, and a number waits for the swing to connect (x.d).
@@ -368,9 +369,16 @@ export function settingsHTML(){return `<div class="settings sx">
  ${sxSw('setshake','Screen shake',settings.screenShake!==false,'setScreenShake')}${sxSw('sethaptic','Hand vibration',settings.handHaptic!==false,'setHandHaptic')}
  ${sxSw('settaptwice','Tap twice to confirm',!!settings.tapConfirm,'setTapConfirm')}
  ${sxSw('setcharselpar','Hero select motion',settings.charselParallax!==false&&!settings.reduceMotion,'setCharselParallax',settings.reduceMotion)}${sxSw('setreduce','Reduced motion',settings.reduceMotion,'setReduceMotion')}
+ ${sxSeg('settextsize','Text size',[['normal','Normal'],['large','Large'],['xlarge','Larger']],settings.textSize||'normal','setTextSize')}
+ ${sxSw('setshapes','Shapes on status icons (▲ good, ▼ bad)',!!settings.statusShapes,'setStatusShapes')}
+ ${(()=>{const u=ascUnlocked(),cur=Math.min(settings.ascension|0,u);return u>0?sxSeg('setasc','Ascension (harder runs)',Array.from({length:u+1},(_,i)=>[String(i),i?'A'+i:'Off']),String(cur),'setAscension')+`<div class="sx-row sx-note"><span class="sx-t">${ascInfo[cur]}</span></div>`:'<div class="sx-row sx-note"><span class="sx-t">Ascension (harder runs) opens after your first Act 1 win.</span></div>'})()}
+ ${sxSw('setdaily','Daily run: everyone gets today\'s map',!!settings.dailyMode,'setDailyMode')}
+ <div class="sx-row"><span class="sx-t">Your past runs</span><button type="button" class="btn sm" id="histbtn" onclick="openOv('history')">Run history</button></div>
  ${sxSw('setrigs','Animated heroes and enemies',!rigsOff(),'setRigs')}
  <div class="sx-row"><span class="sx-t">Saved run</span><button type="button" class="btn sm${W.S.confirmErase?' danger':''}" id="eraserun" onclick="eraseRunSave()">${W.S.confirmErase?'Sure? Tap again':loadRunData()?'Erase saved run':'No saved run'}</button></div>
  </div>`}
+export function setAscension(v){settings.ascension=Math.min(+v|0,ascUnlocked());saveSettings()}
+export function setDailyMode(on){settings.dailyMode=!!on;saveSettings();render()}
 export function setRigs(on){setRigOff(!on)}
 // Two taps: the first asks, the second deletes the saved run (Lamplight and unlocks are never touched).
 export function eraseRunSave(){if(!loadRunData())return;if(!W.S.confirmErase){W.S={...W.S,confirmErase:true};return render()}clearRun();W.S={...W.S,confirmErase:false};render()}
@@ -424,11 +432,12 @@ function vicLampHTML(){const v=lampPreview();if(!v)return '';const up=v.to.lvl>v
  const from=up?0:v.from.pct,to=v.to.pct,need=v.to.max?'':`${v.to.span-v.to.into} to Lamp ${v.to.lvl+1}`;
  return `<div class="vic-lamp${up?' up':''}" id="viclamp" style="--from:${from.toFixed(1)};--to:${to.toFixed(1)}"><div class="vl-top"><b class="vl-gain">Lamplight +${v.gain}</b><span class="vl-lvl">${up?`Lamp ${v.to.lvl} at run end`:need}</span></div>
   <div class="vl-bar"><i class="vl-fill"></i><i class="vl-new"></i><img class="vl-frame" src="art/v2/ui/lamp/vic-lamp-frame.png" alt="" draggable="false">${up?'<img class="vl-glow" src="art/v2/ui/lamp/vic-lamp-ready-glow.png" alt="" draggable="false">':''}<img class="vl-lantern" src="art/v2/ui/lamp/vic-lamp-lantern.png" alt="" draggable="false"></div></div>`}
+const ownedBadge=id=>{const n=(W.run&&W.run.deck||[]).filter(c=>c.id===id).length;return n?`<span class="owned" aria-label="You own ${n}">Owned ${n}</span>`:''};
 function rewardScr(){const S=W.S,title=stripEmoji(S.title||'');
  const boss=S.kind==='boss'&&S.boss&&EN[S.boss]&&S.cardsOpen==null&&S.swap==null?`<div class="bossvic" style="${anim(S.t,2600)||''}"><i class="bv-rays"></i><b>${EN[S.boss].n}</b><q>${BOSS_DEFEAT[S.boss]||''}</q></div>`:'';
  if(S.cardsOpen!=null){const row=S.rows[S.cardsOpen];
   return topBar()+pkScreen({cls:'pk-cards',title:`<span class="reward-banner">${title||'Choose a card'}</span>`,sub:cardSelSub(S.cardSelected!=null?CARDS[row.cards[S.cardSelected]].n:null),
-   body:`<div class="grid rewgrid">${row.cards.map((id,j)=>`<div class="rcw${S.cardSelected===j?' reward-selected':''}" aria-selected="${S.cardSelected===j}">${cardHTML({id,uid:-1-j,up:false},{click:`rewCard(${j})`,isNew:isNewCard(id)})}${cardBackHTML()}</div>`).join('')}</div>`,
+   body:`<div class="grid rewgrid">${row.cards.map((id,j)=>`<div class="rcw${S.cardSelected===j?' reward-selected':''}" aria-selected="${S.cardSelected===j}">${cardHTML({id,uid:-1-j,up:false},{click:`rewCard(${j})`,isNew:isNewCard(id)})}${ownedBadge(id)}${cardBackHTML()}</div>`).join('')}</div>`,
    left:pkBtn('Back','rewCloseCards()',{icon:'undo'})+pkBtn('Skip card','rewSkipCards()',{id:'skipcard'}),right:pkBtn('Continue','rewConfirmCards()',{pri:1,id:'confirmcard'}),
    after:S.skipConfirm?`<div class="ov" role="dialog" aria-modal="true" aria-labelledby="skipquestion"><div class="box card-skip-box"><h2 id="skipquestion">No card has been selected. Do you wish to continue?</h2><label class="chk"><input type="checkbox" id="skipdont"><span>Don't show this again</span></label><div class="actions"><button class="btn pri" id="skipyes" onclick="rewSkipAnswer(true,document.getElementById('skipdont').checked)">Yes</button><button class="btn" id="skipno" onclick="rewSkipAnswer(false)">No</button></div></div></div>`:''})}
  if(S.swap!=null){const row=S.rows[S.swap],p=POTIONS[row.id];
@@ -455,7 +464,7 @@ function shopTipHTML(S){const d=S.shopSelected&&shopDef(S,S.shopSelected);if(!d)
 function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();const coin=glyph('coin');let n=0;
  const pop=()=>`style="--i:${n++}"`;
  const price=it=>`<span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':(it.sale?'<s>'+Math.round(it.base)+'</s> ':'')+coin+' '+it.price}</span>`;
- const card=(it,sh,i)=>`<div data-shop-card="${sh}:${i}" class="shopitem sh1-it${it.sold?' sold':''}${it.sale?' sale':''}${S.shopSelected===sh+':'+i?' reward-selected':''}${anim(it.noT,400)?' no':''}" ${pop()}>${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`selectShopCard('${sh}',${i})`,can:g>=it.price})}${price(it)}${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
+ const card=(it,sh,i)=>`<div data-shop-card="${sh}:${i}" class="shopitem sh1-it${it.sold?' sold':''}${it.sale?' sale':''}${S.shopSelected===sh+':'+i?' reward-selected':''}${anim(it.noT,400)?' no':''}" ${pop()}>${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`selectShopCard('${sh}',${i})`,can:g>=it.price})}${it.sold?'':ownedBadge(it.id)}${price(it)}${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
  const icon=(it,sh,i,def)=>`<button class="sh1-icon sh1-it${it.sold?' sold':''}${it.right?' right':''}${S.shopSelected===sh+':'+i?' reward-selected':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="selectShopCard('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}" ${pop()}>${slotHTML(sh,it.id,'',def.e)}<span class="inm">${def.n}</span>${price(it)}</button>`;
  const sel=S.shopSelected&&shopDef(S,S.shopSelected);
  const used=(S.scrubUses||0)>=ECON.shop.removal.perVisit;
@@ -488,13 +497,30 @@ function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;
 const PATH_GLYPH={fight:['sword','Fight'],elite:['skull','Elite'],rest:['tent','Camp'],shop:['coin','Shop'],unknown:['question','Event'],treasure:['chest','Treasure'],boss:['crown','Boss']};
 // B-051 run summary: one painted glyph per floor climbed, in order.
 function pathStripHTML(path){if(!path||!path.length)return '';return `<div class="endpath" role="img" aria-label="Path: ${path.map(t=>(PATH_GLYPH[t]||['','Room'])[1]).join(', ')}">${path.map((t,i)=>{const g=PATH_GLYPH[t]||['sigil','Room'];return `<span class="ep ep-${t}" title="Floor ${i+1}: ${g[1]}">${glyph(g[0])}</span>`}).join('')}</div>`}
+// Route preview: press and hold an open map node to light every room you could reach from it; a hold never picks the node.
+let rtTimer=0,rtHeld=0;
+export function routeHL(r,i,on){clearTimeout(rtTimer);const map=document.querySelector('.mapwrap');if(!map)return;
+ if(!on){if(map.querySelector('.node.rt'))rtHeld=Date.now();map.classList.remove('routehl');map.querySelectorAll('.node.rt,.node.rt0').forEach(n=>n.classList.remove('rt','rt0'));return}
+ rtTimer=setTimeout(()=>{const rows=W.run&&W.run.map;if(!rows)return;const seen=new Set([r+':'+i]),q=[[r,i]];while(q.length){const [a,b]=q.shift();const n=rows[a]&&rows[a][b];if(!n)continue;for(const j of n.to||[]){const k=(a+1)+':'+j;if(!seen.has(k)){seen.add(k);q.push([a+1,j])}}}
+  map.classList.add('routehl');seen.forEach(k=>{const [a,b]=k.split(':');const el=map.querySelector(`.node[data-r="${a}"][data-i="${b}"]`);if(el)el.classList.add(k===r+':'+i?'rt0':'rt')})},300)}
+export function goNodeTap(r,i){if(rtHeld&&Date.now()-rtHeld<700){rtHeld=0;return}goNode(r,i)}
+// Terms tab (deck view): every keyword used by a card in the deck, in plain words (first line of the glossary entry).
+function historyHTML(){const h=loadHistory(),st=statsOf(h);const nm=k=>(CLASSES[k]&&CLASSES[k].n)||k;
+ const rows=Object.entries(st.by).map(([k,b])=>`<p class="dk-term"><b>${nm(k)}</b> ${b.wins} win${b.wins===1?'':'s'} in ${b.runs} run${b.runs===1?'':'s'} · best floor ${b.best}/${TOTAL_FLOORS}</p>`).join('');
+ const last=h.slice(0,12).map(r=>`<p class="dk-term"><b>${nm(r.cls)}</b> ${r.won?`cleared Act ${r.act||1}`:`fell on floor ${r.floor}${r.by?' to '+r.by:''}`} · ${r.mins} min${r.asc?' · A'+r.asc:''}${r.daily?' · Daily':''}</p>`).join('');
+ return `<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><div class="dk-head"><h2>Run history</h2><button class="btn dk-close">Close</button></div><div class="dk-termlist">${h.length?`<p class="dk-term"><b>All runs</b> ${st.wins} win${st.wins===1?'':'s'} in ${st.runs} · best floor ${st.best}/${TOTAL_FLOORS}${st.fastest!=null?' · fastest win '+st.fastest+' min':''}</p>${rows}<p class="dk-term"><b>Latest</b></p>${last}`:'<span class="muted">No finished runs yet. Your wins and losses will show up here.</span>'}</div></div></div>`}
+export function termsToggle(){W.S.dkTerms=!W.S.dkTerms;render()}
+function termsHTML(list){const txt=list.map(c=>(CARDS[c.id]?desc(c):'')).join(' ').replace(/<[^>]+>/g,' ');
+ const names=Object.keys(KW).filter(k=>new RegExp('\\b'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(txt)).sort();
+ return names.length?names.map(k=>`<p class="dk-term"><b>${k}</b> ${shortText(k)||KW[k]}</p>`).join(''):'<span class="muted">No special terms yet.</span>'}
+export function sameHeroNewRun(){const cls=W.run&&W.run.cls;if(!cls||!CLASSES[cls])return;newRun(cls)}
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
  const stat=(k,v,g)=>`<span class="es" title="${k}" aria-label="${k}: ${v}">${glyph(g)}<b>${v}</b></span>`;
- return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?`Act ${run.act||1} cleared!`:'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.${(run.act||1)>=3?' '+CROWN_HOLDS:''}`:`${K.n} fell on floor ${Math.max(1,run.floor)} of ${(run.act||1)>1?16:15}. ${deathLine(run.floor,run.boss,run.act||1)}`}</p>
+ return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?`Act ${run.act||1} cleared!`:'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.${(run.act||1)>=3?' '+CROWN_HOLDS:''}`:`${K.n} fell on floor ${Math.max(1,run.floor)} of ${(run.act||1)>1?16:15}. ${deathLine(run.floor,run.boss,run.act||1)}${st.lastHit?` <span class="lasthit">Last blow: ${st.lastHit.amt} from ${st.lastHit.by}${st.lastHit.turn?' on turn '+st.lastHit.turn:''}.</span>`:''}`}</p>
  ${pathStripHTML(st.path)}<div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}${stat('Deck',run.deck.length,'book')}${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
  ${canContinueToAct2()?`<button class="endlink endnext" id="act2go" onclick="continueToAct2()">${glyph('arrowright')}<span>Continue to Act 2</span><small class="prev">Act 2 preview</small></button>`:''}
  ${canContinueToAct3()?`<button class="endlink endnext" id="act3go" onclick="continueToAct3()">${glyph('arrowright')}<span>Continue to Act 3</span><small class="prev">Act 3 preview</small></button>`:''}
- <button class="endlink" id="restart" onclick="leaveWinScreen()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
+ ${run.won?'':`<button class="endlink endnext" id="samehero" onclick="sameHeroNewRun()">${glyph('undo')}<span>Same hero, new run</span></button>`}<button class="endlink" id="restart" onclick="leaveWinScreen()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
 // Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing
 // sources preserves fitted text, sprite animations and stage styles on unchanged nodes.
 let renderTree=null,renderedCombat=null;
@@ -558,10 +584,11 @@ export function render(){if(W.previewing||W.replaying)return;tutSync();if(drag||
  if(W.S.ov==='map'&&W.run){h+=`<div class="ov" id="ovl" onclick="if(event.target===this){W.S.ov=null;render()}"><div class="box mapbox">${mapHTML(false)}<button class="btn full" onclick="W.S.ov=null;render()">Close map</button></div></div>`}
  else if(W.S.ov==='tasks'&&W.run){h+=tasksHTML()}
  else if(W.S.ov==='learn'){h+=learnOverlayHTML()}
+ else if(W.S.ov==='history'){h+=historyHTML()}
  else if(W.S.ov==='settings'){h+=`<div class="ov" id="ovl" onclick="if(event.target===this){W.S.ov=null;render()}"><div class="box plain"><h2>Settings</h2>${settingsHTML()}<button class="btn full" onclick="W.S.ov=null;render()">Close</button></div></div>`}
  else if(W.S.ov&&W.run){const cb=W.cb;const list=W.S.ov==='deck'?W.run.deck:cb?(W.S.ov==='draw'?(W.run.cls==='carto'?cb.draw:cb.draw.slice().sort((a,b)=>a.id<b.id?-1:1)):W.S.ov==='disc'?cb.disc:cb.exh):[];
   const t={deck:'Your deck',draw:W.run.cls==='carto'?'Draw pile (in order: face up)':'Draw pile (order hidden)',disc:'Discard pile',exh:'Sunk this combat'}[W.S.ov];
-  h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><div class="dk-head"><h2>${t} (${list.length})</h2><button class="btn dk-close">Close</button></div><div class="grid small dk-grid">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div></div></div>`}
+  h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><div class="dk-head"><h2>${W.S.dkTerms?'Terms in your deck':`${t} (${list.length})`}</h2>${W.S.ov==='deck'?`<button class="btn dk-terms" onclick="event.stopPropagation();termsToggle()">${W.S.dkTerms?'Cards':'Terms'}</button>`:''}<button class="btn dk-close">Close</button></div>${W.S.dkTerms&&W.S.ov==='deck'?`<div class="dk-termlist">${termsHTML(list)}</div>`:`<div class="grid small dk-grid">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div>`}</div></div>`}
  if(inspecting)h+=inspectHTML();
  const prev=a.dataset.screen;const changed=prev!==s;
  if(changed){a.dataset.screen=s;runScreenCleanups();screenChange(a,prev,s)}

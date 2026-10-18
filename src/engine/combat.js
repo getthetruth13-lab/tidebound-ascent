@@ -45,7 +45,7 @@ export function addSt(e,k,n){n=Math.floor(n);if(!n||!e)return;if(n<0&&k!=='str'&
  fire('statusApplied',{target:e,key:k,n,player:isP})}
 export function tick(st,hold){['weak','vuln','brittle','drench','reson'].forEach(k=>{if(hold&&hold[k])return;if(st[k]){st[k]--;if(!st[k])delete st[k]}})}
 // ================= enemies =================
-export function spawn(key,o={}){const t=EN[key];const hp=rng(t.hp[0],t.hp[1],cs);
+export function spawn(key,o={}){const t=EN[key];let hp=rng(t.hp[0],t.hp[1],cs);{const asc=(W.run&&W.run.asc)|0;if(asc>0){let m=asc>=5?1.16:1.08;if(asc>=2&&(t.elite||t.boss))m*=1.1;hp=Math.round(hp*m)}} // Ascension: more foe HP, no extra RNG
  const e={key,n:t.n,e:t.e,hp,max:hp,block:t.b0||0,st:Object.assign({},t.st0||{}),t:0,ci:0,ph:1,uid:nextId(),elite:t.elite,boss:t.boss,summoned:!!o.summoned,passive:t.passive||null};
  e.k=W.cb.ens.filter(x=>x.key===key).length;if(t.randomSprite){const nv=spriteCount('enemies',key);if(nv>1)e.sv=R(nv,'sprites')} // own stream: never shifts combat rolls
  W.cb.ens.push(e);e.next=t.ai(e);if(t.onSpawn)t.onSpawn(e);return e}
@@ -149,7 +149,7 @@ export function dmgEnemy(e,d,o={}){if(e.hp<=0)return 0;const b=Math.min(e.block,
 function afterEnemyDamage(e,f){const t=EN[e.key];if(e.hp>0&&t.onDamaged)t.onDamaged(e);
  if(e.hp<=0){e.hp=0;W.run.kills++;if(W.run.stats)W.run.stats.kills++;log('💥 '+e.n+' defeated');if(f)f.killed=true;if(t.onDeath)t.onDeath(e);fire('enemyKilled',{enemy:e,summon:e.summoned,f})}}
 // Unblockable self HP loss (Brine Rot, Reckless...). guard:true lets Guard absorb it (Scald, Barbs).
-export function loseHp(n,o={}){const cb=W.cb;if(o.guard&&cb){const b=Math.min(cb.p.block,n);cb.p.block-=b;n-=b;if(n>0)n=Math.max(0,Math.floor(mod('damageTaken',{source:o.source},n))) /* Act 3 hook: modifyDamageTaken */}if(n<=0)return;W.run.hp=Math.max(0,W.run.hp-n);if(cb){floatText('p','-'+n);cb.pshake=Date.now()}if(W.run.hp<=0)cheatDeath();if(cb&&W.run.hp>0&&W.run.hp<=W.run.max*.3)fire('hpLow',{hp:W.run.hp}) /* Act 3 hook: onHpLow */}
+export function loseHp(n,o={}){const cb=W.cb;if(o.guard&&cb){const b=Math.min(cb.p.block,n);cb.p.block-=b;n-=b;if(n>0)n=Math.max(0,Math.floor(mod('damageTaken',{source:o.source},n))) /* Act 3 hook: modifyDamageTaken */}if(n<=0)return;W.run.hp=Math.max(0,W.run.hp-n);if(W.run.stats)W.run.stats.lastHit={by:o.source==='barbs'?'Barbs':'Your own cost',amt:n,turn:(cb&&cb.turn)||0};if(cb){floatText('p','-'+n);cb.pshake=Date.now()}if(W.run.hp<=0)cheatDeath();if(cb&&W.run.hp>0&&W.run.hp<=W.run.max*.3)fire('hpLow',{hp:W.run.hp}) /* Act 3 hook: onHpLow */}
 export function heal(n){W.run.hp=Math.min(W.run.max,W.run.hp+Math.max(0,Math.floor(n)));if(W.cb&&n>0)floatText('p','+'+Math.floor(n)+'❤','h')}
 // onPlayerDeath (§4.2): relics first (Tidewrack Scale), then potions (Second Tide). Returns true if the death was cancelled.
 export function cheatDeath(){if(W.run.hp>0)return true;const ctx=fire('playerDeath',{});if(ctx.cancel&&W.run.hp>0){return true}return false}
@@ -447,7 +447,7 @@ export function enemyHitPlayer(e,d,o={}){const cb=W.cb;
  if(d>0&&cb.parries&&cb.parries[e.uid]>0&&!cb.parryHit[e.uid])d=answerParry(e,d);
  if(d>0&&cb.parry>0&&!cb.parryUsed){cb.parryUsed=true;const red=Math.min(cb.parry,d);d-=red;const back=Math.floor(cb.parry*mod('parryReflect',{enemy:e},DU.parry_back_frac));
   log(`⚔️ Parry! −${red}, ${back} back to ${e.n}`);callout('PARRY! ↩ '+back,'parry');if(back)dmgEnemy(e,back);cb.retort=true;fire('parry',{enemy:e,reflected:back,reduced:red})}
- const b=Math.min(o.ignoreG?Math.floor(cb.p.block*o.ignoreG):cb.p.block,d);cb.p.block-=b;let rest=d-b;if(rest>0)rest=Math.max(0,Math.floor(mod('damageTaken',{enemy:e,amount:rest},rest))); /* Act 3 hook: modifyDamageTaken */W.run.hp=Math.max(0,W.run.hp-rest);floatText('p',rest>0?'-'+rest:'🛡'+b,rest>0?'':'b');cb.pshake=Date.now();fire('playerHit',{enemy:e,amount:rest,blocked:b});
+ const b=Math.min(o.ignoreG?Math.floor(cb.p.block*o.ignoreG):cb.p.block,d);cb.p.block-=b;let rest=d-b;if(rest>0)rest=Math.max(0,Math.floor(mod('damageTaken',{enemy:e,amount:rest},rest))); /* Act 3 hook: modifyDamageTaken */W.run.hp=Math.max(0,W.run.hp-rest);if(rest>0&&W.run.stats)W.run.stats.lastHit={by:e.n,amt:rest,turn:cb.turn||0};floatText('p',rest>0?'-'+rest:'🛡'+b,rest>0?'':'b');cb.pshake=Date.now();fire('playerHit',{enemy:e,amount:rest,blocked:b});
  if(rest>0&&W.run.cls==='duel'&&cb.mom>0&&!cb.momLostPhase){cb.momLostPhase=true;const lose=mod('momLoss',{},DU.lose_on_unblocked);cb.mom=Math.max(0,cb.mom-lose);log('💢 Hit: −'+lose+' Momentum')}
  if(rest>0)fire('playerDamaged',{enemy:e,amount:rest});
  if(rest>0&&W.run.hp>0&&W.run.hp<=W.run.max*.3)fire('hpLow',{hp:W.run.hp}); // Act 3 hook: onHpLow
@@ -554,7 +554,7 @@ export function enemyPhase(){const cb=W.cb;if(!cb)return;cb.breaks=0;cb.parryHit
 export function win(){const cb=W.cb;const k=cb.kind;fire('combatEnd',{kind:k,won:true});W.run.deck.forEach(ci=>{ci.tmpUp=false;ci.tmp0=false});
  const allFled=cb.ens.some(e=>e.fled)&&cb.ens.every(e=>e.fled||e.summoned);
  // R1b: heal after a won fight / elite (ECON.winHeal), shown as a heal pop + callout before the rewards.
- const wh=((ECON.winHeal||{})[k]||0)+((W.run.act||1)>1?((ECON.winHealLater||{})[k]||0):0);if(wh>0&&W.run.hp>0){const h=Math.min(wh,W.run.max-W.run.hp);if(h>0)W.run.hp+=h;W.run.lastWinHeal=h}
+ let wh=((ECON.winHeal||{})[k]||0)+((W.run.act||1)>1?((ECON.winHealLater||{})[k]||0):0);if((W.run.asc|0)>=4)wh=Math.floor(wh/2);if(wh>0&&W.run.hp>0){const h=Math.min(wh,W.run.max-W.run.hp);if(h>0)W.run.hp+=h;W.run.lastWinHeal=h}
  W.cb=null;if(W.run.lastWinHeal>0)W.run.healPop={n:W.run.lastWinHeal,t:Date.now()};combatRewards(k,{allFled,opts:cb.opts,cb});if(W.run.lastWinHeal>0&&!window.FAST){const S1=W.S;setTimeout(()=>{if(W.S===S1)render()},1450)}}
 export function lose(){if(W.cb)fire('combatEnd',{kind:W.cb.kind,won:false});W.cb=null;endRun(false)}
 // Mist Bomb: escape a normal combat with no rewards.

@@ -7,7 +7,7 @@ import {W} from '../core/state.js';
 import {CARDS,KW} from '../core/registry.js';
 import {settings,saveSettings} from '../save.js';
 import {DATA} from '../data/generated/data-v2.js';
-import {isJunk,canDecamp} from '../engine/combat.js';
+import {isJunk,canDecamp,intentOf} from '../engine/combat.js';
 import {cname,desc} from '../engine/cards.js';
 import {statusInfo} from './combatant.js';
 import {loadProfile,saveProfile} from '../progress.js';
@@ -48,6 +48,12 @@ export const HINTS=[
  {id:'g.vigil',cls:null,when:cb=>cb.powers&&cb.powers.length>0,text:cb=>`<b>${CARDS[cb.powers[cb.powers.length-1].id].n}</b> is a <b>Vigil</b>: it stays in play for the rest of the fight and works on its own.`},
  {id:'g.sink',cls:null,when:cb=>cb.exh&&cb.exh.length>0,text:()=>`<b>Sink</b> removes a card for this fight only. Tap the anchor pile to see it. It comes back next fight.`},
  {id:'g.flotsam',cls:null,when:cb=>cb.hand.some(isJunk),text:()=>`<b>Flotsam</b> and <b>Burdens</b> are junk that clog your hand. Some cards Sink them for a bonus.`},
+ // ---- later acts (v0.6.54): one line the first time each new mechanic matters; they show once, and How to Play > Reset hints brings them back ----
+ {id:'g.seize',cls:null,when:cb=>cb.ens.some(e=>e.seized&&e.hp>0),text:cb=>`<b>Seized</b>: ${cb.ens.find(e=>e.seized&&e.hp>0).n} took your cheapest card. Defeat it and the card comes back; it is never lost for good.`},
+ {id:'g.numbed',cls:null,when:cb=>!!cb.numbCard,text:()=>`<b>Numbed</b>: your cheapest card costs 1 more this turn only.`},
+ {id:'g.charge',cls:null,when:cb=>cb.ens.some(e=>e.hp>0&&e.passive&&e.passive.charge),text:()=>`<b>Charge</b> builds on that enemy each turn. At 3 it discharges and adds a <b>Static</b> to your draw pile. Hitting it hard knocks a pip off.`},
+ {id:'g.tailwind',cls:null,when:cb=>cb.ens.some(e=>e.hp>0&&e.tailwind),text:()=>`<b>Tailwind</b>: that enemy's first hit each turn is stronger. Raise your Guard before it swings.`},
+ {id:'g.gust',cls:null,when:cb=>cb.ens.some(e=>{if(e.hp<=0)return false;try{const m=intentOf(e);return !!(m&&m.gust)}catch(_){return false}}),text:()=>`<b>Gust</b>: when it lands, your last drawn cards are blown back on top of your draw pile. Play them first if you can.`},
  {id:'g.elite',cls:null,when:cb=>cb.kind==='elite'&&cb.turn===1,text:()=>`An <b>Elite</b>: tougher than a normal fight, but it drops a relic when it falls.`}
 ];
 const seen=()=>settings.hintsSeen||(settings.hintsSeen={});

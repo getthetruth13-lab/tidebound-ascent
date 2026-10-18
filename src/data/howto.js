@@ -8,7 +8,7 @@ const C=DATA.v21.sim.core,T=C.tide,E=C.echo,K=C.carto,D=C.duel;
 const RD=K.rank_dmg.slice(1).map(n=>'+'+n).join(' / ');
 export const GENERAL=[
  {id:'climb',tab:'The Climb',title:'The Climb',epi:'Fifteen floors, one boss at the top',blocks:[
-  {h:'The goal',html:'Climb 15 floors of the Wrack Terraces along the map. Your HP carries from fight to fight and does not refill by itself, so every hit you take matters later. If your HP reaches 0 the run ends. A boss waits on the last floor.'},
+  {h:'The goal',html:'Climb the map one floor at a time. Act 1 has 15 floors and ends with a boss. Your HP carries from fight to fight and does not refill on its own (a win heals a little, camps heal more), so every hit you take matters later. If your HP reaches 0 the run ends. Later acts are open as previews: keep climbing after the Act 1 boss.'},
   {h:'Choosing a path',html:'The map shows rooms you can reach next. You pick one each floor. Lines show which rooms connect, so look a few floors ahead before you commit. Open the map any time from the top bar.',art:'map'},
   {h:'Room types',html:'<ul class="hw-list"><li><b>⚔️ Fight</b>: a normal battle. Gold, a card choice, sometimes a potion.</li><li><b>💀 Elite</b>: a tougher battle that also drops a relic.</li><li><b>❓ ? Event</b>: a story choice. It can help, cost HP, or open a fight.</li><li><b>🔥 Camp</b>: heal or upgrade a card.</li><li><b>💰 Merchant</b>: spend gold on cards, relics, potions and card removal.</li><li><b>💎 Treasure</b>: a chest with a relic and gold.</li><li><b>🔔 Boss</b>: the last floor of the act.</li></ul>'}]},
  {id:'turn',tab:'Your Turn',title:'Your Turn',epi:'Energy, cards and the end-turn seal',blocks:[
@@ -71,7 +71,7 @@ export const HEROES_GUIDE={
    `If nothing is Marked, your last card still Echoes at a quarter of its strength.`,
    '<b>Faint</b> cards and Vigils cannot be Marked.',
    '<b>Resonating X</b> on an enemy makes your Echoed Attacks deal X more to it.'],
-  example:{h:'Example turn: Mark and Resound',cards:['reverb','arc','shimmer'],steps:['<b>Reverb</b> is your first Attack, so it is Marked. It deals 6 now.','Play <b>Arc Bolt</b> (7) and <b>Shimmer Ward</b> (5 Guard). Shimmer Ward is your first Skill, so it is Marked too.','End turn. Reverb <b>Echoes</b> for free with its Resound line: 10 damage, +1 because cards followed it, so 11. Shimmer Ward Echoes too and adds its Guard.'],result:'The Reverb alone did 6 + 11 = 17 damage across the turn for 1 Energy.'},
+  example:{h:'Example turn: Mark and Resound',cards:['reverb','arc','shimmer'],steps:['<b>Reverb</b> is your first Attack, so it is Marked. It deals 6 now.','Play <b>Arc Bolt</b> (6) and <b>Shimmer Ward</b> (5 Guard). Shimmer Ward is your first Skill, so it is Marked too.','End turn. Reverb <b>Echoes</b> for free with its Resound line: 10 damage, +1 because cards followed it, so 11. Shimmer Ward Echoes too and adds its Guard.'],result:'The Reverb alone did 6 + 11 = 17 damage across the turn for 1 Energy.'},
   pairs:[
    [['reverb','hollowecho'],'Resound cards. Hollow Echo hits ALL enemies when it Echoes.'],
    [['tuningstrike','beatfreq'],'Tuning Strike applies Resonating; Beat Frequency cashes it in.'],

@@ -49,9 +49,11 @@ function heroHTML(k,i,foc){const S=STAGE[k],K=CLASSES[k],lk=lockedK(k)||beating.
  <span class="cs-floor"><i class="cs-shadow"></i><img class="cs-refl" src="${a}-refl.webp" alt="" draggable="false"></span>
  <span class="st-fig"><img class="cs-base" src="${a}-base.webp" alt="" draggable="false"><img class="cs-lit${LIT_ART[k]?'':' standin'}" src="${a}-lit.webp" alt="" draggable="false"><i class="cs-rim"></i>${S.lamp?`<i class="cs-lamp" style="--lx:${S.lamp[0]};--ly:${S.lamp[1]};--lc:${S.lampc}"><i></i></i>`:''}${lk?CHAINS:FX[k](k)}</span>
  <span class="st-slab cs-name"><b data-n="${K.n}">${K.n}</b><i>${lk?'Locked':HEROES[k].epithet}</i></span></button>`}
+const PLAYSTYLE={tide:'How you play: move the Tide up and down. Hit 10 for a Crest (damage to all), hit 0 for an Undertow (Guard and cards).',echo:'How you play: Mark one card each turn. It plays again for free at the end of your turn.',carto:'How you play: place Waypoints that act every turn, raise their Rank, or Decamp them for a big payoff.',duel:'How you play: every landed hit builds Momentum. Spend it all on a Flourish for a huge Attack.'};
 function loreHTML(k){const K=CLASSES[k],C=CHARSEL[k],S=STAGE[k];
  if(lockedK(k))return `<div class="cs-lore locked" data-cls="${k}" style="--x:${S.x}"><p class="cs-epi">Locked</p><p class="cs-l" style="--l:0">${HERO_LOCKS[k]?.hint||'Not yet.'}</p><i class="cs-thread"></i></div>`;
  return `<div class="cs-lore theme-${TH[k]}" data-cls="${k}" style="--x:${S.x};--tint:${S.tint}" role="note" aria-label="About ${K.n}">${C.lore.map((l,j)=>`<p class="cs-l" style="--l:${j}">${l}</p>`).join('')}
+ <p class="cs-play" style="--l:1">${PLAYSTYLE[k]||''}</p>
  <div class="cs-tags">${C.tags.map(([ic,w],j)=>`<span style="--l:${j+2}">${icon(CS_ICON[ic])}<b>${w}</b></span>`).join('')}</div><i class="cs-thread"><i class="cs-link"></i></i></div>`}
 export function selectScr(){for(const k of takeHeroNews()){beating.add(k);setTimeout(()=>{beating.delete(k);charselUnlockBeat(k)},U(700))}
  const S=W.S,foc=S.hero&&CLASSES[S.hero]?S.hero:null,sel=foc&&!lockedK(foc);

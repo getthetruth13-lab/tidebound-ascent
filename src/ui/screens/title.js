@@ -45,7 +45,11 @@ export function deleteSlot(key){if(W.S.confirmDel!==key){W.S={...W.S,confirmDel:
  if(key===RUN_KEY)clearRun();else try{localStorage.removeItem(key)}catch(_){}
  W.S={...W.S,confirmDel:null};render()}
 // Reduced motion: stills the title-flow animations and the environment ambience (body class + Reduced effects).
-export function applyMotion(){document.body.classList.toggle('reduce-motion',!!settings.reduceMotion)}
+export function applyMotion(){document.body.classList.toggle('reduce-motion',!!settings.reduceMotion);
+ // v0.6.54 accessibility: text size (reading text only; cards keep their fitted layout) and shape markers on status icons (colour is never the only cue)
+ document.body.classList.toggle('ts-large',settings.textSize==='large');document.body.classList.toggle('ts-xlarge',settings.textSize==='xlarge');document.body.classList.toggle('cb-shapes',!!settings.statusShapes)}
+export function setTextSize(v){settings.textSize=['large','xlarge'].includes(v)?v:'normal';saveSettings();applyMotion()}
+export function setStatusShapes(on){settings.statusShapes=!!on;saveSettings();applyMotion();render()}
 export function setReduceMotion(on){settings.reduceMotion=!!on;
  if(on){if(settings.envFx==='full'){settings.envFxBefore='full';settings.envFx='reduced'}}else if(settings.envFxBefore){settings.envFx=settings.envFxBefore;delete settings.envFxBefore}
  saveSettings();applyMotion();render()}

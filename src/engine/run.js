@@ -12,7 +12,8 @@ import {fire,mod} from '../core/bus.js';
 import {saveRun,clearRun,saveWin,loadWin,clearWin,loadRunData,migrateRun} from '../save.js';
 import {initRun as lampInit,noteSeen,settleRun} from './lamplight.js';
 import {warmActPack} from '../assets.js';
-import {loadProfile,saveProfile,lockedFor} from '../progress.js';
+import {loadProfile,saveProfile,lockedFor,addHistory,ascUnlocked} from '../progress.js';
+import {overallFloor} from '../data/places.js';
 import {SPOIL_CARDS} from '../data/lamplight.js';
 import {eventText} from '../data/lore.js';
 import {render,markCardsSeen,updateCardSelection} from '../ui/render.js';
@@ -38,15 +39,20 @@ export const ECON={startGold:99,potionSlots:3,
   relics:[{odds:'relicOdds'},{odds:'relicOdds'},{tier:'shop',fallback:'relicOdds'}],potions:3,removal:{base:75,step:25,perVisit:1}}};
 const TIERS=['c','u','r'];
 // ================= run setup =================
+export function dailySeed(d=new Date()){const k=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();let h=2166136261;for(const c of String(k)+'drowned-sun'){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+export const ascInfo=['Normal game','Foes have 8% more HP','Elites and bosses have 10% more HP','You start with 30 less gold','Victory heals are halved','Foes have 16% more HP in total'];
 export function newRun(cls,o={}){const K=CLASSES[cls];clearWin();nextActSnap=null;
  const urlSeed=o.seed==null&&typeof location!=='undefined'?+new URLSearchParams(location.search).get('seed'):0; // ?seed=N replays a run's maps and rolls
- const seed=(o.seed!=null?o.seed:urlSeed?urlSeed:(Date.now()^Math.floor(Math.random()*4294967296)))>>>0;
- applyHeroHp();W.run={v:2,seed,rngs:seedStreams(seed),cls,hp:K.hp,max:K.hp,gold:ECON.startGold,deck:K.starter.map(id=>mk(id)),floor:0,act:1,pos:{r:-1,i:-1},vis:{},won:false,kills:0,
+ // v0.6.54: Daily run (settings.dailyMode, or o.daily) uses today's date as the seed; Ascension (settings.ascension, opened one level per Act 1 win) is off by default. Neither touches a normal run.
+ const daily=o.daily!=null?!!o.daily:(o.seed==null&&!urlSeed&&!!settings.dailyMode);
+ const asc=o.asc!=null?(o.asc|0):(daily?0:Math.min(settings.ascension|0,ascUnlocked()));
+ const seed=(o.seed!=null?o.seed:urlSeed?urlSeed:daily?dailySeed():(Date.now()^Math.floor(Math.random()*4294967296)))>>>0;
+ applyHeroHp();W.run={v:2,seed,rngs:seedStreams(seed),cls,hp:K.hp,max:K.hp,gold:ECON.startGold-(asc>=3?30:0),deck:K.starter.map(id=>mk(id)),floor:0,act:1,pos:{r:-1,i:-1},vis:{},won:false,kills:0,
   relics:[],potions:Array(ECON.potionSlots).fill(null),potionChance:ECON.potion.start,swell:ECON.swellStart,qOdds:{fight:ECON.q.fight[0],shop:ECON.q.shop[0],treasure:ECON.q.treasure[0]},
   removals:0,seenRelics:{},seenEvents:{},shrinesThisAct:{},charms:[],encHist:[],fights:0,rareNext:false,
   stats:{floors:0,kills:0,elites:[0,0,0],bosses:0,goldEarned:0,maxHit:0,maxCardsTurn:0,cardsPlayed:0,path:[],potionsUsed:0,relicsAtBoss:null,potionsAtBoss:null,startT:Date.now()}};
  // Lamplight (design/progression-proposal.md): the run keeps a snapshot of what is still locked, so rolls and saved runs stay stable. Daily / full-pool runs and old saves have no lock.
- W.run.lock=o.fullPool||o.daily?null:lockedFor(loadProfile());if(o.daily)W.run.daily=true;lampInit(W.run);
+ W.run.lock=o.fullPool||daily?null:lockedFor(loadProfile());if(daily)W.run.daily=true;if(asc>0)W.run.asc=asc;lampInit(W.run);
  W.run.boss=wpick(ENCOUNTERS.boss.map(x=>[x.e[0],x.w]),'map');
  // Later-act bosses are drawn on their own 'acts' stream, so Act 1's map/rolls stay identical (golden test). bosses[act] = that act's boss id.
  W.run.bosses={1:W.run.boss};for(const a of [2,3]){const t=encountersFor(a).boss;if(t&&t.length)W.run.bosses[a]=wpick(t.map(x=>[x.e[0],x.w]),'acts')}
@@ -79,7 +85,10 @@ function tryMapLater(P){const rows=[];const pinch=new Set(shuffle(P.pinch,'map')
  // a gate's row fans out to every node of the next row (the squeeze, then the spread)
  P.gate.forEach(r=>{rows[r][0].to=rows[r+1].map((_,j)=>j)});
  return rows}
-export function genMapLater(act){const P=MAP_ACT[act];let best=null;
+// v0.6.54 (review: path variety): Acts 2 and 3 only (Act 1 maps stay byte-identical for the golden test). If floors 1-3 hold only fights, ? rooms and elites,
+// one floor-3 room becomes a Camp so the first choices include a real non-fight option. No RNG is used, so every other roll is unchanged.
+export function genMapLater(act){const m=genMapLater0(act);if(!m||!m[2])return m;if(!m.slice(0,3).some(row=>row.some(x=>['shop','rest','treasure'].includes(x.t)))){const row=m[2],hit=new Set();m[0].forEach(x=>(x.up||[]).forEach(j=>hit.add(j)));const free=row.filter((x,j)=>!hit.has(j));const n=free.find(x=>x.t==='fight')||free.find(x=>x.t==='unknown'); /* never a Rest where an Updraft lands (Act 3 rule) */if(n){n.t='rest';(n.to||[]).forEach(j=>{const c=m[3]&&m[3][j];if(c&&c.t==='rest')c.t='fight'})}}return m}
+function genMapLater0(act){const P=MAP_ACT[act];let best=null;
  for(let t=0;t<600;t++){const m=tryMapLater(P);
   for(let r=1;r<15;r++)m[r].forEach((n,j)=>{if(P.pin[r])return;let g=0;while(NOREPEAT.has(n.t)&&parents(m,r,j).some(p=>p.t===n.t)&&g++<30)n.t=nodeTypeLater(P,r);if(NOREPEAT.has(n.t)&&parents(m,r,j).some(p=>p.t===n.t))n.t='fight'});
   const all=m.flat(),er=eliteRange(m);if(!(er[0]<=1&&er[1]>=3))continue;best=best||m;
@@ -385,7 +394,7 @@ function openChestImpl(){const run=W.run;const c=wpick(ECON.chest.map(x=>[x,x.w]
 function openChestLidImpl(){if(W.S.screen!=='chest')return;W.S.opened=true;W.S.openT=Date.now();render()}
 // ================= camps (§1.8) =================
 const mendHp=()=>Math.floor(W.run.max*mod('mendFrac',{},ECON.mend));
-export function campOptions(){const mh=mendHp();const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${mh} HP (${Math.round(mh/W.run.max*100)}% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
+export function campOptions(){const mh=mendHp();const o=[{k:'mend',l:'❤️ Mend',d:(W.run.hp>=W.run.max?'Already at full HP, nothing to heal':(()=>{const g=Math.min(mh,W.run.max-W.run.hp);return `Heal ${g} HP`+(g<mh?` (${mh-g} wasted)`:` (${Math.round(mh/W.run.max*100)}% of Max HP)`)})())},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
  for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.camp)o.push({k:d.camp,l:{cook:'Cook',scour:'🪨 Scour',trawl:'Trawl',annotate:'📘 Annotate'}[d.camp],d:{cook:'Gain 4 Max HP (Galley Pot)',scour:'Remove a card (Pumice Stone)',trawl:'Gain a random Common or Uncommon relic (Grapnel Hook)',annotate:'Give a card Opening (Ship\'s Rutter)'}[d.camp],relic:r.id})}
  // Act 3 (ACT3-DESIGN s7): Ground the Deck removes a Static, Dread or other curse / status card. The Stormeye (floor 8) lets you pick TWO different options.
  if((W.run.act||1)===3&&pickable('remove',isJunkCard).length)o.push({k:'ground',l:'⚡ Ground the Deck',d:'Remove a Static, a curse or a status card from your deck'});
@@ -463,7 +472,7 @@ export function restoreWinScreen(){const d=loadWin();if(!d)return false;if(loadR
 export function leaveWinScreen(){nextActSnap=null;clearWin();W.S={screen:'title'};render()}
 export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;const a=run.act||1;
  nextActSnap=won&&previewOn(a)&&!hasNextAct()?{run:JSON.parse(JSON.stringify(run)),uid:W.uid,to:a+1}:null;
- clearRun();clearWin();settleRun(run,won);
+ clearRun();clearWin();settleRun(run,won);try{addHistory({t:Date.now(),cls:run.cls,won:!!won,act:a,floor:overallFloor(a,run.floor),mins:Math.round(((run.stats.endT||Date.now())-run.stats.startT)/60000),kills:run.kills,by:(run.stats.lastHit&&!won)?run.stats.lastHit.by:null,asc:run.asc|0,daily:!!run.daily})}catch(_){}
  if(nextActSnap&&run.lamp){nextActSnap.run.lamp=JSON.parse(JSON.stringify(run.lamp))} // carries settled:true
  if(nextActSnap)saveWin(nextActSnap); // survives a killed page: reopening lands on this win screen
  W.S={screen:'end'};render()}

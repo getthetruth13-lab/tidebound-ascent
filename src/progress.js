@@ -104,3 +104,14 @@ export const heroUnlocked=(p,cls)=>!heroLockingOn()||!HERO_LOCKS[cls]||HERO_LOCK
 export function takeHeroNews(){if(!heroLockingOn())return [];const p=loadProfile(),open=CLASS_ORDER.filter(k=>heroUnlocked(p,k));
  if(p.heroSeen==null){p.heroSeen=Object.fromEntries(open.map(k=>[k,1]));saveProfile(p);return []}
  const fresh=open.filter(k=>!p.heroSeen[k]);if(fresh.length){for(const k of fresh)p.heroSeen[k]=1;saveProfile(p)}return fresh}
+
+// ---- Run history (v0.6.54): one small record per finished run, kept apart from the Lamplight profile. Newest first, 60 max.
+export const HISTORY_KEY='tidebound.history.v1';
+let histMem=[];
+export function loadHistory(){try{const v=JSON.parse(localStorage.getItem(HISTORY_KEY));return Array.isArray(v)?v:histMem}catch(_){return histMem}}
+export function addHistory(rec){const h=[rec,...loadHistory()].slice(0,60);histMem=h;try{localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}catch(_){}return h}
+export const ASC_MAX=5;
+// Ascension levels open one per Act 1 win (history), up to ASC_MAX. Level 0 is the normal game and is always on.
+export function ascUnlocked(){return Math.min(ASC_MAX,loadHistory().filter(r=>r.won&&(r.act||1)===1).length)}
+export function statsOf(h){const by={};for(const r of h){const b=by[r.cls]||(by[r.cls]={runs:0,wins:0,best:0});b.runs++;if(r.won)b.wins++;b.best=Math.max(b.best,r.floor||0)}
+ const wins=h.filter(r=>r.won&&r.mins!=null);return {by,runs:h.length,wins:h.filter(r=>r.won).length,fastest:wins.length?Math.min(...wins.map(r=>r.mins)):null,best:h.reduce((a,r)=>Math.max(a,r.floor||0),0)}}
