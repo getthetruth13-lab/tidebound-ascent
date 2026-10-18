@@ -14,6 +14,7 @@ import {lampPickScr,ledgerScr,totalPending} from './lamp.js';
 import {loadProfile} from '../../progress.js';
 import {dip} from '../dip.js';
 import {VERSION} from '../../../version.js';
+import {restoreWinScreen} from '../../engine/run.js';
 const RUN_KEY='tidebound.run.v2';
 function ago(t){if(!t)return'';const m=Math.max(0,Math.round((Date.now()-t)/60000));if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';return Math.round(h/24)+' d ago'}
 // Every stored run slot (today a single autosave; any extra 'tidebound.run*' keys show up here too).
@@ -35,7 +36,7 @@ export function studioNext(){clearTimeout(studioTimer);if(W.S.screen==='title'&&
 // Tap anywhere on the start screen: fade out, then the main menu (the tap also unlocks audio, so the menu music starts).
 export function startTap(){if(W.S.screen!=='title'||W.S.view!=='start'||W.S.leaving)return;
  // Menu background is the video's frame 0, so swap instantly and fade only the words in.
- dip(()=>{if(toMenuOrLoad())return;W.S={screen:'title',view:'main',page:0,hero:null,fade:!window.FAST};render()})}
+ dip(()=>{if(toMenuOrLoad())return;if(restoreWinScreen())return;W.S={screen:'title',view:'main',page:0,hero:null,fade:!window.FAST};render()})}
 export function titleGo(view){dip(()=>{W.S={screen:'title',view:view||'main',page:0,hero:null};render()})}
 export function loadSlot(key){if(key===RUN_KEY){continueRun();return}
  const s=listSlots().find(x=>x.key===key);if(!s)return;W.run=s.run;W.uid=Math.max(W.uid,s.data.uid||1);W.cb=null;W.S={screen:'map'};render()}

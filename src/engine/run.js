@@ -9,7 +9,7 @@ import {R,W,pick,rng,shuffle,wpick,rnd,seedStreams} from '../core/state.js';
 import {mk,cname,canTemper,upgradeCard,rawLvl} from './cards.js';
 import {startCombat,heal as cHeal} from './combat.js';
 import {fire,mod} from '../core/bus.js';
-import {saveRun,clearRun} from '../save.js';
+import {saveRun,clearRun,saveWin,loadWin,clearWin,loadRunData,migrateRun} from '../save.js';
 import {initRun as lampInit,noteSeen,settleRun} from './lamplight.js';
 import {warmActPack} from '../assets.js';
 import {loadProfile,saveProfile,lockedFor} from '../progress.js';
@@ -38,7 +38,7 @@ export const ECON={startGold:99,potionSlots:3,
   relics:[{odds:'relicOdds'},{odds:'relicOdds'},{tier:'shop',fallback:'relicOdds'}],potions:3,removal:{base:75,step:25,perVisit:1}}};
 const TIERS=['c','u','r'];
 // ================= run setup =================
-export function newRun(cls,o={}){const K=CLASSES[cls];
+export function newRun(cls,o={}){const K=CLASSES[cls];clearWin();nextActSnap=null;
  const urlSeed=o.seed==null&&typeof location!=='undefined'?+new URLSearchParams(location.search).get('seed'):0; // ?seed=N replays a run's maps and rolls
  const seed=(o.seed!=null?o.seed:urlSeed?urlSeed:(Date.now()^Math.floor(Math.random()*4294967296)))>>>0;
  applyHeroHp();W.run={v:2,seed,rngs:seedStreams(seed),cls,hp:K.hp,max:K.hp,gold:ECON.startGold,deck:K.starter.map(id=>mk(id)),floor:0,act:1,pos:{r:-1,i:-1},vis:{},won:false,kills:0,
@@ -384,7 +384,8 @@ function openChestImpl(){const run=W.run;const c=wpick(ECON.chest.map(x=>[x,x.w]
  W.S={screen:'chest',chest:c.k,name:(c.k==='small'&&(run.act||1)>1)?'Weathered Chest':c.n,rows,opened:false,t:Date.now()};render()}
 function openChestLidImpl(){if(W.S.screen!=='chest')return;W.S.opened=true;W.S.openT=Date.now();render()}
 // ================= camps (§1.8) =================
-export function campOptions(){const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${Math.floor(W.run.max*mod('mendFrac',{},ECON.mend))} HP (${Math.round(mod('mendFrac',{},ECON.mend)*100)}% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
+const mendHp=()=>Math.floor(W.run.max*mod('mendFrac',{},ECON.mend));
+export function campOptions(){const mh=mendHp();const o=[{k:'mend',l:'❤️ Mend',d:`Heal ${mh} HP (${Math.round(mh/W.run.max*100)}% of Max HP)`},{k:'temper',l:'⬆️ Temper',d:'Upgrade a card'}];
  for(const r of W.run.relics){const d=RELICS[r.id];if(d&&d.camp)o.push({k:d.camp,l:{cook:'Cook',scour:'🪨 Scour',trawl:'Trawl',annotate:'📘 Annotate'}[d.camp],d:{cook:'Gain 4 Max HP (Galley Pot)',scour:'Remove a card (Pumice Stone)',trawl:'Gain a random Common or Uncommon relic (Grapnel Hook)',annotate:'Give a card Opening (Ship\'s Rutter)'}[d.camp],relic:r.id})}
  // Act 3 (ACT3-DESIGN s7): Ground the Deck removes a Static, Dread or other curse / status card. The Stormeye (floor 8) lets you pick TWO different options.
  if((W.run.act||1)===3&&pickable('remove',isJunkCard).length)o.push({k:'ground',l:'⚡ Ground the Deck',d:'Remove a Static, a curse or a status card from your deck'});
@@ -395,7 +396,7 @@ function campDoImpl(k){if(W.S.screen!=='rest')return;
  // backing out of a card pick returns to the camp with the option still unspent (the Stormeye counts only finished actions)
  const back=()=>{if(eye){const u=W.run.eyeUsed||[],i=u.lastIndexOf(k);if(i>=0)u.splice(i,1)}W.S={screen:'rest'};render()};
  if(k==='ground')return openPick('remove','Ground the Deck: choose a Static, curse or status card to remove',goMap,back,isJunkCard);
- if(k==='mend'){heal(Math.floor(W.run.max*mod('mendFrac',{},ECON.mend)));return goMap()}
+ if(k==='mend'){heal(mendHp());return goMap()}
  if(k==='temper')return openPick('upgrade','Temper: choose a card to upgrade',goMap,back);
  if(k==='cook'){gainMaxHp(4);return msg('Cook','A hearty stew. +4 Max HP.')}
  if(k==='scour')return openPick('remove','Scour: choose a card to remove',goMap,back);
@@ -447,17 +448,24 @@ const previewOn=a=>a===1?ACT2_PREVIEW:a===2?ACT3_PREVIEW:false;
 const canContinueTo=to=>!!(previewOn(to-1)&&nextActSnap&&nextActSnap.to===to&&W.S&&W.S.screen==='end'&&W.run&&W.run.won&&(W.run.act||1)===to-1);
 export const canContinueToAct2=()=>canContinueTo(2);
 export const canContinueToAct3=()=>canContinueTo(3);
-function continueToAct(to){if(!canContinueTo(to))return;const snap=nextActSnap;nextActSnap=null;
+function continueToAct(to){if(!canContinueTo(to))return;const snap=nextActSnap;nextActSnap=null;clearWin();
  W.run=JSON.parse(JSON.stringify(snap.run));W.uid=snap.uid;W.run.won=false;delete W.run.stats.endT;W.cb=null;
  // Lamplight was credited once at the first win (Act 1); the carried run must never credit again.
  if(W.run.lamp){W.run.lamp.settled=true;delete W.run.lamp.summary}
  if(W.run.act==null)W.run.act=1;startNextAct()}
 export const continueToAct2=()=>continueToAct(2);
 export const continueToAct3=()=>continueToAct(3);
+// Reopen after killing the page on an Act 1 / Act 2 win screen: put the win screen (with its Continue button) back. A live run save always wins.
+export function restoreWinScreen(){const d=loadWin();if(!d)return false;if(loadRunData()){clearWin();return false}
+ try{migrateRun(d.run);W.run=JSON.parse(JSON.stringify(d.run));W.uid=d.uid||W.uid;W.cb=null;nextActSnap={run:JSON.parse(JSON.stringify(d.run)),uid:W.uid,to:d.to};
+  W.S={screen:'end'};if(!canContinueTo(d.to))throw Error('bad win state');render();return true}catch(e){nextActSnap=null;W.run=null;clearWin();console.warn('Could not restore the win screen:',e);return false}}
+// Leaving the win screen without continuing (Play again) drops the saved win state.
+export function leaveWinScreen(){nextActSnap=null;clearWin();W.S={screen:'title'};render()}
 export function endRun(won){const run=W.run;run.won=!!won;run.stats.endT=Date.now();W.cb=null;const a=run.act||1;
  nextActSnap=won&&previewOn(a)&&!hasNextAct()?{run:JSON.parse(JSON.stringify(run)),uid:W.uid,to:a+1}:null;
- clearRun();settleRun(run,won);
+ clearRun();clearWin();settleRun(run,won);
  if(nextActSnap&&run.lamp){nextActSnap.run.lamp=JSON.parse(JSON.stringify(run.lamp))} // carries settled:true
+ if(nextActSnap)saveWin(nextActSnap); // survives a killed page: reopening lands on this win screen
  W.S={screen:'end'};render()}
 // Event fights (Sunken Chest crab, Gull Nest gulls): normal fight rules + options.
 export function eventFight(enc,opts={}){return startCombat('fight',enc,opts)}

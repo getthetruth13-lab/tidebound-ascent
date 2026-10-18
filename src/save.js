@@ -38,6 +38,11 @@ export function savedAction(name,args,fn){
  try{return fn()}finally{depth--;saveRun()}
 }
 export function loadRunData(){const d=safeGet(RUN_KEY);return d&&(d.v===2||d.v===3||d.v===4||d.v===5)&&d.run&&!d.run.won&&d.run.hp>0?d:null}
+// Win-screen state (Continue to Act 2/3): the run is cleared at a win, so the winning snapshot is kept under its own key until the player continues or leaves the win screen.
+const WIN_KEY='tidebound.win.v1';
+export function saveWin(snap){if(W.previewing||!snap)return;safeSet(WIN_KEY,{v:1,t:Date.now(),to:snap.to,uid:snap.uid,run:snap.run})}
+export function loadWin(){const d=safeGet(WIN_KEY);return d&&d.v===1&&(d.to===2||d.to===3)&&d.run&&d.run.won&&typeof d.run.cls==='string'&&Array.isArray(d.run.deck)&&Array.isArray(d.run.relics)?d:null}
+export function clearWin(){if(W.previewing)return;try{localStorage.removeItem(WIN_KEY)}catch(_){}}
 export function clearRun(){if(W.previewing)return;checkpoint=null;journal=[];try{localStorage.removeItem(RUN_KEY)}catch(_){}}
 export function continueRun(){
  const d=loadRunData();if(!d)return false;

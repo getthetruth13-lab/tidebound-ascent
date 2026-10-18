@@ -490,7 +490,7 @@ function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Mat
  ${pathStripHTML(st.path)}<div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}${stat('Deck',run.deck.length,'book')}${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
  ${canContinueToAct2()?`<button class="endlink endnext" id="act2go" onclick="continueToAct2()">${glyph('arrowright')}<span>Continue to Act 2</span><small class="prev">Act 2 preview</small></button>`:''}
  ${canContinueToAct3()?`<button class="endlink endnext" id="act3go" onclick="continueToAct3()">${glyph('arrowright')}<span>Continue to Act 3</span><small class="prev">Act 3 preview</small></button>`:''}
- <button class="endlink" id="restart" onclick="W.S={screen:'title'};render()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
+ <button class="endlink" id="restart" onclick="leaveWinScreen()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
 // Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing
 // sources preserves fitted text, sprite animations and stage styles on unchanged nodes.
 let renderTree=null,renderedCombat=null;
