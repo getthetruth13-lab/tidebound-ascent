@@ -347,8 +347,11 @@ function placeStatusRows(){
 
 // ---------------- title / travel ----------------
 const sxSw=(id,label,on,fn,dis)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-sw" id="${id}" type="checkbox" ${on?'checked':''} ${dis?'disabled':''} onchange="${fn}(this.checked)"></label>`;
-const sxSeg=(id,label,vals,cur,fn)=>`<div class="sx-row"><span class="sx-t">${label}</span><span class="sx-seg" id="${id}" role="radiogroup" aria-label="${label}">${vals.map(([v,t])=>`<button type="button" role="radio" aria-checked="${v===cur}" class="${v===cur?'on':''}" data-v="${v}" onclick="${fn}('${v}');render()">${t}</button>`).join('')}</span></div>`;
+const sxSeg=(id,label,vals,cur,fn)=>`<div class="sx-row"><span class="sx-t">${label}</span><span class="sx-seg" id="${id}" role="radiogroup" aria-label="${label}" onkeydown="sxKey(event)">${vals.map(([v,t])=>`<button type="button" role="radio" aria-checked="${v===cur}" class="${v===cur?'on':''}" data-v="${v}" onclick="${fn}('${v}');render();sxRefocus('${id}','${v}')">${t}</button>`).join('')}</span></div>`;
 const sxRange=(id,label,key,val)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-rng" id="${id}" aria-label="${label} volume" type="range" min="0" max="1" step="0.01" value="${val}" style="--p:${Math.round(val*100)}%" oninput="this.style.setProperty('--p',this.value*100+'%');setAudioSetting('${key}',this.value)"></label>`;
+// Segmented settings: render() rebuilds the rows, so give keyboard focus back to the chosen step; arrow keys move between steps (radiogroup).
+export function sxRefocus(id,v){const b=document.querySelector(`#${id} [data-v="${v}"]`);if(b)b.focus()}
+export function sxKey(ev){const k=ev.key,d=k==='ArrowRight'||k==='ArrowDown'?1:k==='ArrowLeft'||k==='ArrowUp'?-1:0;if(!d)return;const bs=[...ev.currentTarget.querySelectorAll('button')],i=bs.indexOf(ev.target.closest('button'));if(i<0)return;ev.preventDefault();bs[(i+d+bs.length)%bs.length].click()}
 export function settingsHTML(){return `<div class="settings sx">
  <div class="sx-row sx-howto"><span class="sx-t">Rules, heroes and tips</span><button type="button" class="btn sm" id="howtobtn" onclick="openHowTo()">How to Play</button></div>
  ${sxSeg('setanimspeed','Animation speed',[...Object.keys(SPEEDS).map(v=>[v,SPEED_LABEL[v]]),['instant','Instant']],settings.fastAnim?'instant':settings.animSpeed||'normal','setAnimSpeed')}
