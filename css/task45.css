@@ -102,6 +102,13 @@
 .topbar .mini,.topbar .potion,.topbar .relics>*{position:relative}
 .topbar .mini::after,.topbar .potion::after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:max(100%,var(--tap));transform:translateY(-50%)}
 .topbar .mini{min-width:44px;min-height:40px}
+/* PICKETROPE: in the fixed battle / run top bar the four .mini hit areas are an invisible 32 CSS px zone around each icon (nothing drawn
+   differently, nothing moves): 14/26 hud-units above/below, and map / deck / settings split the strip 736-768 / 768-800 / 800-832 px (at 832 wide)
+   with no overlap. The lamp is already wider than 32. */
+:is(.combat,.runhud) .topbar>.mini::after{top:calc(-14*var(--hud-unit));bottom:calc(-26*var(--hud-unit));height:auto;transform:none;left:-6px;right:-6px}
+:is(.combat,.runhud) .topbar>#mapbtn::after{left:-1.71vw;right:0}
+:is(.combat,.runhud) .topbar>#deckbtn::after{left:-.42vw;right:-1.28vw}
+:is(.combat,.runhud) .topbar>#setbtn::after{left:-.21vw;right:-1.5vw}
 /* ---- checkboxes: label right next to the box, same on both columns ---- */
 .chk{display:inline-flex;align-items:center;gap:10px;cursor:pointer;min-height:var(--tap);font:500 15px var(--serif);color:var(--cream)}
 .chk input{width:22px;height:22px;accent-color:#d9b46a;flex:none;margin:0}

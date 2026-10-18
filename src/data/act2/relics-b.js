@@ -71,7 +71,7 @@ R.counterweight={on:{enemyAct(r,ctx){const m=ctx.intent;if(!m||!m.pull)return;co
  m.fx=q=>{if(prev)prev(q);const n=Math.min(m.pull,before);if(n>0){gainBlock(Math.min(6,2*n));flash(r)}}}}};
 R.reednet={on:{beforeCardPlay(r,ctx){const f=ctx.f;if(!f||f.potion)return;const a=f.all;f.all=function(...x){f.aoe=true;return a.apply(this,x)}}},
  mod:{damageAdd(r,ctx,v){if(!ctx.attack)return v;return isAoE(ctx.f)?v+4:v-1}}};
-// picketrope: ENGINE-NEEDS (see bottom).
+R.picketrope={mod:{retainPick(r,ctx,v){return v+1},drawCount(r,ctx,v){return W.cb&&W.cb.turn===1?Math.max(0,v-1):v}}}; // end of turn: Retain 1 card of your choice (combat.js retainWindow); first turn draws 1 less
 R.casematebrick={on:{turnEnd(r){const c=Cst(r);if((c.n||0)<3&&W.cb.p.block>=15){c.n=(c.n||0)+1;addSt(W.cb.p,'str',1);flash(r)}}}};
 R.prybar={on:{beforeCardPlay(r,ctx){if(CARDS[ctx.card.id].t==='A'&&W.cb.stat.attacksTurn===1)T(r).second=ctx.card.uid}},
  mod:{damageAdd(r,ctx,v){const f=ctx.f;return ctx.attack&&f&&f.ci&&!f.echo&&f.ci.uid===T(r).second?v+5:v}}};
@@ -208,8 +208,5 @@ R.hushbell={on:{turnStart(r,ctx){ctx.energy=(ctx.energy||0)+1},cardPlayed(r,ctx)
  mod:{canPlay(r,ctx,v){if(ctx.card)LASTCOST.set(ctx.card,cost(ctx.card));return v}}};
 
 // ENGINE-NEEDS:
-// picketrope (R2-?, uncommon): "At the end of your turn, Retain 1 card of your choice." needs a pre-discard choice window in endTurn
-//   (e.g. fire('turnEndRetain',{pick:n}) that opens a blocking cb.mode before endTurnImpl discards the hand, then sets ci.moor=true on the choice).
-//   Its second clause (draw 1 less on the first turn) is trivially a 'drawCount' mod; left out so the stub never rolls half-built.
 // Approximation notes (behaviour true, but through existing hooks): Pull/Seize/Gunnery/Blast Door edit the live intent in 'enemyAct';
 //   Jam Wedge lifts the enemy's turn-base by 4 (a proper 'jamThreshold' mod would be cleaner); Sluice Gate Pin's Undertow penalty is -3 Guard (Undertow deals no damage).

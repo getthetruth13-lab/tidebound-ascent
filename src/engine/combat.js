@@ -52,7 +52,7 @@ export function spawn(key,o={}){const t=EN[key];const hp=rng(t.hp[0],t.hp[1],cs)
 export function countAlive(key){return alive().filter(x=>x.key===key).length}
 // ================= combat start =================
 function startCombatImpl(kind,enc,opts={}){
- W.run.deck.forEach(ci=>{ci.sus=0;ci.moor=false;ci.tmp0=false;ci.tmpUp=false;ci.rank=0});
+ W.run.deck.forEach(ci=>{ci.sus=0;ci.moor=false;delete ci.pk;ci.tmp0=false;ci.tmpUp=false;ci.rank=0});
  const cb=W.cb={kind,ens:[],tgt:0,p:{block:0,st:{}},energy:3,maxE:3,banner:null,insp:null,hand:[],draw:shuffle(W.run.deck.slice(),cs),disc:[],exh:[],log:[],vfx:[],callouts:[],fx:[],powers:[],
   stat:{playedTurn:0,playedCombat:0,attacksTurn:0,attacksCombat:0,tideturnsTurn:0,tideturnsCombat:0,crests:0,undertows:0,echoesTurn:0,echoesCombat:0,wpDestroyed:0,wpLeft:0,wpLeftTurn:0,wpLeftLast:0,lastTideDir:0,lastEchoed:null,flourishes:0,advances:0},
   turn:0,lastType:null,mode:null,busy:false,sel:null,opts:opts,startQ:[],nextTurnQ:[],pendingE:0,nextDraw:0,
@@ -251,6 +251,10 @@ function modeActImpl(a,i,j){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)re
  const done=()=>{if(m.thenStart&&!cb.mode){if(W.cb===cb)return nextStart()}return after()};
  if(m.k==='choice'){cb.mode=null;m.opts[i].f();return done()}
  if(m.k==='slot'){cb.mode=null;m.then(i);return done()}
+ if(m.k==='retain'){const ci=a==='skip'?null:cb.hand.find(c=>c.uid===m.uids[i]);if(a!=='skip'&&!ci)return;
+  cb.mode=null;if(ci){ci.pk=true;log('🪢 Retained: '+cname(ci))}
+  if(ci&&m.n>1&&retainWindow(m.held,m.n-1))return;
+  return endTurnFinish(m.held)}
  if(m.k==='chart'){const d=cb.draw;
   if(a==='up'&&i>0)[d[i-1],d[i]]=[d[i],d[i-1]];
   if(a==='dn'&&i<m.n-1)[d[i+1],d[i]]=[d[i],d[i+1]];
@@ -388,9 +392,16 @@ function endTurnImpl(){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  for(const ci of held){const d=CARDS[ci.id];if(cb.hand.includes(ci)&&d.endInHand)d.endInHand(F(ci,{}),ci)}
  fire('turnEndInHand',{});
  if(W.run.hp<=0&&!cheatDeath())return lose();
+ if(!retainWindow(held,mod('retainPick',{},0)))endTurnFinish(held)}
+// Picket Rope (modifier 'retainPick'): before the hand is discarded, the player picks cards to Retain. Fleeting cards are not offered
+// (they Sink anyway); an empty choice skips the window. The pick is a plain modeAct, so a saved run replays it exactly.
+function retainWindow(held,n){const cb=W.cb;if(!cb||n<1)return false;
+ const ok=cb.hand.filter(ci=>held.includes(ci)&&!ci.pk&&!CARDS[ci.id].fleet);if(!ok.length)return false;
+ cb.mode={k:'retain',n,held,uids:ok.map(c=>c.uid),title:`Retain ${n>1?n+' cards':'1 card'}: it stays in your hand`};cb.sel=null;cb.insp=null;render();return true}
+function endTurnFinish(held){const cb=W.cb;if(!cb)return;
  // Cards drawn by the Echo (e.g. Mirror Step's old Resound) stay in hand; the rest is discarded, Fleeting cards Sink, Moored cards stay.
  const keep=[];for(const ci of cb.hand){const d=CARDS[ci.id];if(!held.includes(ci)){keep.push(ci);continue}ci.tmp0=false;
-  if(d.fleet)sinkCard(ci,'fleeting');else if(d.moor||ci.moor)keep.push(ci);else cb.disc.push(ci)}
+  const pk=ci.pk;delete ci.pk;if(d.fleet)sinkCard(ci,'fleeting');else if(d.moor||ci.moor||pk)keep.push(ci);else cb.disc.push(ci)}
  cb.hand=keep;cb.sel=null;cb.insp=null;
  if(W.run.cls==='duel'&&!cb.keepMom&&!mod('keepMomentum',{},false))cb.mom=Math.max(0,cb.mom-DU.decay);cb.keepMom=false;
  cb.fx=cb.fx.filter(l=>l.combat||(l.turns&&--l.turns>0));

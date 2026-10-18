@@ -340,3 +340,8 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 .lp-earned{position:absolute;right:4px;top:4px;width:9px;height:9px;border-radius:50%;background:#f2c14e;box-shadow:0 0 8px #f2c14e,0 0 0 2px #05070b;pointer-events:none}
 .lp-cardwrap{position:relative}
 .lp-lock .lp-hint{font-size:10px;line-height:1.25}
+/* Picket Rope retain window: each real card is a button (Tab / Enter / Space). */
+.retainpick{background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+.retainpick:focus-visible{outline:2px solid #d9b46a;outline-offset:3px;border-radius:8px}
+.battle .tilebox .retaintiles{flex-wrap:wrap;--choice-card:min(110px,calc((100dvh - 150px)*5/7))}
+#retainbox .actions{margin-top:6px;display:flex;justify-content:center}
