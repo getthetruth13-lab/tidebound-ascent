@@ -61,11 +61,12 @@ addEventListener('pointerdown',()=>{try{const o=screen.orientation;if(o&&o.lock&
 
 // Offline support: register the service worker and ask it to cache everything this page loaded + all art in the asset map.
 loading.loadingInit();
-if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
+// Registered after the page's own load (slow links: the game's code and start screen get the bandwidth first, the install does not fight them for it).
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))(document.readyState==='complete'?Promise.resolve():new Promise(r=>addEventListener('load',r,{once:true}))).then(()=>{
  navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(reg=>{
   const urls=performance.getEntriesByType('resource').map(e=>e.name).filter(u=>u.startsWith(location.origin)).concat([...assets.assetURLs(),...env.envURLs(1),...tileUrls()].map(u=>new URL(u,location.href).href));
   (reg.active||navigator.serviceWorker.controller)&&reg.active.postMessage({type:'precache',urls});
   // Act 2/3 art is not installed up front: fetch it only when a later act is requested (?act=N) or a saved run is already in one.
   assets.warmActPack(Math.max(+new URLSearchParams(location.search).get('act')||1,(W.run&&W.run.act)||1));
  }).catch(e=>{console.warn('SW registration failed',e);loading.loadingFail()});
-}
+});
