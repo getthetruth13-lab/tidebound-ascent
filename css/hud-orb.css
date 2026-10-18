@@ -117,3 +117,7 @@
 /* Echo: moving a mark is free. Its ready/armed state lights only the ring and bell chevron, never the Energy orb itself, so it never reads as spending Energy. */
 #orb.horb.free.ready .ho-art{animation:none}
 #orb.horb.free.armed .ho-art{filter:drop-shadow(0 3px 6px #000)}
+
+.noplay-tip{position:fixed;z-index:80;pointer-events:none;max-width:60vw;padding:4px 10px;border-radius:10px;background:#0b0e14ee;border:1px solid #e8d5a2;color:#f3e6bd;font:700 13px/1.2 var(--font-body);text-align:center;text-shadow:0 1px 2px #000;animation:nptip 1.4s ease-out forwards}@keyframes nptip{0%{opacity:0;transform:translateY(4px)}12%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0}}
+.reduce-motion .noplay-tip{animation:none}
+

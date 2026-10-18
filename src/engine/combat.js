@@ -255,7 +255,7 @@ function modeActImpl(a,i,j){const cb=W.cb;if(!cb)return;const m=cb.mode;if(!m)re
   cb.mode=null;if(ci){ci.pk=true;log('🪢 Retained: '+cname(ci))}
   if(ci&&m.n>1&&retainWindow(m.held,m.n-1))return;
   return endTurnFinish(m.held)}
- if(m.k==='chart'){const d=cb.draw;
+ if(m.k==='chart'){const d=cb.draw;m.n=Math.min(m.n,d.length);if(m.n<1)a='done'; // draw pile shrank under the prompt: nothing to chart, finish
   if(a==='up'&&i>0)[d[i-1],d[i]]=[d[i],d[i-1]];
   if(a==='dn'&&i<m.n-1)[d[i+1],d[i]]=[d[i],d[i+1]];
   if(a==='mv'&&i!==j&&i>=0&&j>=0&&i<m.n&&j<m.n)d.splice(j,0,d.splice(i,1)[0]); // drag-and-drop reorder (ui/chartdrag.js)
@@ -290,6 +290,13 @@ function drift(){const cb=W.cb;if(W.run.cls!=='tide'||cb.turn<2||!cb.tideDir)ret
 function tideActImpl(a){const cb=W.cb;if(!cb||cb.busy||cb.mode)return;
  if((a==='up'||a==='down')&&hasRelic('tidetable')&&!cb.tideBtnUsed){cb.tideBtnUsed=true;flash(relic('tidetable'));tideShift(a==='up'?1:-1,'relic');return after()}
  if(a==='flip'&&hasRelic('helmwheel')&&!cb.wheelUsed&&cb.tideDir){cb.wheelUsed=true;cb.tideDir=-cb.tideDir;flash(relic('helmwheel'));log('☸️ Helmsman\'s Wheel: drift arrow flipped');return after()}}
+// Why a card can't be played, for the tap hint: null = playable (or the hand is busy), 'energy' = true lack of energy, else a short phrase.
+// Mod handlers that veto a card set W.cb.whyNot first; cards with req get a phrase from REQ_WHY (fallback: generic).
+const REQ_WHY={solo:'Needs a Marked card',grandpause:'Needs a Marked card',coda:'Needs 3 cards played first',enpassant:'Needs 1+ Momentum',tithe:'Needs 3 Tide',siphon:'Needs more Tide',drawtide:'Needs Tide above 2',gtraverse:'Needs 1 Energy',tithebox:'Needs more gold',breakcamp:'Needs a Waypoint',mirrorsig:'Needs a Waypoint',abandon:'Needs a Waypoint',stakenext:'Needs a Waypoint',relocate:'Needs a Waypoint (once a turn)'};
+export function playBlockReason(ci){const cb=W.cb;const d=ci&&CARDS[ci.id];if(!cb||!d||cb.busy||cb.mode)return null;if(canPlay(ci))return null;
+ if(d.unplay&&!mod('playUnplayable',{card:ci},false))return 'Unplayable';if(cb.locked===ci)return 'Locked';if(cost(ci)>cb.energy)return 'energy';
+ if(d.req&&!d.req(F(ci,{})))return REQ_WHY[ci.id]||'Not playable right now';
+ cb.whyNot=null;mod('canPlay',{card:ci},true);const w=cb.whyNot;cb.whyNot=null;return w||'Not playable right now'}
 export function canPlay(ci){const cb=W.cb;const d=CARDS[ci.id];if(!d||cb.busy||cb.mode)return false;if(d.unplay&&!mod('playUnplayable',{card:ci},false))return false;if(cb.locked===ci)return false;if(cost(ci)>cb.energy)return false;if(d.req&&!d.req(F(ci,{})))return false;return mod('canPlay',{card:ci},true)}
 function tapCardImpl(i){const cb=W.cb;if(cb.busy||cb.mode)return;cb.sel=i;cb.insp=null;render()}
 // Retained for old debug callers; only the drag release UI commits a card.

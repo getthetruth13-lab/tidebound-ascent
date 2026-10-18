@@ -93,7 +93,7 @@ R('solo',{e:'🎸',req:()=>!!(W.cb.mark||W.cb.mark2),d:'Choose a marked card (au
  const L=thisTurn({id:'solo',slot:0,played:0,mod:{
   echoPlan(inst,ctx,p){if(!inst.slot||ctx.slot!==inst.slot)return p;const other=inst.slot===1?W.cb.mark2:W.cb.mark;let r=p.repeats+3;
    if(other&&(other._seq||0)>(p.card._seq||0))r=Math.min(r,EC.cap-W.cb.stat.echoesTurn-1);return {...p,repeats:Math.max(p.repeats,r)}},
-  canPlay(inst,ctx,v){return inst.played>=3?false:v}},
+  canPlay(inst,ctx,v){if(inst.played>=3){if(W.cb)W.cb.whyNot='Card limit reached';return false}return v}},
   on:{cardPlayed(inst,ctx){if(ctx.card!==ci)inst.played++}}});
  const set=s=>{L.slot=s;const m=s===1?c.mark:c.mark2;m.soloT=Date.now();log('🎸 Solo: '+cname(m)+' rings 3 more times');callout('SOLO: '+cname(m)+' ×4','echo')};
  const opts=[c.mark&&{l:'🔔 '+cname(c.mark),card:{id:c.mark.id,up:c.mark.up},f:()=>set(1)},c.mark2&&{l:'🔔 '+cname(c.mark2),card:{id:c.mark2.id,up:c.mark2.up},f:()=>set(2)}].filter(Boolean);

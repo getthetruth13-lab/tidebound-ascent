@@ -126,6 +126,11 @@ if(typeof document!=='undefined')document.addEventListener('pointerdown',ev=>{if
 export function flashNoAfford(cardEl){const c=cardEl&&cardEl.isConnected?cardEl:document.querySelector('.hand .card.peek,.hand .card.tap-armed');
  for(const el of [c,document.getElementById('orb')])if(el){el.classList.remove(el===c?'fx-noafford':'fx-poor');void el.offsetWidth;el.classList.add(el===c?'fx-noafford':'fx-poor')}
  playSound('cancel',.7)}
+// Short reason (not an energy problem) near the tapped card: fixed-position, no layout change, gone in ~1.4 s.
+export function showNoPlay(cardEl,text){document.querySelectorAll('.noplay-tip').forEach(e=>e.remove());const c=cardEl&&cardEl.isConnected?cardEl:document.querySelector('.hand .card.peek,.hand .card.tap-armed');if(!c)return;
+ const r=c.getBoundingClientRect(),t=document.createElement('div');t.className='noplay-tip';t.setAttribute('role','status');t.textContent=text;document.body.appendChild(t);
+ const w=t.offsetWidth;t.style.left=Math.max(4,Math.min(innerWidth-w-4,r.left+r.width/2-w/2))+'px';t.style.top=Math.max(4,r.top-t.offsetHeight-6)+'px';
+ c.classList.remove('fx-noafford');playSound('cancel',.5);setTimeout(()=>t.remove(),1400)}
 function handCardEl(node){const hit=node?.closest?.('.hand-hit');if(hit)return document.querySelector(`.hand .card[data-i="${hit.dataset.i}"]`);return node?.closest?.('.hand .card[data-uid]')||null}
 if(typeof document!=='undefined')document.addEventListener('pointerdown',ev=>{const c=handCardEl(ev.target);const cb=W.cb;if(!c||!cb||W.S.screen!=='combat')return;
  const ci=cb.hand.find(h=>String(h.uid)===c.dataset.uid);if(!ci||CARDS[ci.id]?.unplay)return;let k;try{k=cost(ci)}catch(e){return}if(k<=cb.energy)return;

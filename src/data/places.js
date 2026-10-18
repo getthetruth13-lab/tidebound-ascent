@@ -9,6 +9,11 @@ export const A3_BANDS=[{floors:[1,5],n:'The Windward Cliffs'},{floors:[6,10],n:'
 export const A3_LAIRS={engine:'The Engine Hall',thalassa:'The Upturned Sea',navigator:'The Navigator\'s Wake'};
 export const BANDS={1:A1_BANDS,2:A2_BANDS,3:A3_BANDS},LAIRS={1:A1_LAIRS,2:A2_LAIRS,3:A3_LAIRS};
 export const BOSS_FLOOR={1:15,2:16,3:16};
+// Floors in each act = its boss floor (Act 1: 14 rooms + boss; Acts 2-3: 15 rooms + boss). The top bar counts across the whole climb.
+export const FLOORS_IN_ACT=[0,BOSS_FLOOR[1],BOSS_FLOOR[2],BOSS_FLOOR[3]];
+export const TOTAL_FLOORS=FLOORS_IN_ACT[1]+FLOORS_IN_ACT[2]+FLOORS_IN_ACT[3];
+// Derived from act + floor only (no save field): floor 3 of Act 2 = 15+3 = 18.
+export function overallFloor(act,floor){let n=0;for(let a=1;a<(act||1);a++)n+=FLOORS_IN_ACT[a]||15;return n+Math.max(0,floor||0)}
 export const MAP_LINE='The great flight is broken. Every road up is a gamble.';
 export const MAP_LINES={1:MAP_LINE,2:'Two gates still hold the road. Every ward has its price.',3:'No walls up here. Read the sky: the Eye is the only calm.'};
 export const actName=act=>(ACT_NAMES[act]||ACT_NAMES[1]).n;

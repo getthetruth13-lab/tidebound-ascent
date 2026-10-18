@@ -1133,7 +1133,7 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 
 /* Task 41: measured 2340×1080 battle baseline, scaled by height and UI size. */
 @media(orientation:landscape){
- .combat,.runhud{--unit:calc(100dvh / 1080);--hud-unit:calc(var(--unit)*1);--topbar-h:calc(78*var(--hud-unit));--hud-icon:calc(40*var(--hud-unit));--hud-text:calc(30*var(--hud-unit));--hud-gap:calc(8*var(--hud-unit));--edge:calc(20*var(--hud-unit));--relic-cell:calc(63*var(--hud-unit))}
+ .combat,.runhud{--unit:calc(100dvh / 1080);--hud-unit:calc(var(--unit)*1);--topbar-h:calc(78*var(--hud-unit));--hud-icon:calc(40*var(--hud-unit));--hud-text:calc(30*var(--hud-unit));--hud-gap:calc(8*var(--hud-unit));--edge:calc(20*var(--hud-unit));--relic-cell:calc(63*var(--hud-unit));--relic-scale:1.2;--relic-size:calc(55*var(--hud-unit)*var(--relic-scale))}
  :is(.combat,.runhud)>.topbar{position:absolute;inset:0 0 auto;width:100%;height:var(--topbar-h);transform:none;padding:0;background:linear-gradient(#15212bd9,#18242bc4,#18242b00);border:0;box-shadow:none;display:block;font-size:var(--hud-text)}
  :is(.combat,.runhud) .topbar>.who,:is(.combat,.runhud) .topbar>.stat,:is(.combat,.runhud) .topbar>.mini,:is(.combat,:where(.runhud>.topbar.sts)) #potions{position:absolute;top:calc(40*var(--hud-unit));transform:translateY(-50%);padding:0;background:none;border:0;box-shadow:none;min-height:0;white-space:nowrap}
  :is(.combat,:where(.runhud>.topbar.sts)) .who{left:2.56%;width:calc(170*var(--hud-unit))}:is(.combat,:where(.runhud>.topbar.sts)) .who>.slot{display:none}:is(.combat,:where(.runhud>.topbar.sts)) .who .nm{font-size:var(--hud-text);line-height:1}:is(.combat,:where(.runhud>.topbar.sts)) .who small{display:block;font:calc(20*var(--hud-unit))/1 var(--font-body)}
@@ -1141,8 +1141,8 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
  :is(.combat,.runhud) .topbar .uic{width:var(--hud-icon);height:var(--hud-icon)}
  :is(.combat,:where(.runhud>.topbar.sts)) #potions{left:27.35%;display:flex;gap:calc(48*var(--hud-unit))}:is(.combat,:where(.runhud>.topbar.sts)) .potion,:is(.combat,:where(.runhud>.topbar.sts)) .potion .slot{width:var(--hud-icon);height:var(--hud-icon);min-width:0;padding:0}
  :is(.combat,:where(.runhud>.topbar.sts)) #lampbtn{left:53%;font-size:var(--hud-text)}:is(.combat,:where(.runhud>.topbar.sts)) #mapbtn{left:90.17%}:is(.combat,:where(.runhud>.topbar.sts)) #deckbtn{left:92.73%}:is(.combat,:where(.runhud>.topbar.sts)) #setbtn{left:96.36%}:is(.combat,.runhud) .topbar .mini{font-size:calc(20*var(--hud-unit))}:is(.combat,.runhud) .topbar .mini .uic{width:calc(50*var(--hud-unit));height:calc(50*var(--hud-unit))}
- :is(.combat,:where(.runhud>.topbar.sts)) #relicbar{position:absolute;left:var(--edge);top:calc(88*var(--hud-unit));width:calc(59% - var(--edge));height:calc(55*var(--hud-unit));display:flex;flex-wrap:nowrap;gap:var(--hud-gap);overflow:hidden;align-items:center}
- :is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic{width:calc(55*var(--hud-unit));height:calc(55*var(--hud-unit));flex:0 0 calc(55*var(--hud-unit));padding:0}:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .slot{width:100%;height:100%}:is(.combat,:where(.runhud>.topbar.sts)) .relic-more{font-size:var(--hud-text)}
+ :is(.combat,:where(.runhud>.topbar.sts)) #relicbar{position:absolute;left:var(--edge);top:calc(88*var(--hud-unit));width:calc(59% - var(--edge));height:var(--relic-size);display:flex;flex-wrap:nowrap;gap:var(--hud-gap);overflow:hidden;align-items:center}
+ :is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic{width:var(--relic-size);height:var(--relic-size);flex:0 0 var(--relic-size);padding:0}:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .slot{width:100%;height:100%}:is(.combat,:where(.runhud>.topbar.sts)) .relic-more{font-size:var(--hud-text)}
  .combat #orb{left:calc(10.043% - 60*var(--hud-unit));bottom:calc(18.519dvh - 60*var(--hud-unit));width:calc(120*var(--hud-unit));height:calc(120*var(--hud-unit));transform:none;font-size:var(--hud-text)}
  .combat .ctl .pile{width:calc(70*var(--hud-unit));height:calc(70*var(--hud-unit));min-height:0;min-width:0;padding:0;font-size:calc(24*var(--hud-unit));display:block}.combat .ctl .pile .uic{display:block;width:100%;height:100%}
  .combat #drawpile{left:calc(2.137% - 35*var(--hud-unit));bottom:calc(8.333dvh - 35*var(--hud-unit));transform:none}.combat #discpile{right:calc(2.35% - 35*var(--hud-unit));bottom:calc(8.333dvh - 35*var(--hud-unit));transform:none}
@@ -1201,7 +1201,7 @@ body.reduce-motion .combat #endbtn:active:not(:disabled){transform:none}
    viewport like in battle, and the page reserves the bar (78) + relic row (88..143) so content never sits under the relics. */
 @media(orientation:landscape){
  .runhud>.topbar.sts{position:fixed;inset:0 0 auto;width:100%;z-index:30;border-radius:0}
- .page.page.runhud:not(.fit-event){padding-top:calc(150*var(--hud-unit));box-sizing:border-box}
+ .page.page.runhud:not(.fit-event){padding-top:calc(95*var(--hud-unit) + var(--relic-size));box-sizing:border-box}
  .page.runhud.fit{height:100dvh}
  .runhud>.topbar.sts #relicbar .relic,.runhud>.topbar.sts #relicbar .slot{background:none;border:0;box-shadow:none;border-radius:0}
  .runhud>.topbar.sts #relicbar .relic::before{display:none}
@@ -1212,7 +1212,7 @@ body.reduce-motion .combat #endbtn:active:not(:disabled){transform:none}
  .page.runhud.fit-shop .pk-shop .shopicon .slot{width:30px;height:30px}
  .page.runhud.fit-shop .pk-shop .shopicon .inm{font-size:11px;white-space:nowrap}
  /* the map is bright parchment, not a dark battle scene: a soft dusk scrim behind the bar + relic row keeps the same bar readable */
- .page.mappage.runhud::before{content:'';position:fixed;inset:0 0 auto;height:calc(150*var(--hud-unit));background:linear-gradient(#0b0e14e6,#0b0e14b0 55%,#0b0e1400);z-index:29;pointer-events:none}
+ .page.mappage.runhud::before{content:'';position:fixed;inset:0 0 auto;height:calc(95*var(--hud-unit) + var(--relic-size));background:linear-gradient(#0b0e14e6,#0b0e14b0 55%,#0b0e1400);z-index:29;pointer-events:none}
 }
 /* clovis-intents: "+1" surcharge badge on the cost gem (Barnacled), a small painted coral-red seal at the gem's lower right. */
 .card .costplus{position:absolute;z-index:2;left:calc(12% + 2.5cqw);top:calc(8.286% + 2cqw);min-width:8.5cqw;height:8.5cqw;padding:0 1cqw;box-sizing:border-box;display:flex;align-items:center;justify-content:center;

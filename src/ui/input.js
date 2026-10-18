@@ -4,8 +4,9 @@ import {W} from '../core/state.js';
 import {settings} from '../save.js';
 import {observeEvents} from '../core/bus.js';
 import {needsTarget} from '../engine/cards.js';
-import {alive,canPlay,playCard} from '../engine/combat.js';
-import {flashNoAfford} from './hud-panel.js';
+import {alive,canPlay,playCard,playBlockReason} from '../engine/combat.js';
+import {flashNoAfford,showNoPlay} from './hud-panel.js';
+const blockedTap=el=>{const ci=W.cb&&W.cb.hand[+(el&&el.dataset.i)];const why=ci?playBlockReason(ci):'energy';if(why&&why!=='energy')showNoPlay(el,why);else flashNoAfford(el)};
 import {layoutHand,render,openInspect,closeInspect,inspecting} from './render.js';
 // ================= pointer / touch input: tap-to-select, drag-to-play =================
 export let drag=null;
@@ -106,7 +107,7 @@ export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)retur
  if(!d.moved){W.cb.sel=null;W.cb.insp=null;layoutHand();return}
  const ci=W.cb.hand[d.i],target=ci&&canPlay(ci)?dropTarget(ci,ev.clientX,ev.clientY):null;
  if(target!=null){if(target!=='hero')W.cb.tgt=target;return playCard(d.i)}
- render();
+ const di=d.i,blocked=ci&&!canPlay(ci)&&playBlockReason(ci);render();if(blocked&&blocked!=='energy')setTimeout(()=>{const el=document.querySelector(`#hand .card[data-i="${di}"]`);if(el)showNoPlay(el,blocked)},30);
 }
 document.addEventListener('pointerup',ev=>endDrag(ev,false));
 document.addEventListener('pointercancel',ev=>endDrag(ev,true));
@@ -172,7 +173,7 @@ function tryTapPlay(spot){if(!arm||!W.cb||W.cb.busy||W.cb.mode)return false;cons
  const nt=needsTarget(ci);
  if(nt){if(typeof spot!=='number')return false;const en=W.cb.ens[spot];if(!en||en.hp<=0||en.fled)return true}
  else if(spot!=='hero'&&spot!=='area')return false;
- if(!canPlay(ci)){flashNoAfford(document.querySelector(`#hand .card[data-i="${arm.i}"]`));return true}
+ if(!canPlay(ci)){blockedTap(document.querySelector(`#hand .card[data-i="${arm.i}"]`));return true}
  if(settings.tapConfirm&&arm.confirm!==spot){arm.confirm=spot;showArmTargets();return true}
  const i=arm.i;if(typeof spot==='number')W.cb.tgt=spot;clearArm();playCard(i);return true}
 function tapSpot(ev){const t=ev.target;if(!t?.closest||t.closest('.topbar,.dais,.ctl,.ov,.pop,#orb,.hand,.bottom,button'))return null;

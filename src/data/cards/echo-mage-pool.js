@@ -92,5 +92,5 @@ E('infinitehum',{e:'🎵',d:'Your Marked card gains +2 per card played after it,
 E('livingsong',{e:'🌱',sus:4,moor:1,d:'Deal {6|9}. Sustain {4|5}. When this Echoes, draw 1. Moor.',p:f=>{f.dmg(f.v(6,9));if(f.echo)f.draw(1);susUp(f,1)}});
 E('feedstorm',{e:'🌪️',d:'Deal {4|5} to ALL for each Echo this combat (max 15). Sink.',p:f=>{const n=Math.min(15,W.cb.stat.echoesCombat);if(!n){log('🌪️ Feedback Storm: no Echoes yet');return}f.all(f.v(4,5)*n);callout('FEEDBACK STORM ×'+n,'echo')}});
 E('solo',{e:'🎸',d:'This turn, your Echo happens one extra time, and you can play at most 3 more cards. Faint.',p:f=>{const ci=f.ci;callout('SOLO: 3 more cards','echo');
- thisTurn({id:'solo',played:0,mod:{echoPlan(inst,ctx,p){return {...p,repeats:p.repeats+1}},canPlay(inst,ctx,v){return inst.played>=3?false:v}},on:{cardPlayed(inst,ctx){if(ctx.card!==ci)inst.played++}}})}});
+ thisTurn({id:'solo',played:0,mod:{echoPlan(inst,ctx,p){return {...p,repeats:p.repeats+1}},canPlay(inst,ctx,v){if(inst.played>=3){if(W.cb)W.cb.whyNot='Card limit reached';return false}return v}},on:{cardPlayed(inst,ctx){if(ctx.card!==ci)inst.played++}}})}});
 E('finalchord',{e:'🎆',d:'Deal 3 for each card played this combat (max 40 counted). Sink.',p:f=>{const n=Math.min(40,W.cb.stat.playedCombat);f.dmg(3*n);if(n>=10)callout('FINAL CHORD ×'+n,'echo')}});

@@ -113,7 +113,7 @@ R.mooringring={on:{enemyAct(r,ctx){const m=ctx.intent;if(m&&m.pull&&W.run.cls===
  turnEnd(r){if(!T(r).moved){gainBlock(5);flash(r)}}}};
 R.sparringpost={mod:{damageAdd(r,ctx,v){if(!ctx.attack||!ctx.target)return v;return v+Math.min(4,DEB.filter(k=>ctx.target.st[k]).length)}}};
 R.scratchedplaque={on:{combatStart(r){gainBlock(14);flash(r)},turnStart(r,ctx){if(W.cb.turn===2){ctx.draw=(ctx.draw||0)+2;flash(r)}}},
- mod:{canPlay(r,ctx,v){const cb=W.cb;return cb&&cb.turn===1&&ctx.card&&CARDS[ctx.card.id].t==='A'?false:v}}};
+ mod:{canPlay(r,ctx,v){const cb=W.cb;if(cb&&cb.turn===1&&ctx.card&&CARDS[ctx.card.id].t==='A'){cb.whyNot='No Attacks on turn 1';return false}return v}}};
 R.ballastbar={on:{combatStart(r){W.cb.startQ.push(()=>{if(W.run.gold<8)return;choose('⚓ Ballast Bar: pay 8 gold?',[
  {l:'Pay 8 gold',cap:'+1 Energy on turn 1, +10 Guard',f:()=>{if(W.run.gold<8)return;W.run.gold-=8;W.cb.pendingE=(W.cb.pendingE||0)+1;gainBlock(10);flash(r)}},{l:'Keep the gold',f:()=>{}}])})}}};
 R.dampbedroll={on:{combatStart(r){addSt(W.cb.p,'weak',1)}},mod:{mendFrac(r,ctx,v){return v+12.01/Math.max(1,W.run.max)}}};

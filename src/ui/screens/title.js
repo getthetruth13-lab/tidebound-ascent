@@ -14,6 +14,7 @@ import {lampPickScr,ledgerScr,totalPending} from './lamp.js';
 import {loadProfile} from '../../progress.js';
 import {dip} from '../dip.js';
 import {VERSION} from '../../../version.js';
+import {overallFloor,TOTAL_FLOORS} from '../../data/places.js';
 import {restoreWinScreen} from '../../engine/run.js';
 const RUN_KEY='tidebound.run.v2';
 function ago(t){if(!t)return'';const m=Math.max(0,Math.round((Date.now()-t)/60000));if(m<1)return'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';return Math.round(h/24)+' d ago'}
@@ -48,7 +49,7 @@ export function applyMotion(){document.body.classList.toggle('reduce-motion',!!s
 export function setReduceMotion(on){settings.reduceMotion=!!on;
  if(on){if(settings.envFx==='full'){settings.envFxBefore='full';settings.envFx='reduced'}}else if(settings.envFxBefore){settings.envFx=settings.envFxBefore;delete settings.envFxBefore}
  saveSettings();applyMotion();render()}
-const slotHTML=s=>{const K=CLASSES[s.run.cls];return `<div class="tb-slot theme-${K.theme}" data-key="${s.key}"><span class="tb-sico">${K.e}</span><span class="tb-sinfo"><b>${K.n}</b> · Floor ${s.run.floor}/15<br><i>${glyph('heart')} ${s.run.hp}/${s.run.max} · ${glyph('coin')} ${s.run.gold} · ${s.run.deck.length} cards · ${ago(s.t)}</i></span>
+const slotHTML=s=>{const K=CLASSES[s.run.cls];return `<div class="tb-slot theme-${K.theme}" data-key="${s.key}"><span class="tb-sico">${K.e}</span><span class="tb-sinfo"><b>${K.n}</b> · Floor ${overallFloor(s.run.act,s.run.floor)}/${TOTAL_FLOORS}<br><i>${glyph('heart')} ${s.run.hp}/${s.run.max} · ${glyph('coin')} ${s.run.gold} · ${s.run.deck.length} cards · ${ago(s.t)}</i></span>
  <button class="tb-btn sm pri" onclick="loadSlot('${s.key}')">Load</button><button class="tb-btn sm${W.S.confirmDel===s.key?' danger':''}" onclick="deleteSlot('${s.key}')">${W.S.confirmDel===s.key?'Sure?':'Delete'}</button></div>`};
 function framed(id,title,body,cls=''){return `<div class="tb-scr tb-title">${bgHTML()}<div class="tb-ov"><div class="tb-frame ${cls}" id="${id}">${frameOpen()}<h2>${title}</h2>${body}${frameClose()}</div></div></div>`}
 export function titleScr(){const v=W.S.view||'main';
@@ -68,7 +69,7 @@ export function titleScr(){const v=W.S.view||'main';
  // Menu: video frame 0 with title/emblem painted out (menu-plate.webp), small cut-out title+emblem (menu-emblem.webp) up top, one centred column of live words.
  const R=[['continue','Continue','continueRun()',!K],['newgame','New Game','newGame()'],['loadgame','Load Game',"titleGo('load')",!nsl],
   ['options','Options',"titleGo('options')"],['learn','Learn to Play',"titleGo('learn')"],['ledger','Ledger','openLedger()']];
- const w=([id,label,act,off],i)=>`<button class="tm-w${off?' off':''}" id="${id}" data-sfx="confirm" style="--i:${i}" aria-label="${label}${id==='continue'&&K?`: ${K.n}, Floor ${sv.run.floor}/15`:''}"${off?' disabled':` onclick="menuPress(this,&quot;${act.replace(/"/g,'')}&quot;)"`}><span>${label}</span>${id==='ledger'&&pend?`<em class="lp-dot">${pend}</em>`:''}</button>`;
+ const w=([id,label,act,off],i)=>`<button class="tm-w${off?' off':''}" id="${id}" data-sfx="confirm" style="--i:${i}" aria-label="${label}${id==='continue'&&K?`: ${K.n}, Floor ${overallFloor(sv.run.act,sv.run.floor)}/${TOTAL_FLOORS}`:''}"${off?' disabled':` onclick="menuPress(this,&quot;${act.replace(/"/g,'')}&quot;)"`}><span>${label}</span>${id==='ledger'&&pend?`<em class="lp-dot">${pend}</em>`:''}</button>`;
  const fade=W.S.fade?' tm-fade':'';if(W.S.fade){W.S.fade=0;if(!W.S.noFly)requestAnimationFrame(flyEmblem)}
  return `<div class="tb-scr tb-title tb-main tb-imgmenu${fade}">${TITLE_LAYERED?layeredStage():`<div class="tv-stage"><img class="tv-img" src="art/v2/title/menu-plate.webp" alt="" draggable="false"></div>`}<img class="tm-emb" id="tmemb" src="art/v2/title/menu-emblem.webp" alt="The Drowned Sun" draggable="false">
  <nav class="tm-nav tm-words" aria-label="Main menu">${R.map(w).join('')}</nav><span class="tm-ver" id="tmver">v${VERSION}</span></div>`}

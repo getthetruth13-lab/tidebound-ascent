@@ -18,6 +18,6 @@ K('seasick',{e:'🤢',onDrawSelf:(f,ci)=>{const o=W.cb.hand.filter(c=>c!==ci);if
 K('anchorchain',{e:'⛓️',moor:1});
 K('dread',{e:'😨',endInHand:(f,ci)=>{addSt(W.cb.p,'weak',1);log('😨 Dread: +1 Soaked');floatText('p','Dread: +1 Soaked','curse');(W.cb.cursePops=W.cb.cursePops||[]).push({id:'dread',uid:ci&&ci.uid,t:Date.now()})}});
 K('leakyhull',{e:'🕳️',endInHand:f=>{addSt(W.cb.p,'brittle',1);log('🕳️ Leaky Hull: +1 Brittle')}});
-K('sirenwhisper',{e:'🧜',mod:{canPlay(inst,ctx,v){return v&&W.cb.stat.playedTurn<4}}});
+K('sirenwhisper',{e:'🧜',mod:{canPlay(inst,ctx,v){const ok=v&&W.cb.stat.playedTurn<4;if(v&&!ok)W.cb.whyNot='Muffled';return ok}}});
 K('wreckghost',{e:'👻',onDrawSelf:f=>{if(W.cb.energy>0){W.cb.energy--;log('👻 Wreck Ghost: −1 Energy')}}});
 K('doubloon',{e:'🪙'});
