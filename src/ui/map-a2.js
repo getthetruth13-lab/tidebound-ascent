@@ -68,6 +68,9 @@ export function a2Layers(Y,N,boss){
  const ban=[['quay',2],['galleries',7],['ramparts',12]].map(([k,r])=>at('a2ban','banner-'+k,5.66,Y(r))).join('');
  const lair=LAIR[boss]?at('a2lair','lair-'+LAIR[boss],80,128):'';
  return box+ban+at('a2lamp','lamp-top',19,44)+lair}
+// v0.6.56: Act 2 nodes now draw the shared Act 1 icons (map.js); only the gate seal ring is still Act 2 art. a2NodeInner is kept but unused,
+// and the painted Act 2 node icons stay on disk and in A2_FILES (never remove later-act art).
+export const a2GateRing=state=>`<img class="a2seal" src="${a2Src('node-gate'+(state?'-'+state:''))}" alt="" draggable="false">`;
 // node face: painted icon per state (normal / vis = visited / ghost = passed over); gate seal nodes carry their room icon on the portcullis
 export function a2NodeInner(n,r,state,uiFallback){
  const k=KEY[n.t]||'fight',sfx=state?'-'+state:'';

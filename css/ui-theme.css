@@ -564,18 +564,12 @@ body.env-still #envfx{visibility:hidden}
 .mapwrap.a2 .a2lamp{width:40px;height:53px}
 .mapwrap.a2 .a2lair{width:88px;height:88px}
 .mapwrap.a2>svg{z-index:1}
-.mapwrap.a2 .node{width:54px;height:54px;min-width:48px;min-height:48px;background:transparent;border:0;box-shadow:none;border-radius:50%}
-.mapwrap.a2 .node .nodeic{width:100%;height:100%;object-fit:contain;filter:none;display:block}
-.mapwrap.a2 .node.boss{width:70px;height:95.5px;min-width:64px;min-height:64px;border-radius:30px 30px 6px 6px}
-.mapwrap.a2 .node.gate{width:84px;height:84px;border-radius:8px}
-.mapwrap.a2 .node.gate .a2seal{position:absolute;left:0;top:0}
-.mapwrap.a2 .node.gate .a2sealic{position:absolute;left:25px;top:25px;width:34px;height:34px}
-.mapwrap.a2 .node.vis .nodeic{filter:none}
-.mapwrap.a2 .node.vis::after{content:none;display:none}
-.mapwrap.a2 .node.dim{opacity:1}
-.mapwrap.a2 .node.av{box-shadow:0 0 0 2px #cdb88acc}
-.mapwrap.a2 .node.av::before{inset:-4px;border-radius:inherit;box-shadow:0 0 0 5px #cdb88a55}
-.mapwrap.a2 .node.cur .nodeic{opacity:.7}
+/* v0.6.56: Act 2 nodes use the Act 1 icons and node styles (same as Act 3); only the gate keeps its painted portcullis seal ring behind the Act 1 icon. */
+.mapwrap.a2 .node.gate{width:84px;height:84px;border-radius:8px;background:transparent;border:0}
+.mapwrap.a2 .node.gate .a2seal{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.mapwrap.a2 .node.gate .nodeic{position:absolute;left:18px;top:18px;width:48px;height:48px}
+.mapwrap.a2 .node.gate.dim{opacity:1}.mapwrap.a2 .node.gate.dim .nodeic{opacity:.55}
+.mapwrap.a2 .node.gate.vis::after{inset:13px}
 .mapwrap.a2 .mlan.a2 .mlan-img{left:3px;top:-52px;width:54px;height:72px;transform-origin:50% 100%;filter:drop-shadow(0 2px 2px #0009)}
 .mapwrap.a2 .mlan.a2 .mlan-glow{left:-15px;top:-70px;width:90px;height:108px}
 .mapwrap.a2 .mlan.a2 .mlan-glow img{opacity:.85}
