@@ -375,15 +375,15 @@
    "hoverPx": 0
   },
   "shellguard": {
-   "file": "sprites/shellguard.webp",
-   "w": 876,
-   "h": 1203,
-   "bytes": 734974,
+   "file": "sprites/shellguard-a2-r42.webp",
+   "w": 1392,
+   "h": 1424,
+   "bytes": 352584,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.477,
-    "y": 1.0
+    "x": 0.447,
+    "y": 1
    },
    "screenHeightPct": 46,
    "hoverPx": 0
@@ -473,15 +473,15 @@
    "hoverPx": 0
   },
   "pylon": {
-   "file": "sprites/pylon.webp",
-   "w": 451,
-   "h": 1379,
-   "bytes": 259694,
+   "file": "sprites/pylon-a2-r44.webp",
+   "w": 1194,
+   "h": 1362,
+   "bytes": 380698,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.548,
-    "y": 1.0
+    "x": 0.618,
+    "y": 1
    },
    "screenHeightPct": 40,
    "hoverPx": 0
@@ -515,15 +515,15 @@
    "hoverPx": 0
   },
   "ghostcannon": {
-   "file": "sprites/ghostcannon.webp",
-   "w": 1706,
-   "h": 511,
-   "bytes": 499880,
+   "file": "sprites/ghostcannon-a2-r43.webp",
+   "w": 2106,
+   "h": 1349,
+   "bytes": 1187184,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.485,
-    "y": 1.0
+    "x": 0.479,
+    "y": 1
    },
    "screenHeightPct": 34,
    "hoverPx": 0
@@ -849,6 +849,32 @@
    },
    "screenHeightPct": 42,
    "hoverPx": 0
+  },
+  "navigator": {
+   "file": "sprites/navigator-a3-r42.webp",
+   "w": 666,
+   "h": 1399,
+   "bytes": 456170,
+   "role": "boss",
+   "facing": "left",
+   "anchor": {
+    "x": 0.537,
+    "y": 1
+   },
+   "screenHeightPct": 42
+  },
+  "magus": {
+   "file": "sprites/magus-a3-r42.webp",
+   "w": 1025,
+   "h": 1423,
+   "bytes": 540386,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.567,
+    "y": 1
+   },
+   "screenHeightPct": 42
   }
  }
 }

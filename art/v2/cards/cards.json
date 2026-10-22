@@ -2870,5 +2870,181 @@
    768,
    576
   ]
+ },
+ "bankedflame": {
+  "art": "art/v2/cards/bankedflame-a2.webp",
+  "thumb": "art/v2/cards/bankedflame-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bountychit": {
+  "art": "art/v2/cards/bountychit-a2.webp",
+  "thumb": "art/v2/cards/bountychit-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brimmingbasin": {
+  "art": "art/v2/cards/brimmingbasin-a2.webp",
+  "thumb": "art/v2/cards/brimmingbasin-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "censer": {
+  "art": "art/v2/cards/censer-a2.webp",
+  "thumb": "art/v2/cards/censer-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "closedledger": {
+  "art": "art/v2/cards/closedledger-a2.webp",
+  "thumb": "art/v2/cards/closedledger-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cutdeck": {
+  "art": "art/v2/cards/cutdeck-a2.webp",
+  "thumb": "art/v2/cards/cutdeck-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "dryingrack": {
+  "art": "art/v2/cards/dryingrack-a2.webp",
+  "thumb": "art/v2/cards/dryingrack-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hailcap": {
+  "art": "art/v2/cards/hailcap-a2.webp",
+  "thumb": "art/v2/cards/hailcap-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ironrivet": {
+  "art": "art/v2/cards/ironrivet-a2.webp",
+  "thumb": "art/v2/cards/ironrivet-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "masonlevel": {
+  "art": "art/v2/cards/masonlevel-a2.webp",
+  "thumb": "art/v2/cards/masonlevel-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rubbing": {
+  "art": "art/v2/cards/rubbing-a2.webp",
+  "thumb": "art/v2/cards/rubbing-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "staticjar": {
+  "art": "art/v2/cards/staticjar-a2.webp",
+  "thumb": "art/v2/cards/staticjar-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "thirdwatch": {
+  "art": "art/v2/cards/thirdwatch-a2.webp",
+  "thumb": "art/v2/cards/thirdwatch-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tithebox": {
+  "art": "art/v2/cards/tithebox-a2.webp",
+  "thumb": "art/v2/cards/tithebox-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "unisonpipe": {
+  "art": "art/v2/cards/unisonpipe-a2.webp",
+  "thumb": "art/v2/cards/unisonpipe-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "armory": {
+  "art": "art/v2/cards/armory-a2.webp",
+  "thumb": "art/v2/cards/armory-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cistern": {
+  "art": "art/v2/cards/cistern-a2.webp",
+  "thumb": "art/v2/cards/cistern-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "counterweight": {
+  "art": "art/v2/cards/counterweight-a2.webp",
+  "thumb": "art/v2/cards/counterweight-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "handover": {
+  "art": "art/v2/cards/handover-a2.webp",
+  "thumb": "art/v2/cards/handover-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "heirloom": {
+  "art": "art/v2/cards/heirloom-a2.webp",
+  "thumb": "art/v2/cards/heirloom-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "raisemound": {
+  "art": "art/v2/cards/raisemound-a2.webp",
+  "thumb": "art/v2/cards/raisemound-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "whettededge": {
+  "art": "art/v2/cards/whettededge-a2.webp",
+  "thumb": "art/v2/cards/whettededge-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
  }
 }

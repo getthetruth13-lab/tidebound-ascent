@@ -80,7 +80,7 @@ export const ASSETS={
    // v0.6.36: second batch, all at 9.0 (art reviews enemies-round25/29/31/33/34/35). Lowest sole = image bottom (8-10 px pad), so the runtime shadow sits on the lowest foot.
    bellnun:'bellnun',dummy:'dummy',hauler:'hauler',grell:'grell',hgunner:'hgunner',cantor:'cantor',chorister:'chorister',basso:'basso',
    // v0.6.43 (wired as-is, below the 9 review bar, to be improved): the three Act 2 bosses, latest files in studio/art/act2/enemies/
-   colossus:'colossus',wreckqueen:'wreckqueen',battery:'battery',anchorite:'anchorite',eyegale:'eyegale',hailorb:'hailorb',lenswright:'lenswright',polyp:'polyp',automaton:'automaton',voltray:'voltray',shardcarrier:'shardcarrier',jelly:'jelly',ringcharge:'ringcharge'}},
+   colossus:'colossus',wreckqueen:'wreckqueen',battery:'battery',anchorite:'anchorite',eyegale:'eyegale',hailorb:'hailorb',lenswright:'lenswright',polyp:'polyp',automaton:'automaton',voltray:'voltray',shardcarrier:'shardcarrier',jelly:'jelly',ringcharge:'ringcharge',navigator:'navigator',magus:'magus'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.
@@ -107,7 +107,7 @@ export function spriteCount(group,key){const id=ASSETS.sprites[group]&&ASSETS.sp
 export function spriteFor(group,key,idx=0){let id=ASSETS.sprites[group]&&ASSETS.sprites[group][key];if(Array.isArray(id))id=id[idx%id.length];const m=id&&SPRITES[id];return m?{id,...m}:null}
 export {SPRITE_BASELINE,ENEMY_POSES};
 // Contained sprite portraits use the same reviewed painting; no separate crop is needed.
-for(const id of ['battery','dummy','gateplate','mortar','sluiceeng','anchorite','eyegale','hailorb','lenswright','polyp','automaton','voltray','shardcarrier','jelly','ringcharge'])ASSETS.enemies[id]={src:SPRITES[id].f,fit:'contain',pos:'50% 100%'};
+for(const id of ['pylon','ghostcannon','battery','dummy','gateplate','mortar','sluiceeng','anchorite','eyegale','hailorb','lenswright','polyp','automaton','voltray','shardcarrier','jelly','ringcharge','navigator','magus'])ASSETS.enemies[id]={src:SPRITES[id].f,fit:'contain',pos:'50% 100%'};
 // Remains for a sprite (spriteFor result) or null: {id,src,w,h}. The Knell's second phase (e.ph 2) falls as the cracked Leviathan Bell.
 export function fallenFor(sp,e){let id=sp&&sp.id;if(id&&e&&e.key==='bell'&&e.ph===2)id='leviathan-bell';const pose=id&&ENEMY_POSES[id]?.fall;if(pose)return {id,src:pose.f,w:pose.w,h:pose.h};const d=id&&FALLEN[id];return d?{id,src:ASSETS.fallen[id],w:d[0],h:d[1]}:null}
 // An icon from a group (hud / status) with an emoji fallback when the slot is empty or the file fails.
@@ -119,7 +119,7 @@ export function assetFail(img){const s=img.parentNode;if(s)s.classList.remove('h
 // sw.js ACTPACK[act]); the worker fills them when ?act=N is used or an act opens (warmActPack), and on first use otherwise. Act 1 stays fully offline.
 // Add a sprite id here whenever a later-act enemy gets its sprite (tests/precache-coverage.cjs fails if one is missing).
 export const LATER_ACT_SPRITES={diver:2,shellguard:2,kettleman:2,lice:2,bosun:2,gateplate:2,salthusk:2,lamplighter:2,pylon:2,pumper:2,sluiceeng:2,ghostcannon:2,mortar:2,deckshade:2,
- bellnun:2,dummy:2,hauler:2,grell:2,hgunner:2,cantor:2,chorister:2,basso:2,colossus:2,wreckqueen:2,battery:2,anchorite:3,eyegale:3,hailorb:3,lenswright:3,polyp:3,automaton:3,voltray:3,shardcarrier:3,jelly:3,ringcharge:3};
+ bellnun:2,dummy:2,hauler:2,grell:2,hgunner:2,cantor:2,chorister:2,basso:2,colossus:2,wreckqueen:2,battery:2,anchorite:3,eyegale:3,hailorb:3,lenswright:3,polyp:3,automaton:3,voltray:3,shardcarrier:3,jelly:3,ringcharge:3,navigator:3,magus:3};
 export function actPackFiles(){const o={};for(const [id,act] of Object.entries(LATER_ACT_SPRITES))if(SPRITES[id])o[SPRITES[id].f]=act;return o}
 export function actPackURLs(act=3){const f=actPackFiles();return Object.keys(f).filter(u=>f[u]<=act)}
 // Ask the worker to fetch the Act 2/3 pack (acts <= act). No-op for Act 1, without a worker, or on file://.

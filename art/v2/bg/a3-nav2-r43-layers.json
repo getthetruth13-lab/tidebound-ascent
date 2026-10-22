@@ -1,0 +1,172 @@
+{
+ "scene": "a3_lair_navigator",
+ "canvas": [
+  2340,
+  1080
+ ],
+ "foot_y": 586,
+ "hero_x": 570,
+ "boss_x": 2000,
+ "layers": [
+  {
+   "file": "layers/sky-back.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 27.3,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "cloud gulf beyond the broken wall end and below the causeway rim (key plate nav2), solids cut out by hand polygon and refilled behind (push-pull + grain); calmed behind the boss; static"
+  },
+  {
+   "file": "layers/solids.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 4,
+   "kb": 93.2,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "ALL solids from nav2: level stormglass-and-brass causeway (matte; lantern sheen pool tamed), stone wall with three EMPTY niches, one chain-rail post at the far left (the second post that stood behind the hero slot and its chain span removed + patched), storm lantern on its post (grounded on the floor); v2: dark faceted stormglass backs in the three niches (plate nicheback), ring-topped + hook-topped brass waymark posts at the wall foot with contact shadows (plate waymarks), the hero-end stain and deck-face runoff removed, matte drag-stain from the front (gulf-side) deck edge to the boss spot; static"
+  },
+  {
+   "file": "layers/cloud-gulf-far.webp",
+   "px": [
+    1170,
+    460
+   ],
+   "channels": 4,
+   "kb": 347.0,
+   "decoded_mb": 2.15,
+   "animated": true,
+   "reason": "storm cloud rising out of the gulf behind the broken wall end (plate cloud), up and R->L [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/cloud-gulf-near.webp",
+   "px": [
+    936,
+    526
+   ],
+   "channels": 4,
+   "kb": 226.5,
+   "decoded_mb": 1.97,
+   "animated": true,
+   "reason": "vapour rising from the gulf (plate vapour), faster, masked to the gulf [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/cloud-below.webp",
+   "px": [
+    1521,
+    556
+   ],
+   "channels": 4,
+   "kb": 525.3,
+   "decoded_mb": 3.38,
+   "animated": true,
+   "reason": "cloud under the causeway rim (plate cloud), R->L 470 px / 12 s [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/mist.webp",
+   "px": [
+    1287,
+    246
+   ],
+   "channels": 4,
+   "kb": 119.4,
+   "decoded_mb": 1.27,
+   "animated": true,
+   "reason": "wind mist over the rim/gulf, far (plate mist), R->L 260 px / 12 s [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/mist2.webp",
+   "px": [
+    819,
+    184
+   ],
+   "channels": 4,
+   "kb": 55.9,
+   "decoded_mb": 0.6,
+   "animated": true,
+   "reason": "wind mist low over the gulf, near, R->L 470 px / 12 s [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/drip-niche.png",
+   "px": [
+    42,
+    486
+   ],
+   "channels": 1,
+   "kb": 2.2,
+   "decoded_mb": 0.02,
+   "animated": true,
+   "reason": "slow drip from the third niche lip to the floor (plate drips column), scrolls down"
+  },
+  {
+   "file": "layers/chain-loose.webp",
+   "px": [
+    93,
+    198
+   ],
+   "channels": 4,
+   "kb": 1.1,
+   "decoded_mb": 0.07,
+   "animated": true,
+   "reason": "broken loose end of the chain-rail hanging from the post ring (plate chain), pivot at the top link, sways +-4.5 deg in the wind (only the chain moves; post is solid)"
+  },
+  {
+   "file": "layers/accent-glow-mask.png",
+   "px": [
+    186,
+    186
+   ],
+   "channels": 1,
+   "kb": 4.7,
+   "decoded_mb": 0.03,
+   "animated": true,
+   "reason": "lantern flame + glass halo (courier's last light), soft flicker; place at (797,160)"
+  }
+ ],
+ "authored_layers": 10,
+ "composited_layer_count": 12,
+ "game_layers": [
+  "fighters (game sprites)",
+  "hud (game)"
+ ],
+ "draw_order": [
+  "sky-back",
+  "cloud-gulf-far",
+  "cloud-gulf-near",
+  "cloud-below",
+  "solids",
+  "lantern flicker",
+  "chain-loose",
+  "drip-niche",
+  "mist",
+  "mist2",
+  "fighters",
+  "hud"
+ ],
+ "animated_effects": [
+  "gulffar",
+  "gulfnear",
+  "cloudbelow",
+  "mistfar",
+  "mistnear",
+  "lantern",
+  "drip",
+  "chain"
+ ],
+ "animated_effect_count": 8,
+ "full_screen_layers": [
+  "layers/sky-back.webp",
+  "layers/solids.webp"
+ ],
+ "total_asset_kb": 1402.6,
+ "decoded_memory_mb": 29.7,
+ "mp4_kb": 1249.9,
+ "pending_plates": [],
+ "note": "decoded MB = w*h*4 for RGB(A), w*h for single-channel masks; fighters/HUD excluded. Solids never move; every mover is a painted plate."
+}

@@ -93,7 +93,9 @@
   "wetsand": "art/v2/ui/relic-wetsand.webp",
   "echochamber": "art/v2/ui/relic-echochamber.webp",
   "fencermask": "art/v2/ui/relic-fencermask.webp",
-  "rapier": "art/v2/ui/relic-rapier.webp"
+  "rapier": "art/v2/ui/relic-rapier.webp",
+  "firebucket": "art/v2/ui/relic-firebucket-a2.webp",
+  "platekey": "art/v2/ui/relic-platekey-a2.webp"
  },
  "potion": {
   "abyssaloil": "art/v2/ui/potion-abyssaloil.webp",

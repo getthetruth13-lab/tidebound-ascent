@@ -1,0 +1,160 @@
+{
+ "scene": "a3_lair_thalassa",
+ "canvas": [
+  2340,
+  1080
+ ],
+ "foot_y": 586,
+ "hero_x": 570,
+ "boss_x": 2000,
+ "layers": [
+  {
+   "file": "layers/sky-back.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 84.7,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "hanging sea + sky + false-dawn horizon + drop cloud (key plate thal2, sky band squashed 0.59 as a ceiling seen from below), struts cut out (hand polygons) and the holes texture-patched from the sky beside them; static"
+  },
+  {
+   "file": "layers/solids.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 4,
+   "kb": 71.2,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "ALL solids: pale stormglass lens deck with brass inlay rings and the cracked lens rim (level, matte, the Line reflection below the lens removed), one faceted stormglass strut re-seated at the far rim at uniform scale 0.8 with an attached contact shadow (v2: the right strut is removed and its place re-patched from the sky/horizon); static"
+  },
+  {
+   "file": "layers/cloud-far.webp",
+   "px": [
+    1053,
+    326
+   ],
+   "channels": 4,
+   "kb": 226.2,
+   "decoded_mb": 1.37,
+   "animated": true,
+   "reason": "far storm cloud along the false-dawn horizon (plate cloud), R->L 120 px / 12 s [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/cloud-mid.webp",
+   "px": [
+    1287,
+    290
+   ],
+   "channels": 4,
+   "kb": 113.7,
+   "decoded_mb": 1.49,
+   "animated": true,
+   "reason": "mid mist band over the horizon (plate mist), R->L 260 px / 12 s [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/cloud-low.webp",
+   "px": [
+    1521,
+    556
+   ],
+   "channels": 4,
+   "kb": 525.3,
+   "decoded_mb": 3.38,
+   "animated": true,
+   "reason": "low cloud in the drop below the deck (plate cloud), R->L 470 px / 12 s [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/drips.webp",
+   "px": [
+    1170,
+    658
+   ],
+   "channels": 1,
+   "kb": 34.8,
+   "decoded_mb": 0.77,
+   "animated": true,
+   "reason": "falling water from the hanging sea: thin columns of plate drips run down from the sea underside at 12 stream positions (two depths share this plate), scroll down 2x/3x per loop, fade in/out [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/hail-far.png",
+   "px": [
+    1235,
+    695
+   ],
+   "channels": 1,
+   "kb": 37.7,
+   "decoded_mb": 0.86,
+   "animated": true,
+   "reason": "hail streaks far: plate hail, steep R->L slant, scrolls one tile left + 4 tiles down per loop, low contrast, weighted to the platform rim"
+  },
+  {
+   "file": "layers/hail-near.png",
+   "px": [
+    1909,
+    1074
+   ],
+   "channels": 1,
+   "kb": 78.9,
+   "decoded_mb": 2.05,
+   "animated": true,
+   "reason": "hail streaks near: plate hail larger scale, 6 tiles down per loop"
+  },
+  {
+   "file": "layers/accent-glow-mask.png",
+   "px": [
+    75,
+    300
+   ],
+   "channels": 1,
+   "kb": 3.4,
+   "decoded_mb": 0.02,
+   "animated": true,
+   "reason": "halo of the Line (thin pale thread rising into the sea at x~1250, fading out by y~410 above the fight band); slow 6 s pulse, the one accent; place at (1214,23)"
+  }
+ ],
+ "authored_layers": 9,
+ "composited_layer_count": 11,
+ "game_layers": [
+  "fighters (game sprites)",
+  "hud (game)"
+ ],
+ "draw_order": [
+  "sky-back",
+  "cloud-far",
+  "cloud-mid",
+  "cloud-low",
+  "drips back",
+  "drips front",
+  "solids",
+  "Line pulse",
+  "hail-far",
+  "hail-near",
+  "fighters",
+  "hud"
+ ],
+ "animated_effects": [
+  "cloudfar",
+  "cloudmid",
+  "cloudlow",
+  "dripsback",
+  "dripsfront",
+  "hailfar",
+  "hailnear",
+  "glow"
+ ],
+ "animated_effect_count": 8,
+ "full_screen_layers": [
+  "layers/sky-back.webp",
+  "layers/solids.webp"
+ ],
+ "total_asset_kb": 1175.9,
+ "decoded_memory_mb": 30.2,
+ "mp4_kb": 3462.7,
+ "pending_plates": [],
+ "note": "decoded MB = w*h*4 for RGB(A), w*h for single-channel masks; fighters/HUD excluded. Solids never move; every mover is a painted plate."
+}
