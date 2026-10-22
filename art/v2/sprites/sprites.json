@@ -669,10 +669,10 @@
    "hoverPx": 0
   },
   "colossus": {
-   "file": "sprites/colossus.webp",
+   "file": "sprites/colossus-a2-r58.webp",
    "w": 1643,
    "h": 1279,
-   "bytes": 1622946,
+   "bytes": 388112,
    "role": "boss",
    "facing": "left",
    "anchor": {

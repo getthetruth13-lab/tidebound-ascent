@@ -14,6 +14,7 @@ function css(){if(styled)return;styled=true;const s=document.createElement('styl
 @keyframes envlv-flame{${seq.map((f,i)=>`${(i/seq.length*100).toFixed(3)}%{background-position:${f%3*50}% ${Math.floor(f/3)*100}%}`).join('')}}
 @keyframes envlv-tile{from{transform:translate3d(var(--fx),var(--fy),0)}to{transform:translate3d(var(--tx),var(--ty),0)}}
 @keyframes envlv-pulse{0%,100%{opacity:var(--p0)}25%{opacity:var(--p1)}50%{opacity:var(--p2)}75%{opacity:var(--p3)}}
+@keyframes envlv-flash{0%{opacity:0}2.5%{opacity:.5}5%{opacity:1}9.17%{opacity:1}13%{opacity:.85}16.67%{opacity:.5}20.4%{opacity:.15}24.17%,100%{opacity:0}}
 @keyframes envlv-flicker{0%{opacity:.62}18%{opacity:.95}33%{opacity:.7}52%{opacity:1}71%{opacity:.66}86%{opacity:.9}100%{opacity:.62}}`;
  document.head.appendChild(s)}
 const crops={};
@@ -43,7 +44,7 @@ function scrollBand(box,W,H,{src,y,h,tw,v,op,filter}){ // a repeat-x painted ban
 //  kind 'pulse' : a static plate at r whose opacity breathes between the ops[] stops over period seconds: lamp glow, light shafts, glints.
 function plates(box,L,W,H){
  for(const p of L){const r=p.r;
-  if(p.kind==='pulse'){const o=p.ops,e=el('i','envlv-a envlv-pulse',`left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};background:url("${p.f}") 0 0/100% 100% no-repeat;--p0:${o[0]};--p1:${o[1]};--p2:${o[2]};--p3:${o[3]};animation:envlv-pulse ${p.period}s ease-in-out ${(-(p.phase||0)*p.period).toFixed(2)}s infinite`);
+  if(p.kind==='pulse'){const o=p.ops,e=el('i','envlv-a envlv-pulse'+(p.cls?' '+p.cls:''),`${p.flash?'opacity:0;':''}left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};background:url("${p.f}") 0 0/100% 100% no-repeat;--p0:${o[0]};--p1:${o[1]};--p2:${o[2]};--p3:${o[3]};animation:${p.flash?'envlv-flash':'envlv-pulse'} ${p.period}s ${p.flash?'linear':'ease-in-out'} ${(-(p.phase||0)*p.period).toFixed(2)}s infinite`);
    if(p.blend)e.style.mixBlendMode=p.blend;
    if(p.op!=null)e.style.setProperty('--m',p.op);box.appendChild(e);continue}
   const [tw,th]=p.tile,[sx,sy]=p.loop,iw=r[2]+(sx?tw:0),ih=r[3]+(sy?th:0),box2=el('i','envlv-clip'+(p.cls?' '+p.cls:''),`position:absolute;left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};overflow:hidden;opacity:${p.op}`);

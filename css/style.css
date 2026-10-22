@@ -1343,6 +1343,9 @@ body[data-env-rest] #env .envlv,body[data-env-rest] #env .envlv *{animation-play
 #env .envlv-combat{display:none}body.env-combat #env .envlv-combat{display:block}
 @media (prefers-reduced-motion:reduce){#env .envlv,#env .envlv *{animation:none!important}}
 .reduce-motion #env .envlv,.reduce-motion #env .envlv *{animation:none!important}
+/* v0.6.65 reduce flashes: a flash plate (sheet glow, a3_terraces) is hidden with Reduced motion, Effects Reduced/Off, the load governor or the OS reduced-motion setting */
+.reduce-motion #env .envlv-flash,#env[data-q="reduced"] .envlv-flash,#env[data-q="off"] .envlv-flash,#env.gov-reduced .envlv-flash,#env.gov-off .envlv-flash{display:none!important}
+@media (prefers-reduced-motion:reduce){#env .envlv-flash{display:none!important}}
 /* bugsweep 10-14: behind scene-choice screens (event/reward/pick/tasks: blur 7px + dim) and a card inspect (backdrop blur) the stack is filtered every frame. The two swell groups
    (masked, 836x388, one pair per paint) make that filter cost ~2x (headless event screen 33 ms median vs 16.7 with them hidden; p95 50). The swell is a +-6 px shift of the plate that
    already sits underneath, so hiding it under a 7 px blur changes nothing visible. Everything else on the stack freezes (paused) while blurred. */
@@ -1381,3 +1384,8 @@ body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .c
 /* Wordless End Turn seal (ui/wordless.js, art/v2/ui/end-turn.json): "END" is live text centred on the clean seal. Button size/position untouched. */
 .combat #endbtn[data-wl] .end-label{position:absolute;inset:0;width:auto;height:auto;margin:0;overflow:visible;clip:auto;display:grid;place-items:center;pointer-events:none;font:700 calc(50*var(--hud-unit)) 'Cinzel',var(--font-display),Georgia,serif;letter-spacing:.06em;color:#f0b95a;background:linear-gradient(180deg,#ffe9a8 0%,#f0b24c 55%,#b8671f 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 calc(1.2*var(--hud-unit)) #000) drop-shadow(0 0 calc(1.2*var(--hud-unit)) #000) drop-shadow(0 calc(2*var(--hud-unit)) calc(3*var(--hud-unit)) #000)}
 .combat #endbtn[data-wl][data-sun=dim] .end-label{opacity:.7}
+
+/* v0.6.65 camp_a3: the run's hero standing in the painted scene (ui/env.js sceneHero); soft contact shadow like the scene mock */
+#env .envstack .envhero{position:absolute;pointer-events:none;z-index:3}
+#env .envstack .envhero img{position:absolute;inset:0;width:100%;height:100%}
+#env .envstack .envhero .envhero-sh{position:absolute;left:calc(var(--ax,50%) - 42%);width:84%;bottom:-3%;height:6%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,0))}

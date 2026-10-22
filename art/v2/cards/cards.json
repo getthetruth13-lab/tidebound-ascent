@@ -8,8 +8,8 @@
   ]
  },
  "arc": {
-  "art": "art/v2/cards/arc.webp",
-  "thumb": "art/v2/cards/arc-256.webp",
+  "art": "art/v2/cards/arc-ga-994f1893.webp",
+  "thumb": "art/v2/cards/arc-ga-994f1893-256.webp",
   "size": [
    768,
    576
@@ -304,8 +304,8 @@
   ]
  },
  "waymarker": {
-  "art": "art/v2/cards/waymarker.webp",
-  "thumb": "art/v2/cards/waymarker-256.webp",
+  "art": "art/v2/cards/waymarker-ga-7cd9699c.webp",
+  "thumb": "art/v2/cards/waymarker-ga-7cd9699c-256.webp",
   "size": [
    768,
    576
@@ -656,8 +656,8 @@
   ]
  },
  "stakeclaim": {
-  "art": "art/v2/cards/stakeclaim.webp",
-  "thumb": "art/v2/cards/stakeclaim-256.webp",
+  "art": "art/v2/cards/stakeclaim-ga-04daa843.webp",
+  "thumb": "art/v2/cards/stakeclaim-ga-04daa843-256.webp",
   "size": [
    768,
    576
@@ -1984,8 +1984,8 @@
   ]
  },
  "ledgerleaf": {
-  "art": "art/v2/cards/ledgerleaf.webp",
-  "thumb": "art/v2/cards/ledgerleaf-256.webp",
+  "art": "art/v2/cards/ledgerleaf-a2-n1.webp",
+  "thumb": "art/v2/cards/ledgerleaf-a2-n1-256.webp",
   "size": [
    768,
    576
@@ -2512,8 +2512,8 @@
   ]
  },
  "cacophony": {
-  "art": "art/v2/cards/cacophony-a2.webp",
-  "thumb": "art/v2/cards/cacophony-a2-256.webp",
+  "art": "art/v2/cards/cacophony-a2-ga-9172c75c.webp",
+  "thumb": "art/v2/cards/cacophony-a2-ga-9172c75c-256.webp",
   "size": [
    768,
    576
@@ -2568,8 +2568,8 @@
   ]
  },
  "pedaltone": {
-  "art": "art/v2/cards/pedaltone-a2.webp",
-  "thumb": "art/v2/cards/pedaltone-a2-256.webp",
+  "art": "art/v2/cards/pedaltone-a2-ga-e6f04dfe.webp",
+  "thumb": "art/v2/cards/pedaltone-a2-ga-e6f04dfe-256.webp",
   "size": [
    768,
    576
@@ -2616,8 +2616,8 @@
   ]
  },
  "breachwall": {
-  "art": "art/v2/cards/breachwall-a2.webp",
-  "thumb": "art/v2/cards/breachwall-a2-256.webp",
+  "art": "art/v2/cards/breachwall-a2-ga-d49b2ce9.webp",
+  "thumb": "art/v2/cards/breachwall-a2-ga-d49b2ce9-256.webp",
   "size": [
    768,
    576
@@ -2720,8 +2720,8 @@
   ]
  },
  "listenclose": {
-  "art": "art/v2/cards/listenclose-a2.webp",
-  "thumb": "art/v2/cards/listenclose-a2-256.webp",
+  "art": "art/v2/cards/listenclose-a2-ga-4c9d6dc0.webp",
+  "thumb": "art/v2/cards/listenclose-a2-ga-4c9d6dc0-256.webp",
   "size": [
    768,
    576
@@ -3042,6 +3042,54 @@
  "whettededge": {
   "art": "art/v2/cards/whettededge-a2.webp",
   "thumb": "art/v2/cards/whettededge-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "catchbreath": {
+  "art": "art/v2/cards/catchbreath-a2-c3.webp",
+  "thumb": "art/v2/cards/catchbreath-a2-c3-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "waitingedge": {
+  "art": "art/v2/cards/waitingedge-a3.webp",
+  "thumb": "art/v2/cards/waitingedge-a3-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lastcut": {
+  "art": "art/v2/cards/lastcut-a3.webp",
+  "thumb": "art/v2/cards/lastcut-a3-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "festering": {
+  "art": "art/v2/cards/festering-a3.webp",
+  "thumb": "art/v2/cards/festering-a3-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "dancingsteel": {
+  "art": "art/v2/cards/dancingsteel-a2-c3.webp",
+  "thumb": "art/v2/cards/dancingsteel-a2-c3-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "swornfoe": {
+  "art": "art/v2/cards/swornfoe-a3-c3fix.webp",
+  "thumb": "art/v2/cards/swornfoe-a3-c3fix-256.webp",
   "size": [
    768,
    576

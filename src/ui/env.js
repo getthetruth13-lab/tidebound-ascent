@@ -14,6 +14,8 @@ import {U} from '../core/timing.js';
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
 import {syncLiving,prewarmLiving} from './env-living.js';
+import {ASSETS} from '../assets.js';
+import {SPRITES} from '../data/sprites.js';
 import './gfxstats.js';
 const LAYERS=['sky','far','mid','ground'];// fg lives in #env-front (design-v2 §W.7.3 DOM order: over the figures, under the UI)
 export const FEET=.694; // the painted battle floor: feet of every figure sit on this fraction of the viewport (sceneGeom, anchor() and stage all read it)
@@ -106,7 +108,7 @@ export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&
  // painted layers: each layer is the full rect space (3600x1440); every shipped file sits at its rect (trimmed mid / fg-l / fg-r)
  const sp=e.space||[3600,1440];root.classList.toggle('has-art',!!e.art);
  allL().forEach(el=>swapLayer(el,(e.art&&e.art[el.dataset.l])||[],sp));
- root.toggleAttribute('data-still',!!e.still);root.toggleAttribute('data-sandwich',!!e.sandwich);document.body.toggleAttribute('data-still-env',!!e.still);front.toggleAttribute('data-still',!!e.still);syncLiving(k.id,e); // still env: solids never move; painted living layers only
+ root.toggleAttribute('data-still',!!e.still);root.toggleAttribute('data-sandwich',!!e.sandwich);document.body.toggleAttribute('data-still-env',!!e.still);front.toggleAttribute('data-still',!!e.still);syncLiving(k.id,e);sceneHero(e); // still env: solids never move; painted living layers only
  const t=e.tint||{col:'#000',a:0},v=e.vig||{s:.4,col:'#000'};
  const hx=(c,a)=>c+Math.round(Math.max(0,Math.min(1,a))*255).toString(16).padStart(2,'0');
  root.querySelector('.envlight').style.background=`radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, ${hx(v.col,(v.s||.4)+(g.vig_add||0)+.3)} 100%), linear-gradient(${hx(t.col,(t.a||0)+(g.tint_add||0))}, ${hx(t.col,(t.a||0)+(g.tint_add||0))})`;
@@ -119,6 +121,15 @@ export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&
   if(W.S.screen==='combat'&&motionOK()&&!e.still)slideIn()}
  // band toast on the map
  if(W.S.screen==='map'&&W.run){const b=bandOf(W.run.act||1,Math.max(1,Math.min(14,(W.run.floor||0)+1)));if(b&&lastBand&&b.band!==lastBand.band)bandToast(ENV.envs[b.env]?ENV.envs[b.env].n:b.band);lastBand=b}}
+// v0.6.65 camp_a3: the scene is painted without the hero (camp_a3-v1 c2); the run's hero stands on the flagstones at e.hero (layer-space foot x,y; h = height
+// as a fraction of the layer height), drawn with its carried lantern unlit (e.hero.unlit[cls]) so the ground lantern stays the only warm light.
+function sceneHero(e){const st=root.querySelector('.envstack');if(!st)return;let el=st.querySelector('.envhero');const h=e.hero,cls=W.run&&W.run.cls;
+ const sp=h&&cls&&W.S.screen!=='combat'?SPRITES[ASSETS.sprites.figures[cls]]:null;
+ if(!sp){if(el)el.remove();return}
+ const sp0=e.space||[3600,1440],H=h.h*sp0[1],Wd=H*sp.w/sp.h,src=(h.unlit&&h.unlit[cls])||sp.f;
+ if(!el){el=document.createElement('div');el.className='envhero';el.innerHTML='<i class="envhero-sh"></i><img alt="" draggable="false" decoding="async">';st.appendChild(el)}
+ const im=el.querySelector('img');if(im.getAttribute('src')!==src)im.setAttribute('src',src);el.dataset.cls=cls;el.style.setProperty('--ax',sp.ax*100+'%');
+ Object.assign(el.style,{left:(h.x-Wd*sp.ax)/sp0[0]*100+'%',top:(h.y-H)/sp0[1]*100+'%',height:H/sp0[1]*100+'%',width:Wd/sp0[0]*100+'%'})}
 // A/B art swap: the new art is built off-screen in its own box, decoded (img.decode, off the main thread), then faded in OVER the old
 // art, which is removed only after the fade. The old art is never blanked and a slow decode never freezes a frame.
 function swapLayer(el,list,sp){const sig=list.map(x=>x.f).join('|');const sh=el.firstChild;

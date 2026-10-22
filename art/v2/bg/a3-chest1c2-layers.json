@@ -1,0 +1,149 @@
+{
+ "id": "chest_a3",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 114.6,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate 76a90b89844c (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-cabinet.webp",
+   "px": [
+    692,
+    772
+   ],
+   "channels": 4,
+   "kb": 32.6,
+   "decoded_mb": 2.04,
+   "animated": false,
+   "reason": "brass-banded glass cabinet with its door ajar (etched glass plates and copper ingots) on its iron wall bracket; hangs from the faceted wall, bracket bolted in",
+   "place": [
+    505,
+    0
+   ],
+   "parallax": 0.45,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-lamp.webp",
+   "px": [
+    212,
+    409
+   ],
+   "channels": 4,
+   "kb": 5.9,
+   "decoded_mb": 0.33,
+   "animated": false,
+   "reason": "amber oil lamp with its iron hanger (one cut-out from the bracket underside down), moving with the cabinet layer (same parallax) so it never detaches; faint wall shadow behind it; the single amber accent",
+   "place": [
+    1012,
+    482
+   ],
+   "parallax": 0.45,
+   "role": "mid"
+  },
+  {
+   "file": "layers/cloud-drift.webp",
+   "px": [
+    3393,
+    1088
+   ],
+   "channels": 4,
+   "kb": 1247.3,
+   "decoded_mb": 14.08,
+   "animated": true,
+   "reason": "painted effect plate 58dd41aa (wind R->L 300 px/6s), screen/alpha=luminance, screen y=0 h=1080",
+   "effect": "mist",
+   "vec": [
+    -300,
+    0
+   ],
+   "op": 0.22,
+   "y": 0,
+   "plate_src": "58dd41aa"
+  },
+  {
+   "file": "layers/mist-still.webp",
+   "px": [
+    2340,
+    332
+   ],
+   "channels": 4,
+   "kb": 312.1,
+   "decoded_mb": 2.96,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (still vertical rise 44 px/6s), screen/alpha=luminance, screen y=760 h=280",
+   "effect": "mist",
+   "vec": [
+    0,
+    -44
+   ],
+   "op": 0.1,
+   "y": 760,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/lamp-glow.webp",
+   "px": [
+    826,
+    795
+   ],
+   "channels": 4,
+   "kb": 174.9,
+   "decoded_mb": 2.5,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    720,
+    285
+   ],
+   "op": 0.3
+  },
+  {
+   "file": "layers/lamp-flame-mask.png",
+   "px": [
+    82,
+    75
+   ],
+   "channels": 1,
+   "kb": 2.9,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1077,
+    694
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 1890.3,
+  "mp4_kb": 618.8,
+  "decoded_mb": 29.2,
+  "n_layers": 7,
+  "n_animated": 4
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "packaged": {
+  "layers": "art/v2/bg/a3-chest1c2-layers.json",
+  "loop": "art/v2/bg/a3-chest1c2-living.mp4",
+  "preview": "art/v2/bg/a3-chest1c2-living-preview.webp"
+ }
+}

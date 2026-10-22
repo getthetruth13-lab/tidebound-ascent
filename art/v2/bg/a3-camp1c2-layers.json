@@ -1,0 +1,154 @@
+{
+ "id": "camp_a3",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 109.3,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate b941dd5da1fb (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-lantern.webp",
+   "px": [
+    221,
+    327
+   ],
+   "channels": 4,
+   "kb": 9.7,
+   "decoded_mb": 0.28,
+   "animated": false,
+   "reason": "brass storm lantern in its glass cage standing on the flagstones at the ledge centre, the single amber accent; crisp contact shadow at its foot",
+   "place": [
+    1067,
+    441
+   ],
+   "parallax": 0.45,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mist-still.webp",
+   "px": [
+    2340,
+    356
+   ],
+   "channels": 4,
+   "kb": 336.4,
+   "decoded_mb": 3.18,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (still vertical rise 48 px/6s), screen/alpha=luminance, screen y=640 h=300",
+   "effect": "mist",
+   "vec": [
+    0,
+    -48
+   ],
+   "op": 0.045,
+   "y": 640,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/lantern-glow.webp",
+   "px": [
+    875,
+    892
+   ],
+   "channels": 4,
+   "kb": 202.8,
+   "decoded_mb": 2.98,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    755,
+    141
+   ],
+   "op": 0.28
+  },
+  {
+   "file": "layers/lantern-flame-mask.png",
+   "px": [
+    89,
+    89
+   ],
+   "channels": 1,
+   "kb": 4.2,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1131,
+    564
+   ]
+  },
+  {
+   "file": "layers/storm-rim-mask.png",
+   "px": [
+    2340,
+    963
+   ],
+   "channels": 1,
+   "kb": 69.3,
+   "decoded_mb": 2.15,
+   "animated": true,
+   "reason": "mask of the violet storm-rim pixels of base-far (saturation key, outside the still hollow, rocks/ledge/panes excluded); runtime rotates base-far pixels under this mask about the hollow centre, cross-faded so the loop is seamless",
+   "effect": "swirl",
+   "place": [
+    0,
+    117
+   ],
+   "centre_px": [
+    1170,
+    568
+   ],
+   "deg_per_loop": 0.4,
+   "ky": 0.56
+  },
+  {
+   "file": "layers/overlay-stormeye.webp",
+   "px": [
+    900,
+    506
+   ],
+   "channels": 4,
+   "kb": 25.5,
+   "decoded_mb": 1.74,
+   "animated": false,
+   "reason": "OPTIONAL floor-8 Stormeye plate (painted, 425ec6fa): plain pale grey-violet disc of clear air in the storm above the hollow; no stars, moon or sun. Off by default; not in the MP4/mock",
+   "optional": true,
+   "default_on": false,
+   "place": [
+    720,
+    -170
+   ],
+   "blend": "screen",
+   "op": 0.5
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 757.2,
+  "mp4_kb": 577.4,
+  "decoded_mb": 17.6,
+  "n_layers": 7,
+  "n_animated": 4
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "packaged": {
+  "layers": "art/v2/bg/a3-camp1c2-layers.json",
+  "loop": "art/v2/bg/a3-camp1c2-living.mp4",
+  "preview": "art/v2/bg/a3-camp1c2-living-preview.webp"
+ }
+}

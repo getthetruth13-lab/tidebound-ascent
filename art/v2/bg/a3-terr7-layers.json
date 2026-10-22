@@ -1,0 +1,227 @@
+{
+ "layers": [
+  {
+   "file": "layers/solids-baked.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 319.8,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "used_as": 1,
+   "reason": "ALL solids baked into one layer. Sky/sea/balustrade from the full-scene reference d07b8904 (Real-ESRGAN x4 then downsample); matte glass floor plate 6a7c24fc (Real-ESRGAN crop, denoised, cold slate grade, darkened over the fighter area) with brass barometer rings and the wind rose between hero and enemies (east arm beyond x~1450 dimmed ~40%); right floor strip x>=1820 rebuilt from the same plate own plain floor (perspective patch quilt, no mirror, no smooth fill), pale chips cloned out; v7: the six tick-only brass dials from plate dials6 (Real-ESRGAN x4) are each cut out individually (ellipse fit on the brass rim, rectified to a round face, soft round mask; no slab, no backing board) and mounted directly on the balustrade rail top y433 at x999-1371, each with a short drum body, a connected contact-shadow ellipse and a soft fall onto the rail; all six whole (the 6th no longer clipped, clear of the finial at x1392); graded to the rail slate; foam crest under the top-centre counters calmed; dome cut out and re-placed left with contact shadow; lighthouse base re-cut; wind-rose north tip at ~(1290,480) softened into the floor; cloud tiles feathered top and bottom (the hard sky step at y~260 x2040-2340 gone); no wood, no reflections, no lettering"
+  },
+  {
+   "file": "layers/cloud-a.png",
+   "px": [
+    2232,
+    250
+   ],
+   "channels": 3,
+   "kb": 379.4,
+   "decoded_mb": 2.23,
+   "animated": true,
+   "used_as": 1,
+   "reason": "terraces-only cloud plate (313cca94), depth a: R->L 6 px/s, screen blend 0.2 tinted violet, masked to the horizon band and behind dome/wall; cloud on black with a black gap, so it tiles in x without a seam",
+   "place_y": 230,
+   "repeat_x": true,
+   "speed_px_s": -6.0
+  },
+  {
+   "file": "layers/cloud-b.png",
+   "px": [
+    2079,
+    220
+   ],
+   "channels": 3,
+   "kb": 329.1,
+   "decoded_mb": 1.83,
+   "animated": true,
+   "used_as": 1,
+   "reason": "terraces-only cloud plate (b0c13275), depth b: R->L 14 px/s, screen blend 0.18 tinted violet, masked to the horizon band and behind dome/wall; cloud on black with a black gap, so it tiles in x without a seam",
+   "place_y": 215,
+   "repeat_x": true,
+   "speed_px_s": -14.0
+  },
+  {
+   "file": "layers/cloud-c.png",
+   "px": [
+    1900,
+    215
+   ],
+   "channels": 3,
+   "kb": 241.5,
+   "decoded_mb": 1.63,
+   "animated": true,
+   "used_as": 1,
+   "reason": "terraces-only cloud plate (313cca94, flipped crop recoloured), depth c: R->L 28 px/s, screen blend 0.14 tinted violet, masked to the horizon band and behind dome/wall; cloud on black with a black gap, so it tiles in x without a seam",
+   "place_y": 260,
+   "repeat_x": true,
+   "speed_px_s": -28.0
+  },
+  {
+   "file": "layers/mist-far.jpg",
+   "px": [
+    2432,
+    200
+   ],
+   "channels": 3,
+   "kb": 77.3,
+   "decoded_mb": 1.95,
+   "animated": true,
+   "used_as": 1,
+   "reason": "terrace-edge mist band (far) painted terrace-mist plate 5043f8f7; R->L 20 px/s; seamless in x",
+   "place_y": 430,
+   "repeat_x": true,
+   "speed_px_s": -20.0
+  },
+  {
+   "file": "layers/mist-low.jpg",
+   "px": [
+    3456,
+    230
+   ],
+   "channels": 3,
+   "kb": 126.2,
+   "decoded_mb": 3.18,
+   "animated": true,
+   "used_as": 1,
+   "reason": "terrace-edge mist band (low) painted terrace-mist plate 5043f8f7; R->L 38 px/s; seamless in x",
+   "place_y": 500,
+   "repeat_x": true,
+   "speed_px_s": -38.0
+  },
+  {
+   "file": "layers/hail-far.png",
+   "px": [
+    1280,
+    720
+   ],
+   "channels": 1,
+   "kb": 16.2,
+   "decoded_mb": 0.92,
+   "animated": true,
+   "used_as": 1,
+   "reason": "NEW hail dash plate 4a8df2d9 (short steep white dashes, no tails, ~5 deg lean), depth far scale 1.0, seamless on both axes, falls steeply R->L, screen blend 0.34",
+   "repeat_xy": true,
+   "fall_px_s": [
+    -107,
+    720
+   ]
+  },
+  {
+   "file": "layers/hail-near.png",
+   "px": [
+    1856,
+    1044
+   ],
+   "channels": 1,
+   "kb": 29.6,
+   "decoded_mb": 1.94,
+   "animated": true,
+   "used_as": 1,
+   "reason": "NEW hail dash plate 4a8df2d9 (short steep white dashes, no tails, ~5 deg lean), depth near scale 1.45, seamless on both axes, falls steeply R->L, screen blend 0.4",
+   "repeat_xy": true,
+   "fall_px_s": [
+    -155,
+    1044
+   ]
+  },
+  {
+   "file": "layers/dawn-glow.webp",
+   "px": [
+    800,
+    150
+   ],
+   "channels": 3,
+   "kb": 3.6,
+   "decoded_mb": 0.48,
+   "animated": true,
+   "used_as": 1,
+   "reason": "false-dawn glow derived from the reference own horizon smear (the ONE accent, horizon rows only), slow pulse 0.8-1.0 over 12 s, screen blend 0.46",
+   "place_xy": [
+    1000,
+    290
+   ]
+  },
+  {
+   "file": "layers/sheet-glow.webp",
+   "px": [
+    840,
+    280
+   ],
+   "channels": 3,
+   "kb": 3.4,
+   "decoded_mb": 0.94,
+   "animated": true,
+   "used_as": 1,
+   "reason": "terraces-only sheet glow plate fb7aaf23 (screen on black, softened, clipped so there is no disc, masked off every HUD element incl. enemy intent icons) in the cloud band, window x880-1720: 1 per 12 s, rise 0.6 s, hold 0.5 s, decay 1.8 s, peak gain 0.22",
+   "place_xy": [
+    880,
+    120
+   ]
+  },
+  {
+   "file": "layers/water-threads-atlas.png",
+   "px": [
+    60,
+    216
+   ],
+   "channels": 1,
+   "kb": 4.8,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "used_as": 4,
+   "reason": "water-thread atlas from plate fa77feb0 (replaces the cartoon drips): thin elongated threads, no teardrop head; 4 instances at the foam lip grow to 165-235 px, detach and fall ~110 px while fading; tapered both ends, alpha falls off toward the tip, slight sway; screen blend 0.55",
+   "sprite_w": 15,
+   "thread_h": 216,
+   "count": 4
+  },
+  {
+   "file": "layers/the-line.png",
+   "px": [
+    158,
+    75
+   ],
+   "channels": 3,
+   "kb": 3.7,
+   "decoded_mb": 0.05,
+   "animated": true,
+   "used_as": 1,
+   "reason": "the Line from plate 42c3f803 (wavering pale-gold thread on black): a mid section of the thread only, its dust haze removed, remapped along a curved spine from the lighthouse lantern (2283,174) up-left into the sea ceiling to ~(2158,114); wavelength varied along its length, amplitude narrowed at both ends, v7: full strength right at the lantern (no fade at the lantern end) with a warm catch-light on the lantern where it leaves, tapered only at the far end; Real-ESRGAN x4 plate; masked behind the tower and kept >=20 px from the HUD icons; thin (v7 peak 0.55, screen 0.8), slow breathe 0.85-1.0",
+   "place_xy": [
+    2161,
+    111
+   ]
+  }
+ ],
+ "composited_layer_count": 14,
+ "authored_layers": 12,
+ "game_layers": [
+  "fighters (game sprites)",
+  "hud (game)"
+ ],
+ "full_screen_layers": [
+  "layers/solids-baked.webp"
+ ],
+ "animated_effects": [
+  "hail dashes x2 depths (near/far)",
+  "terraces cloud x3 depths (R->L)",
+  "terrace mist x2 depths (R->L)",
+  "4 water threads from the foam lip (tapered, detach and fade)",
+  "false-dawn glow pulse (the accent)",
+  "sheet glow in the cloud band (1 per 12 s)",
+  "the Line breathe"
+ ],
+ "animated_effect_count": 7,
+ "animated_layers": 11,
+ "animated_instances": 15,
+ "total_asset_kb": 1534.6,
+ "mp4_kb": 3278.8,
+ "webp_kb": 2661.2,
+ "decoded_memory_mb_measured_from_exported_pixel_dims": 25.3,
+ "loop_seconds": 12.0,
+ "note": "decoded MB = w*h*4 for RGB(A), w*h*1 for single-channel; fighters/HUD game-owned; tile layers repeat (hail xy, cloud/mist x)"
+}
