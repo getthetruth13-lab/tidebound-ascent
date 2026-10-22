@@ -1,0 +1,171 @@
+{
+ "id": "camp_a2",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 53.9,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate 943bd660 (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-iron-door.webp",
+   "px": [
+    947,
+    973
+   ],
+   "channels": 4,
+   "kb": 34.3,
+   "decoded_mb": 3.51,
+   "animated": false,
+   "reason": "riveted iron plate door with hinges (painted door plate cc012bbe, polygon cut, scaled); partly cropped by the left frame edge; sill shadow",
+   "place": [
+    0,
+    20
+   ],
+   "parallax": 0.35,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-brazier.webp",
+   "px": [
+    1215,
+    519
+   ],
+   "channels": 4,
+   "kb": 40.4,
+   "decoded_mb": 2.41,
+   "animated": false,
+   "reason": "gunmetal bowl brazier on three claw feet (painted brazier plate 59ef99b2, polygon cut, scaled), the single amber accent; crisp contact shadow at each foot; candidate 2: tight silhouette, no plate wall/floor inside the cut",
+   "place": [
+    467,
+    523
+   ],
+   "parallax": 0.55,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mist-still.webp",
+   "px": [
+    2340,
+    370
+   ],
+   "channels": 4,
+   "kb": 350.7,
+   "decoded_mb": 3.3,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (still vertical rise 52 px/6s), screen/alpha=luminance, screen y=720 h=310",
+   "effect": "mist",
+   "vec": [
+    0,
+    -52
+   ],
+   "op": 0.15,
+   "y": 720,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/rain-window.webp",
+   "px": [
+    1310,
+    921
+   ],
+   "channels": 4,
+   "kb": 119.5,
+   "decoded_mb": 4.6,
+   "animated": true,
+   "reason": "painted rain plate ce9d92c6 (alpha only), falls with vec (-45, 320), op 0.2",
+   "effect": "rain",
+   "vec": [
+    -45,
+    320
+   ],
+   "op": 0.2,
+   "plate_src": "ce9d92c6"
+  },
+  {
+   "file": "layers/embers.webp",
+   "px": [
+    2540,
+    608
+   ],
+   "channels": 4,
+   "kb": 3.5,
+   "decoded_mb": 5.89,
+   "animated": true,
+   "reason": "painted effect plate procedural-embers (6 drawn amber cores) (wind R->L 10 px/6s), screen/alpha=luminance, screen y=300 h=420",
+   "effect": "motes",
+   "vec": [
+    10,
+    -180
+   ],
+   "op": 0.95,
+   "y": 300,
+   "plate_src": "procedural-embers (6 drawn amber cores)"
+  },
+  {
+   "file": "layers/brazier-glow.webp",
+   "px": [
+    973,
+    958
+   ],
+   "channels": 4,
+   "kb": 246.6,
+   "decoded_mb": 3.56,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    605,
+    122
+   ],
+   "op": 0.3
+  },
+  {
+   "file": "layers/brazier-flame-mask.png",
+   "px": [
+    92,
+    27
+   ],
+   "channels": 1,
+   "kb": 0.6,
+   "decoded_mb": 0.0,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1029,
+    597
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 849.5,
+  "mp4_kb": 605.0,
+  "decoded_mb": 30.5,
+  "n_layers": 8,
+  "n_animated": 5
+ },
+ "fighters_hero": [
+  1450,
+  860
+ ],
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "packaged": {
+  "layers": "art/v2/bg/a2-camp5-layers.json",
+  "loop": "art/v2/bg/a2-camp5-living.mp4",
+  "preview": "art/v2/bg/a2-camp5-living-preview.webp"
+ }
+}

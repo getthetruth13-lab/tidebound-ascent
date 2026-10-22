@@ -1379,6 +1379,10 @@ body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .c
 .a2tcard .act{font:700 14px var(--font-display);letter-spacing:.4em;color:#e0c48a}
 .a2tcard h1{font-size:clamp(26px,6vw,48px);margin:4px 0}
 .a2tcard .sub{font-size:15px;color:#d8cdb4}
+.a2tcard[data-panel]{padding:0 2%;background:none}
+.a2tcard[data-panel] h1{font-size:clamp(20px,calc(var(--tck,1)*96px),48px)}
+.a2tcard[data-panel] .act{font-size:clamp(10px,calc(var(--tck,1)*30px),14px)}
+.a2tcard[data-panel] .sub{font-size:clamp(11px,calc(var(--tck,1)*32px),15px)}
 .a2trav .a2tcboss,.a2trav .a2ferry{text-shadow:0 2px 8px #000;background:#04060a99;border-radius:6px;padding:4px 12px}
 
 /* Wordless End Turn seal (ui/wordless.js, art/v2/ui/end-turn.json): "END" is live text centred on the clean seal. Button size/position untouched. */

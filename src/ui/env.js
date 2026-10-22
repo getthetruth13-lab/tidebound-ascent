@@ -69,8 +69,8 @@ const victoryView=S=>!!(S&&S.screen==='reward'&&S.scene&&S.cardsOpen==null&&S.sw
 const A2_EV_ENV={chapel:['a2_tithebox','a2_brazier','a2_quietbell','a2_holdstone','a2_lanternlick'],armoury:['a2_armoury','a2_magazine','a2_drill','a2_oathanvil','a2_pressgang','a2_oilcask'],mess:['a2_mess','a2_surgeon','a2_qmgift','a2_grellread','a2_auction']};
 export function a2EventEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='event'||!run||(run.act||1)!==2||!S.ev||!/^a2_/.test(S.ev.id||''))return null;
  let k='yard';for(const n in A2_EV_ENV)if(A2_EV_ENV[n].includes(S.ev.id))k=n;const id='ev_a2_'+k;const e=ENV.envs[id];return e&&e.art?id:null}
-// Later-act travel backdrops. Act 3 placeholders reuse the existing Act 3 battle paintings (no tr_a2a3 / tc_a3 art yet): cliffs for the crossing, spires for the title card.
-const LATER_TRAVEL={2:['tr_a1a2','tc_a2'],3:['a3_cliffs','a3_spires']};
+// Later-act travel backdrops. v0.6.66: Act 3 has its own crossing (tr_a2a3 c3-finish) and title card (tc_a3 c3; title in its text panel, render.js tcPanelStyle).
+const LATER_TRAVEL={2:['tr_a1a2','tc_a2'],3:['tr_a2a3','tc_a3']};
 export function a2TravelEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='travel'||S.kind!=='act'||!LATER_TRAVEL[S.to])return null;const id=LATER_TRAVEL[S.to][S.card?1:0];const e=ENV.envs[id];return e&&e.art?id:null}
 export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=W.run;
  if(!run||s==='title')return {id:'a1_shore',grade:'title',dim:.55};
@@ -95,7 +95,7 @@ const nextSig=()=>{const k=envKeyFor();return `${k.id}|${k.band||''}|${k.grade}|
 const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'),'env-still':!!(W.S&&W.S.screen==='end'),'a2-room':!!a2EventEnv()});
 export function envWillChange(){if(!root)return false;if(nextSig()!==cur)return true;const c=sceneCls();return Object.keys(c).some(n=>document.body.classList.contains(n)!==c[n])}
 export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&W.S.view||'');if(scr!==lastScr){lastScr=scr;quiet(500);document.body.toggleAttribute('data-env-rest',['title','reward','event','pick','msg','potpick'].includes(W.S.screen));if(adaptive!=='full'&&lastP75<=panelMs()*1.25)govTo(adaptive==='off'?'reduced':'full');if(W.S.screen==='map')prewarmEnv(W.run?bandEnv(W.run.act||1,Math.min(14,Math.max(1,(W.run.floor||1)+1))):'a1_shore')} // next screen: one step back up if the last stretch ran smooth
- startLoop();const k=envKeyFor();const sig=nextSig();anchor();
+ startLoop();const k=envKeyFor();const sig=nextSig();anchor();warmAhead();
  overlayOpen=!!document.querySelector('#app .ov');{const c=sceneCls();for(const n in c)document.body.classList.toggle(n,c[n])}
  if(sig===cur)return;const prev=cur;cur=sig;
  const e0=ENV.envs[k.id]||ENV.envs.a1_shore||{};const e=k.id==='map_a1'?mapEnv(e0,k.band):e0;const g=ENV.grades[k.grade]||{tint_add:0,vig_add:0};
@@ -129,7 +129,25 @@ function sceneHero(e){const st=root.querySelector('.envstack');if(!st)return;let
  const sp0=e.space||[3600,1440],H=h.h*sp0[1],Wd=H*sp.w/sp.h,src=(h.unlit&&h.unlit[cls])||sp.f;
  if(!el){el=document.createElement('div');el.className='envhero';el.innerHTML='<i class="envhero-sh"></i><img alt="" draggable="false" decoding="async">';st.appendChild(el)}
  const im=el.querySelector('img');if(im.getAttribute('src')!==src)im.setAttribute('src',src);el.dataset.cls=cls;el.style.setProperty('--ax',sp.ax*100+'%');
- Object.assign(el.style,{left:(h.x-Wd*sp.ax)/sp0[0]*100+'%',top:(h.y-H)/sp0[1]*100+'%',height:H/sp0[1]*100+'%',width:Wd/sp0[0]*100+'%'})}
+ const put=(f,k)=>Object.assign(el.style,{left:(f.x-Wd*k*sp.ax)/sp0[0]*100+'%',top:(f.y-H*k)/sp0[1]*100+'%',height:H*k/sp0[1]*100+'%',width:Wd*k/sp0[0]*100+'%'});
+ put(h,1);el.dataset.foot='0';heroFit=()=>fitHero(st,el,h,sp0,H,Wd,sp,put);heroFit();requestAnimationFrame(()=>heroFit&&heroFit());clearTimeout(heroT);heroT=setTimeout(()=>heroFit&&heroFit(),480)}
+// v0.6.66: on the rest screen the camp tiles sit over the painted hero spot on short landscape phones (S24: hero hidden behind Temper). Measure the tile row
+// in layer space and use the first foot (default, then e.hero.rest[]) whose figure clears the tiles and stays on screen; if none clears, the roomiest one,
+// scaled down (to .6) until it clears. Re-run after layout settles and on resize.
+let heroFit=null,heroT=0;addEventListener('resize',()=>{if(heroFit)heroFit()});
+function fitHero(st,el,h,sp0,H,Wd,sp,put){if(!el.isConnected){heroFit=null;return}
+ const tiles=[...document.querySelectorAll('.camptiles .k-camp')];if(!tiles.length){put(h,1);return}
+ const sr=st.getBoundingClientRect();if(!sr.width)return;const kx=sp0[0]/sr.width,ky=sp0[1]/sr.height;
+ let R=null;for(const t of tiles){const r=t.getBoundingClientRect();if(!r.width)continue;R=R?{l:Math.min(R.l,r.left),t:Math.min(R.t,r.top),r:Math.max(R.r,r.right),b:Math.max(R.b,r.bottom)}:{l:r.left,t:r.top,r:r.right,b:r.bottom}}
+ if(!R){put(h,1);return}
+ const pad=8,T={l:(R.l-pad-sr.left)*kx,r:(R.r+pad-sr.left)*kx,t:(R.t-pad-sr.top)*ky,b:(R.b+pad-sr.top)*ky}; // tiles in layer space
+ const V={l:(Math.max(0,-sr.left))*kx,r:(Math.min(innerWidth,sr.right)-sr.left)*kx,t:(Math.max(0,-sr.top))*ky,b:(Math.min(innerHeight,sr.bottom)-sr.top)*ky}; // visible layer window
+ const box=(f,k)=>({l:f.x-Wd*k*sp.ax,r:f.x+Wd*k*(1-sp.ax),t:f.y-H*k,b:f.y});
+ const hit=(f,k)=>{const b=box(f,k),ox=Math.max(0,Math.min(b.r,T.r)-Math.max(b.l,T.l)),oy=Math.max(0,Math.min(b.b,T.b)-Math.max(b.t,T.t));return ox*oy/((b.r-b.l)*(b.b-b.t))};
+ const onscr=(f,k)=>{const b=box(f,k);return b.l>=V.l-2&&b.r<=V.r+2&&b.t>=V.t-2&&b.b<=V.b+2};
+ const C=[h].concat(h.rest||[]).map((f,i)=>({x:f.x,y:f.y,i}));
+ for(const k of [1,.9,.8,.7,.6])for(const f of C)if(onscr(f,k)&&hit(f,k)<.02){put(f,k);el.dataset.foot=String(f.i);el.dataset.k=String(k);return}
+ const best=C.map(f=>({f,v:hit(f,.6)+(onscr(f,.6)?0:1)})).sort((a,b)=>a.v-b.v)[0].f;put(best,.6);el.dataset.foot=String(best.i);el.dataset.k='.6'}
 // A/B art swap: the new art is built off-screen in its own box, decoded (img.decode, off the main thread), then faded in OVER the old
 // art, which is removed only after the fade. The old art is never blanked and a slow decode never freezes a frame.
 function swapLayer(el,list,sp){const sig=list.map(x=>x.f).join('|');const sh=el.firstChild;
@@ -191,6 +209,13 @@ function anchor(force){if(!root)return;if(force||!anchorWidth){anchorWidth=inner
 // ---------- debug / tests ----------
 export function envState(){return root?{id:root.dataset.env,band:root.dataset.band||undefined,grade:root.dataset.grade,q:root.dataset.q,anchor:root.dataset.anchor,particles:parts.length,gov:adaptive,govFlips,rebuilds,raf:!!raf,cap:PARTICLE_CAP[quality()],
  cssFx:root.querySelectorAll('.envfx-back .efx').length,layers:[...allL()].filter(l=>l.dataset.src).map(l=>l.dataset.l),files:[...document.querySelectorAll('#env .envI,#env-front .envI')].filter(i=>i.style.backgroundImage).length,wipeEvents:getComputedStyle(wipe).pointerEvents}:null}
+// v0.6.66 band flash: a band's backdrop was first fetched when its first fight / map view opened, so the old band's art stayed up (held by swapLayer) until the
+// new base decoded, then swapped: the previous background flashed in the new band. Outside combat, decode the current and the next two floors' band
+// backdrops (and the next act's first band on the travel screens) ahead, once per env id, in idle slices.
+let warmKey='';
+function warmAhead(){const run=W.run,s=W.S&&W.S.screen;if(!run||!s||s==='title'||s==='combat')return;const act=run.act||1,f=Math.max(1,run.floor||1);
+ const ids=[bandEnv(act,Math.min(14,f)),bandEnv(act,Math.min(14,f+1)),bandEnv(act,Math.min(14,f+2))];if(s==='travel'&&W.S.to)ids.push(bandEnv(W.S.to,1));if(f>=12)ids.push(bandEnv(Math.min(3,act+1),1));
+ const key=act+'/'+f+'/'+s;if(key===warmKey)return;warmKey=key;[...new Set(ids)].forEach(id=>prewarmEnv(id))}
 // G.debugEnv(id, grade): force an environment (shot.js / art review). Pass no id to return to normal routing.
 export function debugEnv(id,grade){forced=id&&ENV.envs[id]?{id,grade:grade||'normal'}:null;cur='';syncEnv();return !!forced||!id}
 export function envFiles(id){const e=ENV.envs[id];if(!e||!e.art)return [];const live=e.living?[...new Set(JSON.stringify(e.living).match(/art\/[^"]+\.webp/g)||[])]:[];return [...new Set([...Object.values(e.art).flat().map(x=>x.f),...live])]}

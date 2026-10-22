@@ -1,0 +1,221 @@
+{
+ "id": "ev_a2_mess",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 87.2,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate ev_a2_mess_v2 (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-slab-table.webp",
+   "px": [
+    1930,
+    729
+   ],
+   "channels": 4,
+   "kb": 61.5,
+   "decoded_mb": 5.37,
+   "animated": false,
+   "reason": "low slab-sided riveted iron table on slab pedestals + right bench (plate 1fefb828); table ends above y~800; shadows under every foot; v3: dark contact lines at pedestal/bench feet",
+   "place": [
+    239,
+    351
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-bench-foot.webp",
+   "px": [
+    529,
+    322
+   ],
+   "channels": 4,
+   "kb": 8.3,
+   "decoded_mb": 0.65,
+   "animated": false,
+   "reason": "right bench foot re-cut from the iron/stone post-base plate 14ba1034 so the bench reaches the floor; attached dark contact shadow",
+   "place": [
+    1430,
+    758
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-lantern.webp",
+   "px": [
+    234,
+    333
+   ],
+   "channels": 4,
+   "kb": 7.3,
+   "decoded_mb": 0.3,
+   "animated": false,
+   "reason": "surgeon's lantern on the table (the amber accent); shadow on the slab",
+   "place": [
+    1420,
+    143
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-kettle-a.webp",
+   "px": [
+    269,
+    219
+   ],
+   "channels": 4,
+   "kb": 4.3,
+   "decoded_mb": 0.22,
+   "animated": false,
+   "reason": "iron kettle on the table; shadow",
+   "place": [
+    757,
+    294
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-kettle-b.webp",
+   "px": [
+    235,
+    211
+   ],
+   "channels": 4,
+   "kb": 4.0,
+   "decoded_mb": 0.19,
+   "animated": false,
+   "reason": "iron kettle on the table; shadow",
+   "place": [
+    963,
+    329
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-kettle-c.webp",
+   "px": [
+    241,
+    208
+   ],
+   "channels": 4,
+   "kb": 4.0,
+   "decoded_mb": 0.19,
+   "animated": false,
+   "reason": "iron kettle on the table; shadow",
+   "place": [
+    1180,
+    303
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mist-still.webp",
+   "px": [
+    2358,
+    483
+   ],
+   "channels": 4,
+   "kb": 463.8,
+   "decoded_mb": 4.34,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (still vertical rise 55 px/6s), screen/alpha=luminance, screen y=380 h=420",
+   "effect": "mist",
+   "vec": [
+    0,
+    -55
+   ],
+   "op": 0.22,
+   "y": 380,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/sparks.webp",
+   "px": [
+    963,
+    601
+   ],
+   "channels": 4,
+   "kb": 7.8,
+   "decoded_mb": 2.21,
+   "animated": true,
+   "reason": "painted effect plate fx_motes (still vertical rise 60 px/6s), screen/alpha=luminance, screen y=100 h=560",
+   "effect": "motes",
+   "vec": [
+    0,
+    -60
+   ],
+   "op": 0.4,
+   "y": 100,
+   "plate_src": "fx_motes"
+  },
+  {
+   "file": "layers/lantern-glow.webp",
+   "px": [
+    1342,
+    824
+   ],
+   "channels": 4,
+   "kb": 148.5,
+   "decoded_mb": 4.22,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    597,
+    0
+   ],
+   "op": 0.28
+  },
+  {
+   "file": "layers/lantern-flame-mask.png",
+   "px": [
+    108,
+    83
+   ],
+   "channels": 1,
+   "kb": 3.5,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1478,
+    298
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 800.2,
+  "mp4_kb": 483.7,
+  "decoded_mb": 24.9,
+  "n_layers": 11,
+  "n_animated": 4
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "packaged": {
+  "layers": "art/v2/bg/a2-evmess4-layers.json",
+  "loop": "art/v2/bg/a2-evmess4-living.mp4",
+  "preview": "art/v2/bg/a2-evmess4-living-preview.webp"
+ }
+}

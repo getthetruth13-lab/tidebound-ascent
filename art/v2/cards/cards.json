@@ -1984,8 +1984,8 @@
   ]
  },
  "ledgerleaf": {
-  "art": "art/v2/cards/ledgerleaf-a2-n1.webp",
-  "thumb": "art/v2/cards/ledgerleaf-a2-n1-256.webp",
+  "art": "art/v2/cards/ledgerleaf-n1.webp",
+  "thumb": "art/v2/cards/ledgerleaf-n1-256.webp",
   "size": [
    768,
    576
