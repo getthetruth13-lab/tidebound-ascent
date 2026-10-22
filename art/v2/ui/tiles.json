@@ -1,4 +1,150 @@
 {
+ "swapSlots": {
+  "sprite-battery": {
+   "path": "art/v2/sprites/battery-a2-r41.webp",
+   "transparent": true,
+   "size": [
+    1008,
+    1414
+   ]
+  },
+  "sprite-sluiceeng": {
+   "path": "art/v2/sprites/sluiceeng-a2-r41.webp",
+   "transparent": true,
+   "size": [
+    855,
+    1371
+   ]
+  },
+  "sprite-mortar": {
+   "path": "art/v2/sprites/mortar-a2-r41.webp",
+   "transparent": true,
+   "size": [
+    2013,
+    1345
+   ]
+  },
+  "sprite-ghostcannon": {
+   "path": "art/v2/sprites/ghostcannon-a2-r43.webp",
+   "transparent": true,
+   "size": [
+    2106,
+    1349
+   ]
+  },
+  "sprite-gateplate": {
+   "path": "art/v2/sprites/gateplate-a2-r41.webp",
+   "transparent": true,
+   "size": [
+    1438,
+    1337
+   ]
+  },
+  "sprite-pylon": {
+   "path": "art/v2/sprites/pylon-a2-r44.webp",
+   "transparent": true,
+   "size": [
+    1194,
+    1362
+   ]
+  },
+  "sprite-dummy": {
+   "path": "art/v2/sprites/dummy-a2-r41.webp",
+   "transparent": true,
+   "size": [
+    1539,
+    1351
+   ]
+  },
+  "sprite-shellguard": {
+   "path": "art/v2/sprites/shellguard-a2-r42.webp",
+   "transparent": true,
+   "size": [
+    1392,
+    1424
+   ]
+  },
+  "sprite-colossus": {
+   "path": "art/v2/sprites/colossus.webp",
+   "transparent": true,
+   "size": [
+    1643,
+    1279
+   ]
+  },
+  "tc-a2": {
+   "path": "art/v2/bg/a2-tc4-solids.webp",
+   "transparent": false,
+   "size": [
+    2340,
+    1080
+   ]
+  },
+  "camp-a2": {
+   "path": "art/v2/bg/a2-camp3-solids.webp",
+   "transparent": false,
+   "size": [
+    2340,
+    1080
+   ]
+  },
+  "cliffs": {
+   "path": "art/v2/bg/a3-cliff2-solids.webp",
+   "transparent": false,
+   "size": [
+    2340,
+    1080
+   ]
+  },
+  "terraces": {
+   "path": "art/v2/bg/a3-terr4-solids.webp",
+   "transparent": false,
+   "size": [
+    2340,
+    1080
+   ]
+  },
+  "sluice-gate-doors": {
+   "path": "art/v2/bg/a2-sg4b-solids.webp",
+   "transparent": false,
+   "size": [
+    2340,
+    1080
+   ]
+  },
+  "ramparts-plaque": {
+   "path": "art/v2/bg/a2-sr3-solids.webp",
+   "transparent": false,
+   "size": [
+    2340,
+    1080
+   ]
+  },
+  "act2-boss-node": {
+   "path": "art/v2/map/map-a2-node-boss.webp",
+   "transparent": false,
+   "size": [
+    176,
+    240
+   ]
+  },
+  "act2-boss-node-vis": {
+   "path": "art/v2/map/map-a2-node-boss-vis.webp",
+   "transparent": false,
+   "size": [
+    176,
+    240
+   ]
+  },
+  "act2-boss-node-ghost": {
+   "path": "art/v2/map/map-a2-node-boss-ghost.webp",
+   "transparent": false,
+   "size": [
+    176,
+    240
+   ]
+  }
+ },
  "note": "Tile / emblem art slots. Drop a webp at \"path\", run `node tools/make-tiles-manifest.cjs` (sets ready:true), done. Until then the game draws a themed placeholder emblem with the right name.",
  "tiles": {
   "opt-leave": {

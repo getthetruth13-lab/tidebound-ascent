@@ -45,6 +45,8 @@ const V='art/v2/';
 const win=(f,pos)=>({src:V+'enemies/'+f+'.webp',srcset:`${V}enemies/${f}-256.webp 256w, ${V}enemies/${f}.webp 768w`,sizes:'(max-height:500px) 140px, 260px',fit:'cover',pos:pos||'50% 45%',win:true});
 const ui=k=>V+'ui/'+k+'.webp';
 // Painted HUD pass: repainted intent icons live in art/v2/hud/ (intent-ring keeps its old art).
+// r49/r50 keyword paintings (v0.6.61, review 9.00) fill existing later-act intent slots (intent-icons.js INTENT_ICONS); a2 token -> ACTPACK.
+const LATE_INTENT={aim:'art/v2/ui/intent-aim-a2.webp',gust:'art/v2/ui/intent-gust-a2.webp',lure:'art/v2/ui/intent-lure-a2.webp',muffle:'art/v2/ui/intent-muffle-a2.webp',numb:'art/v2/ui/intent-numb-a2.webp',dive:'art/v2/ui/intent-dive-a2.webp',link:'art/v2/ui/intent-link-a2.webp'}; // painted from kw aim, gust, lure, muffled, numbed, clouddive, link
 const HUD_INTENTS=['attack','attack-debuff','buff','debuff','defend','drain','heal','potion','status','steal','summon','unknown'];
 // Painted fallen-remains art, trimmed to its pixels: [w,h] by sprite id (ART staging 2026-10-12; twin-eels-b and tide-leech are the picked poses).
 const FALLEN={"brine-slug":[1426,661],"coral-crab":[1141,650],"drowned-captain":[830,414],"glimmer-wisp":[860,311],"gull-thief":[1210,441],"heap":[1238,490],"kelp-lurker":[1210,483],"kelp-matriarch":[793,579],"kelp-tendril":[773,552],"knell-a":[1024,552],"knell-b":[1061,464],"leviathan-bell":[1021,570],"limpet":[1057,554],"mender":[857,397],"mirror-warden":[876,413],"novice":[717,420],"penitent":[750,579],"rust-knight":[943,503],"spore-pod":[805,641],"tenant":[976,673],"tide-leech":[1159,620],"twin-eels-a":[961,456],"twin-eels-b":[904,516]};
@@ -160,5 +162,5 @@ async function loadCombatIconArt(){try{const r=await fetch('art/v2/ui/icons.json
  for(const [id,path] of Object.entries(j.dais||{}))if(path)DAIS_ART[id]=path;
  }catch(e){/* Keep the existing art and bronze vector placeholders offline. */}
  applyHudArt()}
-function applyHudArt(){for(const k of HUD_INTENTS)ASSETS.ui['intent-'+k]='art/v2/hud/intent-'+k+'.webp';Object.assign(ASSETS.status,ST_HUD)}
+function applyHudArt(){for(const k of HUD_INTENTS)ASSETS.ui['intent-'+k]='art/v2/hud/intent-'+k+'.webp';for(const k in LATE_INTENT)ASSETS.ui['intent-'+k]=LATE_INTENT[k];Object.assign(ASSETS.status,ST_HUD)}
 applyHudArt();

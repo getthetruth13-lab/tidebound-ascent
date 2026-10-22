@@ -535,8 +535,6 @@ body.env-still #envfx{visibility:hidden}
 
 /* Acts 2 and 3 map looks (ACT2_BUILD, D-A2-06/13): placeholder paint until map_a2 / map_a3 plates land. */
 .mapwrap.a2{background:linear-gradient(180deg,#3a4247,#2b3236 55%,#23292d);border:2px solid #6b6f6a;box-shadow:inset 0 0 40px #0008}
-/* Act 3 placeholder (FINISH_NONART_2): the existing Crown Terraces painting under a pale stormglass veil, so the dark route ink stays readable. Replaces the drawn weather chart. */
-.mapwrap.a3{background:linear-gradient(180deg,#d6daea99,#b4bcd48c 60%,#98a2c099),url(../art/v2/bg/a3-terr4-solids.webp) center/cover;border:2px solid #6c7596;box-shadow:inset 0 0 40px #3a4a7a88}
 .mapwrap .ward{position:absolute;right:6px;z-index:0;pointer-events:none;font:600 10px var(--font-display);letter-spacing:.16em;text-transform:uppercase;padding:2px 8px;border-radius:2px}
 .mapwrap .ward2{color:#e8d9b8;background:#4a5a5f;border:1px solid #b08a4a}.mapwrap .ward3{color:#2a3350;background:#e6e9f4;border:1px solid #6c7596}
 .mapwrap .rowmark{position:absolute;left:6px;z-index:0;pointer-events:none;transform:translateY(-50%)}
@@ -551,10 +549,10 @@ body.env-still #envfx{visibility:hidden}
 .en.holder .fig{filter:drop-shadow(0 0 7px #b8e6d0cc)}
 
 /* ===== Act 2 painted map (map_a2 v4, v0.6.39). Plate box = slots.json image_css_box; route under the gate seals; no glow except the pole lamp. ===== */
-.mapwrap.a2{background:none;border:0;box-shadow:none;isolation:isolate;margin-top:64px}
-.mapwrap.a2 .a2box{position:absolute;left:-4.348%;width:108.696%;top:-50px;height:1468.6px;z-index:-1;pointer-events:none;overflow:hidden;background:#15191c}
-.mapwrap.a2 .a2box img{position:absolute;display:block;pointer-events:none;user-select:none}
-.mapwrap.a2 .a2plate{left:0;top:0;width:100%;height:100%}
+.mapwrap:is(.a2,.a3){background:none;border:0;box-shadow:none;isolation:isolate;margin-top:64px}
+.mapwrap:is(.a2,.a3) .a2box{position:absolute;left:-4.348%;width:108.696%;top:-50px;height:1468.6px;z-index:-1;pointer-events:none;overflow:hidden;background:#15191c}
+.mapwrap:is(.a2,.a3) .a2box img{position:absolute;display:block;pointer-events:none;user-select:none}
+.mapwrap:is(.a2,.a3) .a2plate{left:0;top:0;width:100%;height:100%}
 .mapwrap.a2 .a2cut{left:0;top:0;width:100%;height:16.22%;mix-blend-mode:screen;opacity:.4}
 .mapwrap.a2 .a2chalk{left:0;top:0;width:100%;height:100%;mix-blend-mode:screen;opacity:.9}
 .mapwrap.a2 .a2tg{left:7.889%;top:-5.375%;width:22.94%;height:20.72%;mix-blend-mode:screen;opacity:.22}
@@ -563,7 +561,7 @@ body.env-still #envfx{visibility:hidden}
 .mapwrap.a2 .a2ban{width:98px;height:130px}
 .mapwrap.a2 .a2lamp{width:40px;height:53px}
 .mapwrap.a2 .a2lair{width:88px;height:88px}
-.mapwrap.a2>svg{z-index:1}
+.mapwrap:is(.a2,.a3)>svg{z-index:1}
 /* v0.6.56: Act 2 nodes use the Act 1 icons and node styles (same as Act 3); only the gate keeps its painted portcullis seal ring behind the Act 1 icon. */
 .mapwrap.a2 .node.gate{width:84px;height:84px;border-radius:8px;background:transparent;border:0}
 .mapwrap.a2 .node.gate .a2seal{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;pointer-events:none}

@@ -35,7 +35,12 @@
   "parry": "art/v2/ui/status-parry.webp",
   "retort-ready": "art/v2/ui/status-retort-ready.webp",
   "second-mark": "art/v2/ui/status-second-mark.webp",
-  "vigil": "art/v2/ui/status-vigil.webp"
+  "vigil": "art/v2/ui/status-vigil.webp",
+  "charge": "art/v2/ui/status-charge-a2.webp",
+  "shard": "art/v2/ui/status-shard-a2.webp",
+  "water": "art/v2/ui/status-water-a2.webp",
+  "submerged": "art/v2/ui/status-submerged-a2.webp",
+  "behind": "art/v2/ui/status-behind-a2.webp"
  },
  "relic": {
   "abyssalpearl": "art/v2/ui/relic-abyssalpearl.webp",
