@@ -135,7 +135,10 @@
   "turnedgun": "art/v2/ui/relic-turnedgun-a2.webp",
   "vialbelt": "art/v2/ui/relic-vialbelt-a2.webp",
   "wardenswrit": "art/v2/ui/relic-wardenswrit-a2.webp",
-  "wrenlockbox": "art/v2/ui/relic-wrenlockbox-a2.webp"
+  "wrenlockbox": "art/v2/ui/relic-wrenlockbox-a2.webp",
+  "rangeflag": "art/v2/ui/relic-rangeflag-a2.webp",
+  "paidreceipt": "art/v2/ui/relic-paidreceipt-a2.webp",
+  "cisternplug": "art/v2/ui/relic-cisternplug-a2.webp"
  },
  "potion": {
   "abyssaloil": "art/v2/ui/potion-abyssaloil.webp",
