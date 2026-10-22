@@ -2638,5 +2638,133 @@
    768,
    576
   ]
+ },
+ "caravan": {
+  "art": "art/v2/cards/caravan-a2.webp",
+  "thumb": "art/v2/cards/caravan-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cullantern": {
+  "art": "art/v2/cards/cullantern-a2.webp",
+  "thumb": "art/v2/cards/cullantern-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "salvagepit": {
+  "art": "art/v2/cards/salvagepit-a2.webp",
+  "thumb": "art/v2/cards/salvagepit-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "stash": {
+  "art": "art/v2/cards/stash-a2.webp",
+  "thumb": "art/v2/cards/stash-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "watch": {
+  "art": "art/v2/cards/watch-a2.webp",
+  "thumb": "art/v2/cards/watch-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "belltower": {
+  "art": "art/v2/cards/belltower-a2.webp",
+  "thumb": "art/v2/cards/belltower-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "canon": {
+  "art": "art/v2/cards/canon-a2.webp",
+  "thumb": "art/v2/cards/canon-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "carrytone": {
+  "art": "art/v2/cards/carrytone-a2.webp",
+  "thumb": "art/v2/cards/carrytone-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "grandpause": {
+  "art": "art/v2/cards/grandpause-a2.webp",
+  "thumb": "art/v2/cards/grandpause-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "greathall": {
+  "art": "art/v2/cards/greathall-a2.webp",
+  "thumb": "art/v2/cards/greathall-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "listenclose": {
+  "art": "art/v2/cards/listenclose-a2.webp",
+  "thumb": "art/v2/cards/listenclose-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "opusgrand": {
+  "art": "art/v2/cards/opusgrand-a2.webp",
+  "thumb": "art/v2/cards/opusgrand-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "shatternote": {
+  "art": "art/v2/cards/shatternote-a2.webp",
+  "thumb": "art/v2/cards/shatternote-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sympnotes": {
+  "art": "art/v2/cards/sympnotes-a2.webp",
+  "thumb": "art/v2/cards/sympnotes-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tunehall": {
+  "art": "art/v2/cards/tunehall-a2.webp",
+  "thumb": "art/v2/cards/tunehall-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "wreckhymn": {
+  "art": "art/v2/cards/wreckhymn-a2.webp",
+  "thumb": "art/v2/cards/wreckhymn-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
  }
 }
