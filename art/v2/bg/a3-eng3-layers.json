@@ -1,0 +1,172 @@
+{
+ "scene": "a3_lair_engine",
+ "canvas": [
+  2340,
+  1080
+ ],
+ "foot_y": 586,
+ "hero_x": 570,
+ "boss_x": 2000,
+ "layers": [
+  {
+   "file": "layers/sky-back.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 109.8,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "storm sky in the open slot (plate engine3 slot region), every solid cut out (hand polygon) and the hole refilled behind (push-pull + grain); opaque, static"
+  },
+  {
+   "file": "layers/solids.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 4,
+   "kb": 117.2,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "ALL solids from key plate engine3: riveted iron landing (level, matte; warm specular streak before the shaft removed), back wall with ONE bare EMPTY axle socket (second ring patched out) with three iron-eye cable anchors beside it, a riveted pit in the deck at the shaft foot (plate shaftpit_c1), brass piston columns, hanging chains, the central shaft, slot frame and cliffs; graded gun-metal, sat<35%, HUD calm; alpha = 0 only on the slot sky (hand polygon, chain kept solid)"
+  },
+  {
+   "file": "layers/cloud-far.webp",
+   "px": [
+    644,
+    254
+   ],
+   "channels": 4,
+   "kb": 110.4,
+   "decoded_mb": 0.65,
+   "animated": true,
+   "reason": "far storm cloud in the open slot: plate cloud, drifts R->L 120 px / 12 s, masked to the slot (the one wind) [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/cloud-mid.webp",
+   "px": [
+    936,
+    290
+   ],
+   "channels": 4,
+   "kb": 180.4,
+   "decoded_mb": 1.09,
+   "animated": true,
+   "reason": "mid storm cloud in the slot, R->L 260 px / 12 s [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/cloud-near.webp",
+   "px": [
+    878,
+    198
+   ],
+   "channels": 4,
+   "kb": 57.8,
+   "decoded_mb": 0.7,
+   "animated": true,
+   "reason": "near mist in the slot (plate mist), R->L 470 px / 12 s [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/vapour-b.webp",
+   "px": [
+    91,
+    276
+   ],
+   "channels": 4,
+   "kb": 18.4,
+   "decoded_mb": 0.1,
+   "animated": true,
+   "reason": "vapour rising from the shaft, back (plate vapour L half): air the engine pulls down breathes back out; scrolls up + left, masked to the shaft [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/vapour-f.webp",
+   "px": [
+    91,
+    474
+   ],
+   "channels": 4,
+   "kb": 29.3,
+   "decoded_mb": 0.17,
+   "animated": true,
+   "reason": "vapour rising from the shaft, front (plate vapour R half), faster [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/mist-out.webp",
+   "px": [
+    1170,
+    224
+   ],
+   "channels": 4,
+   "kb": 100.8,
+   "decoded_mb": 1.05,
+   "animated": true,
+   "reason": "mist breathed out of the shaft drifting R->L low along the wall base (plate mist), faint [exported at half res, game scales x2]"
+  },
+  {
+   "file": "layers/drip-seep.png",
+   "px": [
+    58,
+    593
+   ],
+   "channels": 1,
+   "kb": 4.8,
+   "decoded_mb": 0.03,
+   "animated": true,
+   "reason": "one dripping seep down the wall beside the brass column (a column of plate drips), scrolls down, loops"
+  },
+  {
+   "file": "layers/accent-glow-mask.png",
+   "px": [
+    137,
+    80
+   ],
+   "channels": 1,
+   "kb": 2.3,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "halo of the small cold pale-gold glow far down the pit below the deck rim (the second pull; THE accent), pulses 6 s; place at (1104,533)"
+  }
+ ],
+ "authored_layers": 10,
+ "composited_layer_count": 12,
+ "game_layers": [
+  "fighters (game sprites)",
+  "hud (game)"
+ ],
+ "draw_order": [
+  "sky-back",
+  "cloud-far",
+  "cloud-mid",
+  "cloud-near",
+  "solids",
+  "accent glow",
+  "vapour-b",
+  "vapour-f",
+  "mist-out",
+  "drip-seep",
+  "fighters",
+  "hud"
+ ],
+ "animated_effects": [
+  "cloudfar",
+  "cloudmid",
+  "cloudnear",
+  "vapourback",
+  "vapourfront",
+  "mistout",
+  "glow",
+  "drip"
+ ],
+ "animated_effect_count": 8,
+ "full_screen_layers": [
+  "layers/sky-back.webp",
+  "layers/solids.webp"
+ ],
+ "total_asset_kb": 731.2,
+ "decoded_memory_mb": 24.0,
+ "mp4_kb": 907.7,
+ "pending_plates": [],
+ "note": "decoded MB = w*h*4 for RGB(A), w*h for single-channel masks; fighters/HUD excluded. Solids never move; every mover is a painted plate."
+}
