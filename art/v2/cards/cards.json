@@ -2766,5 +2766,109 @@
    768,
    576
   ]
+ },
+ "cairnwright": {
+  "art": "art/v2/cards/cairnwright-a2.webp",
+  "thumb": "art/v2/cards/cairnwright-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cornerstone": {
+  "art": "art/v2/cards/cornerstone-a2.webp",
+  "thumb": "art/v2/cards/cornerstone-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "straightroad": {
+  "art": "art/v2/cards/straightroad-a2.webp",
+  "thumb": "art/v2/cards/straightroad-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "surveypost": {
+  "art": "art/v2/cards/surveypost-a2.webp",
+  "thumb": "art/v2/cards/surveypost-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "deadfall": {
+  "art": "art/v2/cards/deadfall-a2.webp",
+  "thumb": "art/v2/cards/deadfall-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lamppost": {
+  "art": "art/v2/cards/lamppost-a2.webp",
+  "thumb": "art/v2/cards/lamppost-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "litroad": {
+  "art": "art/v2/cards/litroad-a2.webp",
+  "thumb": "art/v2/cards/litroad-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "marchorders": {
+  "art": "art/v2/cards/marchorders-a2.webp",
+  "thumb": "art/v2/cards/marchorders-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "menderstent": {
+  "art": "art/v2/cards/menderstent-a2.webp",
+  "thumb": "art/v2/cards/menderstent-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rebuild": {
+  "art": "art/v2/cards/rebuild-a2.webp",
+  "thumb": "art/v2/cards/rebuild-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rubbleroad": {
+  "art": "art/v2/cards/rubbleroad-a2.webp",
+  "thumb": "art/v2/cards/rubbleroad-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "torchrelay": {
+  "art": "art/v2/cards/torchrelay-a2.webp",
+  "thumb": "art/v2/cards/torchrelay-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "mendchord": {
+  "art": "art/v2/cards/mendchord-a2.webp",
+  "thumb": "art/v2/cards/mendchord-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
  }
 }

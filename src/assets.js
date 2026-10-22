@@ -1,6 +1,8 @@
 // assets.js
 // =====================================================================
 // ASSET MAP: the ONE place to swap art. Paths are relative to index.html.
+// Art-push swap inventory: tools/art-drop-slots.cjs. Existing sprite ids and
+// environment paths stay stable; replace those exact files after art approval.
 // Groups and keys:
 //   frames.<classId>     v2 card frame, 5:7 (1000x1400 @2x, 500x700 @1x). Rects: art/v2/frames/layout.json
 //   portraits.<classId>  4:3 class portrait (title screen, top bar)
@@ -23,6 +25,7 @@
 // with the card/enemy emoji, so nothing ever breaks.
 // Environment backgrounds are NOT listed here: files + rects come from design/environments.json (ui/env.js).
 // =====================================================================
+import {ENEMY_POSES} from './data/enemy-poses.js';
 import {SPRITES,SPRITE_BASELINE} from './data/sprites.js';
 import {ICONS} from './data/icons.js';
 // game status key -> Artist icon key (art/v2/ui/icons.json 'status'); 'rooted' is the Kelp Matriarch's passive
@@ -31,7 +34,12 @@ const ST_ICON={block:'guard',str:'might',dex:'poise',weak:'soaked',vuln:'exposed
  parry:'parry',keepMom:'momentum-held',nextDraw:'draw-next',drawLess:'draw-less',nextEnergy:'energy-next',nextMom:'momentum-next',drained:'drained',moonlock:'moonlock',mimic:'mimic-ink',cairn:'cairn-rank',retort:'retort-ready',chartQ:'chart-next',banks:'banked-crest',power:'vigil',queued:'active',armed:'second-mark',guardHold:'guard-held',grudge:'grudge',breath:'held-breath',crestUp:'crest-bonus'};
 // Painted HUD pass (clovis/hud): repainted Bleed and Soaked icons.
 const ST_HUD={bleed:'art/v2/hud/status-bleed.webp',weak:'art/v2/hud/status-soaked.webp'};
-const stIcons=()=>{const o={block:null};for(const [k,v] of Object.entries(ST_ICON))o[k]=ST_HUD[k]||ICONS.status[v]||null;return o};
+// Later-act status icons (LATE-WIRE): every later-act STATUS key without Act 1 art points at art/v2/ui/status-<enginekey>-a2-64.webp (token a2 -> sw ACTPACK, not the install precache).
+// The badge <img> removes itself on a 404, so a missing file keeps the SVG badge. kw-id -> engine key table: studio/tasks/claude/LATE-WIRE-kw-map.json.
+const LATE_ST=['charge','tailwind','submerged','behind','shard','water','stormtide'];
+const stIcons=()=>{const o={block:null};for(const [k,v] of Object.entries(ST_ICON))o[k]=ST_HUD[k]||ICONS.status[v]||null;
+ for(const k of LATE_ST)o[k]=`art/v2/ui/status-${k}-a2-64.webp`;
+ return o};
 const slotIcons=m=>Object.fromEntries(Object.entries(m).map(([k,f])=>[k,{src:f,fit:'contain'}]));
 const V='art/v2/';
 const win=(f,pos)=>({src:V+'enemies/'+f+'.webp',srcset:`${V}enemies/${f}-256.webp 256w, ${V}enemies/${f}.webp 768w`,sizes:'(max-height:500px) 140px, 260px',fit:'cover',pos:pos||'50% 45%',win:true});
@@ -72,7 +80,7 @@ export const ASSETS={
    // v0.6.36: second batch, all at 9.0 (art reviews enemies-round25/29/31/33/34/35). Lowest sole = image bottom (8-10 px pad), so the runtime shadow sits on the lowest foot.
    bellnun:'bellnun',dummy:'dummy',hauler:'hauler',grell:'grell',hgunner:'hgunner',cantor:'cantor',chorister:'chorister',basso:'basso',
    // v0.6.43 (wired as-is, below the 9 review bar, to be improved): the three Act 2 bosses, latest files in studio/art/act2/enemies/
-   colossus:'colossus',wreckqueen:'wreckqueen',battery:'battery'}},
+   colossus:'colossus',wreckqueen:'wreckqueen',battery:'battery',anchorite:'anchorite',eyegale:'eyegale',hailorb:'hailorb',lenswright:'lenswright',polyp:'polyp',automaton:'automaton',voltray:'voltray',shardcarrier:'shardcarrier',jelly:'jelly',ringcharge:'ringcharge'}},
  // HUD icons: art/v2/ui/icon-*-64.webp via data/icons.js (tools/gen-icons.py). A missing key falls back to its emoji.
  hud:{...ICONS.hud},
  // Painterly status icons (art/v2/ui/status-*-64.webp); null = emoji badge.
@@ -83,7 +91,7 @@ export const ASSETS={
  ui:{'intent-attack':ui('intent-attack'),'intent-attack-debuff':ui('intent-attack-debuff'),'intent-buff':ui('intent-buff'),'intent-debuff':ui('intent-debuff'),
   'intent-defend':ui('intent-defend'),'intent-unknown':ui('intent-unknown'),'energy-orb-full':ui('energy-orb-full'),'energy-orb-empty':ui('energy-orb-empty'),
   'end-turn':ui('end-turn'),'end-turn-pressed':ui('end-turn-pressed'),
-  'end-turn-c2':ui('end-turn-c2'),'end-turn-c2-burst':ui('end-turn-c2-burst'),
+  'end-turn-c2':ui('end-turn-c2'),'end-turn-clean':ui('end-turn-clean'),'end-turn-c2-burst':ui('end-turn-c2-burst'),
   'node-fight':ui('node-combat'),'node-elite':ui('node-elite'),'node-rest':ui('node-rest'),'node-shop':ui('node-shop'),'node-event':ui('node-unknown'),'node-unknown':ui('node-unknown'),'node-treasure':ui('node-treasure'),'node-boss':ui('node-boss')},
  textures:{parchment:V+'textures/parchment.webp','parchment-dark':V+'textures/parchment-dark.webp',stone:V+'textures/stone-panel.webp',leather:V+'textures/leather-panel.webp'}
 };
@@ -97,9 +105,11 @@ export function assetEntry(group,key){const g=ASSETS[group];let v=g&&g[key];if(!
 // enemies with randomSprite:1, seeded 'sprites' RNG stream) or else the instance index (e.g. twin eels A/B).
 export function spriteCount(group,key){const id=ASSETS.sprites[group]&&ASSETS.sprites[group][key];return Array.isArray(id)?id.length:1}
 export function spriteFor(group,key,idx=0){let id=ASSETS.sprites[group]&&ASSETS.sprites[group][key];if(Array.isArray(id))id=id[idx%id.length];const m=id&&SPRITES[id];return m?{id,...m}:null}
-export {SPRITE_BASELINE};
+export {SPRITE_BASELINE,ENEMY_POSES};
+// Contained sprite portraits use the same reviewed painting; no separate crop is needed.
+for(const id of ['battery','dummy','gateplate','mortar','sluiceeng','anchorite','eyegale','hailorb','lenswright','polyp','automaton','voltray','shardcarrier','jelly','ringcharge'])ASSETS.enemies[id]={src:SPRITES[id].f,fit:'contain',pos:'50% 100%'};
 // Remains for a sprite (spriteFor result) or null: {id,src,w,h}. The Knell's second phase (e.ph 2) falls as the cracked Leviathan Bell.
-export function fallenFor(sp,e){let id=sp&&sp.id;if(id&&e&&e.key==='bell'&&e.ph===2)id='leviathan-bell';const d=id&&FALLEN[id];return d?{id,src:ASSETS.fallen[id],w:d[0],h:d[1]}:null}
+export function fallenFor(sp,e){let id=sp&&sp.id;if(id&&e&&e.key==='bell'&&e.ph===2)id='leviathan-bell';const pose=id&&ENEMY_POSES[id]?.fall;if(pose)return {id,src:pose.f,w:pose.w,h:pose.h};const d=id&&FALLEN[id];return d?{id,src:ASSETS.fallen[id],w:d[0],h:d[1]}:null}
 // An icon from a group (hud / status) with an emoji fallback when the slot is empty or the file fails.
 export function iconHTML(group,key,fallback,cls){const s=assetSrc(group,key);return s?`<img class="uic ${cls||''}" src="${s}" alt="" draggable="false" onerror="this.outerHTML='${fallback}'">`:fallback}
 export function assetSrc(group,key){const a=assetEntry(group,key);return a?a.src:''}
@@ -109,13 +119,13 @@ export function assetFail(img){const s=img.parentNode;if(s)s.classList.remove('h
 // sw.js ACTPACK[act]); the worker fills them when ?act=N is used or an act opens (warmActPack), and on first use otherwise. Act 1 stays fully offline.
 // Add a sprite id here whenever a later-act enemy gets its sprite (tests/precache-coverage.cjs fails if one is missing).
 export const LATER_ACT_SPRITES={diver:2,shellguard:2,kettleman:2,lice:2,bosun:2,gateplate:2,salthusk:2,lamplighter:2,pylon:2,pumper:2,sluiceeng:2,ghostcannon:2,mortar:2,deckshade:2,
- bellnun:2,dummy:2,hauler:2,grell:2,hgunner:2,cantor:2,chorister:2,basso:2,colossus:2,wreckqueen:2,battery:2};
+ bellnun:2,dummy:2,hauler:2,grell:2,hgunner:2,cantor:2,chorister:2,basso:2,colossus:2,wreckqueen:2,battery:2,anchorite:3,eyegale:3,hailorb:3,lenswright:3,polyp:3,automaton:3,voltray:3,shardcarrier:3,jelly:3,ringcharge:3};
 export function actPackFiles(){const o={};for(const [id,act] of Object.entries(LATER_ACT_SPRITES))if(SPRITES[id])o[SPRITES[id].f]=act;return o}
 export function actPackURLs(act=3){const f=actPackFiles();return Object.keys(f).filter(u=>f[u]<=act)}
 // Ask the worker to fetch the Act 2/3 pack (acts <= act). No-op for Act 1, without a worker, or on file://.
 export function warmActPack(act){if(!(act>=2)||typeof navigator==='undefined'||!navigator.serviceWorker)return;
  navigator.serviceWorker.ready.then(reg=>{const w=navigator.serviceWorker.controller||reg.active;w&&w.postMessage({type:'actpack',act})}).catch(()=>{})}
-export function assetURLs(){const later=LATER_ACT_SPRITES;const out=Object.entries(SPRITES).filter(([id])=>!later[id]).map(([,m])=>m.f);for(const [gn,g] of Object.entries(ASSETS))for(const k in g){if(gn==='sprites')continue;const a=assetEntry(gn,k);if(!a)continue;out.push(a.src);if(a.srcset)a.srcset.split(',').forEach(s=>out.push(s.trim().split(/\s+/)[0]))}return [...new Set(out)].filter(u=>!/^(data:|blob:)/.test(u))}
+export function assetURLs(){const later=LATER_ACT_SPRITES;const out=Object.entries(SPRITES).filter(([id])=>!later[id]).map(([,m])=>m.f);for(const [gn,g] of Object.entries(ASSETS))for(const k in g){if(gn==='sprites')continue;const a=assetEntry(gn,k);if(!a)continue;out.push(a.src);if(a.srcset)a.srcset.split(',').forEach(s=>out.push(s.trim().split(/\s+/)[0]))}out.push(...Object.values(ENEMY_POSES).flatMap(p=>Object.values(p).map(v=>v.f)));return [...new Set(out)].filter(u=>!/^(data:|blob:)/.test(u)&&!/(^|[\/_-])a[23]([._-]|$)/.test(u))}
 // Renders an image slot with fallback placeholder. ph = placeholder inner HTML (emoji)
 export function slotHTML(group,key,cls,ph){const a=assetEntry(group,key);
  const img=a?`<img src="${a.src}"${a.srcset?` srcset="${a.srcset}"`:''}${a.sizes?` sizes="${a.sizes}"`:''} alt="" draggable="false" decoding="async" style="object-fit:${a.fit}${a.pos?';object-position:'+a.pos:''}" onerror="assetFail(this)">`:'';

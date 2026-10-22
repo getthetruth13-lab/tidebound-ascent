@@ -10,6 +10,7 @@ import {selectScr} from './select.js';
 import {learnScr} from './learn.js';
 import {introScr,newGame} from './intro.js';
 import {loadingScr,toMenuOrLoad} from './loading.js';
+import {WL} from '../wordless.js';
 import {lampPickScr,ledgerScr,totalPending} from './lamp.js';
 import {loadProfile} from '../../progress.js';
 import {dip} from '../dip.js';
@@ -58,7 +59,10 @@ const slotHTML=s=>{const K=CLASSES[s.run.cls];return `<div class="tb-slot theme-
 function framed(id,title,body,cls=''){return `<div class="tb-scr tb-title">${bgHTML()}<div class="tb-ov"><div class="tb-frame ${cls}" id="${id}">${frameOpen()}<h2>${title}</h2>${body}${frameClose()}</div></div></div>`}
 export function titleScr(){const v=W.S.view||'main';
  if(v==='studio'){clearTimeout(studioTimer);studioTimer=setTimeout(studioNext,window.FAST?50:2500);return `<div class="tb-scr tb-studio" id="studio" onclick="studioNext()"><img src="${STUDIO_LOGO}" alt=""></div>`}
- if(v==='start')return `<div class="tb-scr tb-title tb-start tb-vid" id="startscr" onclick="startTap()"><div class="tv-stage"><video class="tv-video" src="art/v2/title/title-loop.mp4" poster="art/v2/title/title-poster.jpg" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture preload="auto" aria-label="The Drowned Sun. Tap to begin"></video></div></div>`;
+ if(v==='start'&&!WL.ready)return `<div class="tb-scr tb-title tb-start tb-vid" id="startscr" onclick="startTap()"></div>`;
+ if(v==='start'){const wl=WL.title,pj=wl?'art/v2/title/title-poster-clean.jpg':'art/v2/title/title-poster.jpg',vid=wl?WL.titleVideo&&'art/v2/title/'+WL.titleVideo:'art/v2/title/title-loop.mp4';
+  // wordless art (ui/wordless.js): the tagline and tap prompt are live text over the clean poster/video; baked-text art keeps its own.
+  return `<div class="tb-scr tb-title tb-start tb-vid${wl?' wordless':''}" id="startscr" onclick="startTap()"${wl?` style="--tp:url(../${pj})"`:''}><div class="tv-stage">${vid?`<video class="tv-video" src="${vid}" poster="${pj}" autoplay muted loop playsinline webkit-playsinline disablepictureinpicture preload="auto" aria-label="The Drowned Sun. Tap to begin"></video>`:`<img class="tv-img" src="${pj}" alt="The Drowned Sun. Tap to begin" draggable="false">`}${wl?'<div class="tv-words"><span class="tv-tag">A Deckbuilding Ascent</span><span class="tv-tap">Tap to begin</span></div>':''}</div></div>`}
  if(v==='loading')return loadingScr();
  if(v==='select')return selectScr();
  if(v==='learn')return learnScr();
@@ -91,3 +95,6 @@ export function flyEmblem(){const e=document.getElementById('tmemb');if(!e||docu
  const r=e.getBoundingClientRect();if(!r.width)return;const bx=ox+EB[0]*sc,by=oy+EB[1]*sc,bw=(EB[2]-EB[0])*sc;
  const k=bw/r.width;e.style.transition='none';e.style.transformOrigin='0 0';e.style.transform=`translate(${bx-r.left}px,${by-r.top}px) scale(${k})`;
  e.getBoundingClientRect();requestAnimationFrame(()=>{e.style.transition='transform 1.1s cubic-bezier(.45,.05,.2,1)';e.style.transform='none'})}
+
+// A wordless flag that turns on after boot (the json arrives late): redraw the start screen so it picks up the clean art and live words.
+window.addEventListener('wordless',()=>{if(W.S&&W.S.screen==='title'&&W.S.view==='start')render()});

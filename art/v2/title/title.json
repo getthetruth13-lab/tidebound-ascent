@@ -1,0 +1,6 @@
+{
+ "wordless": true,
+ "poster": "title-poster-clean.jpg",
+ "video": null,
+ "note": "Set wordless true when art/v2/title/title-poster-clean.jpg lands (no tagline, no TAP TO BEGIN; wordmark kept). Code then draws A Deckbuilding Ascent and Tap to begin. video: optional clean loop file name in this folder; null = still poster."
+}

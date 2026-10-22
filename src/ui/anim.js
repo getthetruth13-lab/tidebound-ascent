@@ -4,6 +4,7 @@
 //      so an animation resumes instead of restarting or vanishing when something re-renders mid-flight.
 import {shakeLayers} from './stage.js';
 import {syncRigs} from './rig.js';
+import {ENEMY_POSES} from '../assets.js';
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
 import {CARDS} from '../core/registry.js';
@@ -43,6 +44,19 @@ const later=(ms,fn)=>ms>0?fxQueue.push(T(ms),fn):fn();
 const laterU=(ms,fn)=>ms>0?fxQueue.push(U(ms),fn):fn();
 function burstAt(sel,kind,ms=0,...args){later(ms,()=>{const c=centre(sel);if(c)emit(kind,c.x,c.y,...args)})}
 function ringAt(sel,col,size,ms=0,ms2=360){later(ms,()=>{const c=centre(sel);if(c)ring(c.x,c.y,col,size,ms2)})}
+// Attack cutouts keep idle height and foot anchor; wider weapons/gestures may extend beyond the idle box.
+function attackPose(sel,pose,total){
+ const touched=new Map();
+ entry(total,elapsed=>{const im=sel&&$(sel+' img.spr');if(!im)return;
+  if(!touched.has(im)){touched.set(im,{src:im.getAttribute('src'),style:im.getAttribute('style')});
+   im.src=pose.f;im.dataset.pose='atk';
+   const box=im.closest('.fig');const h=box.offsetHeight,w=h*pose.w/pose.h;
+   const anchor=parseFloat(im.closest('.en').style.getPropertyValue('--ax'))||box.offsetWidth/2;
+   Object.assign(im.style,{height:h+'px',width:w+'px',left:(anchor-w*pose.ax)+'px',top:'auto',bottom:'0'});
+  }
+ });
+ setTimeout(()=>{for(const [im,old] of touched){if(im.dataset.pose!=='atk'||im.getAttribute('src')!==pose.f)continue;im.src=old.src;old.style==null?im.removeAttribute('style'):im.setAttribute('style',old.style);delete im.dataset.pose}},T(total));
+}
 // ---------- ghosts (persistent copies of a figure) ----------
 function ghost(selector,kind,opts={}){const source=selector&&$(selector);if(!source)return null;
  const fig=source.querySelector('.fig'),r=(fig||source).getBoundingClientRect();
@@ -240,7 +254,7 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
   if(!c.hpLoss&&c.amount)queue({k:'blocked',sel:target})}
  if(event==='playerHit'){queue({k:'herohit',amount:c.amount,blocked:c.blocked,enemy:c.enemy,B:W.cb&&W.cb.beats||beatsFor(c.enemy,{a:1})})}
  if(event==='enemyTelegraph'){setImpact(0);queue({k:'telegraph',sel:enemy(c.enemy),B:c.beats||beatsFor(c.enemy,{a:1}),e:c.enemy})}
- if(event==='enemyStrike'){queue({k:'estrike',sel:enemy(c.enemy),B:c.beats,m:c.intent||{}})}
+ if(event==='enemyStrike'){queue({k:'estrike',sel:enemy(c.enemy),B:c.beats,m:c.intent||{},e:c.enemy})}
  if(event==='enemyAct'){setImpact(Math.round((W.cb&&W.cb.beats||EB()).impact||0))}
  if(event==='playerAttacked')setImpact(0);
  if(event==='enemyKilled'){const e=c.enemy;if(move){death(e,impactBase());queue({k:'shake',amp:(e.boss||e.elite)?7:3,delay:impactBase()})}else if(reducedMotion()&&fxOn())deathFade(e)}
@@ -362,6 +376,11 @@ function flush(){let recs=pending;pending=[];if(!recs.length)return;
     else play(figOf(sel),[{scale:'1 1',translate:'0 0',filter:'none',offset:0},{scale:'1.04',translate:'0 -3px',filter:'brightness(1.35)',offset:1}],tm,el,0,'ease-out');
     const ic=$(sel+' .intentw');if(ic)play(ic,[{scale:'1.4',filter:'brightness(1.6)'},{scale:'1',filter:'none'}],tm*.96,el,0,'cubic-bezier(.2,1.4,.4,1)')})}
   else if(r.k==='estrike'){const sel=r.sel,dir=-1,B=r.B||EB(),m=r.m||{};
+   if(B.dmg||m.a){
+    const pose=ENEMY_POSES[r.e?.key]?.atk,total=B.lead>0?B.lead+B.hitstop+Math.max(0,B.hits-1)*B.hitGap+B.recover:B.strike;
+    if(pose)attackPose(sel,pose,total);
+    if(r.e?.key==='lenswright')later(B.lead||0,()=>{const im=sel&&$(sel+' img.spr');PFX.lensBeam(im?rectOf(im):centre(sel),centre('#hero'))});
+   }
    if(!(B.lead>0)){const total=B.strike,f=total/370;   // 370 = the classic stage sum 60+50+60+200
     const st=n=>n*f;
     entry(total,el=>play(figOf(sel),[{translate:'0 0',scale:'1 1',offset:0},{translate:`${-dir*7}px 0`,scale:'1.02 .97',offset:at(st(60),total),easing:'cubic-bezier(.2,.9,.3,1)'},{translate:`${dir*30}px 0`,scale:'1.06 .96',offset:at(st(110),total)},{translate:`${dir*30}px 0`,scale:'1.06 .96',offset:at(st(170),total),easing:'ease-out'},{translate:'0 0',scale:'1 1',offset:1}],total,el,0,'linear'))}

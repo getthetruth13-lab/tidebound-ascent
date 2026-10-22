@@ -477,7 +477,7 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 #tbdip{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:99999}
 /* Title video (v0.6.5, Spencer's 1744x1168 cut): cover the screen, no side bars. Baked title top is at frame y~19%, baked TAP TO BEGIN bottom at ~86%.
    Stage width = max(cover width, but capped so at least 69% of frame height stays visible) -> cover at 19.5:9 shows y~19-88%, so the title clears the top and TAP TO BEGIN keeps ~4% screen space above the bottom. Blurred poster fills any gap on ultra-wide screens. */
-.tb-start.tb-vid::before{content:"";position:absolute;inset:-40px;background:url(../art/v2/title/title-poster.jpg) center/cover;filter:blur(24px) brightness(.45)}
+.tb-start.tb-vid::before{content:"";position:absolute;inset:-40px;background:var(--tp,url(../art/v2/title/title-poster.jpg)) center/cover;filter:blur(24px) brightness(.45)}
 .tb-start.tb-vid .tv-stage{--vh:calc(100dvh - env(safe-area-inset-bottom,0px));aspect-ratio:1744/1168;width:min(max(100vw,calc(var(--vh)*1744/1168)),calc(var(--vh)/.69*1744/1168));top:calc((var(--vh) - min(max(100vw,calc(var(--vh)*1744/1168)),calc(var(--vh)/.69*1744/1168))*1168/1744)*.6);-webkit-mask-image:none;mask-image:none}
 /* v0.6.1.1 layered title backdrop (TITLE_LAYERED in title.js). Transform/opacity-only animation for 60fps. */
 .tl-stage{overflow:hidden;background:#05080c}
@@ -578,3 +578,12 @@ body.env-still #envfx{visibility:hidden}
 .parch:has(.mapwrap.a2) h2{color:#e8d9b8}
 .parch:has(.mapwrap.a2) .legend{color:#d8cdb2}
 .parch:has(.mapwrap.a2) .bossleg{color:#d9b27a}
+
+/* Wordless title (ui/wordless.js, art/v2/title/title.json): live tagline + tap prompt over the clean poster. Positions are % of the 1744x1168 frame (tagline centre y 75%, prompt y 84%), sizes in cqw so they track the stage. */
+.tb-start .tv-words{position:absolute;inset:0;container-type:size;pointer-events:none;font-family:'Cinzel',var(--font-display),Georgia,serif;text-align:center}
+.tb-start .tv-words span{position:absolute;left:0;right:0;display:block;white-space:nowrap;color:#d8b07a;text-transform:uppercase;text-shadow:0 1px 2px #000,0 0 6px #000,0 0 14px #000c}
+.tb-start .tv-tag{top:75%;transform:translateY(-50%);font-size:max(2.15cqw,11px);letter-spacing:.34em;font-weight:600;color:#c9976a}
+.tb-start .tv-tap{top:84.3%;transform:translateY(-50%);font-size:max(3.1cqw,13px);letter-spacing:.3em;font-weight:700;color:#e8c98f;animation:tvTap 2.4s ease-in-out infinite}
+@keyframes tvTap{0%,100%{opacity:.62}50%{opacity:1}}
+.reduce-motion .tb-start .tv-tap{animation:none}
+@media(prefers-reduced-motion:reduce){.tb-start .tv-tap{animation:none}}

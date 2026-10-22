@@ -1,0 +1,5 @@
+{
+ "wordless": true,
+ "image": "end-turn-clean.webp",
+ "note": "Set wordless true when art/v2/ui/end-turn-clean.webp (End Turn seal without END) lands. Code then draws END as live text over the seal."
+}

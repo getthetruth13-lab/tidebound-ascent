@@ -431,14 +431,14 @@
    "hoverPx": 0
   },
   "gateplate": {
-   "file": "sprites/gateplate.webp",
-   "w": 1009,
-   "h": 998,
-   "bytes": 476254,
+   "file": "sprites/gateplate-a2-r41.webp",
+   "w": 1438,
+   "h": 1337,
+   "bytes": 906132,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.51,
+    "x": 0.414,
     "y": 1.0
    },
    "screenHeightPct": 30,
@@ -501,14 +501,14 @@
    "hoverPx": 0
   },
   "sluiceeng": {
-   "file": "sprites/sluiceeng.webp",
-   "w": 1273,
-   "h": 1340,
-   "bytes": 776930,
+   "file": "sprites/sluiceeng-a2-r41.webp",
+   "w": 855,
+   "h": 1371,
+   "bytes": 632146,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.368,
+    "x": 0.434,
     "y": 1.0
    },
    "screenHeightPct": 44,
@@ -529,14 +529,14 @@
    "hoverPx": 0
   },
   "mortar": {
-   "file": "sprites/mortar.webp",
-   "w": 1149,
-   "h": 948,
-   "bytes": 437420,
+   "file": "sprites/mortar-a2-r41.webp",
+   "w": 2013,
+   "h": 1345,
+   "bytes": 1127304,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.504,
+    "x": 0.435,
     "y": 1.0
    },
    "screenHeightPct": 30,
@@ -571,14 +571,14 @@
    "hoverPx": 0
   },
   "dummy": {
-   "file": "sprites/dummy.webp",
-   "w": 1308,
-   "h": 1147,
-   "bytes": 399574,
+   "file": "sprites/dummy-a2-r41.webp",
+   "w": 1539,
+   "h": 1351,
+   "bytes": 497926,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.5,
+    "x": 0.634,
     "y": 1.0
    },
    "screenHeightPct": 34,
@@ -697,17 +697,157 @@
    "hoverPx": 0
   },
   "battery": {
-   "file": "sprites/battery.webp",
-   "w": 1731,
-   "h": 1323,
-   "bytes": 1498966,
+   "file": "sprites/battery-a2-r41.webp",
+   "w": 1008,
+   "h": 1414,
+   "bytes": 679718,
    "role": "boss",
    "facing": "left",
    "anchor": {
-    "x": 0.529,
-    "y": 0.983
+    "x": 0.443,
+    "y": 1.0
    },
    "screenHeightPct": 66,
+   "hoverPx": 0
+  },
+  "anchorite": {
+   "file": "sprites/anchorite-a3-r41.webp",
+   "w": 1618,
+   "h": 1334,
+   "bytes": 661804,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.444,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "eyegale": {
+   "file": "sprites/eyegale-a3-r41.webp",
+   "w": 1240,
+   "h": 1338,
+   "bytes": 675146,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.874,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "hailorb": {
+   "file": "sprites/hailorb-a3-r41.webp",
+   "w": 1341,
+   "h": 1253,
+   "bytes": 811380,
+   "role": "summon",
+   "facing": "left",
+   "anchor": {
+    "x": 0.444,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "lenswright": {
+   "file": "sprites/lenswright-a3-r41.webp",
+   "w": 719,
+   "h": 1378,
+   "bytes": 427422,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.529,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "polyp": {
+   "file": "sprites/polyp-a3-r41.webp",
+   "w": 1856,
+   "h": 1344,
+   "bytes": 1314956,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.549,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "automaton": {
+   "file": "sprites/automaton-a3-r41.webp",
+   "w": 936,
+   "h": 1320,
+   "bytes": 662010,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.522,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "voltray": {
+   "file": "sprites/voltray-a3-r41.webp",
+   "w": 2391,
+   "h": 1122,
+   "bytes": 622730,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.717,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 40
+  },
+  "shardcarrier": {
+   "file": "sprites/shardcarrier-a3-r41.webp",
+   "w": 818,
+   "h": 1357,
+   "bytes": 513176,
+   "role": "summon",
+   "facing": "left",
+   "anchor": {
+    "x": 0.447,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "jelly": {
+   "file": "sprites/jelly-a3-r41.webp",
+   "w": 1954,
+   "h": 1166,
+   "bytes": 1055694,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.424,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 40
+  },
+  "ringcharge": {
+   "file": "sprites/ringcharge-a3-r41.webp",
+   "w": 1588,
+   "h": 1328,
+   "bytes": 1034640,
+   "role": "summon",
+   "facing": "left",
+   "anchor": {
+    "x": 0.429,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
    "hoverPx": 0
   }
  }

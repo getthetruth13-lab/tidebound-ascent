@@ -1,0 +1,175 @@
+{
+ "layers": [
+  {
+   "file": "layers/solids-baked.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 217.4,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "used_as": 1,
+   "reason": "ALL solids baked: machinery wall + sluice wheels + HOLD block + back crenels (plate 9865db9f, ESRGAN x4, baked rain removed), real painted wet flagstone wall-walk (plates 9dce7279 left + 2f9188a4 right, ESRGAN x4 then downsample, regraded), far crenel run (4dab6c32), studded stone coping + rail posts (9dce7279 stone, 2f9188a4 iron studs), pale tide-line (f97d5830 mist strip), basin water gap, riveted cast-iron mortar bed with hollow mouth (plate 2aaeae35, cut out, grounded with contact shadow), dimmed lighthouse, painted lure flame core (530a4557)"
+  },
+  {
+   "file": "layers/storm-clouds-a.jpg",
+   "px": [
+    3200,
+    330
+   ],
+   "channels": 1,
+   "kb": 93.3,
+   "decoded_mb": 1.06,
+   "animated": true,
+   "used_as": 1,
+   "reason": "storm-cloud plate c86ae5ca (alpha), depth 1: right-to-left drift 46 px/s, screen-added over the sky only (no lightning)"
+  },
+  {
+   "file": "layers/storm-clouds-b.jpg",
+   "px": [
+    4224,
+    330
+   ],
+   "channels": 1,
+   "kb": 68.3,
+   "decoded_mb": 1.39,
+   "animated": true,
+   "used_as": 1,
+   "reason": "second storm-cloud plate f97d5830 (alpha, not flipped), depth 2: right-to-left drift 110 px/s, sky only"
+  },
+  {
+   "file": "layers/wind-mist.jpg",
+   "px": [
+    4224,
+    940
+   ],
+   "channels": 1,
+   "kb": 205.9,
+   "decoded_mb": 3.97,
+   "animated": true,
+   "used_as": 1,
+   "reason": "plate f97d5830 flipped vertically + rescaled: wind-driven low mist, right-to-left 240 px/s, over the back wall band and thinly over the floor"
+  },
+  {
+   "file": "layers/rain-far.jpg",
+   "px": [
+    2432,
+    1368
+   ],
+   "channels": 1,
+   "kb": 377.8,
+   "decoded_mb": 3.33,
+   "animated": true,
+   "used_as": 1,
+   "reason": "rain streak plate 1b39f29a (alpha) rotated 180 deg: right-to-left wind-driven, drift (-110, 300) px/s, opacity 0.13, lower contrast over the fight area"
+  },
+  {
+   "file": "layers/rain-mid.jpg",
+   "px": [
+    2432,
+    1368
+   ],
+   "channels": 1,
+   "kb": 343.9,
+   "decoded_mb": 3.33,
+   "animated": true,
+   "used_as": 1,
+   "reason": "rain streak plate 8aaeccbd (alpha): right-to-left wind-driven, drift (-230, 620) px/s, opacity 0.11, lower contrast over the fight area"
+  },
+  {
+   "file": "layers/rain-near.jpg",
+   "px": [
+    2432,
+    1368
+   ],
+   "channels": 1,
+   "kb": 299.0,
+   "decoded_mb": 3.33,
+   "animated": true,
+   "used_as": 1,
+   "reason": "rain streak plate 2beccb8d (alpha) rotated 180 deg: right-to-left wind-driven, drift (-420, 1130) px/s, opacity 0.055, lower contrast over the fight area"
+  },
+  {
+   "file": "layers/lure-glow.png",
+   "px": [
+    180,
+    180
+   ],
+   "channels": 3,
+   "kb": 18.8,
+   "decoded_mb": 0.13,
+   "animated": true,
+   "used_as": 1,
+   "reason": "golden lure-light glow sprite (180 px) from plate 530a4557: slow pulse, additive"
+  },
+  {
+   "file": "layers/hanging-chain.png",
+   "px": [
+    163,
+    550
+   ],
+   "channels": 4,
+   "kb": 69.5,
+   "decoded_mb": 0.36,
+   "animated": true,
+   "used_as": 1,
+   "reason": "two-strand hanging chain (plate 52088c9b, ESRGAN x4), pinned at the top, only the free loose end sways (<=9 px)"
+  },
+  {
+   "file": "layers/sea-mask.png",
+   "px": [
+    1170,
+    540
+   ],
+   "channels": 1,
+   "kb": 1.7,
+   "decoded_mb": 0.63,
+   "animated": true,
+   "used_as": 1,
+   "reason": "half-res mask of the basin water (far below the wall): slow 2-3 px swell displacement"
+  },
+  {
+   "file": "layers/sky-mask.png",
+   "px": [
+    1170,
+    540
+   ],
+   "channels": 1,
+   "kb": 1.6,
+   "decoded_mb": 0.63,
+   "animated": true,
+   "used_as": 1,
+   "reason": "half-res mask of the open sky where storm clouds may drift"
+  }
+ ],
+ "composited_layer_count": 13,
+ "authored_layers": 11,
+ "game_layers": [
+  "fighters (game sprites)",
+  "hud (game)"
+ ],
+ "full_screen_layers": [
+  "layers/solids-baked.webp",
+  "layers/wind-mist.jpg",
+  "layers/rain-far.jpg",
+  "layers/rain-mid.jpg",
+  "layers/rain-near.jpg"
+ ],
+ "animated_effects": [
+  "storm clouds x2 depths (46/110 px/s)",
+  "basin water swell",
+  "rain x3 depths (R->L)",
+  "wind mist (R->L)",
+  "lure-light pulse",
+  "hanging chain loose-end sway"
+ ],
+ "animated_effect_count": 6,
+ "animated_instances": 8,
+ "total_asset_kb": 1697.2,
+ "mp4_kb": 3261.0,
+ "webp_kb": 1486.3,
+ "decoded_memory_mb_measured_from_exported_pixel_dims": 28.3,
+ "note": "decoded MB = w*h*4 for RGB(A) layers, w*h*1 for single-channel masks/alpha; fighters/HUD excluded (game-owned) | 2026-10-22 v3 packaging: mp4_kb now measured from sluice-ramparts-v3-living.mp4 (was the v2 file size)."
+}

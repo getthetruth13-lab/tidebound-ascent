@@ -5,12 +5,12 @@
 // (Waypoint placed/triggered, Guard pulse; Guard shatter 0.7 s per Spencer 10-13). Durations use core/timing U() (the player's speed setting only, not BATTLE_SCALE) so they stay on Spencer's timing rule.
 import {U} from '../core/timing.js';
 import {fxOn,reducedMotion} from './vfx.js';
-export const PFX_ART={crest:'art/v2/fx/tide-crest.webp',flourish:'art/v2/fx/duel-flourish.webp',echo:'art/v2/fx/echo-bell.webp',
+export const PFX_ART={lensBeam:'art/v2/fx/lenswright-a3-beam.webp',crest:'art/v2/fx/tide-crest.webp',flourish:'art/v2/fx/duel-flourish.webp',echo:'art/v2/fx/echo-bell.webp',
  waypoint:'art/v2/fx/carto-waypoint.webp',shield:'art/v2/fx/guard-shield.webp',shatter:'art/v2/fx/guard-shatter.webp'};
 // aspect ratios of the art (w/h), so pieces are sized before the image decodes
-const AR={crest:900/497,flourish:794/645,echo:900/638,waypoint:900/570,shield:808/715,shatter:791/701};
+const AR={lensBeam:3.2,crest:900/497,flourish:794/645,echo:900/638,waypoint:900/570,shield:808/715,shatter:791/701};
 const cache={};
-export function preloadPaintedFx(){if(typeof Image==='undefined')return;for(const k in PFX_ART)if(!cache[k]){const i=new Image();i.decoding='async';i.src=PFX_ART[k];cache[k]=i}}
+export function preloadPaintedFx(){if(typeof Image==='undefined')return;for(const k in PFX_ART)if(k!=='lensBeam'&&!cache[k]){const i=new Image();i.decoding='async';i.src=PFX_ART[k];cache[k]=i}}
 let live=[];
 export const paintedLive=()=>live.filter(e=>e.isConnected).map(e=>e.dataset.pfx);
 // One painted piece. x,y = centre in viewport px, w = width px. frames use individual transform props.
@@ -74,3 +74,10 @@ export function guardShatter(p,dir=1){if(!ok()||!p)return;const w=Math.max(210,M
    {opacity:0,translate:`${Math.cos(am)*w*.6}px ${Math.sin(am)*w*.45+w*.08}px`,rotate:`${(i%2?1:-1)*(18+i*5)}deg`,scale:'.9'}],700,{easing:'linear'});
   el.classList.add('pfx-shard');el.style.clipPath=`polygon(50% 50%, ${P(a0)}, ${P(am)}, ${P(a1)})`}}
 if(typeof document!=='undefined')preloadPaintedFx();
+
+// The reviewed attack beam is a separate plate: idle and fallen art never contain it.
+export function lensBeam(from,to){if(!ok()||!from||!to)return;
+ const x=from.x-from.w*.38,y=from.y-from.h*.28,dx=x-to.x,dy=y-to.y,w=Math.hypot(dx,dy);
+ const e=piece('lensBeam',{x:(x+to.x)/2,y:(y+to.y)/2,w,z:58,blend:'screen'},[{opacity:0,scale:'1 .35'},{opacity:1,scale:'1 1',offset:.18},{opacity:.8,offset:.65},{opacity:0,scale:'1 .5'}],440);
+ e.style.rotate=Math.atan2(dy,dx)+'rad';
+}

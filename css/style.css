@@ -1377,3 +1377,7 @@ body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .c
 .a2tcard h1{font-size:clamp(26px,6vw,48px);margin:4px 0}
 .a2tcard .sub{font-size:15px;color:#d8cdb4}
 .a2trav .a2tcboss,.a2trav .a2ferry{text-shadow:0 2px 8px #000;background:#04060a99;border-radius:6px;padding:4px 12px}
+
+/* Wordless End Turn seal (ui/wordless.js, art/v2/ui/end-turn.json): "END" is live text centred on the clean seal. Button size/position untouched. */
+.combat #endbtn[data-wl] .end-label{position:absolute;inset:0;width:auto;height:auto;margin:0;overflow:visible;clip:auto;display:grid;place-items:center;pointer-events:none;font:700 calc(50*var(--hud-unit)) 'Cinzel',var(--font-display),Georgia,serif;letter-spacing:.06em;color:#f0b95a;background:linear-gradient(180deg,#ffe9a8 0%,#f0b24c 55%,#b8671f 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 calc(1.2*var(--hud-unit)) #000) drop-shadow(0 0 calc(1.2*var(--hud-unit)) #000) drop-shadow(0 calc(2*var(--hud-unit)) calc(3*var(--hud-unit)) #000)}
+.combat #endbtn[data-wl][data-sun=dim] .end-label{opacity:.7}
