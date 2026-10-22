@@ -2374,5 +2374,269 @@
    768,
    576
   ]
+ },
+ "deeppress": {
+  "art": "art/v2/cards/deeppress-a2.webp",
+  "thumb": "art/v2/cards/deeppress-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "eddynet": {
+  "art": "art/v2/cards/eddynet-a2.webp",
+  "thumb": "art/v2/cards/eddynet-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "spindriftveil": {
+  "art": "art/v2/cards/spindriftveil-a2.webp",
+  "thumb": "art/v2/cards/spindriftveil-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ballastchain": {
+  "art": "art/v2/cards/ballastchain-a2.webp",
+  "thumb": "art/v2/cards/ballastchain-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brinereckon": {
+  "art": "art/v2/cards/brinereckon-a2.webp",
+  "thumb": "art/v2/cards/brinereckon-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brinewheel": {
+  "art": "art/v2/cards/brinewheel-a2.webp",
+  "thumb": "art/v2/cards/brinewheel-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brokenwater": {
+  "art": "art/v2/cards/brokenwater-a2.webp",
+  "thumb": "art/v2/cards/brokenwater-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "moonpull": {
+  "art": "art/v2/cards/moonpull-a2.webp",
+  "thumb": "art/v2/cards/moonpull-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "perigee": {
+  "art": "art/v2/cards/perigee-a2.webp",
+  "thumb": "art/v2/cards/perigee-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "saltmemory": {
+  "art": "art/v2/cards/saltmemory-a2.webp",
+  "thumb": "art/v2/cards/saltmemory-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "saltwound": {
+  "art": "art/v2/cards/saltwound-a2.webp",
+  "thumb": "art/v2/cards/saltwound-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sargassomat": {
+  "art": "art/v2/cards/sargassomat-a2.webp",
+  "thumb": "art/v2/cards/sargassomat-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "searot": {
+  "art": "art/v2/cards/searot-a2.webp",
+  "thumb": "art/v2/cards/searot-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sluicerelease": {
+  "art": "art/v2/cards/sluicerelease-a2.webp",
+  "thumb": "art/v2/cards/sluicerelease-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "strongcurrent": {
+  "art": "art/v2/cards/strongcurrent-a2.webp",
+  "thumb": "art/v2/cards/strongcurrent-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tidehaul": {
+  "art": "art/v2/cards/tidehaul-a2.webp",
+  "thumb": "art/v2/cards/tidehaul-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "antiphon": {
+  "art": "art/v2/cards/antiphon-a2.webp",
+  "thumb": "art/v2/cards/antiphon-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cacophony": {
+  "art": "art/v2/cards/cacophony-a2.webp",
+  "thumb": "art/v2/cards/cacophony-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "castbronze": {
+  "art": "art/v2/cards/castbronze-a2.webp",
+  "thumb": "art/v2/cards/castbronze-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "clearnote": {
+  "art": "art/v2/cards/clearnote-a2.webp",
+  "thumb": "art/v2/cards/clearnote-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "clearpeal": {
+  "art": "art/v2/cards/clearpeal-a2.webp",
+  "thumb": "art/v2/cards/clearpeal-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "damper": {
+  "art": "art/v2/cards/damper-a2.webp",
+  "thumb": "art/v2/cards/damper-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "faultline": {
+  "art": "art/v2/cards/faultline-a2.webp",
+  "thumb": "art/v2/cards/faultline-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "marchdrum": {
+  "art": "art/v2/cards/marchdrum-a2.webp",
+  "thumb": "art/v2/cards/marchdrum-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "pedaltone": {
+  "art": "art/v2/cards/pedaltone-a2.webp",
+  "thumb": "art/v2/cards/pedaltone-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "perfectpitch": {
+  "art": "art/v2/cards/perfectpitch-a2.webp",
+  "thumb": "art/v2/cards/perfectpitch-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "phaseshift": {
+  "art": "art/v2/cards/phaseshift-a2.webp",
+  "thumb": "art/v2/cards/phaseshift-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "temper": {
+  "art": "art/v2/cards/temper-a2.webp",
+  "thumb": "art/v2/cards/temper-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "transcribe": {
+  "art": "art/v2/cards/transcribe-a2.webp",
+  "thumb": "art/v2/cards/transcribe-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "twopart": {
+  "art": "art/v2/cards/twopart-a2.webp",
+  "thumb": "art/v2/cards/twopart-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "breachwall": {
+  "art": "art/v2/cards/breachwall-a2.webp",
+  "thumb": "art/v2/cards/breachwall-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "chaintides": {
+  "art": "art/v2/cards/chaintides-a2.webp",
+  "thumb": "art/v2/cards/chaintides-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "slackstrike": {
+  "art": "art/v2/cards/slackstrike-a2.webp",
+  "thumb": "art/v2/cards/slackstrike-a2-256.webp",
+  "size": [
+   768,
+   576
+  ]
  }
 }
