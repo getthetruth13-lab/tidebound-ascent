@@ -889,6 +889,160 @@
    },
    "screenHeightPct": 42,
    "hoverPx": 0
+  },
+  "skua": {
+   "file": "sprites/skua-a3-r62.webp",
+   "w": 2181,
+   "h": 1343,
+   "bytes": 975822,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.463,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "petrel": {
+   "file": "sprites/petrel-a3-r62.webp",
+   "w": 1866,
+   "h": 1170,
+   "bytes": 742054,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.592,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "cloudshark": {
+   "file": "sprites/cloudshark-a3-r62.webp",
+   "w": 2367,
+   "h": 1098,
+   "bytes": 678444,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.405,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "galereader": {
+   "file": "sprites/galereader-a3-r62.webp",
+   "w": 1515,
+   "h": 2134,
+   "bytes": 897956,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.503,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "slinger": {
+   "file": "sprites/slinger-a3-r62.webp",
+   "w": 1360,
+   "h": 1309,
+   "bytes": 733496,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.499,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "ringpull": {
+   "file": "sprites/ringpull-a3-r62.webp",
+   "w": 1248,
+   "h": 2044,
+   "bytes": 731444,
+   "role": "summon",
+   "facing": "left",
+   "anchor": {
+    "x": 0.43,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "ringveil": {
+   "file": "sprites/ringveil-a3-r62.webp",
+   "w": 664,
+   "h": 1375,
+   "bytes": 474474,
+   "role": "summon",
+   "facing": "left",
+   "anchor": {
+    "x": 0.55,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "squallwest": {
+   "file": "sprites/squallwest-a3-r62.webp",
+   "w": 1484,
+   "h": 2198,
+   "bytes": 927510,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.298,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "squalleast": {
+   "file": "sprites/squalleast-a3-r62.webp",
+   "w": 1542,
+   "h": 1951,
+   "bytes": 1061032,
+   "role": "elite",
+   "facing": "left",
+   "anchor": {
+    "x": 0.732,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "engine": {
+   "file": "sprites/engine-a3-r62.webp",
+   "w": 1374,
+   "h": 1369,
+   "bytes": 932728,
+   "role": "boss",
+   "facing": "left",
+   "anchor": {
+    "x": 0.499,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
+  },
+  "thalassa": {
+   "file": "sprites/thalassa-a3-r62.webp",
+   "w": 1393,
+   "h": 2121,
+   "bytes": 925274,
+   "role": "boss",
+   "facing": "left",
+   "anchor": {
+    "x": 0.609,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
   }
  }
 }

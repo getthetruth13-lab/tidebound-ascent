@@ -97,7 +97,7 @@ export function envKeyFor(){if(forced)return forced;const s=W.S&&W.S.screen,run=
 // whether the backdrop changes at all. Must stay in step with the sig built in syncEnv().
 const nextSig=()=>{const k=envKeyFor();return `${k.id}|${k.band||''}|${k.grade}|${k.dim||0}|${quality()}`};
 // body.env-combat / body.scene-choice also restyle #env (stack position, blur + darken), so a flip of either counts as a backdrop change too
-const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'),'env-still':!!(W.S&&W.S.screen==='end'),'a2-room':!!a2EventEnv()});
+const sceneCls=()=>({'env-combat':!!(W.S&&(W.S.screen==='combat'||victoryView(W.S))),'scene-choice':!victoryView(W.S)&&(['event','reward','pick','msg','potpick'].includes(W.S.screen)||W.S.ov==='tasks'),'env-still':!!(W.S&&W.S.screen==='end'),'a2-room':!!(a2EventEnv()||a3EventEnv())});
 export function envWillChange(){if(!root)return false;if(nextSig()!==cur)return true;const c=sceneCls();return Object.keys(c).some(n=>document.body.classList.contains(n)!==c[n])}
 export function syncEnv(){if(!root)return;const scr=(W.S&&W.S.screen)+'|'+(W.S&&W.S.view||'');if(scr!==lastScr){lastScr=scr;quiet(500);document.body.toggleAttribute('data-env-rest',['title','reward','event','pick','msg','potpick'].includes(W.S.screen));if(adaptive!=='full'&&lastP75<=panelMs()*1.25)govTo(adaptive==='off'?'reduced':'full');if(W.S.screen==='map')prewarmEnv(W.run?bandEnv(W.run.act||1,Math.min(14,Math.max(1,(W.run.floor||1)+1))):'a1_shore')} // next screen: one step back up if the last stretch ran smooth
  startLoop();const k=envKeyFor();const sig=nextSig();anchor();warmAhead();
@@ -163,7 +163,9 @@ function swapLayer(el,list,sp){const sig=list.map(x=>x.f).join('|');const sh=el.
  box.innerHTML=list.map(x=>`<i class="envI" style="left:${x.r[0]/sp[0]*100}%;top:${x.r[1]/sp[1]*100}%;width:${x.r[2]/sp[0]*100}%;height:${x.r[3]/sp[1]*100}%"></i>`).join('');
  const load=(x,i)=>{const im=new Image();im.decoding='async';im.src=x.f;
   const done=()=>{const it=box.children[i];if(it)it.style.backgroundImage=`url("${x.f}")`};
-  return (im.decode?im.decode():new Promise((ok,no)=>{im.onload=ok;im.onerror=no})).then(done,()=>{})};
+  // v0.6.68: Chromium's decode() can reject spuriously under memory pressure (EncodingError) even though the file is fine. That used to leave the
+  // layer blank for the whole band (bands-a3: a3_cliffs solids missing). Now a rejected decode still sets the image, so the browser paints it on load.
+  return (im.decode?im.decode():new Promise((ok,no)=>{im.onload=ok;im.onerror=no})).then(done,()=>new Promise(r=>{if(im.complete&&im.naturalWidth){done();return r()}im.onload=()=>{done();r()};im.onerror=()=>{done();r()}}))};
  Promise.race([Promise.all(list.map(load)),new Promise(r=>setTimeout(r,3000))]).then(()=>{if(el.dataset.src!==sig||el._tok!==tok)return;
   const fresh=!sh.firstChild||el.style.opacity==='0';rebuilds++;
   if(fresh)box.style.transition='none';sh.appendChild(box);el.style.opacity=1;box.getBoundingClientRect();box.style.opacity=1;

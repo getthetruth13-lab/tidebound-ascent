@@ -1,0 +1,114 @@
+{
+ "id": "ev_a3_lee",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 112.9,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate 60907380_coal (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/valley-mist.webp",
+   "px": [
+    2340,
+    428
+   ],
+   "channels": 4,
+   "kb": 395.7,
+   "decoded_mb": 3.82,
+   "animated": true,
+   "reason": "painted effect plate m3lee (wind R->L 120 px/6s), screen/alpha=luminance, screen y=430 h=420",
+   "effect": "mist",
+   "vec": [
+    -120,
+    0
+   ],
+   "op": 0.22,
+   "y": 430,
+   "plate_src": "m3lee"
+  },
+  {
+   "file": "layers/valley-low.webp",
+   "px": [
+    2340,
+    308
+   ],
+   "channels": 4,
+   "kb": 273.9,
+   "decoded_mb": 2.75,
+   "animated": true,
+   "reason": "painted effect plate m3lee (wind R->L 80 px/6s), screen/alpha=luminance, screen y=600 h=300",
+   "effect": "mist",
+   "vec": [
+    -80,
+    0
+   ],
+   "op": 0.16,
+   "y": 600,
+   "plate_src": "m3lee"
+  },
+  {
+   "file": "layers/stove-glow.webp",
+   "px": [
+    728,
+    734
+   ],
+   "channels": 4,
+   "kb": 140.4,
+   "decoded_mb": 2.04,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    15,
+    346
+   ],
+   "op": 0.3
+  },
+  {
+   "file": "layers/stove-fire-mask.png",
+   "px": [
+    78,
+    79
+   ],
+   "channels": 1,
+   "kb": 3.2,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    321,
+    702
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 926.1,
+  "mp4_kb": 461.0,
+  "decoded_mb": 15.8,
+  "n_layers": 5,
+  "n_animated": 4
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "mp4_encode": "libx264 preset slow -qp 20 -x264-params ipratio=1.0:pbratio=1.0, keyframes at frame 0 and last frame (re-encoded from frames/ev_a3_lee_v2 via heavy.sh; CRF16 encode moved to scn3e/rejected)",
+ "packaged": {
+  "layers": "art/v2/bg/a3-evlee2-layers.json",
+  "loop": "art/v2/bg/a3-evlee2-living.mp4",
+  "preview": "art/v2/bg/a3-evlee2-living-preview.webp"
+ }
+}
