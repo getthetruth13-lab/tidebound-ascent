@@ -361,14 +361,14 @@
    "hoverPx": 0
   },
   "diver": {
-   "file": "sprites/diver.webp",
-   "w": 1057,
-   "h": 1372,
-   "bytes": 1110204,
+   "file": "sprites/diver-a2-r86.webp",
+   "w": 2024,
+   "h": 1498,
+   "bytes": 440990,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.494,
+    "x": 0.57,
     "y": 1.0
    },
    "screenHeightPct": 50,
@@ -389,14 +389,14 @@
    "hoverPx": 0
   },
   "kettleman": {
-   "file": "sprites/kettleman.webp",
-   "w": 1589,
-   "h": 1270,
-   "bytes": 889996,
+   "file": "sprites/kettleman-a2-r88.webp",
+   "w": 2243,
+   "h": 1461,
+   "bytes": 452950,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.442,
+    "x": 0.43,
     "y": 1.0
    },
    "screenHeightPct": 40,
@@ -431,14 +431,14 @@
    "hoverPx": 0
   },
   "gateplate": {
-   "file": "sprites/gateplate-a2-r41.webp",
-   "w": 1438,
-   "h": 1337,
-   "bytes": 906132,
+   "file": "sprites/gateplate-a2-r89.webp",
+   "w": 2001,
+   "h": 1625,
+   "bytes": 418370,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.414,
+    "x": 0.39,
     "y": 1.0
    },
    "screenHeightPct": 30,
@@ -501,14 +501,14 @@
    "hoverPx": 0
   },
   "sluiceeng": {
-   "file": "sprites/sluiceeng-a2-r41.webp",
-   "w": 855,
-   "h": 1371,
-   "bytes": 632146,
+   "file": "sprites/sluiceeng-a2-r86.webp",
+   "w": 2241,
+   "h": 1597,
+   "bytes": 358584,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.434,
+    "x": 0.39,
     "y": 1.0
    },
    "screenHeightPct": 44,
@@ -613,14 +613,14 @@
    "hoverPx": 0
   },
   "hgunner": {
-   "file": "sprites/hgunner.webp",
-   "w": 1434,
-   "h": 1338,
-   "bytes": 620816,
+   "file": "sprites/hgunner-a2-r86.webp",
+   "w": 1940,
+   "h": 1595,
+   "bytes": 412962,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.56,
+    "x": 0.55,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -711,14 +711,14 @@
    "hoverPx": 0
   },
   "anchorite": {
-   "file": "sprites/anchorite-a3-r41.webp",
-   "w": 1618,
-   "h": 1334,
-   "bytes": 661804,
+   "file": "sprites/anchorite-a3-r87.webp",
+   "w": 1995,
+   "h": 1420,
+   "bytes": 341644,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.444,
+    "x": 0.51,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -781,14 +781,14 @@
    "hoverPx": 0
   },
   "automaton": {
-   "file": "sprites/automaton-a3-r41.webp",
-   "w": 936,
-   "h": 1320,
-   "bytes": 662010,
+   "file": "sprites/automaton-a3-r87.webp",
+   "w": 2009,
+   "h": 1345,
+   "bytes": 300154,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.522,
+    "x": 0.44,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -809,14 +809,14 @@
    "hoverPx": 40
   },
   "shardcarrier": {
-   "file": "sprites/shardcarrier-a3-r41.webp",
-   "w": 818,
-   "h": 1357,
-   "bytes": 513176,
+   "file": "sprites/shardcarrier-a3-r88.webp",
+   "w": 2027,
+   "h": 1522,
+   "bytes": 296122,
    "role": "summon",
    "facing": "left",
    "anchor": {
-    "x": 0.447,
+    "x": 0.53,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -837,14 +837,14 @@
    "hoverPx": 40
   },
   "ringcharge": {
-   "file": "sprites/ringcharge-a3-r41.webp",
-   "w": 1588,
-   "h": 1328,
-   "bytes": 1034640,
+   "file": "sprites/ringcharge-a3-r90.webp",
+   "w": 2126,
+   "h": 1515,
+   "bytes": 342950,
    "role": "summon",
    "facing": "left",
    "anchor": {
-    "x": 0.429,
+    "x": 0.47,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -864,15 +864,15 @@
    "screenHeightPct": 42
   },
   "magus": {
-   "file": "sprites/magus-a3-r42.webp",
-   "w": 1025,
-   "h": 1423,
-   "bytes": 540386,
+   "file": "sprites/magus-a3-r90.webp",
+   "w": 2124,
+   "h": 1520,
+   "bytes": 312396,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.567,
-    "y": 1
+    "x": 0.42,
+    "y": 1.0
    },
    "screenHeightPct": 42
   },
@@ -1017,14 +1017,14 @@
    "hoverPx": 0
   },
   "engine": {
-   "file": "sprites/engine-a3-r62.webp",
-   "w": 1374,
-   "h": 1369,
-   "bytes": 932728,
+   "file": "sprites/engine-a3-r88.webp",
+   "w": 2189,
+   "h": 1643,
+   "bytes": 417162,
    "role": "boss",
    "facing": "left",
    "anchor": {
-    "x": 0.499,
+    "x": 0.38,
     "y": 1.0
    },
    "screenHeightPct": 42,

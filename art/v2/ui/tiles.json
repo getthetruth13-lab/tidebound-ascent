@@ -9,11 +9,11 @@
    ]
   },
   "sprite-sluiceeng": {
-   "path": "art/v2/sprites/sluiceeng-a2-r41.webp",
+   "path": "art/v2/sprites/sluiceeng-a2-r86.webp",
    "transparent": true,
    "size": [
-    855,
-    1371
+    2241,
+    1597
    ]
   },
   "sprite-mortar": {
@@ -33,11 +33,11 @@
    ]
   },
   "sprite-gateplate": {
-   "path": "art/v2/sprites/gateplate-a2-r41.webp",
+   "path": "art/v2/sprites/gateplate-a2-r89.webp",
    "transparent": true,
    "size": [
-    1438,
-    1337
+    2001,
+    1625
    ]
   },
   "sprite-pylon": {
