@@ -403,14 +403,14 @@
    "hoverPx": 0
   },
   "lice": {
-   "file": "sprites/lice.webp",
-   "w": 2214,
-   "h": 907,
-   "bytes": 1042606,
+   "file": "sprites/lice-a2-r80.webp",
+   "w": 2272,
+   "h": 1182,
+   "bytes": 336368,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.546,
+    "x": 0.29,
     "y": 1.0
    },
    "screenHeightPct": 32,
@@ -515,14 +515,14 @@
    "hoverPx": 0
   },
   "ghostcannon": {
-   "file": "sprites/ghostcannon-a2-r72.webp",
-   "w": 2257,
-   "h": 1437,
-   "bytes": 481816,
+   "file": "sprites/ghostcannon-a2-r83.webp",
+   "w": 2248,
+   "h": 1423,
+   "bytes": 442104,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.48,
+    "x": 0.53,
     "y": 1.0
    },
    "screenHeightPct": 34,
@@ -571,14 +571,14 @@
    "hoverPx": 0
   },
   "dummy": {
-   "file": "sprites/dummy-a2-r41.webp",
-   "w": 1539,
-   "h": 1351,
-   "bytes": 497926,
+   "file": "sprites/dummy-a2-r85.webp",
+   "w": 2027,
+   "h": 1606,
+   "bytes": 299330,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.634,
+    "x": 0.53,
     "y": 1.0
    },
    "screenHeightPct": 34,
@@ -599,14 +599,14 @@
    "hoverPx": 0
   },
   "grell": {
-   "file": "sprites/grell.webp",
-   "w": 921,
-   "h": 1386,
-   "bytes": 654204,
+   "file": "sprites/grell-a2-r84.webp",
+   "w": 1406,
+   "h": 1959,
+   "bytes": 307360,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.65,
+    "x": 0.53,
     "y": 1.0
    },
    "screenHeightPct": 48,
@@ -641,14 +641,14 @@
    "hoverPx": 0
   },
   "chorister": {
-   "file": "sprites/chorister.webp",
-   "w": 904,
-   "h": 1252,
-   "bytes": 649372,
+   "file": "sprites/chorister-a2-r81.webp",
+   "w": 2129,
+   "h": 1605,
+   "bytes": 425256,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.51,
+    "x": 0.48,
     "y": 1.0
    },
    "screenHeightPct": 38,
@@ -697,14 +697,14 @@
    "hoverPx": 0
   },
   "battery": {
-   "file": "sprites/battery-a2-r72.webp",
-   "w": 2093,
-   "h": 1596,
-   "bytes": 575252,
+   "file": "sprites/battery-a2-r85.webp",
+   "w": 2085,
+   "h": 1584,
+   "bytes": 418348,
    "role": "boss",
    "facing": "left",
    "anchor": {
-    "x": 0.452,
+    "x": 0.5,
     "y": 1.0
    },
    "screenHeightPct": 66,
@@ -877,14 +877,14 @@
    "screenHeightPct": 42
   },
   "cloudserpent": {
-   "file": "sprites/cloudserpent-a3-r62.webp",
-   "w": 1923,
-   "h": 1592,
-   "bytes": 963552,
+   "file": "sprites/cloudserpent-a3-r83.webp",
+   "w": 1998,
+   "h": 1478,
+   "bytes": 205728,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.45,
+    "x": 0.46,
     "y": 1.0
    },
    "screenHeightPct": 42,

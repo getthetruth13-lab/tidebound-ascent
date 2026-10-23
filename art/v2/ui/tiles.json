@@ -1,11 +1,11 @@
 {
  "swapSlots": {
   "sprite-battery": {
-   "path": "art/v2/sprites/battery-a2-r72.webp",
+   "path": "art/v2/sprites/battery-a2-r85.webp",
    "transparent": true,
    "size": [
-    2093,
-    1596
+    2085,
+    1584
    ]
   },
   "sprite-sluiceeng": {
@@ -25,11 +25,11 @@
    ]
   },
   "sprite-ghostcannon": {
-   "path": "art/v2/sprites/ghostcannon-a2-r72.webp",
+   "path": "art/v2/sprites/ghostcannon-a2-r83.webp",
    "transparent": true,
    "size": [
-    2257,
-    1437
+    2248,
+    1423
    ]
   },
   "sprite-gateplate": {
@@ -49,11 +49,11 @@
    ]
   },
   "sprite-dummy": {
-   "path": "art/v2/sprites/dummy-a2-r41.webp",
+   "path": "art/v2/sprites/dummy-a2-r85.webp",
    "transparent": true,
    "size": [
-    1539,
-    1351
+    2027,
+    1606
    ]
   },
   "sprite-shellguard": {
