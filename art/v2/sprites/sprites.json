@@ -875,6 +875,20 @@
     "y": 1
    },
    "screenHeightPct": 42
+  },
+  "cloudserpent": {
+   "file": "sprites/cloudserpent-a3-r62.webp",
+   "w": 1923,
+   "h": 1592,
+   "bytes": 963552,
+   "role": "normal",
+   "facing": "left",
+   "anchor": {
+    "x": 0.45,
+    "y": 1.0
+   },
+   "screenHeightPct": 42,
+   "hoverPx": 0
   }
  }
 }
