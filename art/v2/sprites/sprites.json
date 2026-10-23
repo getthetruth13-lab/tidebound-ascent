@@ -515,28 +515,28 @@
    "hoverPx": 0
   },
   "ghostcannon": {
-   "file": "sprites/ghostcannon-a2-r43.webp",
-   "w": 2106,
-   "h": 1349,
-   "bytes": 1187184,
+   "file": "sprites/ghostcannon-a2-r72.webp",
+   "w": 2257,
+   "h": 1437,
+   "bytes": 481816,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.479,
-    "y": 1
+    "x": 0.48,
+    "y": 1.0
    },
    "screenHeightPct": 34,
    "hoverPx": 0
   },
   "mortar": {
-   "file": "sprites/mortar-a2-r41.webp",
-   "w": 2013,
-   "h": 1345,
-   "bytes": 1127304,
+   "file": "sprites/mortar-a2-r71.webp",
+   "w": 2066,
+   "h": 1518,
+   "bytes": 366650,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.435,
+    "x": 0.48,
     "y": 1.0
    },
    "screenHeightPct": 30,
@@ -585,14 +585,14 @@
    "hoverPx": 0
   },
   "hauler": {
-   "file": "sprites/hauler.webp",
-   "w": 1941,
-   "h": 825,
-   "bytes": 685794,
+   "file": "sprites/hauler-a2-r74.webp",
+   "w": 2427,
+   "h": 965,
+   "bytes": 364812,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.55,
+    "x": 0.32,
     "y": 1.0
    },
    "screenHeightPct": 30,
@@ -669,15 +669,15 @@
    "hoverPx": 0
   },
   "colossus": {
-   "file": "sprites/colossus-a2-r58.webp",
-   "w": 1643,
-   "h": 1279,
-   "bytes": 388112,
+   "file": "sprites/colossus-a2-r75.webp",
+   "w": 1872,
+   "h": 1871,
+   "bytes": 526662,
    "role": "boss",
    "facing": "left",
    "anchor": {
-    "x": 0.468,
-    "y": 0.998
+    "x": 0.55,
+    "y": 1.0
    },
    "screenHeightPct": 72,
    "hoverPx": 0
@@ -697,14 +697,14 @@
    "hoverPx": 0
   },
   "battery": {
-   "file": "sprites/battery-a2-r41.webp",
-   "w": 1008,
-   "h": 1414,
-   "bytes": 679718,
+   "file": "sprites/battery-a2-r72.webp",
+   "w": 2093,
+   "h": 1596,
+   "bytes": 575252,
    "role": "boss",
    "facing": "left",
    "anchor": {
-    "x": 0.443,
+    "x": 0.452,
     "y": 1.0
    },
    "screenHeightPct": 66,
@@ -905,14 +905,14 @@
    "hoverPx": 0
   },
   "petrel": {
-   "file": "sprites/petrel-a3-r62.webp",
-   "w": 1866,
-   "h": 1170,
-   "bytes": 742054,
+   "file": "sprites/petrel-a3-r74.webp",
+   "w": 1936,
+   "h": 1928,
+   "bytes": 574688,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.592,
+    "x": 0.39,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -947,14 +947,14 @@
    "hoverPx": 0
   },
   "slinger": {
-   "file": "sprites/slinger-a3-r62.webp",
-   "w": 1360,
-   "h": 1309,
-   "bytes": 733496,
+   "file": "sprites/slinger-a3-r74.webp",
+   "w": 1626,
+   "h": 2031,
+   "bytes": 451498,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.499,
+    "x": 0.47,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -975,14 +975,14 @@
    "hoverPx": 0
   },
   "ringveil": {
-   "file": "sprites/ringveil-a3-r62.webp",
-   "w": 664,
-   "h": 1375,
-   "bytes": 474474,
+   "file": "sprites/ringveil-a3-r74.webp",
+   "w": 2422,
+   "h": 1257,
+   "bytes": 443038,
    "role": "summon",
    "facing": "left",
    "anchor": {
-    "x": 0.55,
+    "x": 0.4,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -1031,14 +1031,14 @@
    "hoverPx": 0
   },
   "thalassa": {
-   "file": "sprites/thalassa-a3-r62.webp",
-   "w": 1393,
-   "h": 2121,
-   "bytes": 925274,
+   "file": "sprites/thalassa-a3-r75.webp",
+   "w": 1634,
+   "h": 2085,
+   "bytes": 454310,
    "role": "boss",
    "facing": "left",
    "anchor": {
-    "x": 0.609,
+    "x": 0.53,
     "y": 1.0
    },
    "screenHeightPct": 42,

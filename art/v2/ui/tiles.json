@@ -1,11 +1,11 @@
 {
  "swapSlots": {
   "sprite-battery": {
-   "path": "art/v2/sprites/battery-a2-r41.webp",
+   "path": "art/v2/sprites/battery-a2-r72.webp",
    "transparent": true,
    "size": [
-    1008,
-    1414
+    2093,
+    1596
    ]
   },
   "sprite-sluiceeng": {
@@ -17,19 +17,19 @@
    ]
   },
   "sprite-mortar": {
-   "path": "art/v2/sprites/mortar-a2-r41.webp",
+   "path": "art/v2/sprites/mortar-a2-r71.webp",
    "transparent": true,
    "size": [
-    2013,
-    1345
+    2066,
+    1518
    ]
   },
   "sprite-ghostcannon": {
-   "path": "art/v2/sprites/ghostcannon-a2-r43.webp",
+   "path": "art/v2/sprites/ghostcannon-a2-r72.webp",
    "transparent": true,
    "size": [
-    2106,
-    1349
+    2257,
+    1437
    ]
   },
   "sprite-gateplate": {
@@ -65,11 +65,11 @@
    ]
   },
   "sprite-colossus": {
-   "path": "art/v2/sprites/colossus-a2-r58.webp",
+   "path": "art/v2/sprites/colossus-a2-r75.webp",
    "transparent": true,
    "size": [
-    1643,
-    1279
+    1872,
+    1871
    ]
   },
   "tc-a2": {
