@@ -19,9 +19,9 @@ const rubble=r=>`<svg class="deco collapsed" viewBox="0 0 60 30" aria-hidden="tr
 const flood=r=>`<svg class="deco flooded" viewBox="0 0 80 30" aria-hidden="true"><path d="M6 17Q4 7 22 6T58 7Q78 9 74 19T48 27Q14 29 6 17z" fill="#3f8fa0aa" stroke="#1f5560" stroke-width="1.5" opacity=".95"/><g fill="none" stroke="#2f6f7c" stroke-width="1.2" stroke-linecap="round" opacity=".8"><path d="M14 13q5-4 10 0t10 0t10 0M24 20q5-4 10 0t10 0t10 0"/></g></svg>`;
 // ---- Acts 2 and 3: the map is a different object (D-A2-06/13). Act 2 = riveted iron plate with ward banners and Gate sigils; Act 3 = a stormglass weather chart with the painted Eye.
 // Cosmetic only: each later act uses its reviewed map plate.
-function a3Layers(){return '<div class="a2box" aria-hidden="true"><img class="a2plate" src="art/v2/map/map-a3-plate.webp" alt="" draggable="false"><img class="a3eye" src="art/v2/map/map-a3-eye-glow.webp" alt="" draggable="false" style="left:30%;top:41.59375%;width:40%;height:22.5%;mix-blend-mode:screen;opacity:.12"></div>'}
+function a3Layers(){return '<div class="a2box" aria-hidden="true"><img class="a2plate" src="art/v2/map/map-a3-plate.webp" alt="" draggable="false"><img class="a3eye" src="art/v2/map/map-a3-eye-glow.webp" alt="" draggable="false" style="left:30%;top:41.59375%;width:40%;height:22.5%;mix-blend-mode:screen;opacity:.20"></div>'}
 function a3Under(d){return `<path d="${d}" fill="none" stroke="#0e121a" stroke-width="5" opacity=".43" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`}
-function a3Path(d,lit,live){return a3Under(d)+`<path d="${d}" fill="none" stroke="${lit?'#e6c784':'#dfe7ec'}" stroke-width="${lit?3:2.4}" ${lit?'':'stroke-dasharray="7 5"'} opacity="${lit?1:live?.9:.65}" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`}
+function a3Path(d,lit){return `<path d="${d}" fill="none" stroke="${lit?'#7c1f2c':'#4a3a22'}" stroke-width="${lit?3.5:2}" stroke-dasharray="${lit?'':'2 7'}" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity="${lit?.9:.7}"/>`} // v0.6.77 map_a3-v4: Act 1 ink route style (as line 54); the old pale a3Path vanished on the paper plate
 function mapDeco(run,rows,X,Y,N,H,a1){if((run.act||1)>1)return {svg:'',html:''};const W=400,full=N*H+30+TOP+BOT,rnd=rng((run.seed|0)^0x5eed);let svg='',html='';
  // terrace contour lines every other row gap, wandering a little
  for(let r=0;r<N-1;r+=2){const y=Y(r)-H/2+(rnd()-.5)*12;let d=`M-10 ${y}`;for(let x=0;x<=W+20;x+=40)d+=` Q${x+14} ${y+(rnd()-.5)*14} ${x+40} ${y+(rnd()-.5)*8}`;
@@ -55,7 +55,7 @@ export function mapHTML(interactive){const run=W.run,rows=run.map,H=74,N=rows.le
   // Act 3 Updrafts: a dashed white-gold wind-arrow that skips one row (ACT3-DESIGN s3)
   (n.up||[]).forEach(j=>{const m=rows[r+2][j];const x2=X(m,r+2,j),y2=Y(r+2);const on=run.vis[r+':'+i]&&run.vis[(r+2)+':'+j];const mx=(x+x2)/2+(x2>=x?16:-16);
    const scale=painted?A2_W/100:4,ud=`M${x*scale} ${y} Q${mx*scale} ${(y+y2)/2} ${x2*scale} ${y2}`;
-   svg+=a3Under(ud)+`<path d="${ud}" fill="none" stroke="${on?'#f2dc9b':'#e8e1c4'}" stroke-width="${on?3:2.4}" stroke-dasharray="7 6" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity="${on?.95:.8}"/>`;
+   svg+=`<path d="${ud}" fill="none" stroke="${on?'#7c1f2c':'#4a3a22'}" stroke-width="${on?3.5:2}" stroke-dasharray="7 6" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity="${on?.9:.7}"/>`;/*v0.6.77: Act 1 ink palette; the longer 7/6 dash keeps the skip-a-floor read*/
    html_up.push(`<i class="updraft" style="left:${mx}%;top:${(y+y2)/2}px" title="Updraft: skips a floor"></i>`)});
   if(!painted)land+=`<i class="ldg${n.t==='boss'?' boss':''}" style="left:${x}%;top:${y+(n.t==='boss'?22:15)}px"></i>`;
   const next=interactive&&r===run.pos.r+1;const upAv=interactive&&r===run.pos.r+2&&reachableUp().includes(i);const isAv=(next&&av.includes(i))||upAv,bootsAv=next&&!isAv&&boots,vis=run.vis[r+':'+i];

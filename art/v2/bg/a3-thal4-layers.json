@@ -1,0 +1,85 @@
+{
+ "scene": "a3_lair_thalassa-v4",
+ "canvas": [
+  2340,
+  1080
+ ],
+ "foot_y": 586,
+ "hero_x": 570,
+ "layers": [
+  {
+   "file": "layers/solids-baked.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "kb": 223.1,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "baked painted plate (new candidate thal4_c2: ruined circular dais hall, cracked flagstone dais to the bottom edge, crisp painted colonnades/arches in teal fog, one falling-water column); static, Act 1 solids-baked pattern"
+  },
+  {
+   "file": "layers/mist-far.webp",
+   "px": [
+    1638,
+    460
+   ],
+   "kb": 236.8,
+   "decoded_mb": 3.01,
+   "animated": true,
+   "reason": "far mist band drifting left across the ruined colonnades (own painted plate d38077ff; tile 1.4x W so the drift never exposes an edge) [half res, game scales x2]"
+  },
+  {
+   "file": "layers/mist-floor.webp",
+   "px": [
+    1521,
+    428
+   ],
+   "kb": 210.0,
+   "decoded_mb": 2.6,
+   "animated": true,
+   "reason": "thin mist drifting right along the dais rim (same own plate, flipped, low; tile 1.3x W) [half res, game scales x2]"
+  },
+  {
+   "file": "layers/accent-glow-mask.png",
+   "px": [
+    184,
+    566
+   ],
+   "kb": 11.4,
+   "decoded_mb": 0.1,
+   "animated": true,
+   "reason": "the single brightest falling column pulses softly (the one accent); place at (1389,0)"
+  }
+ ],
+ "authored_layers": 4,
+ "composited_layer_count": 6,
+ "game_layers": [
+  "fighters (game sprites)",
+  "hud (game)"
+ ],
+ "draw_order": [
+  "solids-baked",
+  "mist-far",
+  "accent glow",
+  "mist-floor",
+  "fighters",
+  "hud"
+ ],
+ "animated_effects": [
+  "mist-far",
+  "mist-floor",
+  "glow"
+ ],
+ "animated_effect_count": 3,
+ "total_asset_kb": 681.3,
+ "decoded_memory_mb": 15.8,
+ "mp4_kb": 1983.6,
+ "note": "Solids are one baked painted plate (Act 1 solids-baked pattern) and never move; every mover is a painted plate.",
+ "packaged": {
+  "layers": "art/v2/bg/a3-thal4-layers.json",
+  "preview": "art/v2/bg/a3-thal4-living-preview.webp",
+  "loop": null,
+  "note": "loop rendered in-game from the layers; mist-floor not wired (drifted under the feet)"
+ }
+}

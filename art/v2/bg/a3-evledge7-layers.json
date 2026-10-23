@@ -1,0 +1,266 @@
+{
+ "id": "ev_a3_ledge",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 87.4,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate 3472c067 (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers); v7: copied rock block x0-660 y530-900 (v6 copy at +686,+32) replaced from the plate's own rock with offsets/flips only + streaky join x560-700 cleaned; also 3 older tiled repeats found by a whole-plate scan replaced (bottom band x1384-2340 y856-1080, sky cloud copy x1812-1990 y55-445) (_src/v7/declone7.py)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-lantern.webp",
+   "px": [
+    171,
+    406
+   ],
+   "channels": 4,
+   "kb": 13.3,
+   "decoded_mb": 0.26,
+   "animated": true,
+   "reason": "storm lantern in its iron-and-glass cage hanging on a short chain from the post arm: the scene accent; sways a little in the wind (real mover, pivot at the arm hook)",
+   "place": [
+    1822,
+    39
+   ],
+   "parallax": 0.4,
+   "role": "mid",
+   "effect": "sway",
+   "pivot_px": [
+    79.25,
+    16.6640625
+   ],
+   "amp_deg": 1.6,
+   "note": "rotates about pivot, sin over the 6 s loop; only real mover (hanging chain)"
+  },
+  {
+   "file": "layers/mid-rope-coil.webp",
+   "px": [
+    178,
+    135
+   ],
+   "channels": 4,
+   "kb": 5.7,
+   "decoded_mb": 0.09,
+   "animated": false,
+   "reason": "coiled hemp rope (painted, keyed from plate l4props) lying on the left extension rock (x~236-414), left of the hero slot and the card zone, attached baked contact shadow",
+   "place": [
+    236,
+    560
+   ],
+   "parallax": 0.4,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-mug.webp",
+   "px": [
+    146,
+    103
+   ],
+   "channels": 4,
+   "kb": 3.4,
+   "decoded_mb": 0.06,
+   "animated": false,
+   "reason": "battered tin mug (painted, keyed from plate l4props) standing on the right rock shelf by the post, attached contact shadow; moved out of the card-hand strip",
+   "place": [
+    2167,
+    467
+   ],
+   "parallax": 0.4,
+   "role": "mid"
+  },
+  {
+   "file": "layers/cloud-high.webp",
+   "px": [
+    2340,
+    338
+   ],
+   "channels": 4,
+   "kb": 340.5,
+   "decoded_mb": 3.02,
+   "animated": true,
+   "reason": "painted effect plate m4ledge (wind R->L 170 px/6s), screen/alpha=luminance, screen y=0 h=330",
+   "effect": "mist",
+   "vec": [
+    -170,
+    0
+   ],
+   "op": 0.2,
+   "y": 0,
+   "plate_src": "m4ledge",
+   "mask": "layers/cloud-high-vm.webp",
+   "mask_r": [
+    0,
+    0,
+    2340,
+    338
+   ],
+   "mask_note": "static alpha mask (white RGB + alpha, quarter res, lossless) stretched 100%x100% over the plate window r, as env-living.js plates() applies p.mask (same format as the evlee2 entries in environments.js). = the EFFECTIVE v6 MP4 mist zone (cfg3e_v6 region rect blurred rfeather x quiet x lip_mask_mul) x the vertical fade vf(fa,fb) x 0 in the card zone x690-1650 y170-820 (feathered outside it) x 0 for y<160 (ramp to y200) x 0 on the props (lantern incl. sway sweep, mug, rope). _src/v7/mask7.py",
+   "game_plate": {
+    "kind": "tile",
+    "f": "art/v2/bg/a3-evledge7-cloud-high.webp",
+    "r": [
+     0,
+     0,
+     2340,
+     338
+    ],
+    "tile": [
+     2340,
+     338
+    ],
+    "loop": [
+     -1,
+     0
+    ],
+    "period": 82.59,
+    "op": 0.2,
+    "phase": 0,
+    "mask": "art/v2/bg/a3-evledge7-cloud-high-vm.webp"
+   }
+  },
+  {
+   "file": "layers/cloud-high-vm.webp",
+   "px": [
+    585,
+    84
+   ],
+   "channels": 4,
+   "kb": 1.1,
+   "decoded_mb": 0.19,
+   "animated": false,
+   "role": "mask",
+   "mask_for": "layers/cloud-high.webp",
+   "reason": "mist mask for the cloud-high tile plate (see its \"mask\" field)"
+  },
+  {
+   "file": "layers/cloud-drop.webp",
+   "px": [
+    2340,
+    788
+   ],
+   "channels": 4,
+   "kb": 518.4,
+   "decoded_mb": 7.03,
+   "animated": true,
+   "reason": "painted effect plate m4ledge (wind R->L 180 px/6s), screen/alpha=luminance, screen y=300 h=780",
+   "effect": "mist",
+   "vec": [
+    -180,
+    0
+   ],
+   "op": 0.26,
+   "y": 300,
+   "plate_src": "m4ledge",
+   "mask": "layers/cloud-drop-vm.webp",
+   "mask_r": [
+    0,
+    300,
+    2340,
+    780
+   ],
+   "mask_note": "static alpha mask (white RGB + alpha, quarter res, lossless) stretched 100%x100% over the plate window r, as env-living.js plates() applies p.mask (same format as the evlee2 entries in environments.js). = the EFFECTIVE v6 MP4 mist zone (cfg3e_v6 region rect blurred rfeather x quiet x lip_mask_mul) x the vertical fade vf(fa,fb) x 0 in the card zone x690-1650 y170-820 (feathered outside it) x 0 for y<160 (ramp to y200) x 0 on the props (lantern incl. sway sweep, mug, rope). _src/v7/mask7.py",
+   "game_plate": {
+    "kind": "tile",
+    "f": "art/v2/bg/a3-evledge7-cloud-drop.webp",
+    "r": [
+     0,
+     300,
+     2340,
+     780
+    ],
+    "tile": [
+     2340,
+     780
+    ],
+    "loop": [
+     -1,
+     0
+    ],
+    "period": 78.0,
+    "op": 0.26,
+    "phase": 0,
+    "mask": "art/v2/bg/a3-evledge7-cloud-drop-vm.webp"
+   }
+  },
+  {
+   "file": "layers/cloud-drop-vm.webp",
+   "px": [
+    585,
+    195
+   ],
+   "channels": 4,
+   "kb": 2.2,
+   "decoded_mb": 0.44,
+   "animated": false,
+   "role": "mask",
+   "mask_for": "layers/cloud-drop.webp",
+   "reason": "mist mask for the cloud-drop tile plate (see its \"mask\" field)"
+  },
+  {
+   "file": "layers/lantern-glow.webp",
+   "px": [
+    535,
+    545
+   ],
+   "channels": 4,
+   "kb": 76.0,
+   "decoded_mb": 1.11,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    1648,
+    49
+   ],
+   "op": 0.32
+  },
+  {
+   "file": "layers/lantern-flame-mask.png",
+   "px": [
+    66,
+    67
+   ],
+   "channels": 1,
+   "kb": 2.4,
+   "decoded_mb": 0.0,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1872,
+    305
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 1050.4,
+  "mp4_kb": 315.3,
+  "decoded_mb": 19.4,
+  "n_layers": 10,
+  "n_animated": 5,
+  "mp4_note": "mp4_kb = the v6 reference MP4 (ev_a3_ledge-v6-living.mp4, 322,874 B; v6 layers.json said 605.1, wrong). NO v7 MP4 was encoded (disk ~1.9 GB free); the preview MP4 must be re-encoded from the v7 layers after the disk is cleared."
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "mp4_encode": "NOT encoded in v7 (disk). Re-encode needed after disk cleanup; v6 settings: libx264 preset slow -qp 20, ONE GOP (keyframe at frame 0 only, no forced last-frame keyframe; -g 600 -sc_threshold 0, ipratio/pbratio 1.0); re-encoded from frames/ev_a3_ledge_v6 via heavy.sh; default encode moved to scn3e/rejected",
+ "ver": "v7",
+ "wiring_note": "wire-ev-a3-67.py ignores layers.json masks (it rebuilds its own ZONES[\"ledge\"] x vfade(.35,.75) mask from the OLD cfg3e regions, which put mist over the card zone); wire v7 with the -vm masks here.",
+ "packaged": {
+  "layers": "art/v2/bg/a3-evledge7-layers.json",
+  "loop": "art/v2/bg/a3-evledge7-living.mp4",
+  "preview": "art/v2/bg/a3-evledge7-living-preview.webp"
+ }
+}

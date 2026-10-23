@@ -459,10 +459,10 @@
    "hoverPx": 0
   },
   "lamplighter": {
-   "file": "sprites/lamplighter-a2-r100.webp",
+   "file": "sprites/lamplighter-a2-r100-c77.webp",
    "w": 1881,
    "h": 1486,
-   "bytes": 479386,
+   "bytes": 449506,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -823,10 +823,10 @@
    "hoverPx": 0
   },
   "jelly": {
-   "file": "sprites/jelly-a3-r98.webp",
+   "file": "sprites/jelly-a3-r98-c77.webp",
    "w": 2288,
    "h": 1068,
-   "bytes": 324462,
+   "bytes": 307232,
    "role": "normal",
    "facing": "left",
    "anchor": {

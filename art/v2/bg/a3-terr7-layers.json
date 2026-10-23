@@ -144,7 +144,8 @@
    "place_xy": [
     1000,
     290
-   ]
+   ],
+   "disabled_in_game": "v0.6.77: off (near-white hot spot / lightning-like flash)"
   },
   {
    "file": "layers/sheet-glow.webp",
@@ -161,7 +162,8 @@
    "place_xy": [
     880,
     120
-   ]
+   ],
+   "disabled_in_game": "v0.6.77: off (near-white hot spot / lightning-like flash)"
   },
   {
    "file": "layers/water-threads-atlas.png",
@@ -223,5 +225,6 @@
  "webp_kb": 2661.2,
  "decoded_memory_mb_measured_from_exported_pixel_dims": 25.3,
  "loop_seconds": 12.0,
- "note": "decoded MB = w*h*4 for RGB(A), w*h*1 for single-channel; fighters/HUD game-owned; tile layers repeat (hail xy, cloud/mist x)"
+ "note": "decoded MB = w*h*4 for RGB(A), w*h*1 for single-channel; fighters/HUD game-owned; tile layers repeat (hail xy, cloud/mist x)",
+ "v0677_note": "dawn-glow and sheet-glow disabled in game (removed from living plates; files archived)"
 }

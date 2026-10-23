@@ -3094,5 +3094,45 @@
    768,
    576
   ]
+ },
+ "tendcut": {
+  "art": "art/v2/cards/tendcut.webp",
+  "thumb": "art/v2/cards/tendcut-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "oldscars": {
+  "art": "art/v2/cards/oldscars.webp",
+  "thumb": "art/v2/cards/oldscars-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "patchedguard": {
+  "art": "art/v2/cards/patchedguard.webp",
+  "thumb": "art/v2/cards/patchedguard-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "honing": {
+  "art": "art/v2/cards/honing.webp",
+  "thumb": "art/v2/cards/honing-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "prisedefer": {
+  "art": "art/v2/cards/prisedefer.webp",
+  "thumb": "art/v2/cards/prisedefer-256.webp",
+  "size": [
+   768,
+   576
+  ]
  }
 }

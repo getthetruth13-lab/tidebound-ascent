@@ -48,10 +48,18 @@ function plates(box,L,W,H){
    if(p.blend)e.style.mixBlendMode=p.blend;
    if(p.op!=null)e.style.setProperty('--m',p.op);box.appendChild(e);continue}
   const [tw,th]=p.tile,[sx,sy]=p.loop,iw=r[2]+(sx?tw:0),ih=r[3]+(sy?th:0),box2=el('i','envlv-clip'+(p.cls?' '+p.cls:''),`position:absolute;left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};overflow:hidden;opacity:${p.op}`);
-  const fx=sx>0?-tw:0,tx=sx<0?-tw:0,fy=sy>0?-th:0,ty=sy<0?-th:0,e=el('i','envlv-a envlv-tile',`left:0;top:0;width:${P(iw,r[2])};height:${P(ih,r[3])};background:url("${p.f}") 0 0/${P(tw,iw)} ${P(th,ih)} repeat;--fx:${(fx/iw*100).toFixed(4)}%;--fy:${(fy/ih*100).toFixed(4)}%;--tx:${(tx/iw*100).toFixed(4)}%;--ty:${(ty/ih*100).toFixed(4)}%;animation:envlv-tile ${p.period}s linear ${(-(p.phase||0)*p.period).toFixed(2)}s infinite`);
+  let e;if(p.vel){ // v0.6.77 rain fix: per-axis speed in scene px/s (vel:[vx,vy]). The outer layer moves one tile on x every tw/|vx| s and an inner child one tile on y every th/|vy| s,
+   // so the fall speed and slant match the package (the plain loop below locks both axes to one tile per period, i.e. the slant to the tile aspect).
+   const [vx,vy]=p.vel,ax=vx?(vx<0?-1:1):0,ay=vy?(vy<0?-1:1):0,ph=p.phase||0,T=(v,t)=>Math.abs(t/v);
+   const k=(a,t,n)=>{const f=a>0?-t:0,to=a<0?-t:0;return [(f/n*100).toFixed(4)+'%',(to/n*100).toFixed(4)+'%']};
+   const [fx,tx]=k(ax,tw,iw),[fy,ty]=k(ay,th,ih);
+   e=el('i','envlv-a envlv-tile',`left:0;top:0;width:${P(iw,r[2])};height:${P(ih,r[3])};--fx:${fx};--tx:${tx};--fy:0%;--ty:0%;`+(vx?`animation:envlv-tile ${T(vx,tw).toFixed(3)}s linear ${(-ph*T(vx,tw)).toFixed(2)}s infinite`:''));
+   e.dataset.vel=vx+','+vy;
+   e.appendChild(el('i','envlv-tiley',`left:0;top:0;width:100%;height:100%;background:url("${p.f}") 0 0/${P(tw,iw)} ${P(th,ih)} repeat;will-change:transform;--fx:0%;--tx:0%;--fy:${fy};--ty:${ty};`+(vy?`animation:envlv-tile ${T(vy,th).toFixed(3)}s linear ${(-ph*T(vy,th)).toFixed(2)}s infinite`:'')))}
+  else{const fx=sx>0?-tw:0,tx=sx<0?-tw:0,fy=sy>0?-th:0,ty=sy<0?-th:0;e=el('i','envlv-a envlv-tile',`left:0;top:0;width:${P(iw,r[2])};height:${P(ih,r[3])};background:url("${p.f}") 0 0/${P(tw,iw)} ${P(th,ih)} repeat;--fx:${(fx/iw*100).toFixed(4)}%;--fy:${(fy/ih*100).toFixed(4)}%;--tx:${(tx/iw*100).toFixed(4)}%;--ty:${(ty/ih*100).toFixed(4)}%;animation:envlv-tile ${p.period}s linear ${(-(p.phase||0)*p.period).toFixed(2)}s infinite`)}
   if(p.ops){const o=p.ops;box2.style.setProperty('--p0',o[0]);box2.style.setProperty('--p1',o[1]);box2.style.setProperty('--p2',o[2]);box2.style.setProperty('--p3',o[3]);box2.style.animation=`envlv-pulse ${p.pperiod||p.period}s ease-in-out ${(-(p.pphase||0)).toFixed(2)}s infinite`}
   if(p.fade){const f=p.fade,g=`linear-gradient(90deg,transparent,#000 ${f[0]*100}%,#000 ${100-f[1]*100}%,${f[1]?'transparent':'#000'})`;box2.style.webkitMaskImage=g;box2.style.maskImage=g}
-  if(p.mask){const m=`url("${p.mask}")`;box2.style.webkitMaskImage=m;box2.style.maskImage=m;box2.style.webkitMaskSize=box2.style.maskSize='100% 100%';box2.style.webkitMaskRepeat=box2.style.maskRepeat='no-repeat'} // v0.6.33: static alpha mask over the clipped window (vertical / 2-D gates that must not scroll with the tile)
+  if(p.mask){const m=p.mask.startsWith('linear-gradient')?p.mask:`url("${p.mask}")`;box2.style.webkitMaskImage=m;box2.style.maskImage=m;box2.style.webkitMaskSize=box2.style.maskSize='100% 100%';box2.style.webkitMaskRepeat=box2.style.maskRepeat='no-repeat'} // v0.6.33: static alpha mask over the clipped window (vertical / 2-D gates that must not scroll with the tile)
   box2.appendChild(e);box.appendChild(box2)}}
 function build(layer,L,sp,still){const [W,H]=sp;const box=el('div','envlv','position:absolute;inset:0;z-index:1;pointer-events:none');css();
  for(const c of L.clouds||[]){const tw=c.tile[0]*c.h/c.tile[1];scrollBand(box,W,H,{src:c.f,y:c.y,h:c.h,tw,v:c.v,op:c.op,filter:[c.con?`contrast(${c.con})`:'',c.dark?`brightness(${c.dark})`:''].join(' ').trim()})}
@@ -71,6 +79,10 @@ function build(layer,L,sp,still){const [W,H]=sp;const box=el('div','envlv','posi
    for(const x of [x0,x0+P0])c.appendChild(el('i','',`left:${P(x,CW)};top:${P(it.y-y0,CH)};width:${P(w,CW)};height:${P(h,CH)};background:url("${pd.f}") ${bx.toFixed(3)}% ${by.toFixed(3)}%/${(aw/r[2]*100).toFixed(3)}% ${(ah/r[3]*100).toFixed(3)}% no-repeat`))}
   box.appendChild(c)}
  for(const s of L.statics||[]){const r=s.r;box.appendChild(el('i','envlv-static'+(s.combatOnly?' envlv-combat':''),`left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};background:url("${s.f}") 0 0/100% 100%`))}
+ // v0.6.77 blend fix: a plate with mix-blend multiply/color-dodge (spires-v9 / thalassa-v4 glow cores) must blend with the painted .envS art, but this box's
+ // z-index:1 made it its own stacking context, so the plate blended with nothing and drew as a pale slab. For such layers the box gets no z-index and each
+ // child takes z-index:1 instead (same paint order, above .envS; the backdrop is now the layer's isolated .envL group). Screen-only layers are unchanged.
+ if((L.plates||[]).some(p=>p.blend&&p.blend!=='screen'&&p.blend!=='normal')){box.style.zIndex='auto';box.dataset.blendfix='1';for(const c of box.children)c.style.zIndex='1'}
  return box}
 // Called by syncEnv on every backdrop change: one .envlv per layer, rebuilt only when the env changes.
 export function syncLiving(id,e){document.querySelectorAll('#env .envL').forEach(l=>{const layer=l.firstElementChild;if(!layer)return;const old=layer.querySelector(':scope>.envlv');const L=e&&e.living&&e.living[l.dataset.l];
