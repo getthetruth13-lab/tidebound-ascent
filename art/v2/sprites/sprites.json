@@ -627,14 +627,14 @@
    "hoverPx": 0
   },
   "cantor": {
-   "file": "sprites/cantor.webp",
-   "w": 1142,
-   "h": 1339,
-   "bytes": 475088,
+   "file": "sprites/cantor-a2-r77.webp",
+   "w": 1398,
+   "h": 2176,
+   "bytes": 273046,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.65,
+    "x": 0.54,
     "y": 1.0
    },
    "screenHeightPct": 48,
@@ -683,15 +683,15 @@
    "hoverPx": 0
   },
   "wreckqueen": {
-   "file": "sprites/wreckqueen.webp",
-   "w": 766,
-   "h": 1405,
-   "bytes": 657248,
+   "file": "sprites/wreckqueen-a2-r78.webp",
+   "w": 2423,
+   "h": 1338,
+   "bytes": 507798,
    "role": "boss",
    "facing": "left",
    "anchor": {
-    "x": 0.668,
-    "y": 0.997
+    "x": 0.44,
+    "y": 1.0
    },
    "screenHeightPct": 78,
    "hoverPx": 0
@@ -891,14 +891,14 @@
    "hoverPx": 0
   },
   "skua": {
-   "file": "sprites/skua-a3-r62.webp",
-   "w": 2181,
-   "h": 1343,
-   "bytes": 975822,
+   "file": "sprites/skua-a3-r77.webp",
+   "w": 2077,
+   "h": 1555,
+   "bytes": 480046,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.463,
+    "x": 0.46,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -961,14 +961,14 @@
    "hoverPx": 0
   },
   "ringpull": {
-   "file": "sprites/ringpull-a3-r62.webp",
-   "w": 1248,
-   "h": 2044,
-   "bytes": 731444,
+   "file": "sprites/ringpull-a3-r77.webp",
+   "w": 2205,
+   "h": 1241,
+   "bytes": 361940,
    "role": "summon",
    "facing": "left",
    "anchor": {
-    "x": 0.43,
+    "x": 0.58,
     "y": 1.0
    },
    "screenHeightPct": 42,

@@ -169,7 +169,10 @@ function swapLayer(el,list,sp){const sig=list.map(x=>x.f).join('|');const sh=el.
  Promise.race([Promise.all(list.map(load)),new Promise(r=>setTimeout(r,3000))]).then(()=>{if(el.dataset.src!==sig||el._tok!==tok)return;
   const fresh=!sh.firstChild||el.style.opacity==='0';rebuilds++;
   if(fresh)box.style.transition='none';sh.appendChild(box);el.style.opacity=1;box.getBoundingClientRect();box.style.opacity=1;
-  setTimeout(()=>{if(box.parentNode===sh)[...sh.children].forEach(c=>{if(c!==box&&!c.classList.contains('envlv'))c.remove()})},fresh?60:450)})} // .envlv (painted living layers) is owned by env-living.js
+  // v0.6.70: only the LATEST request may prune. A superseded swap that was appended (e.g. the map's sky while the title art was still showing) used to run its
+  // prune after the newer box landed and removed it, leaving the old art up for the whole fight (Act 1 shoreline sky in Act 3). Now a stale prune does
+  // nothing and the latest one clears every older box, so the latest request always wins and finishes.
+  setTimeout(()=>{if(box.parentNode===sh&&el._tok===tok&&el.dataset.src===sig)[...sh.children].forEach(c=>{if(c!==box&&!c.classList.contains('envlv'))c.remove()})},fresh?60:450)})} // .envlv (painted living layers) is owned by env-living.js
 // ---------- camera: slide-in (cam.x 1 → 0, 900 ms cubic-out) via transform on each layer ----------
 let cam={x:0,from:0,t0:0,dur:0};
 function slideIn(){cam={x:1,from:1,t0:performance.now(),dur:window.FAST?315:900};root.classList.add('sliding')}
