@@ -41,11 +41,11 @@
    ]
   },
   "sprite-pylon": {
-   "path": "art/v2/sprites/pylon-a2-r44.webp",
+   "path": "art/v2/sprites/pylon-a2-r83.webp",
    "transparent": true,
    "size": [
-    1194,
-    1362
+    1738,
+    2295
    ]
   },
   "sprite-dummy": {
@@ -57,11 +57,11 @@
    ]
   },
   "sprite-shellguard": {
-   "path": "art/v2/sprites/shellguard-a2-r42.webp",
+   "path": "art/v2/sprites/shellguard-a2-r80.webp",
    "transparent": true,
    "size": [
-    1392,
-    1424
+    1670,
+    2163
    ]
   },
   "sprite-colossus": {

@@ -375,15 +375,15 @@
    "hoverPx": 0
   },
   "shellguard": {
-   "file": "sprites/shellguard-a2-r42.webp",
-   "w": 1392,
-   "h": 1424,
-   "bytes": 352584,
+   "file": "sprites/shellguard-a2-r80.webp",
+   "w": 1670,
+   "h": 2163,
+   "bytes": 456338,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.447,
-    "y": 1
+    "x": 0.49,
+    "y": 1.0
    },
    "screenHeightPct": 46,
    "hoverPx": 0
@@ -473,28 +473,28 @@
    "hoverPx": 0
   },
   "pylon": {
-   "file": "sprites/pylon-a2-r44.webp",
-   "w": 1194,
-   "h": 1362,
-   "bytes": 380698,
+   "file": "sprites/pylon-a2-r83.webp",
+   "w": 1738,
+   "h": 2295,
+   "bytes": 215400,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.618,
-    "y": 1
+    "x": 0.5,
+    "y": 1.0
    },
    "screenHeightPct": 40,
    "hoverPx": 0
   },
   "pumper": {
-   "file": "sprites/pumper.webp",
-   "w": 1640,
-   "h": 1094,
-   "bytes": 741634,
+   "file": "sprites/pumper-a2-r92.webp",
+   "w": 2596,
+   "h": 1428,
+   "bytes": 344860,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.585,
+    "x": 0.58,
     "y": 1.0
    },
    "screenHeightPct": 36,
@@ -543,28 +543,28 @@
    "hoverPx": 0
   },
   "deckshade": {
-   "file": "sprites/deckshade.webp",
-   "w": 742,
-   "h": 1224,
-   "bytes": 329460,
+   "file": "sprites/deckshade-a2-r89.webp",
+   "w": 2223,
+   "h": 1534,
+   "bytes": 219362,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.473,
+    "x": 0.52,
     "y": 1.0
    },
    "screenHeightPct": 44,
    "hoverPx": 0
   },
   "bellnun": {
-   "file": "sprites/bellnun.webp",
-   "w": 946,
-   "h": 1324,
-   "bytes": 501454,
+   "file": "sprites/bellnun-a2-r87.webp",
+   "w": 1872,
+   "h": 1485,
+   "bytes": 233120,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.555,
+    "x": 0.55,
     "y": 1.0
    },
    "screenHeightPct": 44,
@@ -655,14 +655,14 @@
    "hoverPx": 0
   },
   "basso": {
-   "file": "sprites/basso.webp",
-   "w": 1156,
-   "h": 1326,
-   "bytes": 949610,
+   "file": "sprites/basso-a2-r77.webp",
+   "w": 2248,
+   "h": 1503,
+   "bytes": 319036,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.48,
+    "x": 0.47,
     "y": 1.0
    },
    "screenHeightPct": 40,
@@ -933,14 +933,14 @@
    "hoverPx": 0
   },
   "galereader": {
-   "file": "sprites/galereader-a3-r62.webp",
-   "w": 1515,
-   "h": 2134,
-   "bytes": 897956,
+   "file": "sprites/galereader-a3-r74.webp",
+   "w": 1893,
+   "h": 1972,
+   "bytes": 564902,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.503,
+    "x": 0.46,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -989,28 +989,28 @@
    "hoverPx": 0
   },
   "squallwest": {
-   "file": "sprites/squallwest-a3-r62.webp",
-   "w": 1484,
-   "h": 2198,
-   "bytes": 927510,
+   "file": "sprites/squallwest-a3-r78.webp",
+   "w": 1894,
+   "h": 1659,
+   "bytes": 221154,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.298,
+    "x": 0.55,
     "y": 1.0
    },
    "screenHeightPct": 42,
    "hoverPx": 0
   },
   "squalleast": {
-   "file": "sprites/squalleast-a3-r62.webp",
-   "w": 1542,
-   "h": 1951,
-   "bytes": 1061032,
+   "file": "sprites/squalleast-a3-r76.webp",
+   "w": 2209,
+   "h": 1551,
+   "bytes": 404200,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.732,
+    "x": 0.42,
     "y": 1.0
    },
    "screenHeightPct": 42,
