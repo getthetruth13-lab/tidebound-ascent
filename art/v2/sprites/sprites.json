@@ -417,14 +417,14 @@
    "hoverPx": 0
   },
   "bosun": {
-   "file": "sprites/bosun.webp",
-   "w": 730,
-   "h": 1359,
-   "bytes": 490566,
+   "file": "sprites/bosun-a2-r91.webp",
+   "w": 1932,
+   "h": 1672,
+   "bytes": 453272,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.523,
+    "x": 0.53,
     "y": 1.0
    },
    "screenHeightPct": 44,
@@ -753,14 +753,14 @@
    "hoverPx": 0
   },
   "lenswright": {
-   "file": "sprites/lenswright-a3-r41.webp",
-   "w": 719,
-   "h": 1378,
-   "bytes": 427422,
+   "file": "sprites/lenswright-a3-r93.webp",
+   "w": 1855,
+   "h": 1414,
+   "bytes": 305162,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.529,
+    "x": 0.52,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -851,15 +851,15 @@
    "hoverPx": 0
   },
   "navigator": {
-   "file": "sprites/navigator-a3-r42.webp",
-   "w": 666,
-   "h": 1399,
-   "bytes": 456170,
+   "file": "sprites/navigator-a3-r93.webp",
+   "w": 2162,
+   "h": 1389,
+   "bytes": 374398,
    "role": "boss",
    "facing": "left",
    "anchor": {
-    "x": 0.537,
-    "y": 1
+    "x": 0.59,
+    "y": 1.0
    },
    "screenHeightPct": 42
   },
