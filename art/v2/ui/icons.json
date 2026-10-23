@@ -40,7 +40,10 @@
   "shard": "art/v2/ui/status-shard-a2.webp",
   "water": "art/v2/ui/status-water-a2.webp",
   "submerged": "art/v2/ui/status-submerged-a2.webp",
-  "behind": "art/v2/ui/status-behind-a2.webp"
+  "behind": "art/v2/ui/status-behind-a2.webp",
+  "tailwind": "art/v2/ui/status-tailwind-a2.webp",
+  "seize": "art/v2/ui/status-seize-a2.webp",
+  "jam": "art/v2/ui/status-jam-a2.webp"
  },
  "relic": {
   "abyssalpearl": "art/v2/ui/relic-abyssalpearl.webp",

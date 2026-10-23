@@ -36,7 +36,7 @@ const ST_ICON={block:'guard',str:'might',dex:'poise',weak:'soaked',vuln:'exposed
 const ST_HUD={bleed:'art/v2/hud/status-bleed.webp',weak:'art/v2/hud/status-soaked.webp'};
 // Later-act status icons (LATE-WIRE): every later-act STATUS key without Act 1 art points at art/v2/ui/status-<enginekey>-a2-64.webp (token a2 -> sw ACTPACK, not the install precache).
 // The badge <img> removes itself on a 404, so a missing file keeps the SVG badge. kw-id -> engine key table: studio/tasks/claude/LATE-WIRE-kw-map.json.
-const LATE_ST=['charge','tailwind','submerged','behind','shard','water','stormtide'];
+const LATE_ST=['charge','tailwind','submerged','behind','shard','water','stormtide','seize','jam']; // v0.6.75: r95 kw-tailwind-n1 / kw-seize-n2 / kw-jam-n2 (9.00) painted
 const stIcons=()=>{const o={block:null};for(const [k,v] of Object.entries(ST_ICON))o[k]=ST_HUD[k]||ICONS.status[v]||null;
  for(const k of LATE_ST)o[k]=`art/v2/ui/status-${k}-a2-64.webp`;
  return o};

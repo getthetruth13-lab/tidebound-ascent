@@ -375,10 +375,10 @@
    "hoverPx": 0
   },
   "shellguard": {
-   "file": "sprites/shellguard-a2-r80.webp",
+   "file": "sprites/shellguard-a2-r80-c75.webp",
    "w": 1670,
    "h": 2163,
-   "bytes": 456338,
+   "bytes": 506830,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -473,10 +473,10 @@
    "hoverPx": 0
   },
   "pylon": {
-   "file": "sprites/pylon-a2-r83.webp",
+   "file": "sprites/pylon-a2-r83-c75.webp",
    "w": 1738,
    "h": 2295,
-   "bytes": 215400,
+   "bytes": 247448,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -487,10 +487,10 @@
    "hoverPx": 0
   },
   "pumper": {
-   "file": "sprites/pumper-a2-r92.webp",
+   "file": "sprites/pumper-a2-r92-c75.webp",
    "w": 2596,
    "h": 1428,
-   "bytes": 344860,
+   "bytes": 398778,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -543,10 +543,10 @@
    "hoverPx": 0
   },
   "deckshade": {
-   "file": "sprites/deckshade-a2-r89.webp",
+   "file": "sprites/deckshade-a2-r89-c75.webp",
    "w": 2223,
    "h": 1534,
-   "bytes": 219362,
+   "bytes": 282850,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -557,10 +557,10 @@
    "hoverPx": 0
   },
   "bellnun": {
-   "file": "sprites/bellnun-a2-r87.webp",
+   "file": "sprites/bellnun-a2-r87-c75.webp",
    "w": 1872,
    "h": 1485,
-   "bytes": 233120,
+   "bytes": 243616,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -655,10 +655,10 @@
    "hoverPx": 0
   },
   "basso": {
-   "file": "sprites/basso-a2-r77.webp",
+   "file": "sprites/basso-a2-r77-c75.webp",
    "w": 2248,
    "h": 1503,
-   "bytes": 319036,
+   "bytes": 375690,
    "role": "elite",
    "facing": "left",
    "anchor": {
@@ -725,14 +725,14 @@
    "hoverPx": 0
   },
   "eyegale": {
-   "file": "sprites/eyegale-a3-r41.webp",
-   "w": 1240,
-   "h": 1338,
-   "bytes": 675146,
+   "file": "sprites/eyegale-a3-r96.webp",
+   "w": 2051,
+   "h": 1680,
+   "bytes": 524262,
    "role": "elite",
    "facing": "left",
    "anchor": {
-    "x": 0.874,
+    "x": 0.49,
     "y": 1.0
    },
    "screenHeightPct": 42,
@@ -795,18 +795,18 @@
    "hoverPx": 0
   },
   "voltray": {
-   "file": "sprites/voltray-a3-r41.webp",
+   "file": "sprites/voltray-a3-r96.webp",
    "w": 2391,
-   "h": 1122,
-   "bytes": 622730,
+   "h": 1144,
+   "bytes": 420560,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.717,
+    "x": 0.41,
     "y": 1.0
    },
    "screenHeightPct": 42,
-   "hoverPx": 40
+   "hoverPx": 0
   },
   "shardcarrier": {
    "file": "sprites/shardcarrier-a3-r88.webp",
@@ -989,10 +989,10 @@
    "hoverPx": 0
   },
   "squallwest": {
-   "file": "sprites/squallwest-a3-r78.webp",
+   "file": "sprites/squallwest-a3-r78-c75.webp",
    "w": 1894,
    "h": 1659,
-   "bytes": 221154,
+   "bytes": 291444,
    "role": "elite",
    "facing": "left",
    "anchor": {
@@ -1003,10 +1003,10 @@
    "hoverPx": 0
   },
   "squalleast": {
-   "file": "sprites/squalleast-a3-r76.webp",
+   "file": "sprites/squalleast-a3-r76-c75.webp",
    "w": 2209,
    "h": 1551,
-   "bytes": 404200,
+   "bytes": 474272,
    "role": "elite",
    "facing": "left",
    "anchor": {

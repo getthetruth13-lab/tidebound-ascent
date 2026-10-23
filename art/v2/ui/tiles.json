@@ -41,7 +41,7 @@
    ]
   },
   "sprite-pylon": {
-   "path": "art/v2/sprites/pylon-a2-r83.webp",
+   "path": "art/v2/sprites/pylon-a2-r83-c75.webp",
    "transparent": true,
    "size": [
     1738,
@@ -57,7 +57,7 @@
    ]
   },
   "sprite-shellguard": {
-   "path": "art/v2/sprites/shellguard-a2-r80.webp",
+   "path": "art/v2/sprites/shellguard-a2-r80-c75.webp",
    "transparent": true,
    "size": [
     1670,

@@ -48,6 +48,9 @@ const ICON={
  shard:S('<path d="M12 1l8 8-8 14L4 9z"/>','<path d="M4 9h16M12 1v22" fill="none" stroke="#05070b" stroke-width="1.2"/>'),
  water:S('<path d="M12 2C6 10 5 13 5 16a7 7 0 0014 0c0-3-1-6-7-14z"/>'),
  stormtide:S('<path d="M4 3h14a2 2 0 012 2v16H6a2 2 0 01-2-2z"/>','<path d="M8 12c2-3 4 3 8 0" fill="none" stroke="#05070b" stroke-width="1.6"/>'),
+ // Act 2 enemy states shown as badges (v0.6.75): Seize (holds your card), Jammed (loses this action)
+ seize:S('<path d="M4 14c0-6 5-10 10-10l-2 5 6-1c-1 6-5 10-10 10z"/>'),
+ jam:S('<circle cx="12" cy="12" r="8"/>','<path d="M6 18L18 6" stroke="#05070b" stroke-width="2.4"/>'),
  rooted:S('<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10"/>','<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>')
 };
 const T=(n,kind,kw,dur,rule)=>({n,kind,kw,dur,rule});
@@ -95,6 +98,8 @@ const STATUS={
  shard:T('Deep Shard','buff',null,'Until it is passed or dropped.','Takes half damage and its attacks hit 4 harder. Hurt it badly, or kill the next holder, and the pass fails.'),
  water:T('Water','debuff',null,'While Thalassa is in her second phase.','At the end of your turn you lose 1 HP per 5 Guard you hold.'),
  stormtide:T('Storm Tide','debuff',null,'This turn.','Your Surge and Recede are 1 weaker, or your first Guard card gives 1 less.')
+ ,seize:T('Seize','debuff',null,'Until it dies.','It holds your cheapest card. Defeat it and the card comes back.'),
+ jam:T('Jammed','debuff',null,'This turn.','Jammed: it loses this action. Hit it hard enough in one turn to jam it again.')
 };
 const ORDER=Object.keys(STATUS);
 export const GUARD_SVG='<svg class="sti" viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1.5L2.5 5v8c0 6.5 4 11 9.5 13.5C17.500 24 21.500 19.500 21.500 13V5z" fill="currentColor" stroke="#05070b" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 4.5v19M5 9h14" fill="none" stroke="#05070b66" stroke-width="1"/></svg>';
@@ -180,7 +185,7 @@ export const LISTENER_INFO={
 const INTERNAL_LISTENERS=new Set(['afterPlay','chartClamp']); // plumbing that finishes a card's own text, not a separate effect
 // Everything the player has pending or armed that is NOT in cb.p.st: [{k,v,n?,t?}] (k = STATUS key; n / t override name / rule text).
 // Lasting effects on an enemy that live outside e.st (your Powers' per-enemy marks): merged into its status row.
-export function enemyExtraSt(e){const o={};if(e.passive&&e.passive.charge){const n=W.cb?poolOf(e):0;if(n)o.charge=n}if(e.tailwind)o.tailwind=e.tailwind;if(e.sub)o.submerged=1;if(e.back)o.behind=1;if(e.holds)o.shard=1;for(const p of (W.cb&&W.cb.powers)||[])if(p.id==='grudge'&&p.g&&p.g[e.uid])o.grudge=(o.grudge||0)+p.g[e.uid];return o}
+export function enemyExtraSt(e){const o={};if(e.passive&&e.passive.charge){const n=W.cb?poolOf(e):0;if(n)o.charge=n}if(e.tailwind)o.tailwind=e.tailwind;if(e.sub)o.submerged=1;if(e.back)o.behind=1;if(e.holds)o.shard=1;if(e.seized)o.seize=1;if(e.next&&e.next.jam)o.jam=1;for(const p of (W.cb&&W.cb.powers)||[])if(p.id==='grudge'&&p.g&&p.g[e.uid])o.grudge=(o.grudge||0)+p.g[e.uid];return o}
 export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
  const add=(k,v,n,t,ico)=>{if(v)out.push({k,v,n,t,ico})};
  if(cb.keepMom)add('keepMom',1);
