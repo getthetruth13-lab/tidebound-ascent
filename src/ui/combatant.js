@@ -51,6 +51,7 @@ const ICON={
  // Act 2 enemy states shown as badges (v0.6.75): Seize (holds your card), Jammed (loses this action)
  seize:S('<path d="M4 14c0-6 5-10 10-10l-2 5 6-1c-1 6-5 10-10 10z"/>'),
  jam:S('<circle cx="12" cy="12" r="8"/>','<path d="M6 18L18 6" stroke="#05070b" stroke-width="2.4"/>'),
+ scald:S('<path d="M12 3c3 4 6 7 6 11a6 6 0 01-12 0c0-4 3-7 6-11z"/>'),
  rooted:S('<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10"/>','<path d="M12 2v10M12 12c-3 0-6 3-7 10M12 12c3 0 6 3 7 10M12 12v10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>')
 };
 const T=(n,kind,kw,dur,rule)=>({n,kind,kw,dur,rule});
@@ -100,6 +101,7 @@ const STATUS={
  stormtide:T('Storm Tide','debuff',null,'This turn.','Your Surge and Recede are 1 weaker, or your first Guard card gives 1 less.')
  ,seize:T('Seize','debuff',null,'Until it dies.','It holds your cheapest card. Defeat it and the card comes back.'),
  jam:T('Jammed','debuff',null,'This turn.','Jammed: it loses this action. Hit it hard enough in one turn to jam it again.')
+ ,scald:T('Scald','debuff',null,'At the end of your turn.','Each Scald in your hand burns you for 2 at the end of your turn.')
 };
 const ORDER=Object.keys(STATUS);
 export const GUARD_SVG='<svg class="sti" viewBox="0 0 24 28" aria-hidden="true"><path d="M12 1.5L2.5 5v8c0 6.5 4 11 9.5 13.5C17.500 24 21.500 19.500 21.500 13V5z" fill="currentColor" stroke="#05070b" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 4.5v19M5 9h14" fill="none" stroke="#05070b66" stroke-width="1"/></svg>';
@@ -194,7 +196,7 @@ export function playerStates(){const cb=W.cb,out=[];if(!cb||!W.run)return out;
  for(const r of W.run.relics)if(r.carry>0)ne+=r.carry;
  add('nextEnergy',ne);add('nextMom',nm);add('drained',cb.drainE||0);
  if(cb.holdDrift)add('moonlock',1);
- if(waterOn())add('water',waterLoss());if(cb.storm&&alive().some(x=>x.key==='magus'))add('stormtide',1);
+ if(waterOn())add('water',waterLoss());if(cb.storm&&alive().some(x=>x.key==='magus'))add('stormtide',1);{const sc=(cb.hand||[]).filter(ci=>ci&&ci.id==='scald').length;if(sc)add('scald',sc)}
  if(cb.mimic)add('mimic',1);
  add('cairn',cb.cairn||0);
  if(cb.retortOk)add('retort',1);

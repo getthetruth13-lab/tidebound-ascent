@@ -6,11 +6,12 @@
 import {U} from '../core/timing.js';
 import {fxOn,reducedMotion} from './vfx.js';
 export const PFX_ART={lensBeam:'art/v2/fx/lenswright-a3-beam.webp',crest:'art/v2/fx/tide-crest.webp',flourish:'art/v2/fx/duel-flourish.webp',echo:'art/v2/fx/echo-bell.webp',
- waypoint:'art/v2/fx/carto-waypoint.webp',shield:'art/v2/fx/guard-shield.webp',shatter:'art/v2/fx/guard-shatter.webp'};
+ waypoint:'art/v2/fx/carto-waypoint.webp',shield:'art/v2/fx/guard-shield.webp',shatter:'art/v2/fx/guard-shatter.webp',
+ platespark:'art/v2/fx/platespark.webp'};
 // aspect ratios of the art (w/h), so pieces are sized before the image decodes
-const AR={lensBeam:3.2,crest:900/497,flourish:794/645,echo:900/638,waypoint:900/570,shield:808/715,shatter:791/701};
+const AR={lensBeam:3.2,crest:900/497,flourish:794/645,echo:900/638,waypoint:900/570,shield:808/715,shatter:791/701,platespark:463/512};
 const cache={};
-export function preloadPaintedFx(){if(typeof Image==='undefined')return;for(const k in PFX_ART)if(k!=='lensBeam'&&!cache[k]){const i=new Image();i.decoding='async';i.src=PFX_ART[k];cache[k]=i}}
+export function preloadPaintedFx(){if(typeof Image==='undefined')return;for(const k in PFX_ART)if(k!=='lensBeam'&&k!=='platespark'&&!cache[k]){const i=new Image();i.decoding='async';i.src=PFX_ART[k];cache[k]=i}}
 let live=[];
 export const paintedLive=()=>live.filter(e=>e.isConnected).map(e=>e.dataset.pfx);
 // One painted piece. x,y = centre in viewport px, w = width px. frames use individual transform props.
@@ -73,6 +74,9 @@ export function guardShatter(p,dir=1){if(!ok()||!p)return;const w=Math.max(210,M
   const el=piece('shatter',{x,y,w,flip:dir<0},[{opacity:0,offset:0},{opacity:0,translate:'0 0',rotate:'0deg',offset:.3},{opacity:1,translate:'0 0',rotate:'0deg',offset:.36,easing:'cubic-bezier(.25,.6,.5,1)'},
    {opacity:0,translate:`${Math.cos(am)*w*.6}px ${Math.sin(am)*w*.45+w*.08}px`,rotate:`${(i%2?1:-1)*(18+i*5)}deg`,scale:'.9'}],700,{easing:'linear'});
   el.classList.add('pfx-shard');el.style.clipPath=`polygon(50% 50%, ${P(a0)}, ${P(am)}, ${P(a1)})`}}
+// v0.6.76 (r97): Gate Plate hit spark, the reviewed fx-platespark plate (iron plate + orange sparks). Act 2 only, so not preloaded at boot.
+export function plateSpark(p){if(!ok()||!p)return;const w=Math.max(120,Math.min(p.h*.9,innerWidth*.2));
+ piece('platespark',{x:p.x,y:p.y-p.h*.1,w},[{scale:'.6',opacity:0,filter:'brightness(1.8)'},{scale:'1.05',opacity:1,filter:'brightness(1.2)',offset:.2},{scale:'1.1',opacity:.9,offset:.6},{scale:'1.14',opacity:0,translate:'0 -10px'}],520,{easing:'linear'})}
 if(typeof document!=='undefined')preloadPaintedFx();
 
 // The reviewed attack beam is a separate plate: idle and fallen art never contain it.

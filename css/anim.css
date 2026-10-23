@@ -1,7 +1,7 @@
 /* Combat life affects only artwork: intents, HP and touch targets stay anchored. */
 .combat-motion .hero .spr,.combat-motion .en .spr{transform-origin:50% 100%;animation:combat-breathe var(--idle-period,4400ms) ease-in-out var(--idle-phase,0ms) infinite}
 @keyframes combat-breathe{0%,100%{transform:translateY(0) rotate(-.5deg) skewX(-.8deg) scale(1)}50%{transform:translateY(-3px) rotate(.5deg) skewX(.8deg) scale(1.008,1.015)}}
-.combat-motion .en[data-key="wisp"] .spr,.combat-motion .en[data-key="gull"] .spr,.combat-motion .en[data-key="jelly"] .spr,.combat-motion .en[data-key="voltray"] .spr{animation-name:combat-hover}
+.combat-motion .en[data-key="wisp"] .spr,.combat-motion .en[data-key="gull"] .spr,.combat-motion .en[data-key="voltray"] .spr{animation-name:combat-hover}
 @keyframes combat-hover{50%{transform:translateY(-5px) rotate(1.4deg) scale(1.015)}}
 .combat-motion .spr-slot::after{content:'';position:absolute;left:42%;top:38%;width:15%;height:18%;pointer-events:none;background:radial-gradient(ellipse,var(--class-accent,var(--env-rim,#8fa3c7)),transparent 70%);opacity:.07;animation:accent-breathe var(--idle-period,4400ms) ease-in-out var(--idle-phase,0ms) infinite}
 @keyframes accent-breathe{50%{opacity:.17}}

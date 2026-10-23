@@ -251,6 +251,7 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
   if(big||c.f?.flourish||c.f?.echo||c.f?.doubled){comboBeat(c.f?.flourish?'flourish':c.f?.echo?'echo':'critical',dealt/12);
    const number=W.cb.vfx.findLast(v=>v.who===t.uid&&v.txt==='-'+dealt);if(number)number.cls+=' combo-pop';}
   queue({k:'hit',sel:target,amount:dealt,big:!!big,boss:!!(t&&t.boss),kill:!!(t&&t.hp<=0),delay:IMPACT_MS,e:t});
+  if(t&&t.key==='gateplate'&&dealt>0&&fxOn())later(IMPACT_MS,()=>{const f=document.querySelector(target+' .fig');if(f)PFX.plateSpark(rectOf(f))});
   if(!c.hpLoss&&c.amount)queue({k:'blocked',sel:target})}
  if(event==='playerHit'){queue({k:'herohit',amount:c.amount,blocked:c.blocked,enemy:c.enemy,B:W.cb&&W.cb.beats||beatsFor(c.enemy,{a:1})})}
  if(event==='enemyTelegraph'){setImpact(0);queue({k:'telegraph',sel:enemy(c.enemy),B:c.beats||beatsFor(c.enemy,{a:1}),e:c.enemy})}

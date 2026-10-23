@@ -459,14 +459,14 @@
    "hoverPx": 0
   },
   "lamplighter": {
-   "file": "sprites/lamplighter.webp",
-   "w": 1604,
-   "h": 1399,
-   "bytes": 790438,
+   "file": "sprites/lamplighter-a2-r100.webp",
+   "w": 1881,
+   "h": 1486,
+   "bytes": 479386,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.64,
+    "x": 0.44,
     "y": 1.0
    },
    "screenHeightPct": 44,
@@ -823,18 +823,18 @@
    "hoverPx": 0
   },
   "jelly": {
-   "file": "sprites/jelly-a3-r41.webp",
-   "w": 1954,
-   "h": 1166,
-   "bytes": 1055694,
+   "file": "sprites/jelly-a3-r98.webp",
+   "w": 2288,
+   "h": 1068,
+   "bytes": 324462,
    "role": "normal",
    "facing": "left",
    "anchor": {
-    "x": 0.424,
+    "x": 0.47,
     "y": 1.0
    },
    "screenHeightPct": 42,
-   "hoverPx": 40
+   "hoverPx": 0
   },
   "ringcharge": {
    "file": "sprites/ringcharge-a3-r90.webp",

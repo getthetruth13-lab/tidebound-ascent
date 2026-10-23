@@ -43,7 +43,9 @@
   "behind": "art/v2/ui/status-behind-a2.webp",
   "tailwind": "art/v2/ui/status-tailwind-a2.webp",
   "seize": "art/v2/ui/status-seize-a2.webp",
-  "jam": "art/v2/ui/status-jam-a2.webp"
+  "jam": "art/v2/ui/status-jam-a2.webp",
+  "scald": "art/v2/ui/status-scald-a2.webp",
+  "stormtide": "art/v2/ui/status-stormtide-a2.webp"
  },
  "relic": {
   "abyssalpearl": "art/v2/ui/relic-abyssalpearl.webp",
@@ -141,7 +143,14 @@
   "wrenlockbox": "art/v2/ui/relic-wrenlockbox-a2.webp",
   "rangeflag": "art/v2/ui/relic-rangeflag-a2.webp",
   "paidreceipt": "art/v2/ui/relic-paidreceipt-a2.webp",
-  "cisternplug": "art/v2/ui/relic-cisternplug-a2.webp"
+  "cisternplug": "art/v2/ui/relic-cisternplug-a2.webp",
+  "tetherpin": "art/v2/ui/relic-tetherpin-a2.webp",
+  "ropeknot": "art/v2/ui/relic-ropeknot-a2.webp",
+  "mudlarksieve": "art/v2/ui/relic-mudlarksieve-a2.webp",
+  "jamwedge": "art/v2/ui/relic-jamwedge-a2.webp",
+  "sapperscharge": "art/v2/ui/relic-sapperscharge-a2.webp",
+  "silentclapper": "art/v2/ui/relic-silentclapper-a2.webp",
+  "gunwaleplank": "art/v2/ui/relic-gunwaleplank-a2.webp"
  },
  "potion": {
   "abyssaloil": "art/v2/ui/potion-abyssaloil.webp",
