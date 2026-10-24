@@ -1,0 +1,164 @@
+{
+ "scene": "a3_lair_engine-v6b",
+ "based_on": "a3_lair_engine-v6",
+ "motion_preview": "../a3_lair_engine-v6/a3-lair-engine-v6-living.mp4 (unchanged motion; v6b only brightens the plate bottom band)",
+ "layers": [
+  {
+   "file": "layers/a3-eng6b-solids.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "kb": 194.0,
+   "decoded_mb": 7.58,
+   "animated": false,
+   "op": 1.0,
+   "blend": "normal",
+   "mask": null,
+   "reason": "baked painted plate (rusted gear engine against the back wall, fog, worn flagstones to the bottom edge); static, Act 1 solids-baked pattern; v5: fog thinned at the machine/brazier feet with painted contact edges, machine grime, top-centre gap darkened; v6: plinth/pedestal fog thinned (y380-450), two-scale detail recovery; floor fog baked still into the plate (sealed hall: still mist); game copy also carries the frozen floor fog and the glow at its darkest pulse; v6b: bottom band lifted (ramp y820-900), brazier pedestal foot/contact shadow"
+  },
+  {
+   "file": "layers/a3-eng6-steam.webp",
+   "px": [
+    1345,
+    471
+   ],
+   "kb": 232.1,
+   "decoded_mb": 2.53,
+   "animated": true,
+   "op": 0.14,
+   "ops": [
+    0.1201,
+    0.1133,
+    0.1319,
+    0.1387
+   ],
+   "blend": "normal",
+   "mask": "layers/a3-eng6-steam.webp-vm.webp",
+   "mask_kb": 0.5,
+   "motion": {
+    "kind": "tile",
+    "loop": [
+     -1,
+     0
+    ],
+    "tile": [
+     2690,
+     942
+    ],
+    "period": 115.286
+   },
+   "reason": "cool steam drifting left through the gear machinery (own painted plate bb3434ba, tinted teal); v6: masked to the machine (above y~490), no steam over the fight floor [half res, game scales x2; seamless tile, real alpha; mask alpha = 0 below y~490]"
+  },
+  {
+   "file": "layers/a3-eng6-glow.webp",
+   "px": [
+    194,
+    211
+   ],
+   "kb": 2.4,
+   "decoded_mb": 0.12,
+   "animated": true,
+   "op": 1.0,
+   "ops": [
+    0.7055,
+    0.0708,
+    0.6571,
+    0.8405
+   ],
+   "blend": "screen",
+   "mask": null,
+   "motion": {
+    "kind": "pulse",
+    "period": 4.0
+   },
+   "reason": "the left brazier flame flickers softly (the one warm accent); screen-blend plate at (94,238)"
+  }
+ ],
+ "game": {
+  "note": "environments.js / env-living.js format. Floor fog is frozen and baked into the solids (it never moves in game). Steam = seamless tile at the MP4 speed, clipped by a real-alpha mask (fade x steam mask, 0 below y~490). Glow = screen-blend pulse plate (solids carry the darkest pulse). v6b: only the solids changed (bottom band lifted from y820, brazier pedestal contact shadow); steam, mask and glow are the v6 files unchanged.",
+  "art": {
+   "far": [
+    {
+     "f": "art/v2/bg/a3-eng6b-solids.webp",
+     "r": [
+      0,
+      0,
+      2340,
+      1080
+     ]
+    }
+   ]
+  },
+  "living": {
+   "far": {
+    "plates": [
+     {
+      "kind": "tile",
+      "f": "art/v2/bg/a3-eng6-steam.webp",
+      "r": [
+       0,
+       0,
+       2340,
+       942
+      ],
+      "tile": [
+       2690,
+       942
+      ],
+      "loop": [
+       -1,
+       0
+      ],
+      "period": 115.286,
+      "op": 0.14,
+      "phase": 0,
+      "ops": [
+       0.1201,
+       0.1133,
+       0.1319,
+       0.1387
+      ],
+      "pperiod": 12.0,
+      "pphase": 6.0,
+      "mask": "art/v2/bg/a3-eng6-steam.webp-vm.webp"
+     },
+     {
+      "kind": "pulse",
+      "f": "art/v2/bg/a3-eng6-glow.webp",
+      "r": [
+       94,
+       238,
+       194,
+       211
+      ],
+      "ops": [
+       0.7055,
+       0.0708,
+       0.6571,
+       0.8405
+      ],
+      "period": 4.0,
+      "phase": 0.49,
+      "blend": "screen"
+     }
+    ]
+   }
+  },
+  "files": {
+   "art/v2/bg/a3-eng6-glow.webp": "layers/a3-eng6-glow.webp",
+   "art/v2/bg/a3-eng6b-solids.webp": "layers/a3-eng6b-solids.webp",
+   "art/v2/bg/a3-eng6-steam.webp": "layers/a3-eng6-steam.webp",
+   "art/v2/bg/a3-eng6-steam.webp-vm.webp": "layers/a3-eng6-steam.webp-vm.webp"
+  },
+  "fit_rms": {
+   "glow_opacity": 0.1254,
+   "steam_opacity": 0.00233
+  },
+  "pulse_range": [
+   -0.9582,
+   0.7273
+  ]
+ },
+ "authored_layers": 3
+}
