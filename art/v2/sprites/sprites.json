@@ -446,14 +446,14 @@
   },
   "salthusk": {
    "file": "sprites/salthusk.webp",
-   "w": 720,
-   "h": 1362,
-   "bytes": 290772,
+   "w": 1632,
+   "h": 1291,
+   "bytes": 429590,
    "role": "normal",
    "facing": "left",
    "anchor": {
     "x": 0.5,
-    "y": 1.0
+    "y": 0.991
    },
    "screenHeightPct": 44,
    "hoverPx": 0
@@ -532,7 +532,7 @@
    "file": "sprites/mortar-a2-r71.webp",
    "w": 2066,
    "h": 1518,
-   "bytes": 425230,
+   "bytes": 389032,
    "role": "normal",
    "facing": "left",
    "anchor": {
