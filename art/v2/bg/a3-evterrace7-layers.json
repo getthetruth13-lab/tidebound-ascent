@@ -1,0 +1,149 @@
+{
+ "id": "ev_a3_terrace",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 118.3,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: v7 (B2 try 2): NEW painted plate terrace-v7-plate-a (GenerateImage, _src/plates/) with stepped ruined terraces left and right that rise through and break the horizon, a broken balustrade and posts, the spiral-grooved terrace floor (solid under every foot), two grounded slate cairns with contact shadows, the cloud sea low behind the card; Real-ESRGAN x4 -> 2340x1316, floating stone orb inpainted out (cv2 TELEA), crop oy 236; _src/build7.py: Lab grade to the Act 1 teal-grey band (a* ~-0.4, b* teal), the low warm dusk rim at far left kept as painted (the one warm accent), luminance-weighted soft Gaussian card dim, soft top falloff under the HUD band",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/hail-far.webp",
+   "px": [
+    749,
+    421
+   ],
+   "channels": 4,
+   "kb": 79.9,
+   "decoded_mb": 1.2,
+   "animated": true,
+   "reason": "painted rain plate r3terr (alpha only), falls with vec (-370, 640), op 0.036",
+   "effect": "rain",
+   "vec": [
+    -370,
+    640
+   ],
+   "op": 0.036,
+   "plate_src": "r3terr",
+   "mask": "layers/hail-far-vm.webp",
+   "mask_r": [
+    0,
+    0,
+    2340,
+    1080
+   ],
+   "mask_note": "static real-alpha mask (white RGB + alpha, quarter res, lossless) stretched 100%x100% over the plate window r (env-living.js plates() p.mask); 0 over the card zone 690-1650 x 170-820 (140/120 px feather); 0 above y160 (HUD band); thinned 90% from y440 to y580 so nothing moves at the stand line (feet y586-599)",
+   "game_plate": {
+    "kind": "tile",
+    "r": [
+     0,
+     0,
+     2340,
+     1080
+    ],
+    "op": 0.036,
+    "mask": "<prefix>hail-far-vm.webp",
+    "note": "as wire-ev-a3-67.py builds it (rain: alpha -> screen rgba tint (.74,.77,.82), vertical loop (0,1))"
+   }
+  },
+  {
+   "file": "layers/hail-far-vm.webp",
+   "px": [
+    585,
+    270
+   ],
+   "channels": 4,
+   "kb": 1.8,
+   "decoded_mb": 0.63,
+   "animated": false,
+   "role": "mask",
+   "mask_for": "layers/hail-far.webp",
+   "reason": "plate mask for hail-far (see its \"mask\" field)"
+  },
+  {
+   "file": "layers/hail-near.webp",
+   "px": [
+    1170,
+    658
+   ],
+   "channels": 4,
+   "kb": 173.7,
+   "decoded_mb": 2.94,
+   "animated": true,
+   "reason": "painted rain plate r3terr (alpha only), falls with vec (-600, 1050), op 0.036",
+   "effect": "rain",
+   "vec": [
+    -600,
+    1050
+   ],
+   "op": 0.036,
+   "plate_src": "r3terr",
+   "mask": "layers/hail-near-vm.webp",
+   "mask_r": [
+    0,
+    0,
+    2340,
+    1080
+   ],
+   "mask_note": "static real-alpha mask (white RGB + alpha, quarter res, lossless) stretched 100%x100% over the plate window r (env-living.js plates() p.mask); 0 over the card zone 690-1650 x 170-820 (140/120 px feather); 0 above y160 (HUD band); thinned 90% from y440 to y580 so nothing moves at the stand line (feet y586-599)",
+   "game_plate": {
+    "kind": "tile",
+    "r": [
+     0,
+     0,
+     2340,
+     1080
+    ],
+    "op": 0.036,
+    "mask": "<prefix>hail-near-vm.webp",
+    "note": "as wire-ev-a3-67.py builds it (rain: alpha -> screen rgba tint (.74,.77,.82), vertical loop (0,1))"
+   }
+  },
+  {
+   "file": "layers/hail-near-vm.webp",
+   "px": [
+    585,
+    270
+   ],
+   "channels": 4,
+   "kb": 1.8,
+   "decoded_mb": 0.63,
+   "animated": false,
+   "role": "mask",
+   "mask_for": "layers/hail-near.webp",
+   "reason": "plate mask for hail-near (see its \"mask\" field)"
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 375.5,
+  "mp4_kb": 0,
+  "decoded_mb": 12.63,
+  "n_layers": 5,
+  "n_animated": 2,
+  "mp4_note": "no MP4 (lean disk); the loop is rendered in-game from the layers; preview = layers-only-f000.jpg (real game, UI hidden)"
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "ver": "v7",
+ "from": "B2 try 2 (second and last); v6 untouched; dropped: v6 cloud-sea (its band now sits behind the ruins and the card; a moving bank over near ruins would read as mist in front of solids) and v6 mid-cairn (the v7 plate paints its own grounded cairns)",
+ "wiring_note": "wire with: BUILD=<ver> python3 tools/wire-ev-a3-67.py terrace=ev_a3_terrace-v7=<review score>  (uses these -vm masks via pkmask; mask_r == plate r asserted). TINT CHANGE (requested): after wiring set src/data/environments.js ev_a3_terrace tint col to \"#1c3a40\" (ev_a1 teal) instead of the inherited ev_a3 \"#231f36\" grey-violet (a .06 soft-light); the QC screenshots were taken with #1c3a40.",
+ "packaged": {
+  "layers": "art/v2/bg/a3-evterrace7-layers.json",
+  "loop": null,
+  "preview": "art/v2/bg/a3-evterrace7-living-preview.webp",
+  "note": "no package MP4 (v7: not encoded); the loop is rendered in-game from the layers"
+ }
+}

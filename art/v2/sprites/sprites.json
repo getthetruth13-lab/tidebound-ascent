@@ -630,7 +630,7 @@
    "file": "sprites/cantor-a2-r77.webp",
    "w": 1398,
    "h": 2176,
-   "bytes": 280826,
+   "bytes": 292550,
    "role": "elite",
    "facing": "left",
    "anchor": {
@@ -867,7 +867,7 @@
    "file": "sprites/magus-a3-r90.webp",
    "w": 2124,
    "h": 1520,
-   "bytes": 377734,
+   "bytes": 348920,
    "role": "elite",
    "facing": "left",
    "anchor": {
