@@ -171,7 +171,8 @@ const LIV=['transform','translate','opacity','display','visibility','mix-blend-m
 function frozenCopy(src){const c=src.cloneNode(true);c.removeAttribute('id');c.setAttribute('aria-hidden','true');const s=[src,...src.querySelectorAll('*')],d=[c,...c.querySelectorAll('*')];
  if(s.length===d.length)for(let i=0;i<s.length;i++){d[i].removeAttribute('id');
   if(s[i].closest('.envlv')){const cs=getComputedStyle(s[i]);let t=s[i].style.cssText.replace(/animation[^;]*;?/g,'')+';position:absolute;';for(const n of LIV)t+=n+':'+cs.getPropertyValue(n)+' !important;';
-   d[i].style.cssText=t+'animation:none!important;transition:none!important;will-change:auto!important;pointer-events:none!important';continue}
+   d[i].style.cssText=t+'animation:none!important;transition:none!important;will-change:auto!important;pointer-events:none!important';
+   if(s[i].tagName==='CANVAS'&&s[i].width){try{d[i].width=s[i].width;d[i].height=s[i].height;d[i].getContext('2d').drawImage(s[i],0,0)}catch(_){}}continue} // v0.6.89: canvas tile plates keep their pixels
   const t=frozenText(getComputedStyle(s[i]));
   d[i].style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important';if(s[i].tagName==='CANVAS'&&s[i].width){try{d[i].width=s[i].width;d[i].height=s[i].height;d[i].getContext('2d').drawImage(s[i],0,0)}catch(_){}}}
  return c}

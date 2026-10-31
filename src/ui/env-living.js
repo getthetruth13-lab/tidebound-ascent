@@ -62,6 +62,12 @@ function plates(box,L,W,H){
    else if(p.blend)e.style.mixBlendMode=p.blend;
    if(p.op!=null)e.style.setProperty('--m',p.op);box.appendChild(e);continue}
   const [tw,th]=p.tile,[sx,sy]=p.loop,iw=r[2]+(sx?tw:0),ih=r[3]+(sy?th:0),box2=el('i','envlv-clip'+(p.cls?' '+p.cls:''),`position:absolute;left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};overflow:hidden;opacity:${p.op}`);
+  if(big(p,W,H)){const key=r.join(',')+'|'+(p.mask||'');let g=box.lastElementChild;
+   if(!g||g.dataset.mgrp!==key){g=el('i','envlv-mgrp',`left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)}`);g.dataset.mgrp=key;
+    if(p.mask){const m=`url("${p.mask}")`;g.style.webkitMaskImage=g.style.maskImage=m;g.style.webkitMaskSize=g.style.maskSize='100% 100%';g.style.webkitMaskRepeat=g.style.maskRepeat='no-repeat'}box.appendChild(g)}
+   box2.style.left=box2.style.top='0';box2.style.width=box2.style.height='100%';canvasPlate(box2,p);
+   if(p.ops){const o=p.ops;for(let i=0;i<4;i++)box2.style.setProperty('--p'+i,o[i]);box2.style.animation=`envlv-pulse ${p.pperiod||p.period}s ease-in-out ${(-(p.pphase||0)).toFixed(2)}s infinite`}
+   box2.dataset.cv='1';g.appendChild(box2);continue} // v0.6.89: see canvasPlate (the shared mask sits on the group)
   let e;if(p.vel){ // v0.6.77 rain fix: per-axis speed in scene px/s (vel:[vx,vy]). The outer layer moves one tile on x every tw/|vx| s and an inner child one tile on y every th/|vy| s,
    // so the fall speed and slant match the package (the plain loop below locks both axes to one tile per period, i.e. the slant to the tile aspect).
    const [vx,vy]=p.vel,ax=vx?(vx<0?-1:1):0,ay=vy?(vy<0?-1:1):0,ph=p.phase||0,T=(v,t)=>Math.abs(t/v);
@@ -75,6 +81,45 @@ function plates(box,L,W,H){
   if(p.fade){const f=p.fade,g=`linear-gradient(90deg,transparent,#000 ${f[0]*100}%,#000 ${100-f[1]*100}%,${f[1]?'transparent':'#000'})`;box2.style.webkitMaskImage=g;box2.style.maskImage=g}
   if(p.mask){const m=p.mask.startsWith('linear-gradient')?p.mask:`url("${p.mask}")`;box2.style.webkitMaskImage=m;box2.style.maskImage=m;box2.style.webkitMaskSize=box2.style.maskSize='100% 100%';box2.style.webkitMaskRepeat=box2.style.maskRepeat='no-repeat'} // v0.6.33: static alpha mask over the clipped window (vertical / 2-D gates that must not scroll with the tile)
   box2.appendChild(e);box.appendChild(box2)}}
+// v0.6.89 gfxmem fix (a2_ramparts was estimated at 732 MB against the 150 MB S24 budget): a moving tile plate is one layer of (window + one tile) on each moving axis,
+// so the 2-axis rain veils and the long mist rows were each a 46-91 MB texture (css ~1958x870 at DPR 3.75), each under its own masked clip (a 20 MB offscreen surface).
+// A plate whose moving layer is bigger than the whole scene (iw*ih > W*H) is drawn instead on one <canvas> the size of its window, at the art's own resolution (the S24
+// shows ~1.5 device px per art px, so this is the full detail of the art; a screen finer than the art caps it at the DPR). Each frame is a handful of clipped 1:1 'copy'
+// blits of the decoded tile (no resampling, no blending), so it stays cheap even on a software rasteriser. Neighbouring plates that share one window and one mask
+// (the three ramparts rain veils, the two mist rows) sit in one masked group, so the mask costs one surface per group, not one per plate.
+// The motion clock is still CSS: zero-size .envlv-clk proxies carry the exact envlv-tile animations (same durations / delays) and each frame reads their progress,
+// so pause, slow-mo, reduce-motion (animation:none -> offset 0, where the CSS layer sat), data-env-rest and test freezes all hold the canvas still too.
+// Opacity and the ops pulse stay on the plate's clip box as before. A redraw is skipped when no clock moved a whole backing px.
+const big=(p,W,H)=>{const [tw,th]=p.tile,[sx,sy]=p.loop,iw=p.r[2]+(sx?tw:0),ih=p.r[3]+(sy?th:0);return iw*ih>W*H&&!p.fade&&!(p.mask&&p.mask.startsWith('linear-gradient'))};
+const imgs={};
+function img(u){return imgs[u]||(imgs[u]=new Promise(ok=>{const im=new Image();im.decoding='async';im.onload=()=>(im.decode?im.decode().catch(()=>{}):Promise.resolve()).then(()=>ok(im));im.onerror=()=>ok(null);im.src=u}))}
+const live=new Set();let raf=0;
+function prog(c){const a=c.getAnimations()[0];if(!a||!a.effect)return 0;const p=a.effect.getComputedTiming().progress;return p==null?0:p}
+function tick(){raf=0;for(const t of live){if(!t.cv.isConnected){live.delete(t);continue}t.draw()}if(live.size)raf=requestAnimationFrame(tick)}
+function canvasPlate(box2,p){const r=p.r,[tw,th]=p.tile,[sx,sy]=p.loop;
+ const cv=el('canvas','envlv-a envlv-cv','left:0;top:0;width:100%;height:100%;will-change:auto');box2.appendChild(cv);
+ cv.dataset.f=p.f;if(p.vel)cv.dataset.vel=p.vel.join(','); // the plate's file stays readable in CSS too (the moving file is still "on screen"): a zero-size marker paints nothing and holds no layer
+ box2.appendChild(el('i','envlv-src',`left:0;top:0;width:0;height:0;background:url("${p.f}") 0 0/0 0 no-repeat`));
+ // clocks: {axis, from, to (scene px), proxy}; the same keyframe timing as the CSS layers they replace
+ const clocks=[],clk=(css,ax,f,to)=>{const c=el('i','envlv-clk',`left:0;top:0;width:0;height:0;animation:${css}`);Object.assign(c.dataset,{ax,from:f,to});box2.appendChild(c);clocks.push({c,ax,f,to})};
+ if(p.vel){const [vx,vy]=p.vel,ph=p.phase||0,T=(v,t)=>Math.abs(t/v);
+  if(vx)clk(`envlv-tile ${T(vx,tw).toFixed(3)}s linear ${(-ph*T(vx,tw)).toFixed(2)}s infinite`,0,vx>0?-tw:0,vx<0?-tw:0);
+  if(vy)clk(`envlv-tile ${T(vy,th).toFixed(3)}s linear ${(-ph*T(vy,th)).toFixed(2)}s infinite`,1,vy>0?-th:0,vy<0?-th:0)}
+ else{const a=`envlv-tile ${p.period}s linear ${(-(p.phase||0)*p.period).toFixed(2)}s infinite`;if(sx)clk(a,0,sx>0?-tw:0,sx<0?-tw:0);if(sy)clk(a,1,sy>0?-th:0,sy<0?-th:0)}
+ let bm=null,cx=null,last='',k=0;
+ const t={cv,draw(){if(!bm)return;const cw=cv.clientWidth;if(!cw)return; // hidden (quality off / reduced): no draw
+  const bw=Math.round(r[2]*k),bh=Math.round(r[3]*k);if(cv.width!==bw||cv.height!==bh){cv.width=bw;cv.height=bh;cx=null;last=''}
+  const o=[0,0];for(const q of clocks)o[q.ax]+=q.f+(q.to-q.f)*prog(q.c);const TW=bm.width,TH=bm.height;
+  const ox=Math.round(o[0]*k)%TW,oy=Math.round(o[1]*k)%TH,key=ox+','+oy;if(key===last)return;last=key;if(!cx)cx=cv.getContext('2d');
+  cx.globalCompositeOperation='copy';
+  for(let x0=ox>0?ox-TW:ox;x0<bw;x0+=TW)for(let y0=oy>0?oy-TH:oy;y0<bh;y0+=TH){const cx0=Math.max(0,x0),cy0=Math.max(0,y0);
+   cx.save();cx.beginPath();cx.rect(cx0,cy0,Math.min(bw,x0+TW)-cx0,Math.min(bh,y0+TH)-cy0);cx.clip();cx.drawImage(bm,x0,y0);cx.restore()}
+  cx.globalCompositeOperation='source-over'}};
+ img(p.f).then(async im=>{if(!im)return;const ak=im.naturalWidth/tw,dk=(devicePixelRatio||1)*((box2.parentNode&&box2.parentNode.clientWidth)||0)/r[2]; // art px vs device px per scene px
+  k=dk>0&&dk<ak?dk:ak;const w=Math.round(tw*k),h=Math.round(th*k);
+  bm=await createImageBitmap(im,w===im.naturalWidth&&h===im.naturalHeight?{}:{resizeWidth:w,resizeHeight:h,resizeQuality:'high'}).catch(()=>null);
+  if(!bm)return;live.add(t);if(!raf)raf=requestAnimationFrame(tick)});
+ return cv}
 function build(layer,L,sp,still){const [W,H]=sp;const box=el('div','envlv','position:absolute;inset:0;z-index:1;pointer-events:none');css();
  for(const c of L.clouds||[]){const tw=c.tile[0]*c.h/c.tile[1];scrollBand(box,W,H,{src:c.f,y:c.y,h:c.h,tw,v:c.v,op:c.op,filter:[c.con?`contrast(${c.con})`:'',c.dark?`brightness(${c.dark})`:''].join(' ').trim()})}
  for(const s of L.swell||[]){const r=s.r,e=el('i','envlv-a envlv-swell',`left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};background:0 0/100% 100% no-repeat;--sx:${P(s.amp[0],r[2])};--sy:${P(s.amp[1],r[3])};animation:envlv-swell ${s.period/2}s ease-in-out infinite alternate;visibility:hidden`);
@@ -102,5 +147,5 @@ function build(layer,L,sp,still){const [W,H]=sp;const box=el('div','envlv','posi
 export function syncLiving(id,e){document.querySelectorAll('#env .envL').forEach(l=>{const layer=l.firstElementChild;if(!layer)return;const old=layer.querySelector(':scope>.envlv');const L=e&&e.living&&e.living[l.dataset.l];
  if(old&&old.dataset.env===id&&L)return;if(old)old.remove();if(!L)return;const b=build(layer,L,e.space||[3600,1440]);b.dataset.env=id;layer.appendChild(b)})}
 // Idle-time prebuild (called from env.js prewarmEnv while the map is up (not title)): bake every swell plate and fog crop now, so entering the fight only builds DOM.
-export function prewarmLiving(e){const sp=(e&&e.space)||[3600,1440];return Promise.all(Object.values((e&&e.living)||{}).flatMap(L=>[...(L.swell||[]).map(s=>bakeSwell(s,sp)),...(L.fog||[]).map(f=>crop(f.atlas,f.crop)),...(L.plates||[]).filter(p=>p.kind==='pulse'&&p.blend==='screen').map(p=>bakeScreen(p.f))]))}
+export function prewarmLiving(e){const sp=(e&&e.space)||[3600,1440];return Promise.all(Object.values((e&&e.living)||{}).flatMap(L=>[...(L.swell||[]).map(s=>bakeSwell(s,sp)),...(L.fog||[]).map(f=>crop(f.atlas,f.crop)),...(L.plates||[]).filter(p=>p.kind==='pulse'&&p.blend==='screen').map(p=>bakeScreen(p.f)),...(L.plates||[]).filter(p=>p.kind!=='pulse'&&big(p,sp[0],sp[1])).map(p=>img(p.f))]))}
 export function livingCount(){return document.querySelectorAll('#env .envlv .envlv-a').length}

@@ -2,16 +2,16 @@
 /* A1/A4: the map parchment fills every aspect ratio: no black side voids, no band under the shore, no stepped seam.
    The page spans the full viewport, the painted mid strip covers the whole width (oversized so the ink splat stays off the edge),
    and the calibrated top/bottom plates feather into that strip on their left/right edges instead of ending in a hard step. */
-html:has(.page.mappage){min-height:100%;background:url("../art/v2/bg/map-a1-mid@2x.webp") center top/max(118vw,1100px) auto repeat-y,#e6d6b0!important}
+html.has-mappage{min-height:100%;background:url("../art/v2/bg/map-a1-mid@2x.webp") center top/max(118vw,1100px) auto repeat-y,#e6d6b0!important}
 .page.mappage{max-width:none!important;width:100%;margin:0;padding-left:0;padding-right:0;padding-bottom:0}
 .mappage .parch{width:100vw!important;margin:8px 0 0 calc(50% - 50vw)!important;background:transparent!important;box-shadow:none!important;border:0!important;padding-bottom:24px}
 .mappage .parch::before,.mappage .parch::after{display:none!important}
 .mapwrap.a1 .a1art{-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
 /* A6: nodes never sit half-hidden under the top bar: denser painted dusk backing behind bar + relic row, and scroll padding so
    auto-scroll keeps the reachable row clear of the HUD. */
-html:has(.page.mappage){scroll-padding-top:calc(160*var(--hud-unit,1px))}
+html.has-mappage{scroll-padding-top:calc(160*var(--hud-unit,1px))}
 @media(orientation:landscape){.page.mappage.runhud::before{background:linear-gradient(#0b0e14f5,#0b0e14e0 62%,#0b0e1400)!important}}
-html:has(.page.mappage) #env,html:has(.page.mappage) #env-front{visibility:hidden}
+html.has-mappage #env,html.has-mappage #env-front{visibility:hidden}
 /* A10: each Lantern Task has its own painting; an unlit task shows that painting dimmed and cold (no "Unlit" text), a lit one at full warmth. */
 .lp-task:not(.done) .tart img{filter:grayscale(.6) brightness(.62) contrast(1.05)}
 .lp-task.done .tart img{filter:saturate(1.1) brightness(1.08)}

@@ -11,6 +11,17 @@ export function gfxStats(){const dpr=devicePixelRatio||1,vw=innerWidth,vh=innerH
  for(const a of document.getAnimations()){const t=a.effect&&a.effect.target;if(!t||a.playState!=='running')continue;const k=a.effect.getKeyframes?a.effect.getKeyframes():[];
   if(k.some(f=>'transform' in f||'opacity' in f||'translate' in f||'scale' in f))add(t,'anim')}
  for(const e of document.querySelectorAll('#env *,#env-front *,.xfade *'))if(!seen.has(e)){const w=getComputedStyle(e).willChange;if(/transform|opacity/.test(w))add(e,'will-change')}
+ // v0.6.89: a canvas tile plate (env-living canvasPlate) is one texture at its backing size, not css x DPR^2.
+ for(const c of document.querySelectorAll('#env canvas.envlv-cv,#env-front canvas.envlv-cv'))if(!seen.has(c)&&c.width&&c.height){const n=list.length;add(c,'canvas');if(list.length>n)list[n].mb=c.width*c.height*4/1048576}
+ // v0.6.89 estimate fix: a wrapper that paints nothing itself (no background, mask, filter, border or text) and whose element children are all layers of their own
+ // gets no texture (CDP LayerTree: the 2-axis rain's outer x-mover drew no content), so it is dropped, not counted as a second full-size layer.
+ const inl=new Set(list.map(x=>x.el)),bare=e=>{if(e.tagName==='CANVAS'||e.tagName==='IMG')return false;const cs=getComputedStyle(e);
+  return cs.backgroundImage==='none'&&/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor)&&(cs.maskImage||cs.webkitMaskImage||'none')==='none'&&cs.filter==='none'&&cs.borderStyle.split(' ').every(b=>b==='none')&&
+   ![...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())&&e.children.length>0&&[...e.children].every(c=>inl.has(c)||getComputedStyle(c).display==='none'||(!c.offsetWidth&&!c.offsetHeight))};
+ list=list.filter(x=>!(x.inEnv&&bare(x.el)));
+ // a masked box over composited layers is drawn through an offscreen surface of its own size (v0.6.89: counted, e.g. the shared mask of a canvas plate group)
+ {const lay=list.filter(x=>x.inEnv).map(x=>x.el);for(const e of document.querySelectorAll('#env .envlv *,#env-front .envlv *'))if(!seen.has(e)){const cs=getComputedStyle(e),m=cs.maskImage||cs.webkitMaskImage||'none';
+  if(m!=='none'&&lay.some(l=>l!==e&&e.contains(l)))add(e,'mask')}}
  const sum=l=>({layers:l.length,big:l.filter(x=>x.big).length,mb:Math.round(l.reduce((s,x)=>s+x.mb,0)),visMB:Math.round(l.reduce((s,x)=>s+x.vis*dpr*dpr*4/1048576,0))});
  const env=list.filter(x=>x.inEnv);return {dpr,all:sum(list),env:sum(env),top:list.sort((a,b)=>b.mb-a.mb).slice(0,8).map(x=>({cls:(x.el.className&&x.el.className.baseVal===undefined?x.el.className:'')||x.el.tagName,why:x.why,mb:Math.round(x.mb*10)/10}))}}
 let box=null,timer=0;

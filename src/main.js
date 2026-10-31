@@ -13,6 +13,7 @@ import * as runMod from './engine/run.js';
 import * as render from './ui/render.js';
 import * as input from './ui/input.js';
 import './ui/chartdrag.js';
+import './ui/docflags.js'; // v0.6.89: html/body page-state classes in place of document-level :has()
 import './ui/foil.js';
 import {loadTiles,tileUrls} from './ui/tiles.js';
 import {installGlyphs} from './ui/glyphs.js';
