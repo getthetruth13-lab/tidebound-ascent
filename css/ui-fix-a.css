@@ -94,3 +94,19 @@ html.has-mappage #env,html.has-mappage #env-front{visibility:hidden}
 .lp-node.next .lp-lan{filter:drop-shadow(0 0 6px #ffcf7aaa) drop-shadow(0 0 14px #ffb84a66)}
 .lp-lock:not(.lp-li){border:0!important;border-radius:6px!important;background:#0c1118 url(../art/v2/ui/tiles/lamp-cardback.webp) center/cover no-repeat!important;box-shadow:0 2px 6px #000a,inset 0 0 0 1px #8a744055}
 .lp-lock.lp-li{border:0!important;background:#10161f!important;box-shadow:0 2px 6px #000a,inset 0 0 0 1px #8a744055}
+/* v0.6.91 hunt B1: S24 landscape end screen after a real run (path strip, Last-blow line, both stat rows) put "Play again" 47px below the fold.
+   On short landscape screens the decorative crown/skull glyph goes (the title stays), the sub line is a touch smaller, and the end buttons use the 44px touch height. tests/end-fold-s24.cjs */
+@media (orientation:landscape) and (max-height:480px){
+ .end .endl>.big{display:none}
+ .end .endl .sub{font-size:14.5px;line-height:1.25}
+ .end .endl .endlink{min-height:44px}
+}
+/* v0.6.91 hunt B2: the fading snapshot of the old screen must never take a tap. Its root is pointer-events:none, but .combat .hero/.en, the orb and the
+   coach close button set pointer-events:auto and came back to life inside the clone (taps on the new reward/camp tiles hit the ghost sprite). tests/xfade-taps.cjs */
+.xfade,.xfade *,.xfade *::before,.xfade *::after,.reward-ghost,.reward-ghost *{pointer-events:none!important}
+/* v0.6.91 hunt B3: on short landscape (S24) the coach pills (tutorial, ctx-hint, hero-hint) sat in the top band and covered enemy intents
+   (y 38-102) and a late-run relic row (y 31-55). They now sit in the free band between the health plates and the hand. tests/coach-clear-s24.cjs */
+@media (orientation:landscape) and (max-height:480px){
+ .combat .coach,.combat .coach.hero-hint,.combat .coach.ctx-hint{top:auto;bottom:calc(21vh + 2px);left:50%;max-width:min(66vw,560px);font-size:12px!important;line-height:1.2;padding:3px 9px!important;gap:6px!important;border-radius:12px}
+ .combat .coach .co-ico{width:1.2em;height:1.2em}
+}
