@@ -364,7 +364,7 @@
    "file": "sprites/diver-a2-r86.webp",
    "w": 2024,
    "h": 1498,
-   "bytes": 489878,
+   "bytes": 382136,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -392,7 +392,7 @@
    "file": "sprites/kettleman-a2-r88.webp",
    "w": 2243,
    "h": 1461,
-   "bytes": 503182,
+   "bytes": 457850,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -420,7 +420,7 @@
    "file": "sprites/bosun-a2-r91.webp",
    "w": 1932,
    "h": 1672,
-   "bytes": 492572,
+   "bytes": 510390,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -434,7 +434,7 @@
    "file": "sprites/gateplate-a2-r89.webp",
    "w": 2001,
    "h": 1625,
-   "bytes": 457608,
+   "bytes": 399598,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -462,7 +462,7 @@
    "file": "sprites/lamplighter-a2-r100-c77.webp",
    "w": 1881,
    "h": 1486,
-   "bytes": 472396,
+   "bytes": 469012,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -490,7 +490,7 @@
    "file": "sprites/pumper-a2-r92-c75.webp",
    "w": 2596,
    "h": 1428,
-   "bytes": 440000,
+   "bytes": 458318,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -518,7 +518,7 @@
    "file": "sprites/ghostcannon-a2-r83.webp",
    "w": 2248,
    "h": 1423,
-   "bytes": 489940,
+   "bytes": 480808,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -546,7 +546,7 @@
    "file": "sprites/deckshade-a2-r89-c75.webp",
    "w": 2223,
    "h": 1534,
-   "bytes": 321348,
+   "bytes": 231830,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -588,7 +588,7 @@
    "file": "sprites/hauler-a2-r74.webp",
    "w": 2427,
    "h": 965,
-   "bytes": 396048,
+   "bytes": 407220,
    "role": "elite",
    "facing": "left",
    "anchor": {
@@ -602,7 +602,7 @@
    "file": "sprites/grell-a2-r84.webp",
    "w": 1406,
    "h": 1959,
-   "bytes": 361566,
+   "bytes": 297464,
    "role": "elite",
    "facing": "left",
    "anchor": {
@@ -616,7 +616,7 @@
    "file": "sprites/hgunner-a2-r86.webp",
    "w": 1940,
    "h": 1595,
-   "bytes": 461652,
+   "bytes": 398166,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -672,7 +672,7 @@
    "file": "sprites/colossus-a2-r75.webp",
    "w": 1872,
    "h": 1871,
-   "bytes": 582832,
+   "bytes": 495676,
    "role": "boss",
    "facing": "left",
    "anchor": {
@@ -700,7 +700,7 @@
    "file": "sprites/battery-a2-r85.webp",
    "w": 2085,
    "h": 1584,
-   "bytes": 461164,
+   "bytes": 484508,
    "role": "boss",
    "facing": "left",
    "anchor": {
@@ -770,7 +770,7 @@
    "file": "sprites/polyp-a3-r41.webp",
    "w": 1856,
    "h": 1344,
-   "bytes": 357672,
+   "bytes": 323826,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -812,7 +812,7 @@
    "file": "sprites/shardcarrier-a3-r88.webp",
    "w": 2027,
    "h": 1522,
-   "bytes": 327406,
+   "bytes": 268772,
    "role": "summon",
    "facing": "left",
    "anchor": {
@@ -880,7 +880,7 @@
    "file": "sprites/cloudserpent-a3-r83.webp",
    "w": 1998,
    "h": 1478,
-   "bytes": 256412,
+   "bytes": 288224,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -908,7 +908,7 @@
    "file": "sprites/petrel-a3-r74.webp",
    "w": 1936,
    "h": 1928,
-   "bytes": 574688,
+   "bytes": 617070,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -936,7 +936,7 @@
    "file": "sprites/galereader-a3-r74.webp",
    "w": 1893,
    "h": 1972,
-   "bytes": 596610,
+   "bytes": 592478,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -964,7 +964,7 @@
    "file": "sprites/ringpull-a3-r77.webp",
    "w": 2205,
    "h": 1241,
-   "bytes": 403648,
+   "bytes": 361782,
    "role": "summon",
    "facing": "left",
    "anchor": {
