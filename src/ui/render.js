@@ -508,7 +508,13 @@ export function routeHL(r,i,on){clearTimeout(rtTimer);const map=document.querySe
  if(!on){if(map.querySelector('.node.rt'))rtHeld=Date.now();map.classList.remove('routehl');map.querySelectorAll('.node.rt,.node.rt0').forEach(n=>n.classList.remove('rt','rt0'));return}
  rtTimer=setTimeout(()=>{const rows=W.run&&W.run.map;if(!rows)return;const seen=new Set([r+':'+i]),q=[[r,i]];while(q.length){const [a,b]=q.shift();const n=rows[a]&&rows[a][b];if(!n)continue;for(const j of n.to||[]){const k=(a+1)+':'+j;if(!seen.has(k)){seen.add(k);q.push([a+1,j])}}}
   map.classList.add('routehl');seen.forEach(k=>{const [a,b]=k.split(':');const el=map.querySelector(`.node[data-r="${a}"][data-i="${b}"]`);if(el)el.classList.add(k===r+':'+i?'rt0':'rt')})},300)}
-export function goNodeTap(r,i){if(rtHeld&&Date.now()-rtHeld<700){rtHeld=0;return}goNode(r,i)}
+// v0.6.93 B9: a quick double tap on the button that leaves a room (camp Mend, Leave shop, reward Proceed ...) landed its second tap on
+// the map that had just replaced it, and walked into whatever node sat under the finger, so the player skipped the path choice.
+// A node tap (here and in the anim.js lantern-glide hook) is ignored when the press before it came on another screen less than 450 ms earlier and within 40 px of it (a double tap, not a choice).
+// Only the second press of a real double tap counts: it lands within 40 px of the first. A deliberate tap elsewhere on the map soon after leaving is kept.
+const downs=[];addEventListener('pointerdown',e=>{downs.push({t:Date.now(),x:e.clientX,y:e.clientY,scr:W.S&&W.S.screen});if(downs.length>2)downs.shift()},true);
+export const mapGhostTap=()=>downs.length===2&&downs[1].scr==='map'&&downs[0].scr!=='map'&&downs[1].t-downs[0].t<450&&Math.hypot(downs[1].x-downs[0].x,downs[1].y-downs[0].y)<40;
+export function goNodeTap(r,i){if(rtHeld&&Date.now()-rtHeld<700){rtHeld=0;return}if(mapGhostTap())return;goNode(r,i)}
 // Terms tab (deck view): every keyword used by a card in the deck, in plain words (first line of the glossary entry).
 function historyHTML(){const h=loadHistory(),st=statsOf(h);const nm=k=>(CLASSES[k]&&CLASSES[k].n)||k;
  const rows=Object.entries(st.by).map(([k,b])=>`<p class="dk-term"><b>${nm(k)}</b> ${b.wins} win${b.wins===1?'':'s'} in ${b.runs} run${b.runs===1?'':'s'} · best floor ${b.best}/${TOTAL_FLOORS}</p>`).join('');

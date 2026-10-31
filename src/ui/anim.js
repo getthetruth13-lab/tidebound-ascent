@@ -13,7 +13,7 @@ import {playSound,duckMusic} from '../audio.js';
 import {deathStyleOf,DEATH_STYLES,BOSS_VARIANT,FINALE,DEATH_DRAIN} from './deathstyles.js';
 import {alive} from '../engine/combat.js';
 import {T,U,EB,HIT_WEIGHT,beatsFor} from '../core/timing.js';
-import {cardHTML} from './render.js';
+import {cardHTML,mapGhostTap} from './render.js';
 import {cloneCard,IMPACT_MS} from './fx.js';
 import * as PFX from './painted-fx.js';
 import {glideTo,lanternBusy} from './lantern.js';
@@ -450,13 +450,17 @@ function flipReveal(delay){const ws=$$('.rewgrid .rcw');ws.forEach((w,i)=>{const
   setTimeout(()=>card.classList.remove('foiling'),U(900))})})}
 // B061 reward tiles: each one flies from the fallen foes to its usual spot, one after another (design ms, see ANIMATION-TIMINGS.md)
 const TILE_FLY={ms:760,gap:640,lift:20};
-function flyInTiles(hold){const tiles=$$('.rewtiles .tile');if(!tiles.length)return;
+// v0.6.93 B8: while the tiles fly in they are live buttons -- one waiting its turn sits invisible over the remains, a flying one passes over
+// the landed ones. A tap on the tiles during the fly-in finishes it (all tiles snap to rest) and takes nothing (capture hook below).
+let tileFlights=[];
+function finishTileFlights(){const live=tileFlights.filter(a=>a.playState!=='finished'&&a.effect?.target?.isConnected);tileFlights=[];live.forEach(a=>{try{a.finish()}catch(_){}});return live.length}
+function flyInTiles(hold){const tiles=$$('.rewtiles .tile');if(!tiles.length)return;tileFlights=[];
  const rem=$$('.victory-wrap .remains').map(rectOf),ox=rem.length?rem.reduce((a,r)=>a+r.x,0)/rem.length:innerWidth*.72,oy=rem.length?rem.reduce((a,r)=>a+r.y,0)/rem.length:innerHeight*.55;
  const ban=$('.reward-banner');ban&&ban.animate&&ban.animate([{opacity:0,translate:'0 10px'},{opacity:1,translate:'0 0'}],{duration:U(520),delay:U(hold),easing:'ease-out',fill:'backwards'});
  const sub=$('#pksub');sub&&sub.animate&&sub.animate([{opacity:0},{opacity:1}],{duration:U(500),delay:U(hold+TILE_FLY.gap),easing:'ease-out',fill:'backwards'});
  tiles.forEach((el,i)=>{if(!el.animate)return;const r=rectOf(el),dx=ox-r.x,dy=oy-r.y,t0=hold+260+i*TILE_FLY.gap;
-  el.animate([{translate:`${dx}px ${dy}px`,scale:'.25',rotate:`${i%2?9:-9}deg`,opacity:0},{translate:`${dx*.35}px ${dy*.35-TILE_FLY.lift*3}px`,scale:'.7',rotate:`${i%2?-4:4}deg`,opacity:1,offset:.45},
-   {translate:`0 -${TILE_FLY.lift}px`,scale:'1.07',rotate:'0deg',opacity:1,offset:.82},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],{duration:U(TILE_FLY.ms),delay:U(t0),easing:'cubic-bezier(.3,.7,.35,1)',fill:'backwards'});
+  tileFlights.push(el.animate([{translate:`${dx}px ${dy}px`,scale:'.25',rotate:`${i%2?9:-9}deg`,opacity:0},{translate:`${dx*.35}px ${dy*.35-TILE_FLY.lift*3}px`,scale:'.7',rotate:`${i%2?-4:4}deg`,opacity:1,offset:.45},
+   {translate:`0 -${TILE_FLY.lift}px`,scale:'1.07',rotate:'0deg',opacity:1,offset:.82},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],{duration:U(TILE_FLY.ms),delay:U(t0),easing:'cubic-bezier(.3,.7,.35,1)',fill:'backwards'}));
   laterU(t0+TILE_FLY.ms*.8,()=>{playSound('flip');ring(r.x,r.y,COL.gold,r.w?Math.min(r.w,160):90,380)})})}
 // Proceed: the hero turns toward the path and walks off to the right in a step-and-bob, the tiles and prompt fade; then the map (design ms)
 export const HERO_WALK={turn:260,walk:2300,steps:7,bob:7};
@@ -485,6 +489,7 @@ function syncScreens(){if(!motionOn())return;const S=W.S,s=S.screen;
 }
 // capture-phase click hooks: flights start before the click's own handler re-renders the screen
 addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.closest)return;
+ if(tileFlights.length&&t.closest('.rewtiles')&&finishTileFlights()){ev.stopImmediatePropagation();ev.preventDefault();return}
  const card=t.closest('#confirmcard')&&W.S.cardSelected!=null&&!W.S.skipConfirm?$('.rewgrid .reward-selected .card'):null;
  if(card){const deck=$('#deckbtn');if(deck){const all=$$('.rewgrid .card').filter(c=>c!==card);const b=rectOf(deck),rects=new Map([card,...all].map(c=>[c,c.getBoundingClientRect()]));const {g,r}=cloneCard(card,rects.get(card));
    all.forEach(c=>{const o=cloneCard(c,rects.get(c));o.g.animate([{opacity:1},{opacity:0,transform:'translateY(18px) scale(.9)'}],{duration:U(260),easing:'ease-in'}).finished.then(()=>o.g.remove(),()=>o.g.remove())});
@@ -509,7 +514,8 @@ addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.clos
   setTimeout(()=>{if(window.openChestLid)window.openChestLid()},U(340))}
  // map travel: the painted map lantern glides to the chosen node along the path; the room opens on arrival (ui/lantern.js). Input is locked meanwhile.
  const mnode=t.closest('.node');
- if(mnode&&W.S.screen==='map'&&!W.S.ov){if(lanternBusy()){ev.stopImmediatePropagation();ev.preventDefault()}
+ if(mnode&&W.S.screen==='map'&&!W.S.ov){if(lanternBusy()||mapGhostTap()){ // v0.6.93 B9: the second tap of a double tap that left the last room picks nothing
+ ev.stopImmediatePropagation();ev.preventDefault()}
   else if(mnode.classList.contains('av')){const r=+mnode.dataset.r,i=+mnode.dataset.i;if(glideTo(mnode,()=>{if(W.S.screen==='map'&&!W.S.ov&&window.goNode)window.goNode(r,i)})){ev.stopImmediatePropagation();ev.preventDefault()}}}
 },true);
 // A collected reward's frame lifts away (its art flies to the HUD separately); the live slot is hidden by CSS so the other tiles stay put
