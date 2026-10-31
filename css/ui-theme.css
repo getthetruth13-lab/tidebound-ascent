@@ -546,6 +546,9 @@ body.env-still #envfx{visibility:hidden}
 /* Act 3 enemy states: submerged (Cloud Dive), behind (Twin Squalls back rank), Shard holder (Navigator) */
 .en.sub .fig{opacity:.38;filter:saturate(.5) blur(1.2px) brightness(.8);transform:translateY(8%)}
 .en.back .fig{opacity:.72;filter:brightness(.72) saturate(.8)}
+/* 10-30 BS1: a foe that dies in one of these states keeps the same darkening on its fallen sprite (the .remains box takes the .fig filter, its img the .fig opacity) */
+.combat .remains.sub{filter:saturate(.5) blur(1.2px) brightness(.8)}.combat .remains.sub>img{opacity:.38}
+.combat .remains.back{filter:brightness(.72) saturate(.8)}.combat .remains.back>img{opacity:.72}
 .en.holder .fig{filter:drop-shadow(0 0 7px #b8e6d0cc)}
 
 /* ===== Act 2 painted map (map_a2 v4, v0.6.39). Plate box = slots.json image_css_box; route under the gate seals; no glow except the pole lamp. ===== */

@@ -31,6 +31,8 @@
 /* R9 acting-enemy highlight: the acting foe lifts, the others dim */
 .foes.has-act .en{opacity:.7;transition:opacity .15s}
 .foes.has-act .en.act{opacity:1;translate:0 -6px;z-index:2}
+/* 10-30 BS1: the fallen dim with the other non-acting foes (same .7 as .foes.has-act .en) */
+.combat .remains>img,.combat .remains>.shadow{transition:opacity .15s}.foes.has-act .remains>img{opacity:.7}.foes.has-act .remains>.shadow{opacity:.42}.foes.has-act .remains.back>img{opacity:.504}.foes.has-act .remains.sub>img{opacity:.266}
 .fig{transform-origin:50% 100%}
 /* R1 persistent FX layer (src/ui/vfx.js): never re-rendered */
 #fxlayer{position:fixed;inset:0;z-index:36;pointer-events:none;overflow:hidden}

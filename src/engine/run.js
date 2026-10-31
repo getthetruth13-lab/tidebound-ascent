@@ -251,7 +251,7 @@ export function combatRewards(kind,{allFled,opts={},cb}={}){const run=W.run;cons
   // Spoils (D-A2-12): beating the named boss/elite adds a FOURTH card to the offer while that Spoil is still locked on the account; taking it unlocks it for good.
   const killed=new Set(((cb&&cb.ens)||[]).map(e=>e.key));const spoil=Object.entries(SPOIL_CARDS).find(([id,from])=>CARDS[id]&&CARDS[id].cls===run.cls&&(killed.has(from)||(from==='choir'&&killed.has('cantor')))&&!loadProfile().spoils[id]&&!cards.includes(id));
   remember('offerHist',cards);rows.push({k:'cards',cards:spoil?[...cards,spoil[0]]:cards,spoil:spoil?spoil[0]:undefined})}
- const scene=cb&&cb.ens?{foes:cb.ens.map((e,i)=>({e,i})).filter(({e})=>!e.fled).map(({e,i})=>({gap:!!e.summoned||undefined,key:e.key,sv:e.sv,vi:cb.ens.slice(0,i).filter(x=>x.key===e.key).length,boss:e.boss,elite:e.elite,ph:e.ph,remT:e.remT}))}:null; // the fallen stay on screen behind the rewards
+ const scene=cb&&cb.ens?{foes:cb.ens.map((e,i)=>({e,i})).filter(({e})=>!e.fled).map(({e,i})=>({gap:!!e.summoned||undefined,key:e.key,sv:e.sv,vi:cb.ens.slice(0,i).filter(x=>x.key===e.key).length,boss:e.boss,elite:e.elite,back:e.back||undefined,sub:e.sub||undefined,ph:e.ph,remT:e.remT}))}:null; // the fallen stay on screen behind the rewards
  W.S={screen:'reward',kind,rows,scene,boss:kind==='boss'?(cb&&cb.bossKey)||run.boss:null,title:kind==='boss'?'Boss defeated!':kind==='elite'?'Elite defeated!':allFled?'They fled with your gold…':'Victory!',t:Date.now()};
  // Keep the map checkpoint; the save journal reconstructs this room and its
  // claimed/unclaimed rewards when the player continues.

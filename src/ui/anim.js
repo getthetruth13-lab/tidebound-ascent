@@ -58,7 +58,7 @@ function attackPose(sel,pose,total){
  const swap=im=>{if(touched.has(im)||!im.isConnected)return;touched.set(im,{src:im.getAttribute('src'),style:im.getAttribute('style')});
    im.src=pose.f;im.dataset.pose='atk';
    const box=im.closest('.fig');const h=box.offsetHeight,w=h*pose.w/pose.h;
-   const anchor=parseFloat(im.closest('.en').style.getPropertyValue('--ax'))||box.offsetWidth/2;
+   /*10-30 BS1: --bx is the idle's body anchor (sprite ax) in every fight; --ax centres plates and intents at .5 in group fights, which made poses jump sideways there*/const st=im.closest('.en').style,anchor=parseFloat(st.getPropertyValue('--bx'))||parseFloat(st.getPropertyValue('--ax'))||box.offsetWidth/2;
    Object.assign(im.style,{height:h+'px',width:w+'px',left:(anchor-w*pose.ax)+'px',top:'auto',bottom:'0'})};
  entry(total,elapsed=>{const im=sel&&$(sel+' img.spr');if(!im)return;
   if(!touched.has(im)){if(!warm||poseReady(warm))swap(im);
@@ -386,8 +386,8 @@ function flush(){let recs=pending;pending=[];if(!recs.length)return;
     if(B.dmg||B.lead<=0)play(figOf(sel),[{scale:'1 1',translate:'0 0',filter:'none',offset:0},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(6*w)}px 0`,filter:'brightness(1.3)',offset:.35,easing:'linear'},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(9*w)}px 0`,filter:'brightness(1.4)',offset:.5},{scale:`${1+.03*w} ${1-.07*w}`,translate:`${Math.round(7*w)}px 0`,filter:'brightness(1.4)',offset:.65},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(8*w)}px 0`,filter:'brightness(1.35)',offset:1}],tm,el,0,'ease-out');
     else play(figOf(sel),[{scale:'1 1',translate:'0 0',filter:'none',offset:0},{scale:'1.04',translate:'0 -3px',filter:'brightness(1.35)',offset:1}],tm,el,0,'ease-out');
     const ic=$(sel+' .intentw');if(ic)play(ic,[{scale:'1.4',filter:'brightness(1.6)'},{scale:'1',filter:'none'}],tm*.96,el,0,'cubic-bezier(.2,1.4,.4,1)')})}
-  else if(r.k==='estrike'){const sel=r.sel,dir=-1,B=r.B||EB(),m=r.m||{};
-   if(B.dmg||m.a){
+  else if(r.k==='estrike'){ /* posesOn: see POSE_ACTS below */const sel=r.sel,dir=-1,B=r.B||EB(),m=r.m||{};
+   if(B.dmg||m.a||posesOn(m)){
     const pose=ENEMY_POSES[r.e?.key]?.atk,total=B.lead>0?B.lead+B.hitstop+Math.max(0,B.hits-1)*B.hitGap+B.recover:B.strike;
     if(pose)attackPose(sel,pose,total);
     if(r.e?.key==='lenswright')later(B.lead||0,()=>{const im=sel&&$(sel+' img.spr');PFX.lensBeam(im?rectOf(im):centre(sel),centre('#hero'))});
@@ -414,6 +414,11 @@ function flush(){let recs=pending;pending=[];if(!recs.length)return;
  if(draws.length)firstDrawn=true;
  if(vig)vignette(vig,vig==='red'?.5:.32,vig==='red'?420:320);
 }
+// 10-30 BS1: an enemy with an attack pose also strikes it on a move that deals no damage but acts on you (Pull, Seize, Gust, Numb, Storm Tide, Weak/Vuln/Brittle,
+// status cards, Drain, steals, Ringing, Lure) or carries strike:1 (the Engine rings' Pull and Charge spins). Block, buff, heal, cleanse and summon moves,
+// self-state moves (dive, surface, vent, discharge) and plain waits keep their hop.
+export const POSE_ACTS=['strike','pull','seize','muffle','gust','numb','tide','w','v','brittle','status','drainE','stealPotion','steal','ring','lure'];
+export const posesOn=m=>!!m&&POSE_ACTS.some(k=>m[k]);
 // Status-specific effects (R13), each under 400 ms.
 function statusFx(r){const sel=r.sel;if(!sel)return;const k=r.key;
  const fig=(frames,dur)=>entry(dur,el=>play(figOf(sel),frames,dur,el,0,'ease-out'));

@@ -106,9 +106,9 @@ registerEnemies({
    if(!e.t)return open(e,[dr,cl]);
    return pk(e,[{w:25,m:wa,rep:1},{w:40,m:dr,rep:2},{w:35,m:cl,rep:2}])})},
  // ================= SUMMONS / ADD-ONS =================
- ringpull:{n:'Pull Ring',e:'🧲',act:3,role:'support',hp:HP.ringpull,summonOnly:1,anim:A('spin','lunge','blunt'),ai:e=>({none:1,lbl:'Pull'}),
+ ringpull:{n:'Pull Ring',e:'🧲',act:3,role:'support',hp:HP.ringpull,summonOnly:1,anim:A('spin','lunge','blunt'),ai:e=>({none:1,strike:1,lbl:'Pull'}),
   passive:{n:'Pull Ring',text:'While it spins the Engine pulls 3 at the end of its turn.'},onDeath:e=>ringDied(e)},
- ringcharge:{n:'Charge Ring',e:'⚡',act:3,role:'support',hp:HP.ringcharge,summonOnly:1,anim:A('spin','lunge','shock'),ai:e=>({none:1,lbl:'Charge'}),
+ ringcharge:{n:'Charge Ring',e:'⚡',act:3,role:'support',hp:HP.ringcharge,summonOnly:1,anim:A('spin','lunge','shock'),ai:e=>({none:1,strike:1,lbl:'Charge'}),
   passive:{n:'Charge Ring',text:'While it spins the Engine gains Charge each turn.'},onDeath:e=>{const g=alive().find(x=>x.key==='engine');if(g)g.charge=0;ringDied(e)}},
  ringveil:{n:'Veil Ring',e:'🌁',act:3,role:'support',hp:HP.ringveil,summonOnly:1,anim:A('spin','lunge','glass'),ai:e=>({none:1,lbl:'Veil'}),
   passive:{n:'Veil Ring',text:'While it spins the Engine takes 25% less damage.'},onDeath:e=>ringDied(e)},

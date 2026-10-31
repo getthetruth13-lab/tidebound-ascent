@@ -637,7 +637,7 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 .combat .en.hot .shadow::after{border-color:color-mix(in srgb,var(--status-energy) 75%,transparent)}
 .combat .en.hot .fig{filter:drop-shadow(0 0 1px color-mix(in srgb,var(--status-energy) 50%,transparent)) drop-shadow(0 0 1px color-mix(in srgb,var(--status-energy) 50%,transparent))}
 /* env rim light on enemy sprites (--env-rim colour, --env-rim-s strength set per scene by ui/env.js; 0 = off) */
-.combat .en img.spr{filter:drop-shadow(-1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(0 0 5px color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent))}
+.combat .en img.spr,.combat .remains>img/*10-30 BS1: fallen sprites take the idle's filter path*/{filter:drop-shadow(-1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(0 0 5px color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent))}
 /* status / relic / potion icons */
 .bd .uic{width:16px;height:16px;display:inline-block;flex:none}
 .combat .stw .bd .uic{width:18px;height:18px}
@@ -771,7 +771,7 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
  .combat .scene{position:absolute;inset:0;display:block;padding:0}
  .combat .scene::before,.combat .scene .ground{display:none}
  .combat .fig>.slot.spr-slot{aspect-ratio:auto!important}
- .combat .fig>.slot.spr-slot>img.spr{filter:var(--stage-grade) drop-shadow(var(--stage-light) -1px 1px color-mix(in srgb,var(--stage-rim) 38%,transparent)) drop-shadow(0 2px 2px #0008)}
+ .combat .fig>.slot.spr-slot>img.spr,.combat .remains>img{filter:var(--stage-grade) drop-shadow(var(--stage-light) -1px 1px color-mix(in srgb,var(--stage-rim) 38%,transparent)) drop-shadow(0 2px 2px #0008)}
  /* Task 59: contact shadow = soft radial ellipse (~0.7 sprite width, .55) + a 3px dark core; bosses wider, floaters smaller and offset (sizes set in render.js) */
  .combat .shadow{background:radial-gradient(ellipse,#000 0%,#000a 38%,#0003 62%,transparent 74%);opacity:.55}
  .combat .shadow::before{content:'';position:absolute;left:22%;right:22%;top:calc(50% - 1.5px);height:3px;border-radius:50%;background:#000;filter:blur(1px)}
