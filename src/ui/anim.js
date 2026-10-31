@@ -45,15 +45,24 @@ const laterU=(ms,fn)=>ms>0?fxQueue.push(U(ms),fn):fn();
 function burstAt(sel,kind,ms=0,...args){later(ms,()=>{const c=centre(sel);if(c)emit(kind,c.x,c.y,...args)})}
 function ringAt(sel,col,size,ms=0,ms2=360){later(ms,()=>{const c=centre(sel);if(c)ring(c.x,c.y,col,size,ms2)})}
 // Attack cutouts keep idle height and foot anchor; wider weapons/gestures may extend beyond the idle box.
+// 10-30 BS (single-pose-84): the pose file used to be fetched only when the strike swapped it in, so the first strike of a fight showed an
+// undecoded (blank) sprite for a frame or more (longer on a slow phone link). Poses are now warmed at the telegraph and only swapped in once decoded;
+// until then the idle stays up. Enemies without an atk pose never reach here (the idle simply lunges).
+const POSE_IMG=new Map();
+function warmPose(f){if(!f||typeof Image==='undefined')return null;let im=POSE_IMG.get(f);if(!im){im=new Image();im.decoding='async';im.src=f;
+ im.ready=(im.decode?im.decode():new Promise((ok,no)=>{im.onload=ok;im.onerror=no})).catch(()=>new Promise(r=>{if(im.complete)return r();im.onload=im.onerror=()=>r()}));POSE_IMG.set(f,im)}return im}
+const poseReady=im=>im&&im.complete&&im.naturalWidth>0;
+export function warmEnemyPoses(key){const p=ENEMY_POSES[key];if(p){warmPose(p.atk?.f);warmPose(p.fall?.f)}}
 function attackPose(sel,pose,total){
- const touched=new Map();
- entry(total,elapsed=>{const im=sel&&$(sel+' img.spr');if(!im)return;
-  if(!touched.has(im)){touched.set(im,{src:im.getAttribute('src'),style:im.getAttribute('style')});
+ const touched=new Map(),t0=performance.now(),end=T(total),warm=warmPose(pose.f);
+ const swap=im=>{if(touched.has(im)||!im.isConnected)return;touched.set(im,{src:im.getAttribute('src'),style:im.getAttribute('style')});
    im.src=pose.f;im.dataset.pose='atk';
    const box=im.closest('.fig');const h=box.offsetHeight,w=h*pose.w/pose.h;
    const anchor=parseFloat(im.closest('.en').style.getPropertyValue('--ax'))||box.offsetWidth/2;
-   Object.assign(im.style,{height:h+'px',width:w+'px',left:(anchor-w*pose.ax)+'px',top:'auto',bottom:'0'});
-  }
+   Object.assign(im.style,{height:h+'px',width:w+'px',left:(anchor-w*pose.ax)+'px',top:'auto',bottom:'0'})};
+ entry(total,elapsed=>{const im=sel&&$(sel+' img.spr');if(!im)return;
+  if(!touched.has(im)){if(!warm||poseReady(warm))swap(im);
+   else warm.ready.then(()=>{const cur=sel&&$(sel+' img.spr');if(cur===im&&poseReady(warm)&&performance.now()-t0<end*.8)swap(im)})}
  });
  setTimeout(()=>{for(const [im,old] of touched){if(im.dataset.pose!=='atk'||im.getAttribute('src')!==pose.f)continue;im.src=old.src;old.style==null?im.removeAttribute('style'):im.setAttribute('style',old.style);delete im.dataset.pose}},T(total));
 }
@@ -254,6 +263,7 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
   if(t&&t.key==='gateplate'&&dealt>0&&fxOn())later(IMPACT_MS,()=>{const f=document.querySelector(target+' .fig');if(f)PFX.plateSpark(rectOf(f))});
   if(!c.hpLoss&&c.amount)queue({k:'blocked',sel:target})}
  if(event==='playerHit'){queue({k:'herohit',amount:c.amount,blocked:c.blocked,enemy:c.enemy,B:W.cb&&W.cb.beats||beatsFor(c.enemy,{a:1})})}
+ if(event==='combatStart'){for(const e of c.enemies||[])warmEnemyPoses(e?.key)}/*10-30: fetch + decode this fight's atk/fall poses up front*/
  if(event==='enemyTelegraph'){setImpact(0);queue({k:'telegraph',sel:enemy(c.enemy),B:c.beats||beatsFor(c.enemy,{a:1}),e:c.enemy})}
  if(event==='enemyStrike'){queue({k:'estrike',sel:enemy(c.enemy),B:c.beats,m:c.intent||{},e:c.enemy})}
  if(event==='enemyAct'){setImpact(Math.round((W.cb&&W.cb.beats||EB()).impact||0))}
@@ -371,7 +381,7 @@ function flush(){let recs=pending;pending=[];if(!recs.length)return;
     later(delay,()=>{freezeIdle($('#hero .fig'),s);const c=centre('#hero');if(c)emit('hit',c.x,c.y-c.h*.1,-1)});
     const a=B.lead>0?Math.max(2,Math.min(12,Math.round((2+ratio*28)*(B.shake||1)))):(big?(r.enemy&&r.enemy.boss?8:5):2);later(delay,()=>shakeNow(a));vig='red'}
    if(r.blocked>0){later(delay,()=>{const c=centre('#hero');if(c){emit('guard',c.x+10,c.y);ring(c.x,c.y,COL.pale,80,320)}});if(!vig)vig='blue'}}
-  else if(r.k==='telegraph'){const sel=r.sel,B=r.B,tm=B.tele,w=B.w==='boss'?1.5:B.w==='elite'?1.25:1;
+  else if(r.k==='telegraph'){const sel=r.sel,B=r.B,tm=B.tele,w=B.w==='boss'?1.5:B.w==='elite'?1.25:1;warmEnemyPoses(r.e?.key);
    entry(tm+B.teleHold,el=>{
     if(B.dmg||B.lead<=0)play(figOf(sel),[{scale:'1 1',translate:'0 0',filter:'none',offset:0},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(6*w)}px 0`,filter:'brightness(1.3)',offset:.35,easing:'linear'},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(9*w)}px 0`,filter:'brightness(1.4)',offset:.5},{scale:`${1+.03*w} ${1-.07*w}`,translate:`${Math.round(7*w)}px 0`,filter:'brightness(1.4)',offset:.65},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(8*w)}px 0`,filter:'brightness(1.35)',offset:1}],tm,el,0,'ease-out');
     else play(figOf(sel),[{scale:'1 1',translate:'0 0',filter:'none',offset:0},{scale:'1.04',translate:'0 -3px',filter:'brightness(1.35)',offset:1}],tm,el,0,'ease-out');
