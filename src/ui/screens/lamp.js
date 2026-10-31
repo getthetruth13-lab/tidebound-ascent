@@ -69,10 +69,13 @@ const TAB_N={all:'All cards',climb:'Stair Climb',pages:'Pages'},SEC_N={all:'All'
 // Placeholder for a card from an act that is not in play yet: no name, no art, no rarity.
 const laterTile=(act)=>`<div class="lp-lock lp-later-card"><span class="lp-seal">${emblemHTML('lamp-lock-card','🔒','seal')}</span><b>???</b><i>Act ${act}</i><span class="lp-hint">Not in play yet</span></div>`;
 // Lazy rendering: the grid gets the first chunk now and appends more as the player scrolls (S24 memory budget; the All tab holds 300 tiles).
-const CHUNK0=60,CHUNK=36;
+/*10-30 BS5: the first chunk only covers the screen (about two rows on an S24), so the open paints fast at 4x CPU throttle; the rest of the first 60 fills in small idle-time chunks, then scrolling appends as before*/const CHUNK0=60,CHUNK=36,FIRST=16,FILL=6;
+const idle=typeof requestIdleCallback==='function'?f=>requestIdleCallback(f,{timeout:120}):f=>setTimeout(f,16);
 function hydrate(){const g=document.getElementById('ledgergrid'),q=W.ledgerQ;if(!g||!q||g.dataset.q===String(q.id))return;g.dataset.q=String(q.id);g.innerHTML='';g.scrollTop=0;q.n=0;
  const more=()=>{if(W.ledgerQ!==q||q.n>=q.items.length)return;const k=q.n?CHUNK:CHUNK0;g.insertAdjacentHTML('beforeend',asy(q.items.slice(q.n,q.n+k).join('')));q.n+=k;g.dataset.shown=Math.min(q.n,q.items.length)};
- more();g.onscroll=()=>{if(g.scrollTop+g.clientHeight>g.scrollHeight-400)more()};q.more=more}
+ const fill=()=>{if(W.ledgerQ!==q||q.n>=Math.min(CHUNK0,q.items.length))return;const k=Math.min(FILL,CHUNK0-q.n);g.insertAdjacentHTML('beforeend',asy(q.items.slice(q.n,q.n+k).join('')));q.n+=k;g.dataset.shown=Math.min(q.n,q.items.length);idle(fill)};
+ const f0=W.ledgerFirst||FIRST;/*test knob: ledger-throttle-86 sets W.ledgerFirst=60 to time the pre-fix one-chunk open as a same-run baseline*/g.insertAdjacentHTML('beforeend',asy(q.items.slice(0,f0).join('')));q.n=f0;g.dataset.shown=Math.min(q.n,q.items.length);idle(fill);
+ g.onscroll=()=>{if(g.scrollTop+g.clientHeight>g.scrollHeight-400)more()};q.more=more}
 export function ledgerMore(){const q=W.ledgerQ;if(q&&q.more)q.more()}
 export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=lockedFor(p),sec0=S.sec||'all';
  const tabs=['all',...CLASS_ORDER,'climb','pages'].map(t=>{const pend=t==='pages'||t==='all'?0:t==='climb'?climbPending(p):lampPending(p,t);const hl=CLASSES[t]&&!heroUnlocked(p,t);return `<button class="lp-tab${t===tab?' on':''}${hl?' herolocked':''}" data-tab="${t}"${hl?` data-info="${tesc(HERO_LOCKS[t].hint)}" aria-label="${CLASSES[t].n} (locked)"`:''} onclick="ledgerTab('${t}')">${TAB_N[t]||CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
