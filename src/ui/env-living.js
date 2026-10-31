@@ -33,6 +33,19 @@ function bakeSwell(s,sp){const key=s.f+'|'+s.mask+'|'+s.r.join(',');if(baked[key
    for(let i=0;i<a.length;i+=4)a[i+3]=a[i+3]*(b[i]*.2126+b[i+1]*.7152+b[i+2]*.0722)/255;
    cc.putImageData(pd,0,y0);await new Promise(r=>setTimeout(r,0))}
   return new Promise(ok=>c.toBlob(b=>ok(b?URL.createObjectURL(b):''),'image/webp',.92))})}
+// v0.6.88 brazier fix: a 'screen' pulse plate (a3-eng6-glow, a2-sr3g1-lure: opaque RGB, glow on near-black) only reads as a glow when the art it lights is in
+// its backdrop. Every .envL layer is its own isolated group (drift / will-change / the .35s fade) and the plate's own living box is z-index:1, so the backdrop
+// was empty and the plate's black field drew as a dark rectangle each time the pulse rose (and the a2_ramparts lure sits on the 'ground' layer, over no art at all).
+// Bake it once into an alpha plate instead: alpha = brightest channel, colour = plate / alpha, drawn with normal blend. Over any backdrop B that gives
+// B*(1-a)+P: exact on the brightest channel, a hair darker on the others, and identical whether or not the layer is isolated. null -> keep hidden.
+const screened={};
+function bakeScreen(f){if(screened[f])return screened[f];
+ return screened[f]=new Promise(ok=>{const im=new Image();im.decoding='async';im.onload=async()=>{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;
+  const cc=c.getContext('2d',{willReadFrequently:true});cc.drawImage(im,0,0);
+  for(let y0=0;y0<h;y0+=128){const n=Math.min(128,h-y0),d=cc.getImageData(0,y0,w,n),a=d.data;
+   for(let i=0;i<a.length;i+=4){const m=Math.max(a[i],a[i+1],a[i+2]);if(m){const k=255/m;a[i]=Math.min(255,Math.round(a[i]*k));a[i+1]=Math.min(255,Math.round(a[i+1]*k));a[i+2]=Math.min(255,Math.round(a[i+2]*k))}a[i+3]=Math.round(m*a[i+3]/255)}
+   cc.putImageData(d,0,y0);await new Promise(r=>setTimeout(r,0))}
+  c.toBlob(b=>ok(b?URL.createObjectURL(b):''),'image/png')};im.onerror=()=>ok('');im.src=f})}
 function rng(seed){let s=seed*2654435761>>>0||1;return ()=>{s^=s<<13;s>>>=0;s^=s>>17;s^=s<<5;s>>>=0;return s/4294967296}}
 function el(tag,cls,st){const e=document.createElement(tag);if(cls)e.className=cls;if(st)e.style.cssText=st;return e}
 function scrollBand(box,W,H,{src,y,h,tw,v,op,filter}){ // a repeat-x painted band drifting right->left on a seamless track
@@ -45,7 +58,8 @@ function scrollBand(box,W,H,{src,y,h,tw,v,op,filter}){ // a repeat-x painted ban
 function plates(box,L,W,H){
  for(const p of L){const r=p.r;
   if(p.kind==='pulse'){const o=p.ops,e=el('i','envlv-a envlv-pulse'+(p.cls?' '+p.cls:''),`${p.flash?'opacity:0;':''}left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};background:url("${p.f}") 0 0/100% 100% no-repeat;--p0:${o[0]};--p1:${o[1]};--p2:${o[2]};--p3:${o[3]};animation:${p.flash?'envlv-flash':'envlv-pulse'} ${p.period}s ${p.flash?'linear':'ease-in-out'} ${(-(p.phase||0)*p.period).toFixed(2)}s infinite`);
-   if(p.blend)e.style.mixBlendMode=p.blend;
+   if(p.blend==='screen'){e.style.visibility='hidden';e.dataset.screen='baked';bakeScreen(p.f).then(u=>{if(u){e.style.backgroundImage=`url("${u}")`;e.style.visibility=''}})}
+   else if(p.blend)e.style.mixBlendMode=p.blend;
    if(p.op!=null)e.style.setProperty('--m',p.op);box.appendChild(e);continue}
   const [tw,th]=p.tile,[sx,sy]=p.loop,iw=r[2]+(sx?tw:0),ih=r[3]+(sy?th:0),box2=el('i','envlv-clip'+(p.cls?' '+p.cls:''),`position:absolute;left:${P(r[0],W)};top:${P(r[1],H)};width:${P(r[2],W)};height:${P(r[3],H)};overflow:hidden;opacity:${p.op}`);
   let e;if(p.vel){ // v0.6.77 rain fix: per-axis speed in scene px/s (vel:[vx,vy]). The outer layer moves one tile on x every tw/|vx| s and an inner child one tile on y every th/|vy| s,
@@ -88,5 +102,5 @@ function build(layer,L,sp,still){const [W,H]=sp;const box=el('div','envlv','posi
 export function syncLiving(id,e){document.querySelectorAll('#env .envL').forEach(l=>{const layer=l.firstElementChild;if(!layer)return;const old=layer.querySelector(':scope>.envlv');const L=e&&e.living&&e.living[l.dataset.l];
  if(old&&old.dataset.env===id&&L)return;if(old)old.remove();if(!L)return;const b=build(layer,L,e.space||[3600,1440]);b.dataset.env=id;layer.appendChild(b)})}
 // Idle-time prebuild (called from env.js prewarmEnv while the map is up (not title)): bake every swell plate and fog crop now, so entering the fight only builds DOM.
-export function prewarmLiving(e){const sp=(e&&e.space)||[3600,1440];return Promise.all(Object.values((e&&e.living)||{}).flatMap(L=>[...(L.swell||[]).map(s=>bakeSwell(s,sp)),...(L.fog||[]).map(f=>crop(f.atlas,f.crop))]))}
+export function prewarmLiving(e){const sp=(e&&e.space)||[3600,1440];return Promise.all(Object.values((e&&e.living)||{}).flatMap(L=>[...(L.swell||[]).map(s=>bakeSwell(s,sp)),...(L.fog||[]).map(f=>crop(f.atlas,f.crop)),...(L.plates||[]).filter(p=>p.kind==='pulse'&&p.blend==='screen').map(p=>bakeScreen(p.f))]))}
 export function livingCount(){return document.querySelectorAll('#env .envlv .envlv-a').length}
