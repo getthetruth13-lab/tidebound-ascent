@@ -110,3 +110,21 @@ html.has-mappage #env,html.has-mappage #env-front{visibility:hidden}
  .combat .coach,.combat .coach.hero-hint,.combat .coach.ctx-hint{top:auto;bottom:calc(21vh + 2px);left:50%;max-width:min(66vw,560px);font-size:12px!important;line-height:1.2;padding:3px 9px!important;gap:6px!important;border-radius:12px}
  .combat .coach .co-ico{width:1.2em;height:1.2em}
 }
+/* v0.6.92 hunt B5: .evtext is a scrolling flex column with justify-content:center, so when an event (5 options with a hero line and a
+   locked reason) is taller than the panel the centring pushes the title above the scroll origin where it can never be scrolled to, and the
+   last option ("Leave") ends below the screen. Centre with auto margins (they collapse to 0 on overflow) and, on short landscape, thin the
+   option frames and gaps so every event fits. tests/event-fit-s24.cjs */
+.evtext{justify-content:flex-start}
+.evtext>:first-child{margin-top:auto}.evtext>:last-child{margin-bottom:auto}
+@media (orientation:landscape) and (max-height:480px){
+ .evtext{top:40px;gap:.35em}
+ .evopts{gap:.2em}
+ .evo{border-width:8px}
+}
+/* v0.6.92 hunt B6: a real Act 3 end screen carries the whole climb's path (47 rooms -> three wrapped rows of 18px glyphs) and pushed
+   "Play again" below the fold on S24 landscape again. Short landscape: 12px glyphs on the full column width (~353px, 25 a row) so 47 rooms take two rows.
+   tests/end-fold-s24.cjs (*-full cases) */
+@media (orientation:landscape) and (max-height:480px){
+ .end .endpath{max-width:none;gap:1px 2px;margin:2px 0 1px}
+ .end .endpath .ep{width:12px;height:12px}
+}
