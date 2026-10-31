@@ -100,6 +100,8 @@
 .end .lp-btns .btn{min-height:44px;font-size:13px;white-space:nowrap}
 /* toasts (Lantern Task etc.) stay off the title: bottom-left of the safe frame on every non-combat page */
 .page .toasts{top:auto;bottom:calc(var(--foot-h) + 4px);left:var(--sf-x);right:auto;align-items:flex-start}
+/* camp: the foot strip is empty, so toasts sit in it side by side, below the camp tiles (v0.6.94: they covered the bottom of Mend / Forge) */
+.page.fit-rest .toasts{bottom:var(--sf-b);flex-direction:row;align-items:flex-end;max-width:calc(100vw - 2*var(--sf-x))}
 /* ---- tap targets: icons keep their size, the hit area grows to >= 44x40 (about 9mm on the S24) ---- */
 .topbar .mini,.topbar .potion,.topbar .relics>*{position:relative}
 .topbar .mini::after,.topbar .potion::after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:max(100%,var(--tap));transform:translateY(-50%)}
