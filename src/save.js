@@ -16,7 +16,9 @@ const clone=v=>JSON.parse(JSON.stringify(v));
 // Fields older saves may lack get the same defaults newRun() gives (a missing one used to crash the next event / unknown room / map step).
 const RUN_DEFAULTS=()=>({seenEvents:{},shrinesThisAct:{},seenRelics:{},charms:[],encHist:[],vis:{},removals:0,fights:0,rareNext:false,kills:0,floor:0,act:1,potionChance:40,swell:-4,qOdds:{fight:12,shop:4,treasure:3}});
 const STAT_DEFAULTS=()=>({floors:0,kills:0,elites:[0,0,0],bosses:0,goldEarned:0,maxHit:0,maxCardsTurn:0,cardsPlayed:0,path:[],potionsUsed:0,relicsAtBoss:null,potionsAtBoss:null,startT:Date.now()});
-export const migrateRun=run=>{if(!run)return run;for(const c of run.deck||[])if(c.lvl==null)c.lvl=c.up?1:0;
+// Retired card ids -> the live card that replaced them (v0.6.98: the cut duplicate Catch Breath).
+export const RETIRED_CARDS={secondwind:'catchbreath'};
+export const migrateRun=run=>{if(!run)return run;for(const c of run.deck||[]){if(c.lvl==null)c.lvl=c.up?1:0;if(RETIRED_CARDS[c.id])c.id=RETIRED_CARDS[c.id]}
  const d=RUN_DEFAULTS();for(const k in d)if(run[k]==null)run[k]=d[k];
  if(!run.qOdds||typeof run.qOdds!=='object')run.qOdds=d.qOdds;else for(const k in d.qOdds)if(run.qOdds[k]==null)run.qOdds[k]=d.qOdds[k];
  if(!run.stats||typeof run.stats!=='object')run.stats={};const sd=STAT_DEFAULTS();for(const k in sd)if(run.stats[k]==null)run.stats[k]=sd[k];
