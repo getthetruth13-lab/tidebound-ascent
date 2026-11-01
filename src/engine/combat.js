@@ -95,7 +95,7 @@ export const relic=id=>W.run&&W.run.relics&&W.run.relics.find(r=>r.id===id);
 export function gainBlock(n,o={}){const cb=W.cb;if(!cb)return 0;if(o.fromCard){n+=cb.p.st.dex||0;if(cb.p.st.brittle)n*=.75}
  n=Math.floor(mod('guard',{fromCard:!!o.fromCard},n));
  // Act 3 R5 Storm Tide: a non-Tide hero's first Guard card is 1 weaker (a live Magus). R12 Siphon: each Anchorite takes half of card Guard (max 8 per turn).
- if(o.fromCard&&!o.echo&&cb.storm&&!cb.stormUsed&&W.run.cls!=='tide'&&alive().some(x=>x.key==='magus')){cb.stormUsed=true;n=Math.max(0,n-1);floatText('p','Storm Tide','b')}
+ if(o.fromCard&&!o.echo&&cb.storm&&!cb.stormUsed&&W.run.cls!=='tide'&&alive().some(x=>x.key==='magus')){cb.stormUsed=true;n=Math.max(0,n-1);floatText('p','Foul Tide','b')}
  if(n<=0)return 0;cb.p.block+=n;cb.p.blkT=Date.now();floatText('p','+'+n+'🛡','b');fire('guardGained',{amount:n});
  if(o.fromCard)alive().filter(x=>x.key==='anchorite').forEach(x=>{let t=Math.floor(n/2);t=Math.max(0,Math.min(Math.floor(mod('siphon',{enemy:x},t)),8-(x.siph||0)));if(t>0){x.siph=(x.siph||0)+t;x.block+=t;x.blkT=Date.now();floatText(x.uid,'+'+t+'🛡','b');log('⛓️ '+x.n+' siphons '+t+' Guard')}});
  return n}
@@ -134,7 +134,7 @@ export function hit(e,base,f,o={}){if(!e||e.hp<=0||e.fled)return 0;const cb=W.cb
  if(e.st.vuln)d=Math.floor(d*1.5);
  d=Math.max(0,Math.floor(mod('damage',{target:e,f,attack:atk,raw:!!o.raw},d)));
  const pa=EN[e.key].passive||{};
- if(atk&&pa.armour&&!e.armSpent){e.armSpent=true;d=0;floatText(e.uid,'Armoured','b');fire('armourAbsorb',{target:e,f})} // R3: the first Attack hit each turn bounces off
+ if(atk&&pa.armour&&!e.armSpent){e.armSpent=true;d=0;floatText(e.uid,'Riveted Plate','b');fire('armourAbsorb',{target:e,f})} // R3: the first Attack hit each turn bounces off
  {const dm=EN[e.key].dmgMod;if(dm&&d>0)d=dm(e,d)} // Act 3: Spindrift (Engine ring), the Shard holder's half
  if(atk&&pa.mantlet&&e.block>d&&f&&!f.mantled){f.mantled=true;floatText('p','-'+pa.mantlet,'');loseHp(pa.mantlet)} // Spiked Mantlet: not on the hit that breaks the Guard
  if(atk&&e.st.bleed&&!(f.bled||(f.bled=new Set())).has(e)){f.bled.add(e);const b=Math.ceil(mod('bleedDamage',{target:e},e.st.bleed));loseHpEnemy(e,b,'bleed');if(!mod('keepBleed',{target:e},false)){e.st.bleed--;if(!e.st.bleed)delete e.st.bleed}if(e.hp<=0)return 0}
@@ -159,7 +159,7 @@ export function setTide(v,cause){const cb=W.cb;const from=cb.tide;const to=Math.
  if(dir){noteDir(dir,cause)}cb.tide=to;fire('tideChange',{from,to,delta:to-from,cause:cause||'set'});checkTide(cause);return to}
 // Returns the Tide reached by the move (before a Crest/Undertow resets it to 5), so cards can check "if now at Low/High Tide".
 export function tideShift(n,cause){const cb=W.cb;if(!n)return cb.tide;
- if(cb.storm&&cause==='card'&&alive().some(x=>x.key==='magus')){const m=Math.max(0,Math.abs(n)-1);n=Math.sign(n)*m;if(!n){floatText('p','Storm Tide','b');return cb.tide}} /* R5 Storm Tide: Surge and Recede are 1 weaker */
+ if(cb.storm&&cause==='card'&&alive().some(x=>x.key==='magus')){const m=Math.max(0,Math.abs(n)-1);n=Math.sign(n)*m;if(!n){floatText('p','Foul Tide','b');return cb.tide}} /* R5 Storm Tide: Surge and Recede are 1 weaker */
  if(cb.slack&&cause!=='drift')return cb.tide;const from=cb.tide,dir=Math.sign(n);
  const wasHigh=isHigh();noteDir(dir,cause);const to=Math.max(0,Math.min(10,from+n));cb.tide=to;
  fire(dir>0?'surge':'recede',{n:Math.abs(n),wasHigh,cause});fire('tideChange',{from,to,delta:to-from,cause:cause||'card'});checkTide(cause);return to}
@@ -340,7 +340,7 @@ function playCardImpl(i,opts={}){const cb=W.cb;const ci=cb.hand[i];if(!ci)return
  if(cb.mimic){cb.mimic=false;const f2=F(ci,{tgt:tg,x});f2.flourish=f.flourish;f2.fmult=f.fmult;log('🖋️ Mimic Ink: '+cname(ci)+' again');runCard(d,f2)}
  if(!W.cb)return;
  // R11 Refract: the first Attack CARD each turn hurts you for 3 (Guard absorbs it) while a Lens-Wright lives. Echo repeats never trigger it.
- if(d.t==='A'&&!cb.refracted&&alive().some(x=>x.key==='lenswright')){cb.refracted=true;if(mod('refract',{},true)){floatText('p','Refract -3','');loseHp(3,{guard:true});log('🔆 Refract: 3 damage back to you')}}
+ if(d.t==='A'&&!cb.refracted&&alive().some(x=>x.key==='lenswright')){cb.refracted=true;if(mod('refract',{},true)){floatText('p','Hot Glass -3','');loseHp(3,{guard:true});log('🔆 Hot Glass: 3 damage back to you')}}
  if(W.run.cls==='duel'&&d.t==='A'){if(f.flourish)cb.mom=f.freeFlourish?f.savedMom:mod('momAfterFlourish',{f},0);else gainMom(1)}
  cb.lastType=d.t==='A'?'A':d.t==='P'?'P':'S';
  {cb.last=d.t==='P'?null:ci;cb.lastTgt=tg;if(d.t!=='P'&&!d.faint){cb.lastNF=ci;cb.lastNFTgt=tg}}
@@ -514,7 +514,7 @@ function swapTwins(){const t=alive().filter(x=>x.key==='squallwest'||x.key==='sq
 const cardCost=ci=>cost(ci);
 function applyMuffle(){const cb=W.cb;if(!cb||!cb.muffleNext)return;cb.muffleNext=false;if(!alive().some(x=>x.key==='bellnun'))return;
  let best=null,bc=0;for(const ci of cb.hand){const c=cardCost(ci);if(c>bc){bc=c;best=ci}}
- if(best){cb.locked=best;log('🔕 Muffled: '+cname(best)+' is silenced this turn');callout('MUFFLED','boss')}}
+ if(best){cb.locked=best;log('🔕 Gagged: '+cname(best)+' is silenced this turn');callout('GAGGED','boss')}}
 // R8 Seize: the Bosun keeps your lowest-cost card (leftmost on ties) until he dies. A card stays in run.deck, so combat end needs no return.
 function seizeCard(e){const cb=W.cb;if(e.seized||!cb.hand.length)return;let best=null,bc=99;for(const ci of cb.hand){const c=cardCost(ci);if(c<bc){bc=c;best=ci}}
  if(best){cb.hand.splice(cb.hand.indexOf(best),1);e.seized=best;log('⚓ '+e.n+' seizes '+cname(best));callout('SEIZED','boss')}}

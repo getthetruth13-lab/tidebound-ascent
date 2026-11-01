@@ -76,11 +76,11 @@ registerEnemies({
   ai:AI(e=>loop(e,[{numb:1,b:8,lbl:'Frost Gear',anim:A('spin','lunge','blunt',{hits:0})},{a:18,lbl:'Pound',anim:A('raise','drop','blunt')},{a:9,numb:1,lbl:'Grind',anim:A('spin','lunge','blunt')},{b:6,lbl:'Stiff'}]))},
  // 1.7 Cloudfin Shark [DIVE]: Bite, Fin Slash, Circle (dives next turn), Breach.
  cloudshark:{n:'Cloudfin Shark',e:'🦈',act:3,role:'bruiser',hp:HP.cloudshark,anim:A('lean','lunge','pierce'),
-  passive:{n:'Cloud Dive',text:'When it dives, only area damage and Bleed can reach it.',dive:1},
+  passive:{n:'Under the Cloud',text:'When it dives, only area damage and Bleed can reach it.',dive:1},
   ai:AI(e=>loop(e,[{a:11,lbl:'Bite',anim:A('lean','lunge','pierce')},{a:6,h:2,lbl:'Fin Slash',anim:A('rear','lunge','blunt',{hits:2})},{dive:1,b:6,lbl:'Dives next turn',anim:A('tuck','lunge','blunt',{hits:0})},{a:20,surface:1,lbl:'Breach',anim:A('build','breach','pierce')}]))},
  // 1.8 Cloudfin Serpent [DIVE]
  cloudserpent:{n:'Cloudfin Serpent',e:'🦎',act:3,role:'bruiser',hp:HP.cloudserpent,anim:A('rear','lunge','blunt'),
-  passive:{n:'Cloud Dive',text:'When it dives, only area damage and Bleed can reach it.',dive:1},
+  passive:{n:'Under the Cloud',text:'When it dives, only area damage and Bleed can reach it.',dive:1},
   ai:AI(e=>loop(e,[{a:12,lbl:'Lash',anim:A('rear','lunge','blunt')},{b:10,lbl:'Coil',anim:A('coil','lunge','blunt',{hits:0})},{dive:1,b:8,lbl:'Slips below',anim:A('tuck','lunge','blunt',{hits:0})},{a:14,v:1,surface:1,lbl:'Constrict',anim:A('build','breach','blunt')}]))},
  // 1.9 Gale Reader: Tailwind makes every ally's next attack hit 4 harder (itself if alone).
  galereader:{n:'Gale Reader',e:'📜',act:3,role:'support',hp:HP.galereader,anim:A('read','cast','gale'),
@@ -90,7 +90,7 @@ registerEnemies({
    return pk(e,[{w:allies(e).length?40:20,m:rd,rep:1},{w:35,m:gl,rep:2},{w:25,m:ch,rep:1}])})},
  // 1.10 Lens-Wright [REFRACT]: your first Attack card each turn deals 3 back to you (engine: playCard).
  lenswright:{n:'Lens-Wright',e:'🔭',act:3,role:'debuffer',hp:HP.lenswright,anim:A('raise','beam','glass'),
-  passive:{n:'Refract',text:'Your first Attack each turn deals 3 back to you.',refract:1},
+  passive:{n:'Hot Glass',text:'Your first Attack each turn deals 3 back to you.',refract:1},
   ai:AI(e=>{const ps={a:6,h:3,lbl:'Prism Sweep',anim:A('raise','beam','glass',{hits:3})},bm={a:9,brittle:1,lbl:'Beam',anim:A('aim','beam','glass')},fo={b:10,lbl:'Focus',anim:A('read','beam','glass',{hits:0})};
    if(!e.t)return open(e,[ps,bm]);
    return pk(e,[{w:35,m:ps,rep:2},{w:40,m:bm,rep:2},{w:25,m:fo,rep:1}])})},
@@ -101,7 +101,7 @@ registerEnemies({
    return pk(e,[{w:45,m:pe,rep:2},{w:30,m:hp_,rep:2},{w:25,m:rl,rep:1}])})},
  // 1.12 Windbound Anchorite [SIPHON]: when you gain Guard from a card it gains half (engine: gainBlock).
  anchorite:{n:'Windbound Anchorite',e:'⚓',act:3,role:'bruiser',hp:HP.anchorite,anim:A('haul','drop','blunt'),
-  passive:{n:'Siphon',text:'When you gain Guard from a card, it gains half (up to 8 a turn).',siphon:1},
+  passive:{n:'Leech Guard',text:'When you gain Guard from a card, it gains half (up to 8 a turn).',siphon:1},
   ai:AI(e=>{const wa={b:10,lbl:'Weigh Anchor',anim:A('haul','lunge','blunt',{hits:0})},dr={a:15,lbl:'Drag',anim:A('haul','drop','blunt')},cl={a:7,h:2,lbl:'Chain Lash',anim:A('rear','lunge','blunt',{hits:2})};
    if(!e.t)return open(e,[dr,cl]);
    return pk(e,[{w:25,m:wa,rep:1},{w:40,m:dr,rep:2},{w:35,m:cl,rep:2}])})},
@@ -119,7 +119,7 @@ registerEnemies({
  // ================= ELITES =================
  // 3.1 The Magus [TIDE]: Read the Tide puts Storm Tide on your next turn. Loop of 5; at half HP the Squall Strike drops out.
  magus:{n:'The Magus',e:'🧙',act:3,role:'debuffer',hp:HP.magus,elite:1,anim:AE('read','arc','shock'),
-  passive:{n:'Storm Tide',text:'Storm Tide weakens your Surge, Recede, or first Guard card for a turn.',stormtide:1},
+  passive:{n:'Foul Tide',text:'Foul Tide weakens your Surge, Recede, or first Guard card for a turn.',stormtide:1},
   ai:AI(e=>{const half=e.hp<=e.max/2;const seq=[{tide:1,b:12,lbl:'Read the Tide',anim:AE('read','arc','shock',{hits:0,hold:1.1})},{a:16,lbl:'Lightning Brand',anim:AE('raise','arc','shock')},{b:12,lbl:'Thunderhead next',anim:AE('build','arc','shock',{hits:0})},{a:26,lbl:'Thunderhead',anim:AE('build','arc','shock',{hold:1.3})}];
    if(!half)seq.push({a:9,h:2,lbl:'Squall Strike',anim:AE('raise','cast','gale',{hits:2})});return loop(e,seq)})},
  // 3.2 Twin Squalls [two bodies]: only the front twin is a single target; they trade places after every enemy round.
@@ -129,20 +129,20 @@ registerEnemies({
   ai:e=>twinAI(e),intent:e=>twinIntent(e),onSpawn:e=>{e.back=true},onDeath:e=>twinDied(e)},
  // 3.3 Eye of the Gale [VEIL]: a fixed loop of four, alternating clear and veiled turns. A Marked eye shows its number.
  eyegale:{n:'Eye of the Gale',e:'👁️',act:3,role:'attacker',hp:HP.eyegale,elite:1,anim:AE('lean','cast','gale'),
-  passive:{n:'Squall Veil',text:'Veiled intent hides the number. It never exceeds 26.',veil:1},
+  passive:{n:'Hidden Hand',text:'Hidden Hand: its intent hides the number. It never exceeds 26.',veil:1},
   ai:AI(e=>loop(e,[{a:12,h:2,lbl:'Sidewind',anim:AE('lean','cast','gale',{hits:2})},{a:22,veil:'atk',lbl:'Stormfall',anim:AE('build','drop','blast',{hold:1.4})},{b:14,s:1,lbl:'Shelter',anim:AE('lean','cast','gale',{hits:0})},{b:18,a:10,veil:'mix',lbl:'Eyewall',anim:AE('open','cast','blast',{hold:1.2})}])),
   intent:e=>{const m=e.next||{none:1};if(!m.veil)return m;const cb=W.cb;const marked=!!cb&&((cb.mark&&cb.markTgt===e)||(cb.mark2&&cb.markTgt2===e));return {...m,veiled:!marked,fog:!marked}}},
  // ================= BOSSES =================
  // 4.1 The Maelstrom Engine [RINGS]: each living ring gives it a rule; Overclock / Redline scale with rings alive.
  engine:{n:'The Maelstrom Engine',e:'⚙️',act:3,role:'bruiser',hp:HP.engine,boss:1,anim:AB('spin','drop','blast'),
-  passive:{n:'Overclock rings',text:'Each ring gives the Engine a rule. Break a ring to lose it. Fewer rings, weaker blasts.',rings:1,
+  passive:{n:'Runaway Gears',text:'Each ring gives the Engine a rule. Break a ring to lose it. Fewer rings, weaker blasts.',rings:1,
    endTurn:e=>{if(ringOn('ringpull'))pullPlayer(3);if(ringOn('ringcharge')){const m=e.lastAct||{};if(!m.discharge)setPool(e,poolOf(e)+1)}}},
   dmgMod:(e,d)=>ringOn('ringveil')?Math.floor(d*(e.flare?.65:.75)):d,
   onSpawn:e=>{if(W.cb)for(const k of ['ringpull','ringcharge','ringveil'])spawn(k,{summoned:true})},
   ai:AI(e=>{if(e.stall){e.stall=false;return {none:1,lbl:'Stalled'}}
    if(e.flareT!=null&&e.t>=e.flareT+2){e.flare=false;e.flareT=null}
    const su={b:12,lbl:'Spin Up',anim:AB('spin','lunge','blast',{hits:0})};
-   if(e.ph===1)return loop(e,[su,{a:14,lbl:'Piston',anim:AB('haul','lunge','blunt')},{a:6,h:3,lbl:'Flywheel',anim:AB('spin','cast','pierce',{hits:3})},{a:12,oc:6,lbl:'Overclock',anim:AB('spin','drop','blast',{hold:1.5})}]);
+   if(e.ph===1)return loop(e,[su,{a:14,lbl:'Piston',anim:AB('haul','lunge','blunt')},{a:6,h:3,lbl:'Flywheel',anim:AB('spin','cast','pierce',{hits:3})},{a:12,oc:6,lbl:'Runaway Gears',anim:AB('spin','drop','blast',{hold:1.5})}]);
    return loop(e,[{a:14,lbl:'Piston',anim:AB('haul','lunge','blunt')},{a:7,h:3,lbl:'Flywheel',anim:AB('spin','cast','pierce',{hits:3})},{b:14,lbl:'Spin Up',anim:AB('spin','lunge','blast',{hits:0})},
     {a:12,oc:8,lbl:'Redline',anim:AB('spin','drop','blast',{hold:1.6}),fx:q=>{if(ringOn('ringpull'))pullPlayer(3);if(ringOn('ringcharge'))setPool(q,poolOf(q)+1);q.flare=true;q.flareT=q.t}}])}),
   intent:e=>{const m={...(e.next||{none:1})};if(m.oc)m.a=12+m.oc*rings().length;
@@ -196,7 +196,7 @@ const TIPS={jelly:'At three Charge it discharges and clogs your deck with Static
  skua:'Gust sends your last drawn card back on top of the draw pile.',petrel:'Gust sends your last drawn card back on top of the draw pile.',automaton:'Numbed: your cheapest card costs one more this turn.',
  cloudshark:'When it dives, only area damage and Bleed can reach it.',cloudserpent:'When it dives, only area damage and Bleed can reach it.',galereader:"Tailwind: its allies' next attack hits four harder.",
  lenswright:'Your first Attack each turn hurts you for 3. Lead with Skills.',slinger:'Pelt hits many times. The last hit makes you Brittle.',anchorite:'Gain Guard from a card and the Anchorite takes half.',
- magus:'Storm Tide weakens your Surge, Recede, or first Guard card.',squallwest:'Only the front twin can be hit. AoE and Bleed reach both.',eyegale:'Veiled intent hides the number. It never exceeds 26.',
+ magus:'Foul Tide weakens your Surge, Recede, or first Guard card.',squallwest:'Only the front twin can be hit. AoE and Bleed reach both.',eyegale:'Hidden Hand: its intent hides the number. It never exceeds 26.',
  engine:'Break a ring to lose its rule. Fewer rings, weaker blasts.',thalassa:'Water drains 1 HP per 5 Guard you hold at turn end.',navigator:'Hurt the Shard holder hard or kill the next one.'};
 for(const [k,v] of Object.entries(TIPS))if(EN[k])EN[k].tip=v;
 export const A3_ENEMY_IDS=['jelly','polyp','voltray','skua','petrel','automaton','cloudshark','cloudserpent','galereader','lenswright','slinger','anchorite','ringpull','ringcharge','ringveil','hailorb','shardcarrier','magus','squallwest','squalleast','eyegale','engine','thalassa','navigator'];

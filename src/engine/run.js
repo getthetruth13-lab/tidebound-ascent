@@ -286,9 +286,10 @@ export function rewLeaveBack(){const S=W.S;if(S.screen!=='reward')return;S.leave
 function rewDoneImpl(){const S=W.S;if(S.screen!=='reward')return;S.leaveConfirm=false; // victory-sweep: never leave twice (a stale second call from the walk-off fell through to goMap on the end screen)
 
  // Boss relic (P3): after the boss reward rows, offer 1 of 3 boss relics (like Slay the Spire's boss chest), then finish the act.
- if(S.kind==='boss'&&!S.bossPick&&hasNextAct()){const ids=bossRelicChoices();if(ids.length){S.bossPick=ids;S.bossTook=null;S.t=Date.now();return render()}}
+ // OD-6 (Spencer 10-31): ON after the Act 1 and Act 2 bosses, also on the normal build where the next act comes via 'Continue to Act N' (the relic rides in the win snapshot). Never after Act 3.
+ if(S.kind==='boss'&&!S.bossPick&&(hasNextAct()||previewOn(W.run.act||1))){const ids=bossRelicChoices();if(ids.length){S.bossPick=ids;S.bossTook=null;S.t=Date.now();return render()}}
  if(S.kind==='boss'){if(hasNextAct())return startNextAct();return endRun(true)}goMap()}
-// Acts that exist. Only Act 1 ships live, so the boss relic pick stays hidden (Spencer 10-13) until Act 2 goes live.
+// Acts that exist (ACT_COUNT, default 1; Acts 2/3 follow via the Continue previews below).
 // Act 2 ships behind the live flag (?act=2 preview, plan 12.3); ACT_COUNT is raised to 2 / 3 when each act is approved.
 let ACT_COUNT=(typeof location!=='undefined'&&+new URLSearchParams(location.search).get('act'))||1;
 export const actCount=()=>ACT_COUNT;

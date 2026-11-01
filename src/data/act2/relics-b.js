@@ -27,13 +27,13 @@ const isStatusJunk=ci=>ci&&(ci.id==='murk'||ci.id==='scald');
 const ask=(title,opts)=>{const cb=W.cb;if(!cb)return;const run=()=>choose(title,opts.map(o=>({...o,f:()=>{o.f();const q=W.cb&&W.cb.askQ;if(q&&q.length)q.shift()()}})));
  if(cb.mode){(cb.askQ=cb.askQ||[]).push(run)}else run()};
 const lockHighest=()=>{const cb=W.cb;if(!cb||cb.locked)return false;let best=null,bc=0;for(const ci of cb.hand){const c=cost(ci);if(c>bc){bc=c;best=ci}}
- if(best){cb.locked=best;log('🔕 Muffled: '+(CARDS[best.id].n)+' is silenced this turn');callout('MUFFLED','boss');return true}return false};
+ if(best){cb.locked=best;log('🔕 Gagged: '+(CARDS[best.id].n)+' is silenced this turn');callout('GAGGED','boss');return true}return false};
 const LASTCOST=new WeakMap(); // card -> its cost when canPlay was last asked (the real play asks right before spending)
 const isAoE=f=>!!f&&(f.aoe||f.allTargets||(f.echo&&f.def&&/\bto ALL\b/.test(f.def.d||'')));
 
 // ================= COMMON =================
 R.platekey={on:{armourAbsorb(r,ctx){addSt(ctx.target,'vuln',2);flash(r)}}};
-R.bellwax={on:{afterDraw(r){const cb=W.cb,c=Cst(r);if(cb.locked&&!c.used){c.used=1;cb.locked=null;gainBlock(6);flash(r);log('🕯️ Bell Wax: Muffled fails, +6 Guard')}}}};
+R.bellwax={on:{afterDraw(r){const cb=W.cb,c=Cst(r);if(cb.locked&&!c.used){c.used=1;cb.locked=null;gainBlock(6);flash(r);log('🕯️ Bell Wax: the Gag fails, +6 Guard')}}}};
 R.tallystick={on:{turnStart(r){const cb=W.cb,c=Cst(r);if(cb.owed&&!c.used){c.used=1;cb.owed=null;gainBlock(3);flash(r);log('📏 Tally Stick: the debt is ignored, +3 Guard')}}}};
 R.firebucket={on:{turnEnd(r){const n=W.cb.hand.filter(c=>c.id==='scald').length;if(n){gainBlock(4*n);flash(r)}}}};
 R.barbedcoil={on:{cardPlayed(r,ctx){const cb=W.cb;if(ctx.type!=='A'||cb.stat.attacksTurn!==1)return;const t=ctx.card._tgt;if(t&&t.hp>0){addSt(t,'bleed',2);flash(r)}}},
@@ -103,7 +103,7 @@ R.wardensgage={on:{combatStart(r){const cb=W.cb,c=Cst(r),en=alive();const set=e=
  intentDisplay(r,ctx,m){const c=Cst(r);return m&&m.a&&ctx.enemy&&c.uid!=null&&ctx.enemy.uid===c.uid?{...m,a:m.a+2}:m}}};
 
 // ================= SHOP / EVENT =================
-R.settledaccount={on:{turnStart(r){const cb=W.cb;if(!cb.owed||W.run.gold<8)return;ask('📜 Settled Account: pay 8 gold to ignore the Owed tax this turn?',
+R.settledaccount={on:{turnStart(r){const cb=W.cb;if(!cb.owed||W.run.gold<8)return;ask('📜 Settled Account: pay 8 gold to ignore the In Debt tax this turn?',
  [{l:'Pay 8 gold',cap:'No +1 cost this turn',f:()=>{if(W.run.gold>=8){W.run.gold-=8;W.cb.owed=null;flash(r);log('📜 Settled Account: 8 gold paid')}}},{l:'Keep the gold',cap:'The tax stands',f:()=>{}}])}}};
 R.wrenlockbox={on:{turnStart(r,ctx){if(W.cb.turn===1&&W.run.gold>=100){ctx.energy=(ctx.energy||0)+1;ctx.draw=(ctx.draw||0)+1;flash(r)}}}};
 R.alarmrattle=(()=>{const fn=(r,ctx)=>{const e=ctx.enemy;if(!e||e.hp<=0)return;const m=ctx.intent||intentOf(e);if(!m||!m.a)return;const t=T(r);if(t.used)return;if(eAtk(e,m.a)<15)return;t.used=1;gainBlock(6);flash(r)};

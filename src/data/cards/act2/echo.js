@@ -66,7 +66,7 @@ N('countertone',{e:'🔕',cu:0,d:'Whenever a Skill Echoes, apply 1 Brittle to AL
 N('cacophony',{e:'🥁',d:'Deal {4|5} to ALL. Sink every Flotsam and Burden in your hand and deal {4|5} to ALL for each (max {16|20}).',p:f=>{f.all(f.v(4,5));const c=W.cb;if(!c)return;
  const junk=c.hand.filter(isJunk);junk.forEach(ci=>sinkHand(ci,'cacophony'));
  const n=Math.min(4,junk.length);for(let i=0;i<n;i++){if(!W.cb||!alive().length)return;f.all(f.v(4,5))}if(junk.length)log('🥁 Cacophony: '+junk.length+' junk Sunk')}});
-N('clearnote',{e:'🎵',d:'Unlock every locked card in your hand (Muffled), remove Numbed from you, and draw {1|2}. Faint.',p:f=>{const c=W.cb;if(c.locked){log('🎵 Clear Note: '+cname(c.locked)+' unlocked');c.locked=null}
+N('clearnote',{e:'🎵',d:'Unlock every locked card in your hand (Gagged), remove Numbed from you, and draw {1|2}. Faint.',p:f=>{const c=W.cb;if(c.locked){log('🎵 Clear Note: '+cname(c.locked)+' unlocked');c.locked=null}
  if(c.p.st.numbed){delete c.p.st.numbed;log('🎵 Clear Note: Numbed removed')}f.draw(f.v(1,2))}});
 N('pedaltone',{e:'🎚️',d:'Resonating on enemies does not fall at the end of their turns.',power:{on:{enemyAct(inst,ctx){const e=ctx.enemy;if(e&&e.st&&e.st.reson)(e.hold=e.hold||{}).reson=1}}}});
 // Bronze Bulwark: Guard a Skill's ring gives is remembered (up to 20) and put back after the start-of-turn Guard clear.

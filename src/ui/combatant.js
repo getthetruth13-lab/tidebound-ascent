@@ -95,12 +95,12 @@ const STATUS={
  charge:T('Charge','debuff',null,'Builds each turn.','At 3 Charge it discharges and adds a Static to your draw pile. Hurting it hard knocks a pip off.'),
  tailwind:T('Tailwind','buff',null,'Until its next attack.','Its next attack hits this much harder on the first hit.'),
  submerged:T('Submerged','buff',null,'Until it surfaces.','Only area damage, Bleed and Drenched reach it. It surfaces with a heavy hit.'),
- behind:T('Behind','buff',null,'Until the twins swap.','Single-target cards can only hit the front twin. AoE and Bleed reach both.'),
+ behind:T('Hiding','buff',null,'Until the twins swap.','Single-target cards can only hit the front twin. AoE and Bleed reach both.'),
  shard:T('Deep Shard','buff',null,'Until it is passed or dropped.','Takes half damage and its attacks hit 4 harder. Hurt it badly, or kill the next holder, and the pass fails.'),
  water:T('Water','debuff',null,'While Thalassa is in her second phase.','At the end of your turn you lose 1 HP per 5 Guard you hold.'),
- stormtide:T('Storm Tide','debuff',null,'This turn.','Your Surge and Recede are 1 weaker, or your first Guard card gives 1 less.')
- ,seize:T('Seize','debuff',null,'Until it dies.','It holds your cheapest card. Defeat it and the card comes back.'),
- jam:T('Jammed','debuff',null,'This turn.','Jammed: it loses this action. Hit it hard enough in one turn to jam it again.')
+ stormtide:T('Foul Tide','debuff',null,'This turn.','Your Surge and Recede are 1 weaker, or your first Guard card gives 1 less.')
+ ,seize:T('Impressed','debuff',null,'Until it dies.','It holds your cheapest card. Defeat it and the card comes back.'),
+ jam:T('Misfire','debuff',null,'This turn.','Misfire: it loses this action. Hit it hard enough in one turn to make it misfire again.')
  ,scald:T('Scald','debuff',null,'At the end of your turn.','Each Scald in your hand burns you for 2 at the end of your turn.')
 };
 const ORDER=Object.keys(STATUS);

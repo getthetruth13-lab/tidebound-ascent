@@ -40,7 +40,7 @@ export function intentParts(e,m){const p=[];if(!m)return p;
  if(m.discharge)p.push({k:'discharge',icon:'charge',n:'',cls:'atk',txt:'discharges its Charge'+(m.status?'':'')});
  if(m.gust)p.push({k:'gust',icon:'gust',n:m.gust,cls:'deb',txt:`blows ${m.gust} card${m.gust>1?'s':''} from your hand back onto your draw pile next turn`});
  if(m.numb)p.push({k:'numb',icon:'numb',n:'',cls:'deb',txt:'makes your cheapest card cost 1 more next turn'});
- if(m.tide)p.push({k:'tide',icon:'tide',n:'',cls:'deb',txt:'Storm Tide: your Surge, Recede or first Guard card is 1 weaker next turn'});
+ if(m.tide)p.push({k:'tide',icon:'tide',n:'',cls:'deb',txt:'Foul Tide: your Surge, Recede or first Guard card is 1 weaker next turn'});
  if(m.dive)p.push({k:'dive',icon:'dive',n:'',cls:'oth',txt:'dives into the cloud: only area damage and Bleed reach it next turn'});
  if(m.surface)p.push({k:'surface',icon:'dive',n:'',cls:'atk',txt:'breaks the surface'});
  if(m.tail)p.push({k:'tail',icon:'tail',n:'+'+m.tail,cls:'buf',txt:`Tailwind: its allies' next attack hits ${m.tail} harder`});

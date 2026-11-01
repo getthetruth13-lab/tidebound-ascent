@@ -12,7 +12,7 @@ import {cname,desc} from '../engine/cards.js';
 import {statusInfo} from './combatant.js';
 import {loadProfile,saveProfile} from '../progress.js';
 import {glyph,iconize} from './glyphs.js';
-const C=DATA.v21.sim.core,T=C.tide,D=C.duel,RD=C.carto.rank_dmg.slice(1).map(n=>'+'+n).join(' / ');
+const C=DATA.v21.sim.core,T=C.tide,D=C.duel;
 export const HINT_MS=16000;
 const plain=s=>String(s||'').replace(/<[^>]+>/g,'').replace(/\{[^}]*\}/g,'').replace(/\s+/g,' ').trim();
 const wpOf=cb=>cb.slots.filter(Boolean);
@@ -21,39 +21,40 @@ const STATUS_HINT=['vuln','weak','bleed','drench','reson'];
 const stOn=cb=>{for(const k of STATUS_HINT)for(const e of cb.ens){if(e.hp>0&&e.st&&e.st[k]>0)return k}return null};
 // {id, cls (null = every hero), when(cb) -> falsy | true | text-args, text(cb) -> html}. Order = priority (hero hints first).
 export const HINTS=[
+ // v0.6.96 (Spencer 10-31, D17 settled): every hint is at most ~15 words (tests/hint-cap.cjs). Same meaning, fewer words.
  // ---- Cartographer ----
- {id:'carto.start',cls:'carto',when:cb=>cb.turn===1&&wpOf(cb).some(w=>w.temp),text:cb=>`You start each fight with a free Waypoint, <b>${cname(wpOf(cb).find(w=>w.temp))}</b>. It acts by itself at the start of every turn. Play Waypoint cards to fill the other slots.`},
- {id:'carto.place',cls:'carto',when:cb=>wpOf(cb).some(w=>!w.temp),text:cb=>{const w=wpOf(cb).filter(x=>!x.temp).pop();return `${slotLine(w)}. It first acts at the start of your <b>next turn</b>, then every turn after.`}},
- {id:'carto.advance',cls:'carto',when:cb=>cb.turn>=2&&!cb.busy&&cb.advUsed<1&&wpOf(cb).some(w=>(w.rank||0)<3),text:()=>`<b>Advance</b> is free, once a turn: tap a Waypoint for +1 Rank. Damage Waypoints hit for ${RD} more at Ranks 1 / 2 / 3.`},
- {id:'carto.decamp',cls:'carto',when:cb=>cb.turn>=2&&!cb.busy&&canDecamp(),text:()=>`<b>Decamp</b> (the tent): once a turn, a Waypoint leaves and its Decamp line fires. It loses its Rank; the card goes to your discard pile.`},
- {id:'carto.landmark',cls:'carto',when:cb=>wpOf(cb).some(w=>(w.rank||0)>=3),text:()=>`<b>Landmark!</b> A Rank 3 Waypoint counts as 2 for Expedition and its Decamp is doubled.`},
- {id:'carto.full',cls:'carto',when:cb=>cb.slots.length>=cb.nslots&&cb.hand.some(c=>CARDS[c.id].t==='W'),text:()=>`Your slots are full. Playing another Waypoint replaces one, and the replaced one <b>Decamps</b> (its Decamp line fires).`},
- {id:'carto.chart',cls:'carto',when:cb=>cb.mode&&cb.mode.k==='chart',force:true,text:()=>`<b>Chart</b>: reorder the top cards of your draw pile, and send one to the bottom if you like. Your draw pile is face up, so you can plan your next hand.`},
+ {id:'carto.start',cls:'carto',when:cb=>cb.turn===1&&wpOf(cb).some(w=>w.temp),text:cb=>`Your free Waypoint, <b>${cname(wpOf(cb).find(w=>w.temp))}</b>, acts every turn. Play Waypoint cards to fill other slots.`},
+ {id:'carto.place',cls:'carto',when:cb=>wpOf(cb).some(w=>!w.temp),text:cb=>{const w=wpOf(cb).filter(x=>!x.temp).pop();return `<b>${cname(w)}</b> first acts at your <b>next turn</b>'s start, then every turn.`}},
+ {id:'carto.advance',cls:'carto',when:cb=>cb.turn>=2&&!cb.busy&&cb.advUsed<1&&wpOf(cb).some(w=>(w.rank||0)<3),text:()=>`<b>Advance</b>: free once a turn. Tap a Waypoint for +1 Rank; damage Waypoints hit harder.`},
+ {id:'carto.decamp',cls:'carto',when:cb=>cb.turn>=2&&!cb.busy&&canDecamp(),text:()=>`<b>Decamp</b> (tent), once a turn: a Waypoint fires its Decamp line and goes to discard.`},
+ {id:'carto.landmark',cls:'carto',when:cb=>wpOf(cb).some(w=>(w.rank||0)>=3),text:()=>`<b>Landmark!</b> A Rank 3 Waypoint counts as 2 for Expedition and doubles its Decamp.`},
+ {id:'carto.full',cls:'carto',when:cb=>cb.slots.length>=cb.nslots&&cb.hand.some(c=>CARDS[c.id].t==='W'),text:()=>`Slots full. Another Waypoint replaces one, and the replaced one <b>Decamps</b>.`},
+ {id:'carto.chart',cls:'carto',when:cb=>cb.mode&&cb.mode.k==='chart',force:true,text:()=>`<b>Chart</b>: reorder your face-up top cards, or send one to the bottom.`},
  // ---- Tidecaller ----
- {id:'tide.drift',cls:'tide',when:cb=>cb.turn>=2&&!!cb.tideDir&&!cb.busy,text:cb=>`The Tide <b>drifts</b> ${T.drift} each turn the way the arrow points (${cb.tideDir>0?'up':'down'} now). At 9 pointing up, it Crests for free.`},
- {id:'tide.near',cls:'tide',when:cb=>!cb.busy&&(cb.tide>=9||cb.tide<=1)&&cb.turn>=1&&!cb.mode,text:cb=>cb.tide>=9?`One more Surge and the Tide hits 10: a <b>Crest</b>, ${T.crest_dmg} damage to ALL enemies.`:`One more Recede and the Tide hits 0: an <b>Undertow</b>, ${T.undertow_blk} Guard and draw ${T.undertow_draw}.`},
- {id:'tide.crest',cls:'tide',when:cb=>cb.stat.crests>0,text:()=>`<b>Crest!</b> ${T.crest_dmg} to ALL, and the Tide reset to 5. A second break in one turn is x1.5.`},
- {id:'tide.undertow',cls:'tide',when:cb=>cb.stat.undertows>0,text:()=>`<b>Undertow!</b> ${T.undertow_blk} Guard and a card, and the Tide reset to 5. It also Sinks junk in your hand.`},
- {id:'tide.turn',cls:'tide',when:cb=>cb.stat.tideturnsCombat>0,text:()=>`A <b>Tideturn</b>: the Tide moved against its arrow. Cards like Crosscurrent and Turning Point reward it.`},
+ {id:'tide.drift',cls:'tide',when:cb=>cb.turn>=2&&!!cb.tideDir&&!cb.busy,text:cb=>`Tide <b>drifts</b> ${T.drift} per turn with the arrow (${cb.tideDir>0?'up':'down'}). At 9 rising, it Crests free.`},
+ {id:'tide.near',cls:'tide',when:cb=>!cb.busy&&(cb.tide>=9||cb.tide<=1)&&cb.turn>=1&&!cb.mode,text:cb=>cb.tide>=9?`One more Surge hits 10: a <b>Crest</b>, ${T.crest_dmg} damage to ALL enemies.`:`One more Recede hits 0: an <b>Undertow</b>, ${T.undertow_blk} Guard and draw ${T.undertow_draw}.`},
+ {id:'tide.crest',cls:'tide',when:cb=>cb.stat.crests>0,text:()=>`<b>Crest!</b> ${T.crest_dmg} to ALL; Tide resets to 5. A second break this turn is x1.5.`},
+ {id:'tide.undertow',cls:'tide',when:cb=>cb.stat.undertows>0,text:()=>`<b>Undertow!</b> ${T.undertow_blk} Guard and a card; Tide resets to 5. Junk in hand Sinks too.`},
+ {id:'tide.turn',cls:'tide',when:cb=>cb.stat.tideturnsCombat>0,text:()=>`A <b>Tideturn</b>: the Tide moved against its arrow. Crosscurrent and Turning Point reward it.`},
  // ---- Echo Mage ----
- {id:'echo.mark',cls:'echo',when:cb=>!cb.busy&&!!(cb.mark||cb.mark2),text:()=>`That card is <b>Marked</b>. At the end of your turn it <b>Echoes</b>: it plays again for free, +1 if you played a card after it. Tap the bell to move a Mark.`},
- {id:'echo.resound',cls:'echo',when:cb=>!cb.busy&&cb.hand.some(c=>/Resound/.test(CARDS[c.id].d||'')),text:()=>`<b>Resound</b> lines only happen when that card <b>Echoes</b>. Mark it, then play another card after it.`},
+ {id:'echo.mark',cls:'echo',when:cb=>!cb.busy&&!!(cb.mark||cb.mark2),text:()=>`<b>Marked</b>: replays free at turn end (<b>Echo</b>), +1 if a card follows. Bell moves Marks.`},
+ {id:'echo.resound',cls:'echo',when:cb=>!cb.busy&&cb.hand.some(c=>/Resound/.test(CARDS[c.id].d||'')),text:()=>`<b>Resound</b> lines only happen when that card <b>Echoes</b>. Mark it, then play another card.`},
  {id:'echo.echo',cls:'echo',when:cb=>cb.stat.echoesCombat>0,text:()=>`That was an <b>Echo</b>: a free replay of your Marked card. Max ${C.echo.cap} a turn.`},
  // ---- Duelist ----
- {id:'duel.flourish',cls:'duel',when:cb=>!cb.busy&&cb.mom>=D.flourish_min&&!cb.mode,text:cb=>`You have ${cb.mom} Momentum. Tap the blade, then play an Attack: a <b>Flourish</b> multiplies it (x2 at 2, up to x3.5 at 5) and spends all Momentum.`},
- {id:'duel.parry',cls:'duel',when:cb=>!cb.busy&&Object.values(cb.parries||{}).some(v=>v>0),text:()=>`A <b>Parry</b> is set on that enemy. Its first hit next turn is reduced, and half of the Parry is reflected. Stop the whole hit for a <b>Clean Answer</b> (+1 Momentum).`},
- {id:'duel.bleed',cls:'duel',when:cb=>cb.ens.some(e=>e.hp>0&&e.st&&e.st.bleed>0),text:()=>`<b>Bleed</b>: each time your Attack hits that enemy it loses that much HP, ignoring Guard. Then it drops by 1.`},
+ {id:'duel.flourish',cls:'duel',when:cb=>!cb.busy&&cb.mom>=D.flourish_min&&!cb.mode,text:cb=>`${cb.mom} Momentum: tap the blade, then Attack. <b>Flourish</b>: x2 up to x3.5, spends all.`},
+ {id:'duel.parry',cls:'duel',when:cb=>!cb.busy&&Object.values(cb.parries||{}).some(v=>v>0),text:()=>`<b>Parry</b>: its next hit shrinks; half the Parry reflects. Stop all: <b>Clean Answer</b>, +1 Momentum.`},
+ {id:'duel.bleed',cls:'duel',when:cb=>cb.ens.some(e=>e.hp>0&&e.st&&e.st.bleed>0),text:()=>`<b>Bleed</b>: each Attack hit costs it that much HP, ignoring Guard, then Bleed drops 1.`},
  // ---- every hero ----
- {id:'g.status',cls:null,when:cb=>!!stOn(cb),text:cb=>{const k=stOn(cb),i=statusInfo(k);return `<b>${i.n}</b> on an enemy: ${plain(KW[i.kw]||i.rule||'')} Tap its badge to read more.`}},
- {id:'g.vigil',cls:null,when:cb=>cb.powers&&cb.powers.length>0,text:cb=>`<b>${CARDS[cb.powers[cb.powers.length-1].id].n}</b> is a <b>Vigil</b>: it stays in play for the rest of the fight and works on its own.`},
- {id:'g.sink',cls:null,when:cb=>cb.exh&&cb.exh.length>0,text:()=>`<b>Sink</b> removes a card for this fight only. Tap the anchor pile to see it. It comes back next fight.`},
- {id:'g.flotsam',cls:null,when:cb=>cb.hand.some(isJunk),text:()=>`<b>Flotsam</b> and <b>Burdens</b> are junk that clog your hand. Some cards Sink them for a bonus.`},
+ {id:'g.status',cls:null,when:cb=>!!stOn(cb),text:cb=>{const k=stOn(cb),i=statusInfo(k);const rule=(plain(KW[i.kw]||i.rule||'').match(/^[^.]*\./)||[''])[0];const long=`<b>${i.n}</b> on an enemy: ${rule} Tap its badge for more.`;return plain(long).split(' ').length<=15?long:`<b>${i.n}</b> is on an enemy. Tap its badge to read what it does.`}},
+ {id:'g.vigil',cls:null,when:cb=>cb.powers&&cb.powers.length>0,text:cb=>`<b>${CARDS[cb.powers[cb.powers.length-1].id].n}</b> is a <b>Vigil</b>: it stays in play all fight and works alone.`},
+ {id:'g.sink',cls:null,when:cb=>cb.exh&&cb.exh.length>0,text:()=>`<b>Sink</b> removes a card for this fight only. Tap the anchor pile to see it.`},
+ {id:'g.flotsam',cls:null,when:cb=>cb.hand.some(isJunk),text:()=>`<b>Flotsam</b> and <b>Burdens</b> are hand-clogging junk. Some cards Sink them for a bonus.`},
  // ---- later acts (v0.6.54): one line the first time each new mechanic matters; they show once, and How to Play > Reset hints brings them back ----
- {id:'g.seize',cls:null,when:cb=>cb.ens.some(e=>e.seized&&e.hp>0),text:cb=>`<b>Seized</b>: ${cb.ens.find(e=>e.seized&&e.hp>0).n} took your cheapest card. Defeat it and the card comes back; it is never lost for good.`},
+ {id:'g.seize',cls:null,when:cb=>cb.ens.some(e=>e.seized&&e.hp>0),text:cb=>`<b>Impressed</b>: ${cb.ens.find(e=>e.seized&&e.hp>0).n} took your cheapest card. Defeat it to get it back.`},
  {id:'g.numbed',cls:null,when:cb=>!!cb.numbCard,text:()=>`<b>Numbed</b>: your cheapest card costs 1 more this turn only.`},
- {id:'g.charge',cls:null,when:cb=>cb.ens.some(e=>e.hp>0&&e.passive&&e.passive.charge),text:()=>`<b>Charge</b> builds on that enemy each turn. At 3 it discharges and adds a <b>Static</b> to your draw pile. Hitting it hard knocks a pip off.`},
- {id:'g.tailwind',cls:null,when:cb=>cb.ens.some(e=>e.hp>0&&e.tailwind),text:()=>`<b>Tailwind</b>: that enemy's first hit each turn is stronger. Raise your Guard before it swings.`},
- {id:'g.gust',cls:null,when:cb=>cb.ens.some(e=>{if(e.hp<=0)return false;try{const m=intentOf(e);return !!(m&&m.gust)}catch(_){return false}}),text:()=>`<b>Gust</b>: when it lands, your last drawn cards are blown back on top of your draw pile. Play them first if you can.`},
+ {id:'g.charge',cls:null,when:cb=>cb.ens.some(e=>e.hp>0&&e.passive&&e.passive.charge),text:()=>`<b>Charge</b> builds each turn; at 3 it adds a <b>Static</b> card. Hard hits remove pips.`},
+ {id:'g.tailwind',cls:null,when:cb=>cb.ens.some(e=>e.hp>0&&e.tailwind),text:()=>`<b>Tailwind</b>: that enemy's first hit each turn is stronger. Raise your Guard first.`},
+ {id:'g.gust',cls:null,when:cb=>cb.ens.some(e=>{if(e.hp<=0)return false;try{const m=intentOf(e);return !!(m&&m.gust)}catch(_){return false}}),text:()=>`<b>Gust</b> blows your last drawn cards back onto your draw pile. Play them first.`},
  {id:'g.elite',cls:null,when:cb=>cb.kind==='elite'&&cb.turn===1,text:()=>`An <b>Elite</b>: tougher than a normal fight, but it drops a relic when it falls.`}
 ];
 const seen=()=>settings.hintsSeen||(settings.hintsSeen={});
