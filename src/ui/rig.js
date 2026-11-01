@@ -19,7 +19,7 @@ const dir=id=>'./art/v2/rigs/'+id+'/';
 function loadIndex(){if(indexP)return indexP;return indexP=fetch(INDEX_URL).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{index=j},()=>{index={rigs:{}}})}
 function loadRig(id){let r=rigs.get(id);if(r)return r;rigs.set(id,'loading');
  fetch(dir(id)+index.rigs[id]).then(r=>r.ok?r.json():Promise.reject()).then(rig=>{
-  const imgs={},jobs=[];for(const o of [...rig.pieces,...(rig.glows||[])]){const im=new Image();im.decoding='async';im.src=dir(id)+o.image;imgs[o.id]=im;jobs.push(im.decode().catch(()=>{if(!im.complete||!im.naturalWidth)throw 0}))}
+  const imgs={},jobs=[];const gs=new Set(rig.glows||[]);for(const o of [...rig.pieces,...(rig.glows||[])]){const im=new Image();im.decoding='async';im.src=dir(id)+o.image;imgs[(gs.has(o)?'g:':'')+o.id]=im;jobs.push(im.decode().catch(()=>{if(!im.complete||!im.naturalWidth)throw 0}))}
   return Promise.all(jobs).then(()=>{rigs.set(id,{rig,prep:prepare(rig),imgs,ok:true,used:performance.now()});evict();syncRigs()})
  }).catch(()=>rigs.set(id,'fail'));return 'loading'}
 // memory: keep at most MAXRIGS decoded rigs; drop the least recently used one that no live figure is showing (they reload from the SW cache)
@@ -34,7 +34,10 @@ function build(slot,id,R,key){
  const els={},glows=[];
  for(const p of rig.pieces){const e=R.imgs[p.id].cloneNode();e.decoding='sync';e.draggable=false;e.alt='';e.className='rp';
   e.style.cssText=`left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px`;inn.appendChild(e);els[p.id]=e}
- for(const g of rig.glows||[]){const e=R.imgs[g.id].cloneNode();e.decoding='sync';e.draggable=false;e.alt='';e.className='rp rg';
+// v0.6.97 (r143/r160 hygiene): glow images are keyed 'g:'+id so a glow can never replace a piece with the same id (r160 flag 1). Glows use the
+// class rig-glow, not rg: the bell ring rule .rg in css/meters.css (ring border, 50% radius, translate(-50%,-50%), opacity 0) would also shift
+// static glows (they get no inline transform); .rig-in>.rg is reset as well (css/anim.css, r160 flag 2).
+ for(const g of rig.glows||[]){const e=R.imgs['g:'+g.id].cloneNode();e.decoding='sync';e.draggable=false;e.alt='';e.className='rp rig-glow';
   e.style.cssText=`left:${g.x}px;top:${g.y}px;width:${g.w}px;height:${g.h}px;opacity:0`;inn.appendChild(e);glows.push([g,e])}
  root.appendChild(inn);
  const sp=slot.querySelector('img.spr');if(sp&&sp.style.scale)root.style.scale=sp.style.scale;   // enemies facing right are mirrored

@@ -378,7 +378,7 @@
    "file": "sprites/shellguard-a2-r80-c75.webp",
    "w": 1670,
    "h": 2163,
-   "bytes": 506830,
+   "bytes": 656548,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -406,7 +406,7 @@
    "file": "sprites/lice-a2-r80.webp",
    "w": 2272,
    "h": 1182,
-   "bytes": 389924,
+   "bytes": 443412,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -504,7 +504,7 @@
    "file": "sprites/sluiceeng-a2-r86.webp",
    "w": 2241,
    "h": 1597,
-   "bytes": 386530,
+   "bytes": 490988,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -658,7 +658,7 @@
    "file": "sprites/basso-a2-r77-c75.webp",
    "w": 2248,
    "h": 1503,
-   "bytes": 375690,
+   "bytes": 530378,
    "role": "elite",
    "facing": "left",
    "anchor": {
@@ -798,7 +798,7 @@
    "file": "sprites/voltray-a3-r96.webp",
    "w": 2391,
    "h": 1144,
-   "bytes": 420560,
+   "bytes": 536150,
    "role": "normal",
    "facing": "left",
    "anchor": {
@@ -840,7 +840,7 @@
    "file": "sprites/ringcharge-a3-r90.webp",
    "w": 2126,
    "h": 1515,
-   "bytes": 363040,
+   "bytes": 398844,
    "role": "summon",
    "facing": "left",
    "anchor": {
@@ -908,7 +908,7 @@
    "file": "sprites/petrel-a3-r74.webp",
    "w": 1936,
    "h": 1928,
-   "bytes": 617070,
+   "bytes": 812310,
    "role": "normal",
    "facing": "left",
    "anchor": {

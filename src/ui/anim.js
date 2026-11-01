@@ -56,7 +56,7 @@ export function warmEnemyPoses(key){const p=ENEMY_POSES[key];if(p){warmPose(p.at
 function attackPose(sel,pose,total){
  const touched=new Map(),t0=performance.now(),end=T(total),warm=warmPose(pose.f);
  const swap=im=>{if(touched.has(im)||!im.isConnected)return;touched.set(im,{src:im.getAttribute('src'),style:im.getAttribute('style')});
-   im.src=pose.f;im.dataset.pose='atk';
+   im.src=pose.f;im.dataset.pose='atk';im.parentElement?.classList.add('posing');   /*v0.6.97: a rigged foe hides its img.spr under the idle rig; .posing shows the strike pose and hides the rig (css/anim.css)*/
    const box=im.closest('.fig');const h=box.offsetHeight,w=h*pose.w/pose.h;
    /*10-30 BS1: --bx is the idle's body anchor (sprite ax) in every fight; --ax centres plates and intents at .5 in group fights, which made poses jump sideways there*/const st=im.closest('.en').style,anchor=parseFloat(st.getPropertyValue('--bx'))||parseFloat(st.getPropertyValue('--ax'))||box.offsetWidth/2;
    Object.assign(im.style,{height:h+'px',width:w+'px',left:(anchor-w*pose.ax)+'px',top:'auto',bottom:'0'})};
@@ -64,7 +64,7 @@ function attackPose(sel,pose,total){
   if(!touched.has(im)){if(!warm||poseReady(warm))swap(im);
    else warm.ready.then(()=>{const cur=sel&&$(sel+' img.spr');if(cur===im&&poseReady(warm)&&performance.now()-t0<end*.8)swap(im)})}
  });
- setTimeout(()=>{for(const [im,old] of touched){if(im.dataset.pose!=='atk'||im.getAttribute('src')!==pose.f)continue;im.src=old.src;old.style==null?im.removeAttribute('style'):im.setAttribute('style',old.style);delete im.dataset.pose}},T(total));
+ setTimeout(()=>{for(const [im,old] of touched){if(im.dataset.pose!=='atk'||im.getAttribute('src')!==pose.f)continue;im.src=old.src;old.style==null?im.removeAttribute('style'):im.setAttribute('style',old.style);delete im.dataset.pose;im.parentElement?.classList.remove('posing')}},T(total));
 }
 // ---------- ghosts (persistent copies of a figure) ----------
 function ghost(selector,kind,opts={}){const source=selector&&$(selector);if(!source)return null;
