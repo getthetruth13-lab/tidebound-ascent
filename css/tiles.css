@@ -181,6 +181,8 @@
 .battle .tilebox .tcard{flex:none;--gw:var(--choice-card)}
 .battle .chartrow{--gw:min(132px,calc((100dvh - 280px)*5/7))}
 .battle .tilebox .tiles{max-width:calc(100vw - 60px)}
+/* v0.7.01: a long choice row (e.g. Torn Ledger Leaf over a big discard pile) scrolls sideways from its first card; centring only while it fits (safe), so no option is pushed off the left edge. */
+.combat .ov.battle .tilebox .tiles{justify-content:safe center;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;padding:6px 4px}
 .battle .tilebox .tart .slot>img{object-fit:contain;object-position:center}
 /* Other floating windows and event panels use their content's intrinsic width. */
 body .pop{width:fit-content;max-width:min(440px,92vw)}

@@ -23,7 +23,7 @@ let hh=0,holdTouch=false;
 function handSide(el,point){const cs=el&&el.closest?.('.hand')?[...el.closest('.hand').querySelectorAll('.card')]:[],i=cs.indexOf(el);
  if(i>=0)return i>=Math.floor(cs.length/2)?'left':'right';return point.x>=innerWidth/2?'left':'right'}
 function inspectNow(el,touch,point){const side=touch?handSide(el,point):null;clearArm();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
-document.addEventListener('pointerdown',ev=>{eatClick=false;eatUntil=0;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest?.('.card')||handCardFrom(ev.target);if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected&&peek.contains?.(ev.target))any=peek;if(!any||any.closest('#inspect'))return;
+document.addEventListener('pointerdown',ev=>{eatClick=false;eatUntil=0;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}const tn=touchNode(ev);let any=tn.closest?.('.card')||handCardFrom(tn);if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected&&peek.contains?.(ev.target))any=peek;if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,true,{x:ev.clientX,y:ev.clientY})},LONGPRESS_MS)}},true);
 document.addEventListener('pointermove',ev=>{if(lp&&Math.hypot(ev.clientX-lp.x0,ev.clientY-lp.y0)>10){clearTimeout(lp.t);lp=null}},true);
@@ -47,7 +47,7 @@ document.addEventListener('click',ev=>{if(eatClick&&eatUntil&&performance.now()>
 // Android Chrome fires its own long-press 'contextmenu' while a card is already held; it used to reopen the preview
 // with no point/side, which snapped the held preview to the screen centre. While a hold is open, just swallow it.
 document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(holdTouch||lp||ev.pointerType==='touch'||ev.sourceCapabilities?.firesTouchEvents){ev.preventDefault();return}if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
-document.addEventListener('pointerdown',ev=>{const raw=handCardFrom(ev.target);if(!raw||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;let c=raw;
+document.addEventListener('pointerdown',ev=>{const raw=handCardFrom(touchNode(ev));if(!raw||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;let c=raw;
  if(ev.pointerType==='mouse'&&peek?.isConnected&&peek!==raw){const pr=peek.getBoundingClientRect();if(ev.clientX>=pr.left&&ev.clientX<=pr.right&&ev.clientY>=pr.top&&ev.clientY<=pr.bottom)c=peek}
  if(ev.button!=null&&ev.button>0)return;
  // A second finger (multi-touch) supersedes the first press instead of leaving its card lifted.
@@ -159,6 +159,10 @@ function scrubAt(x,haptic){const h=handCache();if(!h)return;const {cards,xs,cx,c
 let leanSign=0;
 // A tap leaves the same peek raised ("armed") until it is played, switched or cancelled. Hover peek stays momentary.
 let arm=null;
+// v0.7.01: Chrome's touch adjustment can retarget a finger on the narrow visible strip of one hand card to the
+// overlapping neighbour (e.g. Thrust -> Standing Ovation), so the wrong card lifted and nothing played. In the hand, the
+// card actually drawn under the touch point wins; elsewhere the browser's (forgiving) target is kept.
+function touchNode(ev){const t=ev.target;if(ev.pointerType==='mouse'||!handCardFrom(t))return t;const p=document.elementFromPoint(ev.clientX,ev.clientY);return p&&handCardFrom(p)?p:t}
 function handCardFrom(node){if(!node?.closest)return null;const hit=node.closest('.hand-hit');if(hit)return document.querySelector(`#hand .card[data-i="${hit.dataset.i}"]`);return node.closest('.hand .card')}
 function clearArm(){arm=null;document.querySelectorAll('.hand .card.tap-armed').forEach(c=>c.classList.remove('tap-armed'));clearTargets();clearPeek()}
 function enemyLive(el){const en=W.cb?.ens[+el.dataset.en];return !!(en&&en.hp>0&&!en.fled)}

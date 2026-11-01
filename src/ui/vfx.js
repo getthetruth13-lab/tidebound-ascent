@@ -114,10 +114,12 @@ function frozenText(cs){if(!propNames){propNames=[];for(let j=0;j<cs.length;j++)
  for(let j=0;j<cs.length;j++){const n=cs[j];if(n.charCodeAt(0)===45&&n.charCodeAt(1)===45)t+=n+':'+cs.getPropertyValue(n)+' !important;'} // custom properties differ per element: read them per element
  return t}
 // ---------- screen crossfade: the old #app contents fade out over the new screen ----------
-let xf=null;
+let xf=null,xfAnim=null;
 export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!app||!app.firstChild)return;
  const scrollOffset=scrollY,height=app.scrollHeight;
- if(xf){xf.remove();xf=null}
+ // v0.7.01 leak fix: a replaced fade is cancelled, not just removed. Its animation sat paused (waiting for the next screen to paint) and was never played,
+ // so its finished promise never settled and the whole cloned screen (hundreds of nodes) stayed held by the pending fin() callback: ~700 nodes per lap.
+ if(xf){const a=xfAnim;xf.remove();xf=null;xfAnim=null;try{a&&a.cancel()}catch(_){}}
  const o=app.cloneNode(true);o.removeAttribute('id');o.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));o.classList.add('xfade');o.setAttribute('aria-hidden','true');
  o.style.cssText=`position:fixed;left:0;right:0;top:${-scrollOffset}px;height:${height}px;z-index:9000;pointer-events:none;overflow:hidden;visibility:visible`;
  o.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
@@ -158,13 +160,13 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
  const ev=document.getElementById('env');if(ev&&(gray||envWillChange())){const ec=frozenCopy(ev);ec.style.setProperty('position','absolute','important');ec.style.setProperty('top',scrollOffset+'px','important');
   ec.style.setProperty('height',innerHeight+'px','important');ec.style.setProperty('z-index','-1','important');o.appendChild(ec)} // last child (index-stable for snapshot/live element matching); z -1 paints it under everything
  document.body.appendChild(o);xf=o;for(const [b,t,l] of scr){b.scrollTop=t;b.scrollLeft=l} // inner scrollers (map) keep their scroll position
- const fin=()=>{o.remove();if(xf===o)xf=null};
+ const fin=()=>{o.remove();if(xf===o){xf=null;xfAnim=null}};
  const k=hold/(hold+ms)||0,f=gray?'grayscale(1) brightness(.55)':'none';
- const anim=o.animate([{opacity:1,filter:'none',offset:0},{opacity:1,filter:f,offset:k},{opacity:0,filter:f,offset:1}],{duration:hold+ms,easing:'ease-out'});anim.finished.then(fin,fin);
+ const anim=xfAnim=o.animate([{opacity:1,filter:'none',offset:0},{opacity:1,filter:f,offset:k},{opacity:0,filter:f,offset:1}],{duration:hold+ms,easing:'ease-out'});anim.finished.then(fin,fin);
  // flicker fix: never let the old screen start fading before the new one is painted with its images decoded (cards/portraits/map nodes and the new
  // backdrop decode async; on a phone that took longer than the hold, so blank boxes and the bare backdrop popped in mid-fade). The hold still runs;
  // the fade waits at full opacity for readiness (cap 700ms), then starts on a fresh frame so a long decode frame never skips it ahead.
- anim.pause();const t0=performance.now();whenPainted(app).then(()=>requestAnimationFrame(()=>{if(xf!==o||anim.playState==='finished')return;anim.currentTime=Math.min(performance.now()-t0,hold);anim.play()}))}
+ anim.pause();const t0=performance.now();whenPainted(app).then(()=>requestAnimationFrame(()=>{if(xf!==o){try{anim.cancel()}catch(_){}return}if(anim.playState==='finished')return;anim.currentTime=Math.min(performance.now()-t0,hold);anim.play()}))}
 // gfxmem: the painted living layers (.envlv: ~40 animated elements) are copied with 8 baked properties instead of all ~350 computed ones (that loop was most of the
 // ~150 ms main-thread block when a fight starts). The pose is baked as a plain 2D transform / translate, with no animation and no will-change, so the copy adds no composited layers.
 const LIV=['transform','translate','opacity','display','visibility','mix-blend-mode','filter'];

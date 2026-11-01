@@ -30,10 +30,10 @@ const ART='art/v2/charsel/';
 // L: the hero's layer files (art/v2/charsel), body = the single-image fallback used for --spr / reflection; aw = body width/height.
 // piv: prop pivots (fractions of the hero canvas, REPORT-charsel-heroes.md) for the prop layer and the coming rigs.
 export const STAGE={
- tide:{x:.135,h:.56,sun:1,tint:'#5fd4c8',lamp:[.86,.31],lampc:'190,245,225',aw:653/1000,piv:[[.82,.43]],L:{body:'tidecaller-body-c3',under:'tidecaller-under-c2',cloth:'tidecaller-cloth-c2',prop:'tidecaller-prop-c1',lit:'tidecaller-lit-c2'}},
+ tide:{x:.155,h:.56,sun:1,tint:'#5fd4c8',lamp:[.86,.31],lampc:'190,245,225',aw:653/1000,piv:[[.82,.43]],L:{body:'tidecaller-body-c3',under:'tidecaller-under-c2',cloth:'tidecaller-cloth-c2',prop:'tidecaller-prop-c1',lit:'tidecaller-lit-c2'}},
  echo:{x:.335,h:.54,sun:1,tint:'#a58cff',lamp:[.28,.28],lampc:'232,200,255',aw:735/1000,piv:[[.28,.09],[.74,.29]],L:{body:'echo-mage-body-c3',under:'echo-mage-under-c1',cloth:'echo-mage-cloth-c1',prop:'echo-mage-prop-c1',lit:'echo-mage-lit-c2'}},
  carto:{x:.665,h:.52,sun:-1,tint:'#ffb257',lamp:[.26,.205],lampc:'255,200,120',aw:678/1000,piv:[[.26,.03],[.78,.33]],L:{body:'cartographer-body-c2',under:'cartographer-under-c1',cloth:'cartographer-cloth-c1',prop:'cartographer-prop-c1',lit:'cartographer-lit-c2'}},
- duel:{x:.865,h:.56,sun:-1,tint:'#ff5a5a',lamp:[.61,.535],lampc:'255,205,130',aw:665/1000,piv:[[.45,.30],[.60,.45],[.75,.50]],L:{body:'duelist-body-c2',under:'duelist-under-c2',cloth:'duelist-cloth-c2',prop:'duelist-prop-c1',lit:'duelist-lit-c2'}}};
+ duel:{x:.85,h:.56,sun:-1,tint:'#ff5a5a',lamp:[.61,.535],lampc:'255,205,130',aw:665/1000,piv:[[.45,.30],[.60,.45],[.75,.50]],L:{body:'duelist-body-c2',under:'duelist-under-c2',cloth:'duelist-cloth-c2',prop:'duelist-prop-c1',lit:'duelist-lit-c2'}}};
 export const LIT_ART={tide:true,echo:true,carto:true,duel:true};
 export const HERO_PAR=0.55; // heroes + halos move with the ground plate (z3 parallax .55) so their feet stay planted
 export const CAM_MAX=CS_LAYOUT.parallax.safe_max_travel_px; // 240
@@ -86,7 +86,8 @@ const plateHTML=l=>{const st=`--x:${l.x};--y:${l.y};--w:${l.w};--h:${l.h};--par:
  return `<div class="cs-pl cs-par cs-tile cs-pl-${l.id}" data-pl="${l.id}" data-z="${l.z}" style="${st};--n:${n}">${Array.from({length:n},()=>`<img src="${src}" alt="" draggable="false">`).join('')}</div>`};
 function stageHTML(foc,sel){let h='';for(const l of [...CS_LAYOUT.layers].sort((a,b)=>a.z-b.z)){h+=plateHTML(l);
   if(l.id==='sun')h+=`<i class="cs-suncall cs-par" style="--par:${l.parallax}"></i><button class="cs-sunbtn cs-par" id="beginfocus" style="--par:${l.parallax}" onclick="beginFocused()" aria-label="Begin" aria-disabled="${!sel}"><span class="cs-begin">Begin</span><span class="cs-prompt">Choose a Lampbearer</span></button>`;
-  if(l.id==='fog-far')h+=`<div class="cs-halos">${ORDER.map(k=>`<img class="cs-halo cs-par${foc===k&&!lockedK(k)?' on':''}" data-cls="${k}" src="${UI}halo-c3.webp" alt="" draggable="false" style="--par:${HERO_PAR};--x:${STAGE[k].x};--hw:${(STAGE[k].h*.92*STAGE[k].aw*1.25).toFixed(4)};--tint:${STAGE[k].tint}">`).join('')}</div><div class="cs-heroes cs-par" style="--par:${HERO_PAR}">${ORDER.map((k,i)=>heroHTML(k,i,foc)).join('')}</div>`}
+  // v0.7.01: heroes + halos stand in front of the near rock frame (after near-r z7, under fog-near z8) so the rocks never hide a hero at any aspect or camera.
+  if(l.id==='near-r')h+=`<div class="cs-halos">${ORDER.map(k=>`<img class="cs-halo cs-par${foc===k&&!lockedK(k)?' on':''}" data-cls="${k}" src="${UI}halo-c3.webp" alt="" draggable="false" style="--par:${HERO_PAR};--x:${STAGE[k].x};--hw:${(STAGE[k].h*.92*STAGE[k].aw*1.25).toFixed(4)};--tint:${STAGE[k].tint}">`).join('')}</div><div class="cs-heroes cs-par" style="--par:${HERO_PAR}">${ORDER.map((k,i)=>heroHTML(k,i,foc)).join('')}</div>`}
  return h+`<div class="cs-names cs-par" style="--par:${HERO_PAR}">${ORDER.map(k=>nameHTML(k,foc)).join('')}</div>`}
 export function selectScr(){for(const k of takeHeroNews()){beating.add(k);setTimeout(()=>{beating.delete(k);charselUnlockBeat(k)},U(700))}
  const S=W.S,foc=S.hero&&CLASSES[S.hero]?S.hero:null,sel=foc&&!lockedK(foc);

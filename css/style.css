@@ -449,7 +449,7 @@ body.env-on .page{background:transparent}
 .intent.mirror{border-color:var(--echo-mage-primary)}
 /* travel / title card */
 .page.travel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;cursor:pointer;text-align:center;background:radial-gradient(ellipse 70% 60% at 50% 50%,#05070b99,transparent 75%)}
-.tcard{animation:tcard 1.4s ease-out both}
+.tcard:not(.opt){animation:tcard 1.4s ease-out both}
 .tcard .act{font:700 14px var(--font-display);letter-spacing:.4em;color:var(--ui-text-muted)}
 .tcard h1{font-size:clamp(30px,7vw,52px);margin:4px 0}
 .tcard .boss{margin-top:10px;font-size:14px}
