@@ -1,71 +1,55 @@
 /* css/select.css: character select v2 "The Lamp Gallery" (src/ui/screens/select.js; notes in design/CHARSEL-BUILD-NOTES.md).
    Only transform/opacity animate on large layers. Blurs are pre-baked into the WebP files. One shared beat curve for the select moment. */
 .cs2{--beat:.62s;--ease:cubic-bezier(.22,.7,.2,1);--gold:#ffd27a;position:fixed;inset:0;overflow:hidden;background:#010204;color:#d9dde4;font-family:'Crimson Pro',serif;touch-action:manipulation;user-select:none;-webkit-user-select:none}
-.cs-world{position:absolute;inset:0;transition:transform 1.6s cubic-bezier(.55,0,.8,.4);transform-origin:50% 58%}
-.cs-layer{position:absolute;inset:-14px -22px;will-change:transform}
-.cs-plate{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 60%;pointer-events:none}
-/* --- back plate furniture: sun, floor streak, lanterns (positions are fractions of the plate) --- */
-.cs-sun{position:absolute;left:51%;top:57.5%;width:22%;aspect-ratio:2/1;translate:-50% -50%;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
- background:radial-gradient(closest-side,rgba(255,226,150,.85),rgba(255,184,80,.35) 45%,rgba(255,150,40,0) 100%);opacity:.38;transform:scale(.8);
- transition:opacity var(--beat) var(--ease),transform var(--beat) var(--ease);animation:cs-sunbreath 7s ease-in-out infinite}
-.has-sel .cs-sun{opacity:.62;transform:scale(1)}
-.cs-sun.swell{animation:cs-swell var(--beat) var(--ease),cs-sunbreath 7s ease-in-out infinite var(--beat)}
-@keyframes cs-swell{0%{opacity:.38;transform:scale(.8)}45%{opacity:1;transform:scale(1.35)}100%{opacity:.62;transform:scale(1)}}
-@keyframes cs-sunbreath{0%,100%{filter:none;scale:1}50%{scale:1.06}}
-.cs-streak{position:absolute;left:51%;top:60%;width:9%;height:48%;translate:-50% 0;transform-origin:50% 0;pointer-events:none;mix-blend-mode:screen;
- transform:rotate(calc((.5 - var(--fx)) * 70deg)) scaleY(.85);opacity:.35;transition:transform .9s var(--ease),opacity var(--beat) var(--ease)}
-.has-sel .cs-streak{opacity:.75;transform:rotate(calc((.5 - var(--fx)) * 70deg)) scaleY(1.25)}
-.cs-streak>i{position:absolute;inset:0;background:radial-gradient(50% 100% at 50% 0,rgba(255,205,120,.55),rgba(255,180,90,.12) 60%,transparent 100%);animation:cs-shimmer 3.4s ease-in-out infinite}
-@keyframes cs-shimmer{0%,100%{transform:scaleX(1) translateX(0)}30%{transform:scaleX(.82) translateX(6%)}65%{transform:scaleX(1.12) translateX(-5%)}}
-.cs-lan{position:absolute;width:12%;aspect-ratio:1;translate:-50% -50%;pointer-events:none;mix-blend-mode:screen}
-.cs-lan.l{left:9.1%;top:44%}.cs-lan.r{left:86.9%;top:49%}
-.cs-lan::before,.cs-flare{content:'';position:absolute;inset:0;border-radius:50%}
-.cs-lan::before{background:radial-gradient(closest-side,rgba(255,200,110,.55),rgba(255,160,60,.15) 55%,transparent);animation:cs-flick 2.3s steps(1) infinite}
-.cs-lan.r::before{animation-duration:2.9s;animation-delay:-.7s}
-@keyframes cs-flick{0%{opacity:.85}11%{opacity:.7}19%{opacity:.95}33%{opacity:.78}47%{opacity:.9}58%{opacity:.66}71%{opacity:.92}86%{opacity:.8}}
-.cs-flare{background:radial-gradient(closest-side,color-mix(in srgb,var(--tint) 35%,#ffd59a),transparent 70%);opacity:0;transform:scale(.6)}
-.cs-lan.flare .cs-flare{animation:cs-flare var(--beat) var(--ease)}
-@keyframes cs-flare{0%{opacity:0;transform:scale(.6)}40%{opacity:.95;transform:scale(1.6)}100%{opacity:0;transform:scale(1.2)}}
-/* --- mist (pre-baked tileable strip) --- */
-.cs-mist{pointer-events:none;transition:opacity .8s}
-.cs-mist i{position:absolute;left:0;width:200%;background:url('../art/v2/charsel/mist.webp') repeat-x 0 0/50% 100%;will-change:transform}
-.cs-mist .m1{top:52%;height:22%;opacity:.35;animation:cs-drift 70s linear infinite}
-.cs-mist .m2{top:78%;height:26%;opacity:.28;animation:cs-drift 46s linear infinite reverse}
-@keyframes cs-drift{to{transform:translate3d(-50%,0,0)}}
+.cs2{container-type:size}
+/* stage: the artist's 3600x1440 canvas, scaled to cover the screen with the 3120x1440 crop (x=240) centred; --u = one canvas px */
+.cs-world{--u:max(calc(100cqw / 3120),calc(100cqh / 1440));position:absolute;inset:0;transition:transform 1.6s cubic-bezier(.55,0,.8,.4);transform-origin:50% 58%}
+.cs-stage{--cam:0;position:absolute;left:calc(50% - 1800 * var(--u));top:calc(50% - 720 * var(--u));width:calc(3600 * var(--u));height:calc(1440 * var(--u));pointer-events:none}
+.cs-stage>*{pointer-events:none}.cs-stage>.cs-sunbtn,.cs-stage>.cs-heroes .cs-hero{pointer-events:auto}
+/* parallax: offset_x = -camera_x * parallax (camera_x in canvas px, clamped to +-240 in select.js) */
+.cs-par{transform:translate3d(calc(var(--cam) * var(--par) * -1 * var(--u)),0,0)}
+.cs-pl{position:absolute;left:calc(var(--x) * var(--u));top:calc(var(--y) * var(--u));width:calc(var(--w) * var(--u));height:calc(var(--h) * var(--u));display:block;user-select:none}
+/* tiled plates (tile_x): --n copies of the plate from one tile left of x, so the strip covers the canvas at any camera in +-240 */
+.cs-tile{left:calc((var(--x) - var(--w)) * var(--u));width:calc(var(--n) * var(--w) * var(--u));display:flex}
+.cs-tile>img{flex:none;width:calc(var(--w) * var(--u));height:100%;display:block}
+.cs-pl-sun{transition:scale .6s var(--ease)}
 /* --- heroes --- */
-.cs-heroes{pointer-events:none}
+.cs-heroes{position:absolute;left:calc(50% - 50cqw);top:calc(50% - 50cqh);width:100cqw;height:100cqh;pointer-events:none}
+/* selection halo (ui/halo-c3.webp, greyscale): screen blend at opacity .6 ONLY (1.0 reads as a pale mat), 1.25x the hero's width, centred on the foot line -20 canvas px.
+   .cs-halos is not a stacking context, so each halo blends straight onto the plates. Tinted toward the hero colour with a sepia/hue filter would also be fine; kept neutral-warm. */
+.cs-halos{position:absolute;left:calc(50% - 50cqw);top:calc(50% - 50cqh);width:100cqw;height:100cqh;pointer-events:none}
+.cs-halo{position:absolute;left:calc(var(--x) * 100%);top:calc(83% - 20 * var(--u));width:calc(var(--hw) * 100cqh);height:auto;translate:-50% -50%;mix-blend-mode:screen;opacity:0;transition:opacity var(--beat) var(--ease)}
+.cs-halo.on{opacity:.6}
+.lifting .cs-halo{opacity:0}
 .cs-hero{all:unset;position:absolute;left:calc(var(--x) * 100%);bottom:17%;height:calc(var(--h) * 92%);translate:-50% 0;display:block;cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent}
-.cs-hero:focus-visible .cs-name b{outline:1px solid rgba(255,210,122,.5);outline-offset:4px}
+.cs-stage:has(.cs-hero[data-cls="tide"]:focus-visible) .cs-name[data-cls="tide"] b,.cs-stage:has(.cs-hero[data-cls="echo"]:focus-visible) .cs-name[data-cls="echo"] b,.cs-stage:has(.cs-hero[data-cls="carto"]:focus-visible) .cs-name[data-cls="carto"] b,.cs-stage:has(.cs-hero[data-cls="duel"]:focus-visible) .cs-name[data-cls="duel"] b{outline:1px solid rgba(255,210,122,.5);outline-offset:4px}
 .st-fig{position:relative;display:block;height:100%;transition:transform 1.2s var(--ease)}
 .st-fig>img{display:block;height:100%;width:auto;pointer-events:none}
-.st-fig>img+img,.cs-rim,.fx,.cs-chains{position:absolute;inset:0}
-/* silhouette: same art, crushed to near-black with a cold rim (base never animates filter) */
-.cs-base{filter:brightness(.24) saturate(.45) contrast(1.15) drop-shadow(0 0 1px rgba(160,190,225,.6));transition:none}
-/* idea 1+2: lit layer rises from the feet on the shared beat */
-.cs-lit{-webkit-mask:linear-gradient(to top,#000 40%,transparent 60%) 0 0/100% 250% no-repeat;mask:linear-gradient(to top,#000 40%,transparent 60%) 0 0/100% 250% no-repeat;
+.st-fig>img+img,.cs-rim,.fx{position:absolute;inset:0}
+/* v0.6.99 layered hero: under (.cs-base) -> cloth -> prop -> lit. The bodies are painted at Act 1 luminance, so no silhouette filter. */
+/* lit: screen-blended, shown ONLY on the selected hero (no hover, no idle hint), rising from the feet on the shared beat */
+.cs-lit{mix-blend-mode:screen;-webkit-mask:linear-gradient(to top,#000 40%,transparent 60%) 0 0/100% 250% no-repeat;mask:linear-gradient(to top,#000 40%,transparent 60%) 0 0/100% 250% no-repeat;
  opacity:0;transition:-webkit-mask-position .7s var(--ease),mask-position .7s var(--ease),opacity .6s ease .1s}
-.cs-hero.on .cs-lit,.cs-hero:not(.locked):hover .cs-lit{-webkit-mask-position:0 100%;mask-position:0 100%;opacity:1;transition:-webkit-mask-position var(--beat) var(--ease),mask-position var(--beat) var(--ease),opacity .1s}
-.cs-hero:not(.on):hover .cs-lit{opacity:.55}
+.cs-hero.on .cs-lit{-webkit-mask-position:0 100%;mask-position:0 100%;opacity:1;transition:-webkit-mask-position var(--beat) var(--ease),mask-position var(--beat) var(--ease),opacity .1s}
 /* rim light from the sun side, masked to the hero shape */
 .cs-rim{-webkit-mask:var(--spr) 0 0/100% 100% no-repeat;mask:var(--spr) 0 0/100% 100% no-repeat;mix-blend-mode:screen;opacity:0;
  background:linear-gradient(calc(90deg * var(--sun)),transparent 55%,rgba(255,200,120,.55) 88%,rgba(255,230,170,.8));transition:opacity var(--beat) var(--ease)}
 .cs-hero.on .cs-rim{opacity:.55}
+@keyframes cs-flick{0%{opacity:.85}11%{opacity:.7}19%{opacity:.95}33%{opacity:.78}47%{opacity:.9}58%{opacity:.66}71%{opacity:.92}86%{opacity:.8}}
 /* each Lampbearer's own lamp: dim ember when dark, full bloom + warm spill when picked (same beat) */
 .cs-lamp{position:absolute;left:calc(var(--lx) * 100%);top:calc(var(--ly) * 100%);width:0;height:0;pointer-events:none}
 .cs-lamp::before,.cs-lamp>i{content:'';position:absolute;border-radius:50%;translate:-50% -50%;mix-blend-mode:screen}
 .cs-lamp::before{width:22px;height:22px;background:radial-gradient(closest-side,rgba(var(--lc),.95),rgba(var(--lc),.35) 50%,transparent);opacity:.32;transform:scale(.55);
  transition:opacity var(--beat) var(--ease),transform var(--beat) var(--ease);animation:cs-flick 1.9s steps(1) infinite}
-.cs-lamp>i{width:min(260px,34vw);height:min(260px,34vw);background:radial-gradient(closest-side,rgba(var(--lc),.30),rgba(var(--lc),.09) 50%,transparent);opacity:0;transform:scale(.4);transition:opacity var(--beat) var(--ease),transform var(--beat) var(--ease)}
+.cs-lamp>i{width:24cqh;height:24cqh;background:radial-gradient(closest-side,rgba(var(--lc),.30),rgba(var(--lc),.09) 50%,transparent);opacity:0;transform:scale(.4);transition:opacity var(--beat) var(--ease),transform var(--beat) var(--ease)}
 .cs-hero.on .cs-lamp::before{opacity:1;transform:scale(1.25)}
 .cs-hero.on .cs-lamp>i{opacity:1;transform:scale(1);animation:cs-flickglow 2.6s ease-in-out infinite var(--beat)}
 @keyframes cs-flickglow{0%,100%{opacity:1}23%{opacity:.82}41%{opacity:.95}63%{opacity:.78}80%{opacity:.92}}
-/* idea 3: contact shadow + baked reflection on the wet stone */
+/* idea 3: contact shadow + a soft flipped reflection of the body on the wet stone (the halo is a stage child, see .cs-halos) */
 .cs-floor{position:absolute;left:50%;top:100%;width:100%;translate:-50% 0;pointer-events:none}
 .cs-shadow{position:absolute;left:10%;right:10%;top:-6px;height:12px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.75),transparent)}
-.cs-refl{display:block;margin:-2px auto 0;width:100%;height:auto;opacity:.5;transition:opacity var(--beat) var(--ease)}
-.cs-hero.on .cs-refl{opacity:1}
-.cs-floor::after{content:'';position:absolute;left:0;right:0;top:0;height:40px;background:radial-gradient(50% 50% at 50% 30%,rgba(255,190,110,.28),transparent);opacity:0;mix-blend-mode:screen;transition:opacity var(--beat) var(--ease)}
-.cs-hero.on .cs-floor::after{opacity:1}
+.cs-refl{display:block;margin:-2px auto 0;width:100%;height:auto;transform:scaleY(-1);filter:blur(2px) brightness(.55);-webkit-mask:linear-gradient(to top,rgba(0,0,0,.55),transparent 32%);mask:linear-gradient(to top,rgba(0,0,0,.55),transparent 32%);opacity:.5;transition:opacity var(--beat) var(--ease)}
+.cs-hero.on .cs-refl{opacity:.85}
 /* idea 6: per-hero idle life, only while lit (stand-ins over the whole sprite until split layers land; see CHARSEL-ART-NEEDED.md) */
 .cs-hero.on .st-fig{animation:cs-breath 4.2s ease-in-out infinite;transform-origin:50% 100%}
 @keyframes cs-breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,1.009)}}
@@ -84,44 +68,41 @@
 @keyframes cs-glint{0%,70%{left:-30%}88%,100%{left:120%}}
 /* switching away: the light drains back down */
 .cs-hero.dim .cs-lit{transition-duration:.6s}
-/* idea 12: idle hint wave across the silhouettes, only while nothing is picked */
-.cs2:not(.has-sel) .cs-hero:not(.locked) .cs-lit{-webkit-mask-position:0 100%;mask-position:0 100%;animation:cs-hint 7.5s ease-in-out infinite;animation-delay:calc(1.2s + var(--i,0) * .32s)}
 .cs-hero[data-i="1"]{--i:1}.cs-hero[data-i="2"]{--i:2}.cs-hero[data-i="3"]{--i:3}
-@keyframes cs-hint{0%,100%{opacity:0}8%{opacity:.2}18%{opacity:0}}
 /* idea 7: carved name, no box */
-.cs-name{position:absolute;left:50%;top:calc(100% + 4px);translate:-50% 0;white-space:nowrap;text-align:center;pointer-events:none;opacity:0;transition:opacity .25s,transform .3s;transform:translateY(3px)}
+.cs-names{position:absolute;left:calc(50% - 50cqw);top:calc(50% - 50cqh);width:100cqw;height:100cqh;pointer-events:none}
+.cs-name{position:absolute;left:calc(var(--x) * 100%);top:calc(83% + 4px);translate:-50% 0;white-space:nowrap;text-align:center;pointer-events:none;opacity:0;transition:opacity .25s,transform .3s;transform:translateY(3px)}
 .cs-name b{position:relative;display:block;font:700 15px/1 'Cinzel',serif;letter-spacing:.32em;color:#c9ccd2;text-transform:uppercase;
  text-shadow:0 -1px 0 rgba(0,0,0,.9),0 1px 0 rgba(255,255,255,.18),0 0 12px rgba(0,0,0,.95);clip-path:inset(0 100% 0 0);transition:letter-spacing .9s var(--ease)}
 .cs-name b::after{content:attr(data-n);position:absolute;inset:0;color:transparent;background:linear-gradient(90deg,transparent 0,rgba(255,220,150,.95) 6%,transparent 12%) -20% 0/300% 100% no-repeat;-webkit-background-clip:text;background-clip:text;text-shadow:none}
 .cs-name i{position:relative;display:block;margin-top:5px;font:italic 400 10.5px/1.1 'Crimson Pro',serif;color:#9ea6b2;letter-spacing:.04em;text-shadow:0 0 8px #000,0 0 3px #000}
 .cs-name i::before{content:'';position:absolute;left:15%;right:15%;top:-3px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,210,140,.6),transparent);transform:scaleX(0);transition:transform .7s var(--ease) .35s}
-.cs-hero.on .cs-name{opacity:1;transform:none}
-.cs-hero.on .cs-name b{clip-path:inset(0 0 0 0);letter-spacing:.2em;transition:clip-path .8s steps(14,end) .1s,letter-spacing .9s var(--ease)}
-.cs-hero.on .cs-name b::after{animation:cs-scribe .9s linear .1s}
-.cs-hero.on .cs-name i::before{transform:scaleX(1)}
+.cs-name.on{opacity:1;transform:none}
+.cs-name.on b{clip-path:inset(0 0 0 0);letter-spacing:.2em;transition:clip-path .8s steps(14,end) .1s,letter-spacing .9s var(--ease)}
+.cs-name.on b::after{animation:cs-scribe .9s linear .1s}
+.cs-name.on i::before{transform:scaleX(1)}
 @keyframes cs-scribe{from{background-position:-20% 0}to{background-position:120% 0}}
-.cs-hero.locked .cs-name{opacity:.0}
-/* idea 11: locked = chained silhouette, never lights */
+.cs-name.locked{opacity:.0}
+/* idea 11: locked = the painted lock (ui/lock-c1.webp) over the hero dimmed to .55 brightness; never lights */
 .cs-hero.locked .cs-lit,.cs-hero.locked .cs-rim{display:none}
-.cs-chains{width:100%;height:100%;-webkit-mask:var(--spr) 0 0/100% 100% no-repeat;mask:var(--spr) 0 0/100% 100% no-repeat}
-.cs-chains path{fill:none;stroke:#b08a48;stroke-width:2.2;stroke-dasharray:3 1.5;opacity:.75}
-.cs-lock{fill:none;stroke:#ffd27a;stroke-width:1;opacity:.6;animation:cs-flick 3s steps(1) infinite}
-.cs-hero.unchaining .cs-chains{transition:transform .9s cubic-bezier(.5,0,.9,.5),opacity .9s;transform:translateY(30%);opacity:0}
+.cs-hero.locked .st-fig>img:not(.cs-lockimg),.cs-hero.locked .cs-refl{filter:brightness(.55)}
+.st-fig>.cs-lockimg{position:absolute;left:50%;right:auto;top:auto;bottom:22%;width:auto;height:46%;translate:-50% 0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.7))}
+.cs-hero.unchaining .cs-lockimg{transition:transform .9s cubic-bezier(.5,0,.9,.5),opacity .9s;transform:translateY(30%);opacity:0}
 /* layers above the world */
 .cs-motes{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.cs-front{pointer-events:none}
 .cs-vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 55%,transparent 55%,rgba(0,0,0,.6))}
 .cs-word{all:unset;position:absolute;cursor:pointer;font:600 12px/1 'Cinzel',serif;letter-spacing:.22em;text-transform:uppercase;color:#aeb4be;text-shadow:0 -1px 0 #000,0 1px 0 rgba(255,255,255,.12),0 0 10px #000;padding:10px 12px;-webkit-tap-highlight-color:transparent}
-.cs-backbtn{left:max(8px,env(safe-area-inset-left));top:4px}
+/* Back: the painted 9-slice button (ui/button-9s-c2.webp 876x192, insets 52/64/52/64, repeat round). Under 104 px tall the border-image-width scales by height/192. */
+.cs-backbtn{--bh:40;--bs:calc(var(--bh) / 192);left:max(8px,env(safe-area-inset-left));top:4px;box-sizing:border-box;height:calc(var(--bh) * 1px);display:flex;align-items:center;padding:0 4px;border-style:solid;border-width:calc(52px * var(--bs)) calc(64px * var(--bs));border-image:url('../art/v2/charsel/ui/button-9s-c2.webp') 52 64 52 64 fill / calc(52px * var(--bs)) calc(64px * var(--bs)) / 0 round;color:#d9cfb8}
 .cs-title{position:absolute;left:50%;top:9px;translate:-50% 0;margin:0;font:600 11px/1 'Cinzel',serif;letter-spacing:.42em;text-transform:uppercase;color:#7f8792;text-shadow:0 0 10px #000;pointer-events:none;white-space:nowrap}
 @keyframes cs-beginpulse{0%,100%{opacity:.85}50%{opacity:1}}
-/* idea 8: logbook page hanging above the hero (no frame) */
+/* idea 8: logbook page hanging above the hero, on the 9-slice panel */
 .cs-lores{position:absolute;inset:0;pointer-events:none}
-.cs-lore{position:absolute;top:34px;width:min(310px,40vw);padding:2px 4px 0;text-shadow:0 0 6px #000,0 0 14px #000,0 0 2px #000;animation:cs-in .3s var(--ease) both}
+.cs-lore{--ps:.2;position:absolute;top:34px;width:min(310px,40vw);box-sizing:border-box;padding:4px 6px 2px;border-style:solid;border-width:calc(120px * var(--ps));border-image:url('../art/v2/charsel/ui/panel-9s-c2.webp') 120 fill / calc(120px * var(--ps)) / 0 round;filter:drop-shadow(0 4px 10px rgba(0,0,0,.6));text-shadow:0 0 6px #000,0 0 2px #000;animation:cs-in .3s var(--ease) both}
 .cs-lore.out{animation:cs-out .2s ease-in both}
 @keyframes cs-in{from{opacity:0;transform:translateY(-4px)}}
 @keyframes cs-out{to{opacity:0;transform:translateY(-3px)}}
-.cs-lore::before{content:'';position:absolute;inset:-14px -22px -10px;z-index:-1;background:radial-gradient(closest-side,rgba(0,0,0,.62),rgba(0,0,0,.35) 60%,transparent);pointer-events:none}
+/* v0.6.99: the page sits on the painted slate panel (ui/panel-9s-c2.webp, 400x400, slice 120 all round, repeat round so the slate never stretches) */
 .cs-epi{margin:0 0 3px;font:italic 500 12.5px/1.15 'Crimson Pro',serif;color:#f0d9a8}
 .cs-l{margin:0 0 2px;font:400 11px/1.25 'Crimson Pro',serif;color:#c7ccd4;animation:cs-ink-in .45s ease-out both;animation-delay:calc(.08s * var(--l) + .1s)}
 @keyframes cs-ink-in{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
@@ -136,25 +117,24 @@
 .lifting .cs-wash{opacity:1}
 .lifting .cs-world{transform:scale(1.15)}
 .lifting .cs-hero:not(.on){opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}
-.lifting .cs-mist{opacity:0}
-.lifting .cs-sun{opacity:1;transform:scale(2.4);transition:transform 1.4s ease-in,opacity .4s}
+.lifting .cs-pl-sun{scale:2.4;transition:scale 1.4s ease-in}
 .lifting .cs-word,.lifting .cs-title,.lifting .cs-lores,.lifting .cs-name{opacity:0;transition:opacity .3s}
 /* perf fallbacks */
-.cs2.lowfx .cs-lamp>i,.cs2.lowfx .cs-streak>i{animation:none}
+.cs2.lowfx .cs-lamp>i{animation:none}
 .reduce-motion .cs2 *,.cs2.rm *{animation-duration:.01s!important;animation-iteration-count:1!important}
 @media (prefers-reduced-motion:reduce){.cs2 *{animation-iteration-count:1!important}}
 /* The drowned sun is the Begin button (generous circular hit area; BEGIN engraved centred under it). */
-.cs-sunbtn{all:unset;position:absolute;left:51%;top:57.5%;width:104px;height:104px;translate:-50% -50%;border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent;z-index:1}
-.cs-sunbtn::before{content:'';position:absolute;inset:18px;border-radius:50%;mix-blend-mode:screen;background:radial-gradient(closest-side,rgba(255,225,150,.45),rgba(255,180,80,.12) 60%,transparent);opacity:0;transform:scale(.8);transition:opacity .4s,transform .4s var(--ease)}
-.has-sel .cs-sunbtn[aria-disabled="false"]::before{animation:cs-suncall 2.8s ease-in-out infinite var(--beat)}
-.has-sel .cs-sunbtn[aria-disabled="false"]:hover::before{animation:none;opacity:1;transform:scale(1.15)}
-.has-sel .cs-sunbtn[aria-disabled="false"]:active::before{animation:none;opacity:1;transform:scale(1.3);transition-duration:.12s}
-@keyframes cs-suncall{0%,100%{opacity:.15;transform:scale(.85)}50%{opacity:.85;transform:scale(1.12)}}
+.cs-sunbtn{all:unset;position:absolute;left:calc(1831 * var(--u));top:calc(798 * var(--u));width:104px;height:104px;translate:-50% -50%;border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent}
+/* the sun's call glow is its own stage child (not inside the button) so its screen blend reaches the sun plate */
+.cs-suncall{position:absolute;left:calc(1831 * var(--u));top:calc(798 * var(--u));width:68px;height:68px;translate:-50% -50%;border-radius:50%;pointer-events:none;mix-blend-mode:screen;background:radial-gradient(closest-side,rgba(255,225,150,.45),rgba(255,180,80,.12) 60%,transparent);opacity:0;scale:.8;transition:opacity .4s,scale .4s var(--ease)}
+.has-sel .cs-stage:has(.cs-sunbtn[aria-disabled="false"]) .cs-suncall{animation:cs-suncall 2.8s ease-in-out infinite var(--beat)}
+.has-sel .cs-stage:has(.cs-sunbtn[aria-disabled="false"]:hover) .cs-suncall{animation:none;opacity:1;scale:1.15}
+.has-sel .cs-stage:has(.cs-sunbtn[aria-disabled="false"]:active) .cs-suncall{animation:none;opacity:1;scale:1.3;transition-duration:.12s}
+@keyframes cs-suncall{0%,100%{opacity:.15;scale:.85}50%{opacity:.85;scale:1.12}}
 .cs-begin,.cs-prompt{position:absolute;left:50%;top:calc(50% + 26px);translate:-50% 0;white-space:nowrap;pointer-events:none;text-shadow:0 -1px 0 rgba(0,0,0,.9),0 0 14px #000,0 0 3px #000}
 .cs-begin{font:700 17px/1 'Cinzel Decorative','Cinzel',serif;letter-spacing:.26em;padding-left:.26em;color:#f2dcae;text-shadow:0 -1px 0 rgba(0,0,0,.9),0 1px 0 rgba(255,240,200,.25),0 0 18px rgba(255,170,60,.55),0 0 2px #000;opacity:0;transform:translateY(5px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
 .cs-sunbtn[aria-disabled="false"] .cs-begin{opacity:1;transform:none;transition-delay:.25s}
 .cs-prompt{font:italic 500 12px/1 'Crimson Pro',serif;color:#c9b88f;letter-spacing:.06em;opacity:0}
 .cs2.prompt .cs-sunbtn[aria-disabled="true"] .cs-prompt{animation:cs-prompt 2.2s ease-in-out}
 @keyframes cs-prompt{0%{opacity:0;transform:translateY(4px)}20%,70%{opacity:1;transform:none}100%{opacity:0}}
-.cs2.prompt:not(.has-sel) .cs-hero:not(.locked) .cs-lit{animation:cs-hint 1.6s ease-in-out 1;animation-delay:calc(var(--i,0) * .15s)}
-.lifting .cs-begin,.lifting .cs-sunbtn::before{opacity:0!important;transition:opacity .3s}
+.lifting .cs-begin,.lifting .cs-suncall{opacity:0!important;transition:opacity .3s}
