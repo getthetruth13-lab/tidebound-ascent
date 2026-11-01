@@ -1,4 +1,5 @@
 import {showOutcome,clearOutcome,healDigits} from './outcome.js';
+import {placeToasts} from './toast-place.js';
 // Win heal (ECON.winHeal): painted heal digits + a short green glow on the hero bar after the fight.
 const healPopOn=()=>!!(W.run&&!W.cb&&W.run.healPop&&Date.now()-W.run.healPop.t<2200);
 // In the victory scene (B061: no combat, hero still on the battle screen) the hero bar glows green and the painted +N rises from it.
@@ -100,7 +101,7 @@ function fitRelics(){const bar=document.getElementById('relicbar');if(!bar||!bar
  const capacity=Math.max(1,Math.floor(bar.clientWidth/cell));
  const limit=icons.length>capacity?Math.max(0,capacity-1):capacity;
  icons.forEach((el,i)=>el.hidden=i>=limit);const n=Math.max(0,icons.length-limit);more.hidden=!n;more.textContent='+'+n;more.setAttribute('aria-label',`Show all ${icons.length} relics`)}
-export function toastsHTML(){const now=Date.now();const t=(W.toasts||[]).filter(x=>now-x.t<2600);if(!t.length)return'';return `<div class="toasts">${t.map(x=>`<div class="toast t-${x.cls||""}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`}
+export function toastsHTML(){const now=Date.now();const t=(W.toasts||[]).filter(x=>now-x.t<2600);if(!t.length)return'';return `<div class="toasts">${t.map(x=>`<div class="toast t-${x.cls||""}" data-k="${x.t}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`}
 export function potionTap(i){if(drag)return;const id=W.run.potions[i];if(!id){W.S.potion=null;return render()}W.S.potion=W.S.potion===i?null:i;W.S.relicView=null;render()}
 export function relicTap(id){if(drag)return;W.S.relicView=W.S.relicView===id?null:id;W.S.potion=null;render()}
 export function closePop(){W.S.potion=null;W.S.relicView=null;render()}
@@ -611,6 +612,7 @@ export function render(){if(W.previewing||W.replaying)return;tutSync();if(drag||
  for(const el of a.querySelectorAll('.en.hot,.foes.armed,.chartbox.dragging,.cbottom.hot'))el.classList.remove('hot','armed','dragging');
  fitRelics();decorateCardRefs(a);decorateKeywords(a);fitCards(a);if(inspecting)placeHeldInspect();if(s==='pick')updateCardSelection();
  if(s==='combat'){layoutHand();placeDetail();syncTapArm()}
+ placeToasts(a);
  if(s==='combat'&&W.cb.mode&&W.cb.mode.k==='retain'&&!a.contains(document.activeElement?.closest?.('#retainbox'))){const f=a.querySelector('#retainbox .retainpick');if(f)f.focus({preventScroll:true})} // keyboard: Tab/Enter works at once
  syncEnv();syncStage();syncAudio();syncCombatAnimations();
  if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}

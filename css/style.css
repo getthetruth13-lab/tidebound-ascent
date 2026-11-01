@@ -1393,3 +1393,7 @@ body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .c
 #env .envstack .envhero{position:absolute;pointer-events:none;z-index:3}
 #env .envstack .envhero img{position:absolute;inset:0;width:100%;height:100%}
 #env .envstack .envhero .envhero-sh{position:absolute;left:calc(var(--ax,50%) - 42%);width:84%;bottom:-3%;height:6%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,0))}
+/* v0.6.95: in battle each toast is placed in its own free slot by src/ui/toast-place.js; a narrow slot wraps the text */
+.toasts.placed{top:0;left:0;right:auto;bottom:auto;width:0;height:0}
+.toasts.placed .toast{position:fixed}
+.toasts .toast.wrap{white-space:normal}
