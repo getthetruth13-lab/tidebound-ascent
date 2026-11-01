@@ -3134,5 +3134,469 @@
    768,
    576
   ]
+ },
+ "heldmoon": {
+  "art": "art/v2/cards/heldmoon.webp",
+  "thumb": "art/v2/cards/heldmoon-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "meridian": {
+  "art": "art/v2/cards/meridian.webp",
+  "thumb": "art/v2/cards/meridian-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "breachmarker": {
+  "art": "art/v2/cards/breachmarker.webp",
+  "thumb": "art/v2/cards/breachmarker-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bait": {
+  "art": "art/v2/cards/bait.webp",
+  "thumb": "art/v2/cards/bait-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rapidcuts": {
+  "art": "art/v2/cards/rapidcuts.webp",
+  "thumb": "art/v2/cards/rapidcuts-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "buckler": {
+  "art": "art/v2/cards/buckler.webp",
+  "thumb": "art/v2/cards/buckler-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "keepscore": {
+  "art": "art/v2/cards/keepscore.webp",
+  "thumb": "art/v2/cards/keepscore-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "readreply": {
+  "art": "art/v2/cards/readreply.webp",
+  "thumb": "art/v2/cards/readreply-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "beataside": {
+  "art": "art/v2/cards/beataside.webp",
+  "thumb": "art/v2/cards/beataside-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "unhurt": {
+  "art": "art/v2/cards/unhurt.webp",
+  "thumb": "art/v2/cards/unhurt-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bledwhite": {
+  "art": "art/v2/cards/bledwhite.webp",
+  "thumb": "art/v2/cards/bledwhite-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "platepoint": {
+  "art": "art/v2/cards/platepoint.webp",
+  "thumb": "art/v2/cards/platepoint-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tolast": {
+  "art": "art/v2/cards/tolast.webp",
+  "thumb": "art/v2/cards/tolast-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sweepblade": {
+  "art": "art/v2/cards/sweepblade.webp",
+  "thumb": "art/v2/cards/sweepblade-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "brimpool": {
+  "art": "art/v2/cards/brimpool.webp",
+  "thumb": "art/v2/cards/brimpool-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "answerwave": {
+  "art": "art/v2/cards/answerwave.webp",
+  "thumb": "art/v2/cards/answerwave-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "wrackline": {
+  "art": "art/v2/cards/wrackline.webp",
+  "thumb": "art/v2/cards/wrackline-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "cloudburst": {
+  "art": "art/v2/cards/cloudburst.webp",
+  "thumb": "art/v2/cards/cloudburst-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tidemercy": {
+  "art": "art/v2/cards/tidemercy.webp",
+  "thumb": "art/v2/cards/tidemercy-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "tidesieve": {
+  "art": "art/v2/cards/tidesieve.webp",
+  "thumb": "art/v2/cards/tidesieve-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "waveonwave": {
+  "art": "art/v2/cards/waveonwave.webp",
+  "thumb": "art/v2/cards/waveonwave-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "seekecho": {
+  "art": "art/v2/cards/seekecho.webp",
+  "thumb": "art/v2/cards/seekecho-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "countertone": {
+  "art": "art/v2/cards/countertone.webp",
+  "thumb": "art/v2/cards/countertone-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bronzebulwark": {
+  "art": "art/v2/cards/bronzebulwark.webp",
+  "thumb": "art/v2/cards/bronzebulwark-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bronzereply": {
+  "art": "art/v2/cards/bronzereply.webp",
+  "thumb": "art/v2/cards/bronzereply-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "aftertone": {
+  "art": "art/v2/cards/aftertone.webp",
+  "thumb": "art/v2/cards/aftertone-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "growingpeal": {
+  "art": "art/v2/cards/growingpeal.webp",
+  "thumb": "art/v2/cards/growingpeal-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "oildrip": {
+  "art": "art/v2/cards/oildrip.webp",
+  "thumb": "art/v2/cards/oildrip-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "groundrod": {
+  "art": "art/v2/cards/groundrod.webp",
+  "thumb": "art/v2/cards/groundrod-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "fletching": {
+  "art": "art/v2/cards/fletching.webp",
+  "thumb": "art/v2/cards/fletching-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "dualcompass": {
+  "art": "art/v2/cards/dualcompass.webp",
+  "thumb": "art/v2/cards/dualcompass-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "packedearth": {
+  "art": "art/v2/cards/packedearth.webp",
+  "thumb": "art/v2/cards/packedearth-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bleededge": {
+  "art": "art/v2/cards/bleededge.webp",
+  "thumb": "art/v2/cards/bleededge-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "counterthrust": {
+  "art": "art/v2/cards/counterthrust.webp",
+  "thumb": "art/v2/cards/counterthrust-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "unhand": {
+  "art": "art/v2/cards/unhand.webp",
+  "thumb": "art/v2/cards/unhand-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "checkswing": {
+  "art": "art/v2/cards/checkswing.webp",
+  "thumb": "art/v2/cards/checkswing-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "countertempo": {
+  "art": "art/v2/cards/countertempo.webp",
+  "thumb": "art/v2/cards/countertempo-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "siphon": {
+  "art": "art/v2/cards/siphon.webp",
+  "thumb": "art/v2/cards/siphon-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rainbarrel": {
+  "art": "art/v2/cards/rainbarrel.webp",
+  "thumb": "art/v2/cards/rainbarrel-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "twingale": {
+  "art": "art/v2/cards/twingale.webp",
+  "thumb": "art/v2/cards/twingale-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "coldfront": {
+  "art": "art/v2/cards/coldfront.webp",
+  "thumb": "art/v2/cards/coldfront-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "hymndeep": {
+  "art": "art/v2/cards/hymndeep.webp",
+  "thumb": "art/v2/cards/hymndeep-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "ringout": {
+  "art": "art/v2/cards/ringout.webp",
+  "thumb": "art/v2/cards/ringout-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "thirdtine": {
+  "art": "art/v2/cards/thirdtine.webp",
+  "thumb": "art/v2/cards/thirdtine-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "harmseries": {
+  "art": "art/v2/cards/harmseries.webp",
+  "thumb": "art/v2/cards/harmseries-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "fieldsurvey": {
+  "art": "art/v2/cards/fieldsurvey.webp",
+  "thumb": "art/v2/cards/fieldsurvey-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "redrawnmap": {
+  "art": "art/v2/cards/redrawnmap.webp",
+  "thumb": "art/v2/cards/redrawnmap-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "readwound": {
+  "art": "art/v2/cards/readwound.webp",
+  "thumb": "art/v2/cards/readwound-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "triang": {
+  "art": "art/v2/cards/triang.webp",
+  "thumb": "art/v2/cards/triang-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "openedguard": {
+  "art": "art/v2/cards/openedguard.webp",
+  "thumb": "art/v2/cards/openedguard-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "rhythmdrill": {
+  "art": "art/v2/cards/rhythmdrill.webp",
+  "thumb": "art/v2/cards/rhythmdrill-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "bladewaltz": {
+  "art": "art/v2/cards/bladewaltz.webp",
+  "thumb": "art/v2/cards/bladewaltz-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "gathercurrent": {
+  "art": "art/v2/cards/gathercurrent.webp",
+  "thumb": "art/v2/cards/gathercurrent-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "learnbell": {
+  "art": "art/v2/cards/learnbell.webp",
+  "thumb": "art/v2/cards/learnbell-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "sailorcoat": {
+  "art": "art/v2/cards/sailorcoat.webp",
+  "thumb": "art/v2/cards/sailorcoat-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "lodestone": {
+  "art": "art/v2/cards/lodestone.webp",
+  "thumb": "art/v2/cards/lodestone-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "confluence": {
+  "art": "art/v2/cards/confluence.webp",
+  "thumb": "art/v2/cards/confluence-256.webp",
+  "size": [
+   768,
+   576
+  ]
+ },
+ "fullorch": {
+  "art": "art/v2/cards/fullorch.webp",
+  "thumb": "art/v2/cards/fullorch-256.webp",
+  "size": [
+   768,
+   576
+  ]
  }
 }

@@ -75,7 +75,8 @@
   "hgunner": "hgunner.rig.json",
   "galereader": "galereader.rig.json",
   "thalassa": "thalassa.rig.json",
-  "eyegale": "eyegale.rig.json"
+  "eyegale": "eyegale.rig.json",
+  "lenswright": "lenswright.rig.json"
  },
  "files": [
   "art/v2/rigs/anchorite/anchorite.rig.json",
@@ -377,6 +378,14 @@
   "art/v2/rigs/lamplighter/pieces/a2-lamp.webp",
   "art/v2/rigs/lamplighter/pieces/a2-lamp_glow_glow.webp",
   "art/v2/rigs/lamplighter/pieces/a2-stalk.webp",
+  "art/v2/rigs/lenswright/lenswright.rig.json",
+  "art/v2/rigs/lenswright/pieces/a3-base.webp",
+  "art/v2/rigs/lenswright/pieces/a3-body.webp",
+  "art/v2/rigs/lenswright/pieces/a3-claws.webp",
+  "art/v2/rigs/lenswright/pieces/a3-eye_glow.webp",
+  "art/v2/rigs/lenswright/pieces/a3-head.webp",
+  "art/v2/rigs/lenswright/pieces/a3-neck.webp",
+  "art/v2/rigs/lenswright/pieces/a3-tail.webp",
   "art/v2/rigs/leviathan-bell/leviathan-bell.rig.json",
   "art/v2/rigs/leviathan-bell/pieces/base.webp",
   "art/v2/rigs/leviathan-bell/pieces/body.webp",

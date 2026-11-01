@@ -70,10 +70,12 @@ const A2_EV_ENV={chapel:['a2_tithebox','a2_brazier','a2_quietbell','a2_holdstone
 export function a2EventEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='event'||!run||(run.act||1)!==2||!S.ev||!/^a2_/.test(S.ev.id||''))return null;
  let k='yard';for(const n in A2_EV_ENV)if(A2_EV_ENV[n].includes(S.ev.id))k=n;const id='ev_a2_'+k;const e=ENV.envs[id];return e&&e.art?id:null}
 // v0.6.67: Act 3 event scenes, four variants of ev_a3 (studio/design/ACT3-DESIGN.md: #1,2,8,12 ledge (default), #3,5,6,7,9 spire, #11,13,15,16 terrace, #4,10,14 lee).
-// A variant shows only once its painted scene is wired; shrines and unlisted a3_ events use the ledge. Otherwise the battle band shows as before.
+// A variant shows once its painted scene is wired; until then (and for shrines and unlisted a3_ events) the ledge scene shows (v0.7.00; was the battle band).
 const A3_EV_ENV={spire:['a3_thunderspire','a3_barometer','a3_stormbell','a3_glassblower','a3_ballight'],terrace:['a3_falsedawn','a3_counterpull','a3_fallingstair','a3_stillnet'],lee:['a3_galecaller','a3_hailwife','a3_signs']};
 export function a3EventEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='event'||!run||(run.act||1)!==3||!S.ev||!/^a3_/.test(S.ev.id||''))return null;
- let k='ledge';for(const n in A3_EV_ENV)if(A3_EV_ENV[n].includes(S.ev.id))k=n;const id='ev_a3_'+k;const e=ENV.envs[id];if(k!=='ledge'&&!(e&&e.art))return null;return e&&e.art?id:null}
+ let k='ledge';for(const n in A3_EV_ENV)if(A3_EV_ENV[n].includes(S.ev.id))k=n;let id='ev_a3_'+k,e=ENV.envs[id];
+ // v0.7.00: a variant with no painted scene (spire: closed 10-30 without a pass) uses the wired ledge scene, never the battle background.
+ if(!(e&&e.art)){id='ev_a3_ledge';e=ENV.envs[id]}return e&&e.art?id:null}
 // Later-act travel backdrops. v0.6.66: Act 3 has its own crossing (tr_a2a3 c3-finish) and title card (tc_a3 c3; title in its text panel, render.js tcPanelStyle).
 const LATER_TRAVEL={2:['tr_a1a2','tc_a2'],3:['tr_a2a3','tc_a3']};
 export function a2TravelEnv(){const S=W.S,run=W.run;if(!S||S.screen!=='travel'||S.kind!=='act'||!LATER_TRAVEL[S.to])return null;const id=LATER_TRAVEL[S.to][S.card?1:0];const e=ENV.envs[id];return e&&e.art?id:null}

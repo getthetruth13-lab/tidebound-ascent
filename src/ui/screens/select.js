@@ -54,10 +54,22 @@ const FX={
 const reduce=()=>reducedMotion()||document.body.classList.contains('reduce-motion');
 const lockedK=k=>!heroUnlocked(loadProfile(),k);
 const beating=new Set(); // heroes drawn chained for one beat after they unlock (profile.heroSeen, takeHeroNews)
+// v0.7.00 idle rigs r3 (passed review206, css/charsel-rigs.css): the selected hero moves piece by piece instead of the whole-sprite cs-breath.
+// Two spans go right after img.cs-lit: .rp-paint (normal blend, same order as under -> cloth -> prop) and .rp-lit.cs-lit (live cs-lit screen blend and rise mask).
+// 'rigged' is added only once every piece has decoded (until then the static layers show, never a blank hero); RIGOK keeps it across re-renders.
+const RIG={tide:['tidecaller',['base','chest','cloth1','cloth2','staff']],echo:['echo-mage',['base','chest','cloth1','cloth2','lantern','bell']],
+ carto:['cartographer',['base','chest','cloth1','cloth2','lantern','spyglass']],duel:['duelist',['base','chest','cloth1','cloth2','rapier','lantern','dagger']]};
+const RIGOK=new Set(),RIGWAIT=new Set();
+const rigHTML=k=>{const g=RIG[k];if(!g)return '';const [d,P]=g,r=(p,n)=>`<img class="rp r-${n}" src="${ART}rigs/${d}/${p}${n}.webp" alt="" draggable="false">`;
+ return `<span class="rp-paint">${P.map(n=>r('',n)).join('')}</span><span class="rp-lit cs-lit">${P.map(n=>r('lit_',n)).join('')}</span>`};
+function rigUp(r){for(const b of r.querySelectorAll('.cs-hero:not(.rigged)')){const k=b.dataset.cls;if(!RIG[k])continue;
+  if(RIGOK.has(k)){b.classList.add('rigged');continue}if(RIGWAIT.has(k))continue;RIGWAIT.add(k);
+  const ims=[...b.querySelectorAll('.rp')];Promise.all(ims.map(im=>im.decode())).then(()=>{RIGOK.add(k);RIGWAIT.delete(k);const c=root();c&&c.querySelectorAll(`.cs-hero[data-cls="${k}"]`).forEach(x=>x.classList.add('rigged'))},()=>{RIGWAIT.delete(k)})}}
+export const charselRigs={RIG,RIGOK};
 function heroHTML(k,i,foc){const S=STAGE[k],K=CLASSES[k],lk=lockedK(k)||beating.has(k),on=foc===k&&!lk,L=S.L,f=n=>`${ART+L[n]}.webp`,im=(c,n,st='')=>`<img class="${c}" src="${f(n)}" alt="" draggable="false"${st}>`;
- return `<button class="st-pick cs-hero theme-${TH[k]}${on?' on':''}${lk?' locked':''}" data-cls="${k}" data-i="${i}" style="--x:${S.x};--h:${S.h};--sun:${S.sun};--spr:url('${new URL(f('body'),document.baseURI).href}');--tint:${S.tint}" onclick="selectHero('${k}')" aria-label="${K.n}${lk?' (locked)':''}" aria-pressed="${on}">
+ return `<button class="st-pick cs-hero theme-${TH[k]}${on?' on':''}${lk?' locked':''}${RIGOK.has(k)?' rigged':''}" data-cls="${k}" data-i="${i}" style="--x:${S.x};--h:${S.h};--sun:${S.sun};--spr:url('${new URL(f('body'),document.baseURI).href}');--tint:${S.tint}" onclick="selectHero('${k}')" aria-label="${K.n}${lk?' (locked)':''}" aria-pressed="${on}">
  <span class="cs-floor"><i class="cs-shadow"></i>${im('cs-refl','body')}</span>
- <span class="st-fig">${im('cs-base cs-under','under')}${im('cs-cloth','cloth')}${im('cs-prop','prop',` style="transform-origin:${S.piv[0][0]*100}% ${S.piv[0][1]*100}%"`)}${im('cs-lit'+(LIT_ART[k]?'':' standin'),'lit')}${LIT_ART[k]?'':'<i class="cs-rim"></i>'}${S.lamp?`<i class="cs-lamp" style="--lx:${S.lamp[0]};--ly:${S.lamp[1]};--lc:${S.lampc}"><i></i></i>`:''}${lk?LOCK:FX[k](k)}</span></button>`}
+ <span class="st-fig">${im('cs-base cs-under','under')}${im('cs-cloth','cloth')}${im('cs-prop','prop',` style="transform-origin:${S.piv[0][0]*100}% ${S.piv[0][1]*100}%"`)}${im('cs-lit'+(LIT_ART[k]?'':' standin'),'lit')}${rigHTML(k)}${LIT_ART[k]?'':'<i class="cs-rim"></i>'}${S.lamp?`<i class="cs-lamp" style="--lx:${S.lamp[0]};--ly:${S.lamp[1]};--lc:${S.lampc}"><i></i></i>`:''}${lk?LOCK:FX[k](k)}</span></button>`}
 // Carved names live in .cs-names above the near plates (the heroes stand behind near-l/near-r, json z6/z7, and a name must never be hidden).
 function nameHTML(k,foc){const S=STAGE[k],K=CLASSES[k],lk=lockedK(k)||beating.has(k),on=foc===k&&!lk;
  return `<span class="st-slab cs-name${on?' on':''}${lk?' locked':''}" data-cls="${k}" style="--x:${S.x}"><b data-n="${K.n}">${K.n}</b><i>${lk?'Locked':HEROES[k].epithet}</i></span>`}
@@ -150,7 +162,7 @@ function startMotion(){const r=root();if(!r||motes.run)return;const cv=r.querySe
   last=now;requestAnimationFrame(tick)};requestAnimationFrame(tick);motes.size=size;SND.startBed()}
 addEventListener('resize',()=>{if(root()&&motes.run)motes.size?.()},{passive:true}); // once, module-level: startMotion re-runs per visit and must not stack listeners
 // Called after every render (render() is synchronous; a microtask lands after the DOM swap).
-const mo=new MutationObserver(()=>{const r=root();if(!r)return;for(const b of r.querySelectorAll('.cs-hero.on.locked'))b.classList.remove('on');halos(r);if(!motes.run)startMotion();const l=r.querySelector('.cs-lore:not(.out)');if(l&&!l.style.left)placeLore(l);if(r.dataset.focus)motes.focus=STAGE[r.dataset.focus]?.x??.5});
+const mo=new MutationObserver(()=>{const r=root();if(!r)return;for(const b of r.querySelectorAll('.cs-hero.on.locked'))b.classList.remove('on');halos(r);rigUp(r);if(!motes.run)startMotion();const l=r.querySelector('.cs-lore:not(.out)');if(l&&!l.style.left)placeLore(l);if(r.dataset.focus)motes.focus=STAGE[r.dataset.focus]?.x??.5});
 if(typeof document!=='undefined')document.addEventListener('DOMContentLoaded',()=>mo.observe(document.body,{childList:true,subtree:true}),{once:true});
 if(document.readyState!=='loading')mo.observe(document.body,{childList:true,subtree:true});
 // Idea 11 "freshly unlocked" beat (off until unlocks ship): the lock falls and the hero lights once on its own with the bell.
