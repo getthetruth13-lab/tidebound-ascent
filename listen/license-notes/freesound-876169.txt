@@ -1,0 +1,9 @@
+Evidence for: F:876169
+Page: https://freesound.org/people/Assetsmith/sounds/876169/
+Page title: Freesound - Healing Spell Chime (Fantasy RPG) by Assetsmith
+Saved: 2026-11-01 (box network)
+Creative Commons links on the page: http://creativecommons.org/publicdomain/zero/1.0/
+License text found on the page:
+  License: CC0. Procedurally synthesized with code (no AI audio models, no recordings). AI assisted in writing the generator code (GenAI-assisted).
+  cc0
+  Creative Commons 0

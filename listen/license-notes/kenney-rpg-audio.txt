@@ -1,0 +1,7 @@
+Evidence for: K:rpg-audio/drawKnife2, K:rpg-audio/metalLatch, K:rpg-audio/footstep03, K:rpg-audio/doorOpen_1, K:rpg-audio/handleCoins, K:rpg-audio/handleCoins2
+Page: https://kenney.nl/assets/rpg-audio
+Page title: RPG Audio · Kenney
+Saved: 2026-11-01 (box network)
+Creative Commons links on the page: https://creativecommons.org/publicdomain/zero/1.0/
+License text found on the page:
+  Creative Commons CC0

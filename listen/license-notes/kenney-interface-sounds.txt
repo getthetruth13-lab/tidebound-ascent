@@ -1,0 +1,7 @@
+Evidence for: K:interface-sounds/click_002, K:interface-sounds/select_001, K:interface-sounds/tick_001
+Page: https://kenney.nl/assets/interface-sounds
+Page title: Interface Sounds · Kenney
+Saved: 2026-11-01 (box network)
+Creative Commons links on the page: https://creativecommons.org/publicdomain/zero/1.0/
+License text found on the page:
+  Creative Commons CC0

@@ -1,0 +1,10 @@
+Evidence for: O:rpg80/spell_01, O:rpg80/spell_02, O:rpg80/blade_01, O:rpg80/blade_03, O:rpg80/creature_die_01, O:rpg80/item_coins_01, O:rpg80/item_gem_01, O:rpg80/item_coins_03, O:rpg80/creature_roar_01, O:rpg80/creature_roar_02
+Page: https://opengameart.org/content/80-cc0-rpg-sfx
+Page title: 80 CC0 RPG SFX | OpenGameArt.org
+Saved: 2026-11-01 (box network)
+Creative Commons links on the page: http://creativecommons.org/publicdomain/zero/1.0/
+License text found on the page:
+  80 CC0 RPG SFX | OpenGameArt.org
+  80 CC0 RPG SFX
+  Author:&nbsp; rubberduck Sunday, July 8, 2018 - 11:08 Art Type:&nbsp; Sound Effect Tags:&nbsp; RPG Fantasy Blade knife book chain creature monster die hurt misc roar slime Item items coin coins gem st
+  File(s):&nbsp; 80-CC0-RPG-SFX.zip 1.8 Mb [ 9832 download(s)] Log in or register to post comments
