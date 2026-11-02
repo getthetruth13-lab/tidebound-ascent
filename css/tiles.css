@@ -163,7 +163,13 @@
 /* Codex 19: every combat choice fits in one illustrated row above the controls. */
 .battle .tilebox .tiles{display:flex;flex-wrap:nowrap;gap:8px;padding:4px 0;--ta:var(--choice-art)}
 .battle .tilebox .tile{flex:1 1 0;width:auto;min-width:0;padding:6px 4px;gap:3px}
-.battle .tilebox .tsum{white-space:nowrap;display:block;text-overflow:ellipsis;min-height:0}
+/* v0.7.04: the summary is width-bound to its tile and wraps to up to 3 lines (fitTileSums shrinks it until all of it shows). The old
+   one-line ellipsis never fired: the nowrap line sized itself to its text inside the centred flex tile, so the tile clipped it
+   on both sides (Moon Shell 'ide: closer to an Undertow (G'). */
+.battle .tilebox .tile.sp .tsum{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;align-self:stretch;max-width:100%;box-sizing:border-box;text-overflow:clip;min-height:0}
+/* v0.7.04: battle choice tiles keep the frame's inner padding (the compact battle rule set padding:3px 4px, so the summary ran
+   under the carved bottom border and its second line was hidden). */
+.combat .ov.battle .box.tilebox .tile.sp{padding:3px calc(var(--fb) * .6) calc(var(--fb) - 2px)}
 .battle .tilebox .tname{font-size:clamp(11px,1.5vw,14px)}
 .battle .tilebox .tcard{--gw:min(var(--choice-card),calc((90vw - 60px)/var(--n,3)));min-width:0}
 .battle .chartrow{--gw:min(var(--choice-card),calc((90vw - 180px)/var(--n)));gap:8px}

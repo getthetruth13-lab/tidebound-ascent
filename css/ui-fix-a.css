@@ -47,6 +47,9 @@ html.has-mappage #env,html.has-mappage #env-front{visibility:hidden}
 .deckbox .dk-head{position:relative;display:flex;align-items:center;justify-content:center;min-height:34px;flex:none;margin:0 0 4px}
 .deckbox .dk-head h2{margin:0!important;padding:0 96px}
 .deckbox .dk-close{position:absolute!important;right:0;top:50%;transform:translateY(-50%);width:auto!important;min-width:0!important;min-height:30px!important;height:30px;padding:0 10px!important;font-size:12px!important;margin:0!important}
+/* v0.7.04: the deck view's Terms button was pushed right (margin-left:auto) under the pinned Close button and could not be tapped,
+   and it shoved the title off centre. Pin it to the left edge, mirroring Close, so the centred title keeps its 96px clear on both sides. */
+.deckbox .dk-head .dk-terms{position:absolute!important;left:0;right:auto;top:50%;transform:translateY(-50%);width:auto!important;min-width:0!important;min-height:30px!important;height:30px;padding:0 10px!important;font-size:12px!important;margin:0!important}
 .deckbox .dk-grid{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:22px;
  -webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent);mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}
 @media (max-height:440px){.deckbox .dk-grid.grid.small{--gw:calc((100% - 52px)/6);gap:8px;padding-top:2px}}

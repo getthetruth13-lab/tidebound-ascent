@@ -197,6 +197,10 @@
 @keyframes box-in{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
 .ov{animation:ov-in calc(.18s*var(--us,1)) ease-out both}
 .ov>.box,.potpop,.relpop,.msgp{animation:box-in calc(.2s*var(--us,1)) cubic-bezier(.2,.8,.3,1) both}
+/* v0.7.04: a centred popup (.pop: left:50% + translateX(-50%)) keeps its centring through the fade-in. box-in ends at transform:none
+   (fill both), which wiped the translateX, so the relic popup started at the screen centre and ran off the right edge on phones. */
+.pop.relpop{animation-name:box-in-c}
+@keyframes box-in-c{from{opacity:0;transform:translateX(-50%) translateY(6px) scale(.96)}to{opacity:1;transform:translateX(-50%)}}
 .reduce-motion .ov,.reduce-motion .ov>.box,.reduce-motion .potpop,.reduce-motion .relpop,.reduce-motion .msgp{animation-duration:.01s}
 
 /* ===== FINISH_NONART F7 (Spencer 10-16): Options rows are the full 44px tap size; the list scrolls inside the window with a visible gold scrollbar (D-F-07) ===== */
