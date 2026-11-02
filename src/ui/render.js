@@ -440,7 +440,12 @@ function vicLampHTML(){const v=lampPreview();if(!v)return '';const up=v.to.lvl>v
  return `<div class="vic-lamp${up?' up':''}" id="viclamp" style="--from:${from.toFixed(1)};--to:${to.toFixed(1)}"><div class="vl-top"><b class="vl-gain">Lamplight +${v.gain}</b><span class="vl-lvl">${up?`Lamp ${v.to.lvl} at run end`:need}</span></div>
   <div class="vl-bar"><i class="vl-fill"></i><i class="vl-new"></i><img class="vl-frame" src="art/v2/ui/lamp/vic-lamp-frame.png" alt="" draggable="false">${up?'<img class="vl-glow" src="art/v2/ui/lamp/vic-lamp-ready-glow.png" alt="" draggable="false">':''}<img class="vl-lantern" src="art/v2/ui/lamp/vic-lamp-lantern.png" alt="" draggable="false"></div></div>`}
 const ownedBadge=id=>{const n=(W.run&&W.run.deck||[]).filter(c=>c.id===id).length;return n?`<span class="owned" aria-label="You own ${n}">Owned ${n}</span>`:''};
-function rewardScr(){const S=W.S,title=stripEmoji(S.title||'');
+// v0.7.02: every reward sub-screen keeps a way out (Slay the Spire always lets you skip rewards). If a state ever renders without one, a Proceed fallback is added.
+const REW_EXIT=/id="(proceed|skiprelic|confirmcard|skipcard|skipswap)"/;
+function rewardScr(){const h=rewardBody();if(REW_EXIT.test(h))return h;const S=W.S;
+ const fn=S.swap!=null?'potionSwap(-1)':S.bossPick&&!S.bossTook?'bossRelicPick(-1)':S.cardsOpen!=null?'rewSkipCards()':'rewDone()';
+ return h+`<div class="rew-fallback">${pkBtn('Proceed',fn,{pri:1,id:'proceed',icon:'arrowright'})}</div>`}
+function rewardBody(){const S=W.S,title=stripEmoji(S.title||'');
  const boss=S.kind==='boss'&&S.boss&&EN[S.boss]&&S.cardsOpen==null&&S.swap==null?`<div class="bossvic" style="${anim(S.t,2600)||''}"><i class="bv-rays"></i><b>${EN[S.boss].n}</b><q>${BOSS_DEFEAT[S.boss]||''}</q></div>`:'';
  if(S.cardsOpen!=null){const row=S.rows[S.cardsOpen];
   return topBar()+pkScreen({cls:'pk-cards',title:`<span class="reward-banner">${title||'Choose a card'}</span>`,sub:cardSelSub(S.cardSelected!=null?CARDS[row.cards[S.cardSelected]].n:null),
@@ -449,7 +454,7 @@ function rewardScr(){const S=W.S,title=stripEmoji(S.title||'');
    after:S.skipConfirm?`<div class="ov" role="dialog" aria-modal="true" aria-labelledby="skipquestion"><div class="box card-skip-box"><h2 id="skipquestion">No card has been selected. Do you wish to continue?</h2><label class="chk"><input type="checkbox" id="skipdont"><span>Don't show this again</span></label><div class="actions"><button class="btn pri" id="skipyes" onclick="rewSkipAnswer(true,document.getElementById('skipdont').checked)">Yes</button><button class="btn" id="skipno" onclick="rewSkipAnswer(false)">No</button></div></div></div>`:''})}
  if(S.swap!=null){const row=S.rows[S.swap],p=POTIONS[row.id];
   return topBar()+pkScreen({cls:'pk-swap',title:'Potion belt full',sub:`Swap <b>${p.n}</b> for a potion you hold, or leave it behind.`,
-   body:tilesRow([...W.run.potions.map((id,s)=>potionTile(id,{click:`potionSwap(${s})`,tag:'Replace',cls:'swap'})),tileHTML({id:'opt-remove',emoji:'🗑️',name:`Discard ${p.n}`,sum:'Leave it behind.',click:'potionSwap(-1)',cls:'k-discard',tid:'discardnew'})],'swaptiles')})}
+   body:tilesRow([...W.run.potions.map((id,s)=>potionTile(id,{click:`potionSwap(${s})`,tag:'Replace',cls:'swap'})),tileHTML({id:'opt-remove',emoji:'🗑️',name:`Discard ${p.n}`,sum:'Leave it behind.',click:'potionSwap(-1)',cls:'k-discard',tid:'discardnew'})],'swaptiles'),right:pkBtn('Leave it','potionSwap(-1)',{id:'skipswap',icon:'arrowright'})})}
  if(S.bossPick){const took=S.bossTook;
   return (S.scene?victorySceneHTML(S):'')+topBar()+pkScreen({cls:'pk-rewards pk-bossrelic'+(S.scene?' vic':''),title:`<span class="reward-banner">Boss relic</span>`,sub:took?'':'Choose one. The others sink with the boss.',
    body:tilesRow(S.bossPick.map((id,j)=>relicTile(id,{click:took?'':`bossRelicPick(${j})`,done:took===id,disabled:!!took&&took!==id,sum:RELICS[id].d})),'rewtiles bossrelics'),

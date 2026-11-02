@@ -104,10 +104,19 @@ export function selectScr(){for(const k of takeHeroNews()){beating.add(k);setTim
 // ---------- live (no re-render) state changes so light can travel between heroes ----------
 const root=()=>document.querySelector('.cs2');
 function setLore(k){const box=document.querySelector('.cs-lores');if(!box)return;for(const o of box.querySelectorAll('.cs-lore:not(.out)')){o.classList.add('out');setTimeout(()=>o.remove(),U(220))}
- if(k){box.insertAdjacentHTML('beforeend',loreHTML(k));const n=box.lastElementChild;placeLore(n);SND.breath()}}
+ if(k){box.insertAdjacentHTML('beforeend',loreHTML(k));const n=box.lastElementChild;placeLore(n);setTimeout(()=>placeLore(n),U(450));SND.breath()}}
 // Keep the page above its hero, clamped inside the screen (it never covers another hero: it sits in the band above all heads).
-function placeLore(n){const r=root();if(!n||!r)return;const W_=r.clientWidth,w=n.offsetWidth,x=parseFloat(n.style.getPropertyValue('--x'))*W_;
- const left=Math.max(10,Math.min(W_-w-10,x-w/2));n.style.left=left+'px';n.style.setProperty('--tx',(x-left)+'px')}
+function placeLore(n){const r=root();if(!n||!r||!n.isConnected)return;n.style.left='0px';const R=r.getBoundingClientRect(),N=n.getBoundingClientRect(),W_=R.width,w=N.width,x=parseFloat(n.style.getPropertyValue('--x'))*W_;
+ const z=n.offsetWidth?w/n.offsetWidth:1; // v0.7.02: the panel is zoomed 1.35 on big screens (ui-fix-a.css); measure on screen, write left / --tx in its own units
+ let left=Math.max(10,Math.min(W_-w-10,x-w/2)),side=false;
+ // v0.7.02: on short screens the panel above the hero reached down over the selected hero. If it would, it moves beside the hero instead
+ // (the side with more room), like Slay the Spire keeping the chosen character's art clear. The hero box is trimmed by its transparent margins.
+ const hb=r.querySelector(`.cs-hero[data-cls="${n.dataset.cls}"]`);
+ if(hb){const b=hb.getBoundingClientRect(),hx0=b.left-R.left+b.width*.18,hx1=b.right-R.left-b.width*.18,hy=b.top-R.top+b.height*.08,bot=N.bottom-R.top;
+  if(bot>hy&&left<hx1&&left+w>hx0){const rt=hx1+6,lt=hx0-6-w,fitR=rt+w<=W_-10,fitL=lt>=10,preferR=x<W_/2;
+   left=preferR?(fitR?rt:fitL?lt:W_-w-10):(fitL?lt:fitR?rt:10);side=true}}
+ n.classList.toggle('side',side);n.style.left=(left-(N.left-R.left))/z+'px';n.style.setProperty('--tx',Math.max(0,Math.min(w,x-left))/z+'px')}
+addEventListener('resize',()=>{const l=root()?.querySelector('.cs-lore:not(.out)');if(l)placeLore(l)});
 // light() edits the live DOM directly, so the render diff (which compares template to template) can miss a change such as a newly locked hero. Re-apply the state after every render.
 export function syncSelect(){const r=root();if(!r)return;const k=W.S.hero&&CLASSES[W.S.hero]?W.S.hero:null,lk=k&&lockedK(k);
  for(const b of r.querySelectorAll('.cs-hero')){const on=b.dataset.cls===k&&!b.classList.contains('locked');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)}
@@ -143,7 +152,15 @@ addEventListener('pointermove',e=>{if(PAR.gyro||!root())return;PAR.tx=(e.clientX
 addEventListener('deviceorientation',e=>{if(!root()||e.gamma==null)return;PAR.gyro=true;const land=Math.abs(window.orientation||screen.orientation?.angle||0)===90;
  const a=land?e.beta:e.gamma,b=land?e.gamma:e.beta;PAR.tx=Math.max(-1,Math.min(1,(a||0)/18));PAR.ty=Math.max(-1,Math.min(1,((b||0)-35)/18))},{passive:true});
 // Camera: camera_x = PAR.x * 240 canvas px (clamped); every .cs-par layer reads --cam and its own --par in CSS (offset_x = -camera_x * parallax).
-export const camX=x=>Math.max(-CAM_MAX,Math.min(CAM_MAX,x*CAM_MAX));
+export const camX=(x,lim)=>{const lo=lim?lim[0]:CAM_MAX,hi=lim?lim[1]:CAM_MAX;return Math.max(-lo,Math.min(hi,x*CAM_MAX))};
+// v0.7.02: at squarer aspects (4:3) the full +-240 swing pushed the outer heroes' boxes past the screen edge. camLim() returns the
+// largest swing each way that keeps every hero box on screen (heroes move by -cam*HERO_PAR*u px), capped at CAM_MAX. Re-measured at most every 400ms.
+const CL={t:0,v:null};
+export function camLim(force){const r=root(),st=r?.querySelector('.cs-stage');if(!st)return null;const now=performance.now();if(!force&&CL.v&&now-CL.t<400)return CL.v;
+ const W_=innerWidth,M=4,k=st.getBoundingClientRect().width/CS_LAYOUT.canvas.w*HERO_PAR,cam=parseFloat(st.style.getPropertyValue('--cam'))||0;let lo=CAM_MAX,hi=CAM_MAX;
+ if(k>0)for(const b of r.querySelectorAll('.cs-hero')){const q=b.getBoundingClientRect();if(!q.width)continue;const l0=q.left+cam*k,r0=q.right+cam*k;
+  hi=Math.min(hi,Math.max(0,(l0-M)/k));lo=Math.min(lo,Math.max(0,(W_-M-r0)/k))}
+ CL.t=now;CL.v=[lo,hi];return CL.v}
 function startMotion(){const r=root();if(!r||motes.run)return;const cv=r.querySelector('.cs-motes'),stage=()=>root()?.querySelector('.cs-stage');
  const parOn=()=>settings.charselParallax!==false&&!reduce(),fxOn=settings.envFx!=='off'&&!reduce();
  const dpr=Math.min(2,devicePixelRatio||1),c=cv.getContext('2d');let w=0,h=0;const size=()=>{w=cv.clientWidth;h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;c.setTransform(dpr,0,0,dpr,0,0)};size();
@@ -155,7 +172,7 @@ function startMotion(){const r=root();if(!r||motes.run)return;const cv=r.querySe
  Promise.all([...r.querySelectorAll('.cs-stage img')].map(i=>i.decode().catch(()=>{}))).then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{settled=true})));if(dropped)cv.style.display='none';motes.run=true;
  const tick=now=>{if(!cv.isConnected){motes.run=false;motes.size=null;SND.stopBed();return}const dt=Math.min(.05,(now-last)/1000);if(!document.hidden){
   if(settled&&n<240){acc+=now-last;n++;if(n===240&&acc/240>17.5&&!dropped){dropped=true;cv.style.display='none';root()?.classList.add('lowfx')}}
-  if(parOn()){PAR.x+=(PAR.tx-PAR.x)*.06;PAR.y+=(PAR.ty-PAR.y)*.06;parRan=true;stage()?.style.setProperty('--cam',camX(PAR.x).toFixed(1))}
+  if(parOn()){PAR.x+=(PAR.tx-PAR.x)*.06;PAR.y+=(PAR.ty-PAR.y)*.06;parRan=true;stage()?.style.setProperty('--cam',camX(PAR.x,camLim()).toFixed(1))}
   else if(parRan){parRan=false;PAR.x=PAR.y=0;stage()?.style.setProperty('--cam','0')}
   if(!dropped){c.clearRect(0,0,w,h);for(const p of P){p.x+=p.vx*dt;p.y+=p.vy*dt;
    if(p.gold){p.life+=dt;const f=Math.sin(Math.PI*Math.min(1,p.life/p.max));c.globalAlpha=.75*f;c.fillStyle='#ffcf7a';c.beginPath();c.arc(p.x+Math.sin(p.life*1.3+p.r)*4,p.y,p.r,0,6.283);c.fill();if(p.life>p.max)spawn(p,true)}

@@ -138,3 +138,5 @@
 .cs2.prompt .cs-sunbtn[aria-disabled="true"] .cs-prompt{animation:cs-prompt 2.2s ease-in-out}
 @keyframes cs-prompt{0%{opacity:0;transform:translateY(4px)}20%,70%{opacity:1;transform:none}100%{opacity:0}}
 .lifting .cs-begin,.lifting .cs-suncall{opacity:0!important;transition:opacity .3s}
+/* v0.7.02: lore panel moved beside the hero on short screens: no thread pointing down into the hero */
+.cs-lore.side .cs-thread{display:none}
