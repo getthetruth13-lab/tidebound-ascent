@@ -138,3 +138,17 @@ html.has-mappage #env,html.has-mappage #env-front{visibility:hidden}
  :is(.combat,:where(.runhud>.topbar.sts)) #relicbar{overflow:clip;overflow-clip-margin:14px}
  :is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic.flash{position:relative;z-index:2}
 }
+/* v0.7.05 hunt B1: the shop's lower row (2 extra cards + 3 relic/potion columns + Scrub) is wider than the 5-card row it sits under on 780x360 phones
+   (Scrub 5px past the right edge) and at 1280x720 (19px). The relic/potion columns now give up width first (names wrap to two lines, as they already may),
+   and the card width also respects the lower row, so Scrub always ends inside the screen. tests/phone-sizes-fit.cjs */
+.sh1-rp{flex:0 1 auto;min-width:0}
+.sh1-relics,.sh1-potions{min-width:0}
+.sh1-icon{flex:0 1 calc(70px*var(--ik));min-width:calc(50px*var(--ik))}
+.sh1-in{--gw:max(44px,min(calc((100cqw - 24px)/5),calc((100cqh - 8px - 34px)/2.8),calc((100cqw - 18px - 154px*var(--ik))/3)))}
+/* v0.7.05 hunt B2: on 360px-tall landscape phones (360x780 held sideways) every end screen put "Play again" 13px below the bottom edge with nothing to
+   scroll. Under 400px tall the gaps tighten, and without the lamp column the eight run stats share one row. tests/phone-sizes-fit.cjs */
+@media (orientation:landscape) and (max-height:400px){
+ .end:not(.withlamp) .endstats{grid-template-columns:repeat(8,auto);gap:4px 14px;margin:2px 0 4px}
+ .end .endl,.end.withlamp .endl{gap:2px}
+ .end.withlamp .endstats{gap:2px 22px;margin:2px 0}
+}
