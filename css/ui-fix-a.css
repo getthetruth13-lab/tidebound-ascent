@@ -152,3 +152,9 @@ html.has-mappage #env,html.has-mappage #env-front{visibility:hidden}
  .end .endl,.end.withlamp .endl{gap:2px}
  .end.withlamp .endstats{gap:2px 22px;margin:2px 0}
 }
+/* v0.7.07: title Options two-column grid fits its frame at every size (tests/options-fit). The nowrap labels + 4-button segments made the
+   min-content columns ~10-20px wider than the frame, so the list scrolled sideways and cut the left labels and the right buttons. */
+.tb-opt .settings.sx{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.tb-opt .settings.sx .sx-row{min-width:0;flex-wrap:wrap;row-gap:0}
+.tb-opt .settings.sx .sx-t{white-space:normal;min-width:0;flex:1 1 90px}
+.tb-opt .settings.sx .sx-row>:not(.sx-t){margin-left:auto;flex:0 1 auto;min-width:0}
