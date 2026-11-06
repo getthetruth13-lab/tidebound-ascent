@@ -1,0 +1,43 @@
+name: Deploy Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Build publish tree (game only)
+        run: |
+          mkdir -p /tmp/publish
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.gitignore' \
+            --exclude='listen/' \
+            --exclude='art-reviews/' \
+            --exclude='TheDrownedSun.apk' \
+            --exclude='*.apk' \
+            ./ /tmp/publish/
+          echo "publish files=$(find /tmp/publish -type f | wc -l) size=$(du -sh /tmp/publish | cut -f1)"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: /tmp/publish
+      - id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 600000
