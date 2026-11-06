@@ -1,6 +1,0 @@
-{
- "wordless": false,
- "poster": "title-poster.jpg",
- "video": "title-loop.mp4",
- "note": "Spencer 2026-11-06: no-words rule is for in-game art only, not the title screen. wordless false = original title-loop.mp4 with baked tagline and TAP TO BEGIN (no live overlay). End Turn seal stays on its own end-turn.json flag."
-}

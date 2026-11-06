@@ -4,9 +4,8 @@ import {W} from '../core/state.js';
 import {settings} from '../save.js';
 import {observeEvents} from '../core/bus.js';
 import {needsTarget} from '../engine/cards.js';
-import {alive,canPlay,playCard,playBlockReason} from '../engine/combat.js';
-import {flashNoAfford,showNoPlay} from './hud-panel.js';
-const blockedTap=el=>{const ci=W.cb&&W.cb.hand[+(el&&el.dataset.i)];const why=ci?playBlockReason(ci):'energy';if(why&&why!=='energy')showNoPlay(el,why);else flashNoAfford(el)};
+import {alive,canPlay,playCard} from '../engine/combat.js';
+import {flashNoAfford} from './hud-panel.js';
 import {layoutHand,render,openInspect,closeInspect,inspecting} from './render.js';
 // ================= pointer / touch input: tap-to-select, drag-to-play =================
 export let drag=null;
@@ -23,7 +22,7 @@ let hh=0,holdTouch=false;
 function handSide(el,point){const cs=el&&el.closest?.('.hand')?[...el.closest('.hand').querySelectorAll('.card')]:[],i=cs.indexOf(el);
  if(i>=0)return i>=Math.floor(cs.length/2)?'left':'right';return point.x>=innerWidth/2?'left':'right'}
 function inspectNow(el,touch,point){const side=touch?handSide(el,point):null;clearArm();if(drag&&drag.el===el){if(drag.raf)cancelAnimationFrame(drag.raf);if(touch&&side&&!drag.moved){drag.hx=point.x;drag.hy=point.y;heldDrag=drag}drag=null;clearTargets()}eatClick=true;lp=null;holdTouch=!!touch;openInspect(cardOf(el),touch?point:null,side)}
-document.addEventListener('pointerdown',ev=>{eatClick=false;eatUntil=0;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}const tn=touchNode(ev);let any=tn.closest?.('.card')||handCardFrom(tn);if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected&&peek.contains?.(ev.target))any=peek;if(!any||any.closest('#inspect'))return;
+document.addEventListener('pointerdown',ev=>{eatClick=false;eatUntil=0;if(lp){clearTimeout(lp.t);lp=null}if(ev.target.closest?.('#inspect')){eatClick=true;if(holdTouch&&ev.target.closest('.inspect-keywords'))return;closeInspect();return}let any=ev.target.closest?.('.card')||handCardFrom(ev.target);if(ev.pointerType==='mouse'&&any?.closest('.hand')&&peek?.isConnected&&peek.contains?.(ev.target))any=peek;if(!any||any.closest('#inspect'))return;
  if(ev.button>0)return;
  lp={el:any,x0:ev.clientX,y0:ev.clientY,t:setTimeout(()=>{if(lp&&lp.el===any&&(!drag||!drag.moved))inspectNow(any,true,{x:ev.clientX,y:ev.clientY})},LONGPRESS_MS)}},true);
 document.addEventListener('pointermove',ev=>{if(lp&&Math.hypot(ev.clientX-lp.x0,ev.clientY-lp.y0)>10){clearTimeout(lp.t);lp=null}},true);
@@ -47,7 +46,7 @@ document.addEventListener('click',ev=>{if(eatClick&&eatUntil&&performance.now()>
 // Android Chrome fires its own long-press 'contextmenu' while a card is already held; it used to reopen the preview
 // with no point/side, which snapped the held preview to the screen centre. While a hold is open, just swallow it.
 document.addEventListener('contextmenu',ev=>{const c=ev.target.closest&&ev.target.closest('.card');if(holdTouch||lp||ev.pointerType==='touch'||ev.sourceCapabilities?.firesTouchEvents){ev.preventDefault();return}if(!c||c.closest('#inspect'))return;ev.preventDefault();inspectNow(c)});
-document.addEventListener('pointerdown',ev=>{const raw=handCardFrom(touchNode(ev));if(!raw||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;let c=raw;
+document.addEventListener('pointerdown',ev=>{const raw=handCardFrom(ev.target);if(!raw||!W.cb||W.cb.busy||W.cb.mode||W.S.ov)return;let c=raw;
  if(ev.pointerType==='mouse'&&peek?.isConnected&&peek!==raw){const pr=peek.getBoundingClientRect();if(ev.clientX>=pr.left&&ev.clientX<=pr.right&&ev.clientY>=pr.top&&ev.clientY<=pr.bottom)c=peek}
  if(ev.button!=null&&ev.button>0)return;
  // A second finger (multi-touch) supersedes the first press instead of leaving its card lifted.
@@ -107,14 +106,13 @@ export function endDrag(ev,cancel){const d=drag;if(!d||ev.pointerId!==d.id)retur
  if(!d.moved){W.cb.sel=null;W.cb.insp=null;layoutHand();return}
  const ci=W.cb.hand[d.i],target=ci&&canPlay(ci)?dropTarget(ci,ev.clientX,ev.clientY):null;
  if(target!=null){if(target!=='hero')W.cb.tgt=target;return playCard(d.i)}
- const di=d.i,blocked=ci&&!canPlay(ci)&&playBlockReason(ci);render();if(blocked&&blocked!=='energy')setTimeout(()=>{const el=document.querySelector(`#hand .card[data-i="${di}"]`);if(el)showNoPlay(el,blocked)},30);
+ render();
 }
 document.addEventListener('pointerup',ev=>endDrag(ev,false));
 document.addEventListener('pointercancel',ev=>endDrag(ev,true));
 document.addEventListener('lostpointercapture',ev=>endDrag(ev,true));
 addEventListener('blur',()=>{cancelLongPress();heldDrag=null;if(drag)endDrag({pointerId:drag.id},true);else clearArm();dropSel();if(holdTouch){holdTouch=false;closeInspect()}});
-addEventListener('resize',()=>{hc=null;const vic=W.S.screen==='reward'&&W.S.scene;if(vic)document.querySelectorAll('.death-sink,.death-fade,.ghostwrap').forEach(n=>n.remove()); // victory-sweep: body-level ghosts keep their old viewport px, so drop them with the resize and let the live remains take over
- if((W.S.screen==='combat'||vic)&&!drag)requestAnimationFrame(()=>render())});// figure positions are viewport px
+addEventListener('resize',()=>{hc=null;if(W.S.screen==='combat'&&!drag)requestAnimationFrame(()=>render())});// figure positions are viewport px
 
 
 // Stable resting centres, independent of the enlarged card's hit box and pointer capture.
@@ -159,10 +157,6 @@ function scrubAt(x,haptic){const h=handCache();if(!h)return;const {cards,xs,cx,c
 let leanSign=0;
 // A tap leaves the same peek raised ("armed") until it is played, switched or cancelled. Hover peek stays momentary.
 let arm=null;
-// v0.7.01: Chrome's touch adjustment can retarget a finger on the narrow visible strip of one hand card to the
-// overlapping neighbour (e.g. Thrust -> Standing Ovation), so the wrong card lifted and nothing played. In the hand, the
-// card actually drawn under the touch point wins; elsewhere the browser's (forgiving) target is kept.
-function touchNode(ev){const t=ev.target;if(ev.pointerType==='mouse'||!handCardFrom(t))return t;const p=document.elementFromPoint(ev.clientX,ev.clientY);return p&&handCardFrom(p)?p:t}
 function handCardFrom(node){if(!node?.closest)return null;const hit=node.closest('.hand-hit');if(hit)return document.querySelector(`#hand .card[data-i="${hit.dataset.i}"]`);return node.closest('.hand .card')}
 function clearArm(){arm=null;document.querySelectorAll('.hand .card.tap-armed').forEach(c=>c.classList.remove('tap-armed'));clearTargets();clearPeek()}
 function enemyLive(el){const en=W.cb?.ens[+el.dataset.en];return !!(en&&en.hp>0&&!en.fled)}
@@ -177,7 +171,7 @@ function tryTapPlay(spot){if(!arm||!W.cb||W.cb.busy||W.cb.mode)return false;cons
  const nt=needsTarget(ci);
  if(nt){if(typeof spot!=='number')return false;const en=W.cb.ens[spot];if(!en||en.hp<=0||en.fled)return true}
  else if(spot!=='hero'&&spot!=='area')return false;
- if(!canPlay(ci)){blockedTap(document.querySelector(`#hand .card[data-i="${arm.i}"]`));return true}
+ if(!canPlay(ci)){flashNoAfford(document.querySelector(`#hand .card[data-i="${arm.i}"]`));return true}
  if(settings.tapConfirm&&arm.confirm!==spot){arm.confirm=spot;showArmTargets();return true}
  const i=arm.i;if(typeof spot==='number')W.cb.tgt=spot;clearArm();playCard(i);return true}
 function tapSpot(ev){const t=ev.target;if(!t?.closest||t.closest('.topbar,.dais,.ctl,.ov,.pop,#orb,.hand,.bottom,button'))return null;

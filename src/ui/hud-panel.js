@@ -101,7 +101,7 @@ export function orbTap(){const cb=W.cb,cls=W.run?.cls;if(!cb||!cls||W.S.screen!=
  if(cb.busy||cb.enemyTurn||performance.now()-lastLand<250)return;
  const m=meterOf(cb,cls);if(!m.manual)return;
  if(cls==='duel'){if(!cb.armFlourish&&!m.ready)return fizzle(cls,`Needs ${flourishMin()} Momentum`);playSound(cb.armFlourish?'cancel':'steel',cb.armFlourish?1:1.4);window.armFlourish?.();return}
- if(cls==='echo'){if(!cb.armMark&&!canMark())return fizzle(cls,cb.mark||cb.mark2?'No card in hand can take the mark':'Play an Attack or Skill to mark it');playSound(cb.armMark?'cancel':'bell',1.3);window.armMark?.();return}
+ if(cls==='echo'){if(!cb.armMark&&!canMark())return fizzle(cls,cb.mark||cb.mark2?'No card can take a mark':'Nothing marked yet');playSound(cb.armMark?'cancel':'bell',1.3);window.armMark?.();return}
  if(cls==='carto'){if(cartoArmed===cb){cartoArmed=null;playSound('cancel');window.G?.render?.();return}if(!m.ready)return fizzle(cls,cb.advUsed?'Advance used this turn':'No Waypoint to Advance');cartoArmed=cb;playSound('flip',1.2);window.G?.render?.()}}
 function cartoAdvance(i){cartoArmed=null;const s=FX.get(W.cb);if(s)s.fx.fire=performance.now();playSound('rank',1);window.advance?.(i)}
 if(typeof document!=='undefined'){
@@ -126,19 +126,13 @@ if(typeof document!=='undefined')document.addEventListener('pointerdown',ev=>{if
 export function flashNoAfford(cardEl){const c=cardEl&&cardEl.isConnected?cardEl:document.querySelector('.hand .card.peek,.hand .card.tap-armed');
  for(const el of [c,document.getElementById('orb')])if(el){el.classList.remove(el===c?'fx-noafford':'fx-poor');void el.offsetWidth;el.classList.add(el===c?'fx-noafford':'fx-poor')}
  playSound('cancel',.7)}
-// Short reason (not an energy problem) near the tapped card: fixed-position, no layout change, gone in ~1.4 s.
-export function showNoPlay(cardEl,text){document.querySelectorAll('.noplay-tip').forEach(e=>e.remove());const c=cardEl&&cardEl.isConnected?cardEl:document.querySelector('.hand .card.peek,.hand .card.tap-armed');if(!c)return;
- const r=c.getBoundingClientRect(),t=document.createElement('div');t.className='noplay-tip';t.setAttribute('role','status');t.textContent=text;document.body.appendChild(t);
- const w=t.offsetWidth;t.style.left=Math.max(4,Math.min(innerWidth-w-4,r.left+r.width/2-w/2))+'px';t.style.top=Math.max(4,r.top-t.offsetHeight-6)+'px';
- c.classList.remove('fx-noafford');playSound('cancel',.5);setTimeout(()=>t.remove(),1400)}
 function handCardEl(node){const hit=node?.closest?.('.hand-hit');if(hit)return document.querySelector(`.hand .card[data-i="${hit.dataset.i}"]`);return node?.closest?.('.hand .card[data-uid]')||null}
 if(typeof document!=='undefined')document.addEventListener('pointerdown',ev=>{const c=handCardEl(ev.target);const cb=W.cb;if(!c||!cb||W.S.screen!=='combat')return;
  const ci=cb.hand.find(h=>String(h.uid)===c.dataset.uid);if(!ci||CARDS[ci.id]?.unplay)return;let k;try{k=cost(ci)}catch(e){return}if(k<=cb.energy)return;
  flashNoAfford(c)},true);
 // ---- C7: an intent number that changed since the last render flashes (green = weaker, red = stronger), 400 ms
-const INT=new Map();let intFor=null;
-export function flashIntents(){if(typeof document==='undefined')return;if(intFor!==W.cb){intFor=W.cb;INT.clear()} // victory-sweep: memory is per encounter, not per slot
- for(const el of document.querySelectorAll('.en[data-en] .intent')){const k=el.closest('.en').dataset.en,v=el.textContent.replace(/\s+/g,'');const n=parseInt(v)||0;
+const INT=new Map();
+export function flashIntents(){if(typeof document==='undefined')return;for(const el of document.querySelectorAll('.en[data-en] .intent')){const k=el.closest('.en').dataset.en,v=el.textContent.replace(/\s+/g,'');const n=parseInt(v)||0;
  const prev=INT.get(k);INT.set(k,{v,n,t:prev&&prev.v!==v&&prev.n&&n?performance.now():prev?.t||0,dir:prev&&prev.v!==v?(n<prev.n?'down':'up'):prev?.dir});const r=INT.get(k);
  el.classList.remove('fx-ichange','fx-iup','fx-idown');if(r.t&&performance.now()-r.t<400){void el.offsetWidth;el.classList.add('fx-ichange','fx-i'+r.dir);el.style.setProperty('--d-ich',-(performance.now()-r.t|0)+'ms');setTimeout(()=>{if(performance.now()-r.t>=400)el.classList.remove('fx-ichange','fx-iup','fx-idown')},420)}}}
 let ichQ=0;

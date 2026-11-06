@@ -1,7 +1,0 @@
-Evidence for: K:impact-sounds/impactPunch_medium_000, K:impact-sounds/impactPunch_heavy_002, K:impact-sounds/impactSoft_heavy_002, K:impact-sounds/impactPunch_medium_003, K:impact-sounds/impactPlate_medium_000, K:impact-sounds/impactMetal_medium_001, K:impact-sounds/footstep_wood_001
-Page: https://kenney.nl/assets/impact-sounds
-Page title: Impact Sounds · Kenney
-Saved: 2026-11-01 (box network)
-Creative Commons links on the page: https://creativecommons.org/publicdomain/zero/1.0/
-License text found on the page:
-  Creative Commons CC0

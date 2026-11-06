@@ -7,11 +7,9 @@
 import {registerRelic,RELICS,CARDS} from '../core/registry.js';
 import {W,pick} from '../core/state.js';
 import {DATA} from './generated/data-v2.js';
-import {addCard,addSt,alive,choose,dmgEnemy,drawCards,flash,gainBlock,gainEnergy,bonusEnergy,gainMom,heal,loseHp,log,callout,curTgt} from '../engine/combat.js';
+import {addCard,addSt,alive,choose,dmgEnemy,drawCards,flash,gainBlock,gainEnergy,bonusEnergy,gainMom,heal,log,callout,curTgt} from '../engine/combat.js';
 import {gainGold,gainCurse,openPick,pickPotions,gainMaxHp,addPotionSlot,revealRows,loseRelic,gainRelic,randomRelic} from '../engine/run.js';
 import {render} from '../ui/render.js';
-import {ACT23_ITEMS} from './generated/act2-items.js';
-import {RELICS_B} from './act2/relics-b.js';
 const TIER={Starter:'s',Common:'c',Uncommon:'u',Rare:'r',Boss:'b',Shop:'shop',Event:'e'};
 export const RELIC_ICON={moonshell:'🐚',tuningfork:'🎐',sextant:'🧭',glove:'🧤',barnaclecharm:'🦪',kelpwrap:'🌿',coral:'🪸',whaletooth:'🦷',biscuit:'🍪',oysterpurse:'👛',starfish:'⭐',bandolier:'🎽',foghorn:'📯',galleypot:'🍲',
  wetsand:'🏖️',tuningpeg:'🎚️',pocketcompass:'🧭',griptape:'🎗️',totem:'🗿',coralspur:'🦴',earring:'🦪',lens:'🔆',conch:'🐚',scale:'⚖️',chargedcoral:'⚡',pumice:'🪨',anklet:'📿',echochamber:'🕳️',flags:'🚩',fencermask:'🥽',
@@ -21,8 +19,8 @@ export const RELIC_ICON={moonshell:'🐚',tuningfork:'🎐',sextant:'🧭',glove
 // Per-relic behaviour. Anything not listed is a P3 boss relic that ships in Phase 3 (meta only, `stub:true`).
 const B={
  // ---- starters ----
- moonshell:{ready:r=>W.run.cls==='tide'&&!!r.c&&!r.c.e,on:{combatStart(r){r.c={};if(W.run.cls!=='tide')return;gainBlock(5);W.cb.startQ.push(()=>choose('🐚 Moon Shell: choose the starting Tide',[3,5,7].map(v=>({l:(v>5?'🌕 ':v<5?'🌑 ':'🌗 ')+'Tide '+v,tile:v>5?'choice-tide-high':v<5?'choice-tide-low':'choice-tide-mid',sum:v>5?'Start near High Tide: closer to a Crest (damage to all).':v<5?'Start near Low Tide: closer to an Undertow (Guard and a card).':'Start balanced: both breaks are five away.',f:()=>{W.cb.tide=v;log('🐚 Moon Shell: the Tide starts at '+v)}}))))},
-  crest(r){if(!r.c.e){r.c.e=1;bonusEnergy(1,'tide');drawCards(1);flash(r);log('🐚 Moon Shell: +1 Energy, draw 1')}},undertow(r){if(!r.c.e){r.c.e=1;gainEnergy(1);drawCards(1);flash(r);log('🐚 Moon Shell: +1 Energy, draw 1')}}}},
+ moonshell:{ready:r=>W.run.cls==='tide'&&!!r.c&&!r.c.e,on:{combatStart(r){r.c={};if(W.run.cls!=='tide')return;W.cb.startQ.push(()=>choose('🐚 Moon Shell: choose the starting Tide',[3,5,7].map(v=>({l:(v>5?'🌕 ':v<5?'🌑 ':'🌗 ')+'Tide '+v,tile:v>5?'choice-tide-high':v<5?'choice-tide-low':'choice-tide-mid',sum:v>5?'Start near High Tide.':v<5?'Start near Low Tide.':'Start balanced.',f:()=>{W.cb.tide=v;log('🐚 Moon Shell: the Tide starts at '+v)}}))))},
+  crest(r){if(!r.c.e){r.c.e=1;bonusEnergy(1,'tide');flash(r);log('🐚 Moon Shell: +1 Energy')}},undertow(r){if(!r.c.e){r.c.e=1;gainEnergy(1);flash(r);log('🐚 Moon Shell: +1 Energy')}}}},
  tuningfork:{ready:r=>!!r.c&&!r.c.used,on:{combatStart(r){r.c={};W.cb.nextDraw+=1},echo(r){if(r.c&&!r.c.ward){r.c.ward=1;gainBlock(4);flash(r)}}},mod:{echoPlan(r,ctx,p){if(ctx.slot===2||r.c&&r.c.used||p.mult>1)return p;if(!ctx.preview){r.c.used=1;flash(r)}return {...p,mult:2,fork:1}}}},
  sextant:{}, // engine: startCombat offers the choice of 3 starting Waypoints (upgraded, Rank 1)
  glove:{ready:r=>!!r.c&&!r.c.used,on:{combatStart(r){r.c={}},parry(r){if(r.c.used)return;r.c.used=1;flash(r);{const q=()=>{gainMom(2);log('🧤 Dueling Glove: +2 Momentum')};q.meta={mom:2};W.cb.nextTurnQ.push(q)}}}},
@@ -68,7 +66,7 @@ const B={
  // ---- Task 6 rare build-arounds ----
  stormglass:{on:{tideTurn(r){alive().forEach(e=>addSt(e,'drench',1));flash(r)}}},
  tithebowl:{on:{combatStart(r){r.tt=0},recede(r,ctx){if(ctx.cause!=='spend'||r.tt===W.cb.turn)return;r.tt=W.cb.turn;gainEnergy(1);flash(r);log('🥣 Tithe Bowl: +1 Energy')}}},
- duetbell:{on:{echo(r){gainBlock(4);flash(r)}}},
+ duetbell:{mod:{markSlots(r,ctx,v){return v+1},markSecondScale(r,ctx,v){return .5}}},
  soundinglead:{on:{cardPlayed(r,ctx){if(ctx.type!=='A'||W.cb.stat.attacksTurn!==1||ctx.f.echo)return;const t=ctx.f.tg;if(t&&t.hp>0){addSt(t,'reson',2);flash(r)}}}},
  farglass:{on:{mapEnter(r){revealRows(2);flash(r)}}},
  plinth:{mod:{wpTriggers(r,ctx,v){return ctx.wp&&(ctx.wp.rank||0)>=3?v+1:v}}},
@@ -110,7 +108,7 @@ const B={
  celestial:{pickup(){loseRelic('sextant')}}, // engine: startCombat offers 3 starting Waypoints (upgraded, Rank 1) and sets 4 Waypoint slots
  gauntlet:{pickup(){loseRelic('glove')},on:{turnStart(r){r.t={}},parry(r){if(r.t&&r.t.used)return;r.t={used:1};flash(r);const q=()=>{gainMom(1);log('🥊 Gauntlet: +1 Momentum')};q.meta={mom:1};W.cb.nextTurnQ.push(q)}},mod:{keepMomentum(){return true}}},
  springlocket:{mod:{drift(r,ctx,v){return v*2},crest(r,ctx,c){return {...c,dmg:c.dmg+6}},undertow(r,ctx,u){return {...u,guard:u.guard+6}}}},
- twinclapper:{mod:{echoCap(r,ctx,v){return v+1}},on:{combatStart(r){loseHp(8);flash(r);log('🔔 Twin Clapper: −8 HP')}}},
+ twinclapper:{mod:{markPer(){return 0}}}, // two Marks per turn are already the base rule (Twin Tines), so only the drawback applies
  trailboots:{mod:{advances(r,ctx,v){return Math.max(v,2)}}}, // engine: startCombat places no starting Waypoint when held
  gamblersedge:{on:{flourish(r,ctx){if(ctx.mom>=6){ctx.f.allTargets=true;flash(r)}}},mod:{momMax(r,ctx,v){return Math.max(v,8)},momLoss(){return 99}}},
 };
@@ -119,8 +117,5 @@ export const ACT1_PULL=new Set(['wetsand','echochamber','fencermask','rapier']);
 for(const m of DATA.relics){const b=B[m.id]||{stub:true};
  registerRelic(m.id,Object.assign({n:m.name,tier:TIER[m.tier]||'c',tierName:m.tier,cls:m.cls==='any'?null:m.cls,d:m.effect,flavour:m.flavour,hooks:m.hooks,phase:ACT1_PULL.has(m.id)?'P1':m.phase,e:RELIC_ICON[m.id]||'💠'},b))}
 // Relics that roll in Phase 1 pools (elite drops, chests, merchant, Trawl, Wishing Undertow).
-// Act 2 / Act 3 relics (task ACT2_BUILD): meta from generated/act2-items.js, behaviour from act2/relics-b.js. `act` gates every roll path (actOK in engine/run.js).
-for(const m of ACT23_ITEMS.relics){const b=RELICS_B[m.id]||{stub:true};
- registerRelic(m.id,Object.assign({n:m.name,tier:m.tier,tierName:m.tierName,cls:m.cls,d:m.effect,flavour:m.flavour,hooks:m.hooks,phase:'P1',act:m.act,e:'💠',iconBrief:m.icon},b))}
 export const inPool=r=>r.phase==='P1'&&!r.stub&&r.tier!=='s'&&r.tier!=='b'&&r.tier!=='e';
 export {RELICS};

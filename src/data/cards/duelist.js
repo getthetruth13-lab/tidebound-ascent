@@ -7,7 +7,7 @@ import {log,addSt,gainMom} from '../../engine/combat.js';
 import {forCombat} from '../../core/bus.js';
 import {ask} from './kit.js';
 const D=(id,o)=>card('duel',id,o);
-D('thrust',{e:'🗡️',rk:{max:5},d:'Deal {6|9|+}.',p:f=>f.dmg(f.r(6,9))});
+D('thrust',{e:'🗡️',rk:{max:5},d:'Deal {5|8|+}.',p:f=>f.dmg(f.r(5,8))});
 D('parry',{e:'🛡️',d:'Parry {5|8}.',fx:[['parry',5,8]]});
 D('lunge',{e:'🤺',d:'Deal {10|14}.',fx:[['dmg',10,14]]});
 D('footwork',{e:'👣',d:'Gain 1 Momentum. Draw {1|2}.',p:f=>{f.mom(1);f.draw(f.v(1,2))}});
@@ -20,8 +20,7 @@ D('bind',{e:'🪢',d:'Deal 4. Apply {2|3} Exposed.',fx:[['dmg',4],['vuln',2,3]]}
 D('flurry',{e:'💨',d:'Deal {3|4} three times (one Attack).',fx:[['dmg',3,4,3]]});
 D('riposte',{e:'↪️',d:'Parry {6|8}. With 2+ Momentum: Parry {12|14} instead.',p:f=>f.parry(W.cb.mom>=2?f.v(12,14):f.v(6,8))});
 D('press',{e:'🏃',d:'Deal {7|10}. Your Momentum doesn\'t fade at the end of this turn.',p:f=>{f.dmg(f.v(7,10));W.cb.keepMom=true}});
-// v0.6.98: secondwind removed. It was the cut Act 1 copy of Catch Breath (same name as the live Act 2 card catchbreath), so card links
-// could open the old one. Old saves holding it get catchbreath (src/save.js RETIRED_CARDS).
+D('secondwind',{e:'🌬️',d:'Gain {3|4} Guard per Momentum (min {3|4}). Doesn\'t spend it.',p:f=>f.blk(f.v(3,4)*Math.max(1,W.cb.mom))});
 D('disarm',{e:'🫳',tg:1,d:'Target loses {2|3} Might for this combat. Sink.',p:f=>{const t=f.tg;if(t){addSt(t,'str',-f.v(2,3));log('🫳 '+t.n+' loses '+f.v(2,3)+' Might')}}});
 D('coup',{e:'💀',d:'Deal {12|15}. If this is a Flourish and kills, gain 1 Energy and draw 2.',p:f=>{const t=f.tg;f.dmg(f.v(12,15));if(f.flourish&&t&&t.hp<=0){f.gainEnergy(1);f.draw(2);log('💀 Coup! +1 Energy, draw 2')}}});
 D('engarde',{e:'🎌',d:'At the start of your turn, if you have no Momentum, gain 1.',power:{on:{turnStart(inst){if(W.cb.mom<1)gainMom(1-W.cb.mom)}}}});

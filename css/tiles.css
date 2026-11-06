@@ -163,13 +163,7 @@
 /* Codex 19: every combat choice fits in one illustrated row above the controls. */
 .battle .tilebox .tiles{display:flex;flex-wrap:nowrap;gap:8px;padding:4px 0;--ta:var(--choice-art)}
 .battle .tilebox .tile{flex:1 1 0;width:auto;min-width:0;padding:6px 4px;gap:3px}
-/* v0.7.04: the summary is width-bound to its tile and wraps to up to 3 lines (fitTileSums shrinks it until all of it shows). The old
-   one-line ellipsis never fired: the nowrap line sized itself to its text inside the centred flex tile, so the tile clipped it
-   on both sides (Moon Shell 'ide: closer to an Undertow (G'). */
-.battle .tilebox .tile.sp .tsum{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;align-self:stretch;max-width:100%;box-sizing:border-box;text-overflow:clip;min-height:0}
-/* v0.7.04: battle choice tiles keep the frame's inner padding (the compact battle rule set padding:3px 4px, so the summary ran
-   under the carved bottom border and its second line was hidden). */
-.combat .ov.battle .box.tilebox .tile.sp{padding:3px calc(var(--fb) * .6) calc(var(--fb) - 2px)}
+.battle .tilebox .tsum{white-space:nowrap;display:block;text-overflow:ellipsis;min-height:0}
 .battle .tilebox .tname{font-size:clamp(11px,1.5vw,14px)}
 .battle .tilebox .tcard{--gw:min(var(--choice-card),calc((90vw - 60px)/var(--n,3)));min-width:0}
 .battle .chartrow{--gw:min(var(--choice-card),calc((90vw - 180px)/var(--n)));gap:8px}
@@ -187,8 +181,6 @@
 .battle .tilebox .tcard{flex:none;--gw:var(--choice-card)}
 .battle .chartrow{--gw:min(132px,calc((100dvh - 280px)*5/7))}
 .battle .tilebox .tiles{max-width:calc(100vw - 60px)}
-/* v0.7.01: a long choice row (e.g. Torn Ledger Leaf over a big discard pile) scrolls sideways from its first card; centring only while it fits (safe), so no option is pushed off the left edge. */
-.combat .ov.battle .tilebox .tiles{justify-content:safe center;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;padding:6px 4px}
 .battle .tilebox .tart .slot>img{object-fit:contain;object-position:center}
 /* Other floating windows and event panels use their content's intrinsic width. */
 body .pop{width:fit-content;max-width:min(440px,92vw)}
@@ -256,6 +248,8 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 .tile.sp.k-relic .tart::after,.tile.sp.k-potion .tart::after{content:'';position:absolute;left:8%;right:8%;top:56%;height:13%;border-radius:50%/60%;background:radial-gradient(ellipse at 50% 30%,#6b6454,#2a261e 70%,#14110c);box-shadow:0 6px 8px #000c,inset 0 2px 0 #fff2}
 .tile.sp.k-potion{--c1:#14453f;--cg:#58d6c0}
 .tile.sp.k-relic .tart .slot,.tile.sp.k-potion .tart .slot{position:absolute;left:50%;top:15%;width:calc(var(--th)*.42);height:calc(var(--th)*.42);transform:translateX(-50%);z-index:1;border:0;filter:drop-shadow(0 6px 5px #000d) drop-shadow(0 0 14px color-mix(in srgb,var(--cg) 45%,transparent));--phs:calc(var(--th)*.3)}
+.tile.sp.k-relic .tart .ledgeimg,.tile.sp.k-potion .tart .ledgeimg{position:absolute;left:8%;top:35%;width:84%;height:26%;object-fit:fill;filter:drop-shadow(0 2px 2px #000c);pointer-events:none}
+.tile.sp.k-relic .tart.has-ledge::after,.tile.sp.k-potion .tart.has-ledge::after{display:none}
 /* Moon Shell: tiny live tide gauge as the tile art */
 .mg{position:absolute;left:50%;top:9%;height:46%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:7px;z-index:2;pointer-events:none}
 .mg-tube{position:relative;display:block;width:22px;height:100%;border:2px solid #9bdde0aa;border-radius:11px 11px 8px 8px;background:#041015c0;overflow:hidden;box-shadow:inset 0 0 6px #000,0 0 10px #2fb8c455}
@@ -341,15 +335,3 @@ body .pop{width:fit-content;max-width:min(440px,92vw)}
 @keyframes vl-grow{from{transform:scaleX(0)}}
 @keyframes vl-pulse{0%,100%{opacity:.6;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
 .reduce-motion .vic-lamp .vl-new,.reduce-motion .vic-lamp .vl-glow{animation:none}
-
-.lp-sec{flex:0 0 100%;width:100%;grid-column:1/-1;margin:6px 0 0;font:600 13px/1.2 var(--font-display,serif);letter-spacing:.08em;text-transform:uppercase;color:#d9c9a0;border-bottom:1px solid #4a5366;padding-bottom:3px}
-.lp-sec em{font-style:normal;opacity:.65;margin-left:8px}
-.lp-later{flex:0 0 100%;grid-column:1/-1;margin:0;font-size:12px;opacity:.7}
-.lp-earned{position:absolute;right:4px;top:4px;width:9px;height:9px;border-radius:50%;background:#f2c14e;box-shadow:0 0 8px #f2c14e,0 0 0 2px #05070b;pointer-events:none}
-.lp-cardwrap{position:relative}
-.lp-lock .lp-hint{font-size:10px;line-height:1.25}
-/* Picket Rope retain window: each real card is a button (Tab / Enter / Space). */
-.retainpick{background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
-.retainpick:focus-visible{outline:2px solid #d9b46a;outline-offset:3px;border-radius:8px}
-.battle .tilebox .retaintiles{flex-wrap:wrap;--choice-card:min(110px,calc((100dvh - 150px)*5/7))}
-#retainbox .actions{margin-top:6px;display:flex;justify-content:center}

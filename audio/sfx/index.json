@@ -30,18 +30,18 @@
     "pitch": 1
   },
   "pickup": {
-    "file": "pk-pickup.ogg",
-    "gain": 0.89,
+    "file": "cloth.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "drop": {
-    "file": "pk-pickup.ogg",
-    "gain": 0.89,
+    "file": "cloth.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "hover": {
-    "file": "pk-hover.ogg",
-    "gain": 1.0,
+    "file": "cloth.ogg",
+    "gain": 0.55,
     "pitch": 1
   },
   "menuOpen": {
@@ -70,33 +70,33 @@
     "pitch": 1
   },
   "draw": {
-    "file": "pk-draw.ogg",
-    "gain": 1.0,
+    "file": "draw.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "flip": {
-    "file": "pk-draw.ogg",
-    "gain": 1.0,
+    "file": "draw.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "shuffle": {
-    "file": "pk-shuffle.ogg",
-    "gain": 1.0,
+    "file": "shuffle.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "discard": {
-    "file": "pk-discard.ogg",
-    "gain": 1.0,
+    "file": "discard.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "play": {
-    "file": "pk-attack.ogg",
-    "gain": 0.87,
+    "file": "steel.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "attack": {
-    "file": "pk-attack.ogg",
-    "gain": 0.87,
+    "file": "steel.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "flourish": {
@@ -105,18 +105,18 @@
     "pitch": 1
   },
   "critical": {
-    "file": "pk-hit-heavy.ogg",
-    "gain": 0.92,
+    "file": "steel.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "parry": {
-    "file": "pk-parry.ogg",
-    "gain": 0.86,
+    "file": "parry.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "guard": {
-    "file": "pk-block.ogg",
-    "gain": 1.0,
+    "file": "guard.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "undertow": {
@@ -125,18 +125,18 @@
     "pitch": 1
   },
   "light": {
-    "file": "pk-hit-light.ogg",
-    "gain": 0.83,
+    "file": "light.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "hurt": {
-    "file": "pk-hurt.ogg",
-    "gain": 0.84,
+    "file": "light.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "heavy": {
-    "file": "pk-hit-heavy.ogg",
-    "gain": 0.92,
+    "file": "heavy.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "confirm": {
@@ -145,13 +145,13 @@
     "pitch": 1
   },
   "shop": {
-    "file": "pk-shop.ogg",
-    "gain": 0.91,
+    "file": "key.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "chest": {
-    "file": "pk-chest.ogg",
-    "gain": 1.0,
+    "file": "key.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "rank": {
@@ -180,33 +180,33 @@
     "pitch": 1
   },
   "travel": {
-    "file": "pk-step.ogg",
-    "gain": 0.89,
+    "file": "step.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "room": {
-    "file": "pk-room.ogg",
-    "gain": 1.0,
+    "file": "step.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "mapEnter": {
-    "file": "pk-room.ogg",
-    "gain": 1.0,
+    "file": "step.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "mapHover": {
-    "file": "pk-hover.ogg",
-    "gain": 1.0,
+    "file": "chime.ogg",
+    "gain": 0.55,
     "pitch": 1
   },
   "reward": {
-    "file": "pk-reward.ogg",
-    "gain": 0.84,
+    "file": "chime.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "sparkle": {
-    "file": "pk-reward.ogg",
-    "gain": 0.84,
+    "file": "chime.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "evGood": {
@@ -215,18 +215,18 @@
     "pitch": 1
   },
   "levelUp": {
-    "file": "pk-levelup.ogg",
-    "gain": 0.86,
+    "file": "chime.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "taskComplete": {
-    "file": "pk-levelup.ogg",
-    "gain": 0.86,
+    "file": "chime.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "power": {
-    "file": "pk-power.ogg",
-    "gain": 0.86,
+    "file": "chime.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "mark": {
@@ -250,8 +250,8 @@
     "pitch": 1
   },
   "bossIntro": {
-    "file": "pk-boss-intro.ogg",
-    "gain": 0.96,
+    "file": "bell.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "deathBell": {
@@ -260,14 +260,14 @@
     "pitch": 1
   },
   "bossPhase": {
-    "file": "pk-boss-phase.ogg",
-    "gain": 1.0,
-    "pitch": 1
+    "file": "gong.ogg",
+    "gain": 0.85,
+    "pitch": 0.8
   },
   "deathBoss": {
-    "file": "pk-boss-death.ogg",
-    "gain": 1.0,
-    "pitch": 1
+    "file": "gong.ogg",
+    "gain": 0.85,
+    "pitch": 0.8
   },
   "splash": {
     "file": "water.ogg",
@@ -275,8 +275,8 @@
     "pitch": 1
   },
   "skill": {
-    "file": "pk-skill.ogg",
-    "gain": 0.9,
+    "file": "water.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "tideRise": {
@@ -285,18 +285,18 @@
     "pitch": 1
   },
   "soaked": {
-    "file": "pk-debuff.ogg",
+    "file": "water.ogg",
     "gain": 0.85,
     "pitch": 1
   },
   "heal": {
-    "file": "pk-heal.ogg",
-    "gain": 0.86,
+    "file": "water.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "potion": {
-    "file": "pk-potion.ogg",
-    "gain": 0.87,
+    "file": "water.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "crest": {
@@ -310,7 +310,7 @@
     "pitch": 1
   },
   "debuff": {
-    "file": "pk-debuff.ogg",
+    "file": "bubble.ogg",
     "gain": 0.85,
     "pitch": 1
   },
@@ -335,7 +335,7 @@
     "pitch": 1
   },
   "brittle": {
-    "file": "pk-debuff.ogg",
+    "file": "scrape.ogg",
     "gain": 0.85,
     "pitch": 1
   },
@@ -345,12 +345,12 @@
     "pitch": 1
   },
   "might": {
-    "file": "pk-buff.ogg",
-    "gain": 0.96,
+    "file": "metal.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "exposed": {
-    "file": "pk-debuff.ogg",
+    "file": "metal.ogg",
     "gain": 0.85,
     "pitch": 1
   },
@@ -370,18 +370,18 @@
     "pitch": 1
   },
   "deathSink": {
-    "file": "pk-sink-death.ogg",
-    "gain": 1.0,
+    "file": "sink.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "death": {
-    "file": "pk-death.ogg",
-    "gain": 0.89,
+    "file": "dissolve.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "deathDissolve": {
-    "file": "pk-death.ogg",
-    "gain": 0.89,
+    "file": "dissolve.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "defeat": {
@@ -470,28 +470,13 @@
     "pitch": 1
   },
   "mending": {
-    "file": "pk-heal.ogg",
-    "gain": 0.86,
+    "file": "water.ogg",
+    "gain": 0.85,
     "pitch": 1
   },
   "poise": {
-    "file": "pk-buff.ogg",
-    "gain": 0.96,
-    "pitch": 1
-  },
-  "blocked": {
-    "file": "pk-blocked.ogg",
-    "gain": 0.99,
-    "pitch": 1
-  },
-  "windup": {
-    "file": "pk-windup.ogg",
-    "gain": 0.84,
-    "pitch": 1
-  },
-  "gold": {
-    "file": "pk-gold.ogg",
-    "gain": 0.92,
+    "file": "metal.ogg",
+    "gain": 0.85,
     "pitch": 1
   }
 }

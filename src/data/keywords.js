@@ -21,7 +21,7 @@ Object.assign(kw,{
  'Crest':`Tide hits 10: deal ${T.crest_dmg} damage to ALL enemies. Resets to 5.`,
  'Undertow':`Tide hits 0: gain ${T.undertow_blk} Guard, draw ${T.undertow_draw}. Resets to 5.`,
  'Mark':`Tap the bell, then play an Attack or Skill. It replays free at end of turn.`,
- 'Rank':`Ranks 1 / 2 / 3 add +${rankBonus.join(' / +')} to a damage Waypoint's turn-start hit. At Rank 3 (Landmark) its Decamp is doubled. Resets when it leaves its slot.`,
+ 'Rank':`Ranks 1 / 2 / 3 add +${rankBonus.join(' / +')} damage; Guard Waypoints also gain +${K.guard_per_rank||2} Guard per Rank. Resets when it leaves its slot.`,
  'Fast Waypoint':'Also triggers once when placed.',
  'Spend':'Lower the Tide by that much to play this. Can trigger Tideturn or Undertow.',
  'Drenched X':'Loses X HP when the Tide turns, Crests or Undertows. Drops 1 per turn. Max 12.',
@@ -51,51 +51,5 @@ Object.assign(kw,{
  'Momentum':'Attacks build it. Fades each turn and when hit.',
  'Flourish':'Spend all Momentum to multiply an Attack.',
  'Big Moment':'Your hero\'s signature event.',
-});
-// Act 2 rule words (ACT2-RULES tutorial lines): plain, one line each. They only appear once an Act 2 enemy or card names them.
-Object.assign(kw,{
- 'Line of Fire':'Aiming: it fires next turn and only half your Guard blocks.',
- 'Shield Wall':'While it has Guard, single-target attacks on its allies hit it instead. AoE and Bleed ignore the wall.',
- 'Riveted Plate':'The first Attack each turn bounces off. Hit twice.',
- 'Gagged':'Your most expensive card is silenced this turn.',
- 'In Debt':'The first card of the type you played first costs 1 more next turn.',
- 'Scald':'Unplayable. If it is in your hand at turn end, take 2 damage.',
- 'Pull':'Drags your Tide down, or strips Guard.',
- 'Pressure':'The dial fills each turn. At 4 it vents. Hit hard to bleed it.',
- 'Many Voices':'Each hymn is stronger for every other singer alive.',
- 'Impress':'Takes your cheapest card until the Bosun dies.',
- 'Misfire':'Enough damage in one turn makes it misfire and lose an action.',
- 'Turntable':'The gun turns every three turns. A big hit makes the turntable misfire.',
-});
-// Act 3 rule words (ACT3-RULES tutorial lines).
-Object.assign(kw,{
- 'Charge':'Builds each turn. At 3 it discharges and adds a Static to your draw pile.',
- 'Static':'Unplayable. When drawn, you lose 1 Energy this turn. Sinks at turn end.',
- 'Gust':'Sends your last drawn cards back on top of your draw pile.',
- 'Numbed':'Your cheapest card costs 1 more this turn.',
- 'Under the Cloud':'Submerged: only area damage and Bleed reach it. It surfaces with a heavy hit.',
- 'Foul Tide':'Your Surge and Recede are 1 weaker this turn, or your first Guard card gives 1 less.',
- 'Hidden Hand':'You see what it will do, not how much. It never exceeds 26.',
- 'Bound Together':'While both twins live, each hit is 2 stronger. Only the front twin can be hit.',
- 'Runaway Gears':'Its blast grows with every ring still spinning. Break a ring to lose its rule.',
- 'Water':'At the end of your turn you lose 1 HP for every 5 Guard you hold.',
- 'Tailwind':"An ally's next attack hits 4 harder on its first hit.",
- 'Hot Glass':'Your first Attack card each turn deals 3 damage back to you.',
- 'Leech Guard':'When you gain Guard from a card, it gains half (up to 8 a turn).',
- 'Shard':'The Shard holder takes half damage and hits 4 harder. Hurt it badly, or kill the next holder, and the pass fails.',
- 'Pelt':'Many small hits. The last one makes you Brittle.',
-});
-// v0.6.55 plain-words pass (review items 12/14): lead with the action, then the timing. Same rules, clearer wording.
-Object.assign(kw,{
- 'Decamp':'A bonus that fires when this Waypoint leaves its slot. Tap a Waypoint once a turn to send it off.',
- 'Chart X':'Look at the top X cards of your draw pile and put them in the order you want.',
- 'Bearing':'Bonus if the top card of your draw pile is the matching type (Attack or Skill).',
- 'Parry X':'Blunts that enemy\'s next hit and hits it back.',
- 'Resound':'Bonus that fires only when Echo replays this card for free.',
- 'Sink':'Takes this card out of the fight for good. It is back in your deck next fight.',
- 'Tideturn':'The Tide reverses direction from its last move (rising becomes falling, and the other way round).',
- 'Exposed':'Takes 50% more damage. Drops by 1 each turn.',
- 'Expedition':'Gets stronger for every Waypoint you have in play. A Landmark counts as 2.',
- 'Flotsam':'Junk cards added during a fight. They clog your hand; some cards Sink them for a bonus.',
 });
 registerKeywords(kw);
