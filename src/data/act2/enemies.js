@@ -133,7 +133,7 @@ registerEnemies({
   ai:e=>choirMove(e,['drone','drone','hymn']),intent:e=>liveHymn(e)},
  // ================= BOSSES =================
  // Tidewarden Colossus: Floodgates (+4 Guard per gate plate at his turn end); phase 2 Surge (+14 Guard unless a plate broke) and Sluice Release 34 once every plate is down.
- colossus:{n:'Tidewarden Colossus',e:'🚪',act:2,role:'bruiser',hp:HP.colossus,boss:1,anim:A('raise','drop','blast',{tier:'boss'}),
+ colossus:{n:'Tidewarden Colossus',e:'🚪',act:2,role:'bruiser',hp:HP.colossus,phaseAt:150,boss:1,anim:A('raise','drop','blast',{tier:'boss'}),
   passive:{n:'Floodgates',text:'Each gate plate feeds him Guard. Break them, but the gate will groan.',endTurn:e=>{const n=plates();if(n){e.block+=4*n;e.blkT=Date.now()}
    if(e.ph===2){if(!e.plateBroke){e.block+=14;e.blkT=Date.now();log('🚪 The gate Surges: +14 Guard')}e.plateBroke=false}}},
   onSpawn:e=>{if(W.cb){for(let i=0;i<3;i++)spawn('gateplate',{summoned:true})}},
@@ -141,10 +141,10 @@ registerEnemies({
    if(e.relNext){e.relNext=0;return pk(e,[{w:1,m:rl}])}
    if(e.ph===2){const i=e.ci++%3;if(i===0)return pk(e,[{w:1,m:bu}]);if(i===1)return pk(e,[{w:1,m:ha}]);if(!plates()){e.relNext=1;return pk(e,[{w:1,m:gr}])}return pk(e,[{w:1,m:ha}])}
    return loop(e,[bu,bu,ha])}),
-  onDamaged:e=>{if(e.ph===1&&e.hp<=150){e.ph=2;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);addSt(e,'str',1);e.ci=0;e.hist=[];e.queued=null;e.relNext=0;for(let i=0;i<3;i++)spawn('gateplate',{summoned:true});e.next=EN.colossus.ai(e);
+  onDamaged:e=>{if(e.ph===1&&e.hp<=((EN[e.key]&&EN[e.key].phaseAt)||150)){e.ph=2;['weak','vuln','bleed','brittle'].forEach(k=>delete e.st[k]);addSt(e,'str',1);e.ci=0;e.hist=[];e.queued=null;e.relNext=0;for(let i=0;i<3;i++)spawn('gateplate',{summoned:true});e.next=EN.colossus.ai(e);
    if(W.cb.acting===e)e.keepNext=true;log('🚪 The gate opens: three new plates slide in');bossBeat('phase','The gate opens','The Surge begins. Break the plates.',e)}}},
  // Maud Sallow, the Wreck Queen: pylon + ghost cannons (fixed order), Deckshades, Golden Lure choice, Broadside.
- wreckqueen:{n:'Maud Sallow, the Wreck Queen',e:'👑',act:2,role:'support',hp:HP.wreckqueen,boss:1,anim:A('raise','swing','gold',{tier:'boss'}),
+ wreckqueen:{n:'Maud Sallow, the Wreck Queen',e:'👑',act:2,role:'support',hp:HP.wreckqueen,phaseAt:140,boss:1,anim:A('raise','swing','gold',{tier:'boss'}),
   passive:{n:'Dead Fleet',text:'Ghost cannons fire in a fixed order. Destroy the pylon to silence them.'},
   onSpawn:e=>{if(W.cb){spawn('pylon',{summoned:true});spawn('ghostcannon',{summoned:true});spawn('ghostcannon',{summoned:true})}},
   ai:AI(e=>{const lure={lure:1,lbl:'Golden Light',anim:A('raise','cast','gold',{tier:'boss'})},axe={a:e.ph===2?22:20,lbl:'Boarding Axe'},broad={a:7,h:1,broad:1,lbl:'Broadside',anim:A('aim','shot','gold',{tier:'boss'})},fleet={summon:'ghostcannon',max:3,lbl:'Raise Fleet'};
@@ -152,7 +152,7 @@ registerEnemies({
    if(!e.t)return pk(e,[{w:1,m:lure}]);
    return pk(e,[{w:30,m:lure,rep:1},{w:40,m:axe,rep:2},{w:nc>=2?30:0,m:broad,rep:1},{w:py&&nc<3?35:0,m:fleet,rep:1},{w:e.t===2&&countAlive('deckshade')<(e.ph===2?2:1)?100:0,m:{summon:'deckshade',max:e.ph===2?2:1,lbl:'Raise Deckshade'}}])}),
   intent:e=>{const m=e.next||{none:1};return m.broad?{...m,h:Math.max(1,cannons().length)}:m},
-  onDamaged:e=>{if(e.ph===1&&e.hp<=140){e.ph=2;addSt(e,'str',2);e.hist=[];e.next=EN.wreckqueen.ai(e);if(W.cb.acting===e)e.keepNext=true;log('👑 The golden lights flare: +2 Might');bossBeat('phase','The lights flare','The Queen hits harder.',e)}}},
+  onDamaged:e=>{if(e.ph===1&&e.hp<=((EN[e.key]&&EN[e.key].phaseAt)||140)){e.ph=2;addSt(e,'str',2);e.hist=[];e.next=EN.wreckqueen.ai(e);if(W.cb.acting===e)e.keepNext=true;log('👑 The golden lights flare: +2 Might');bossBeat('phase','The lights flare','The Queen hits harder.',e)}}},
  // The Both-Ways Battery: Sea Face (Salvo, Aim -> Gunnery) and Lamp Face (Raise, Lamp Beam, Rally); swivels every 3 turns; 30+ damage in a turn jams the turntable for 2 turns.
  battery:{n:'The Both-Ways Battery',e:'🔫',act:2,role:'attacker',hp:HP.battery,boss:1,anim:A('aim','shot','pierce',{tier:'boss'}),
   passive:{n:'Turntable',text:'It swivels every three turns. Hit it for 30 in one turn to make the turntable misfire.',swivel:1},

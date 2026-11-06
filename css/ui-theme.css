@@ -595,3 +595,15 @@ body.env-still #envfx{visibility:hidden}
 .endscore .es-break{opacity:.8;font-size:.85em;line-height:1.35;margin-bottom:8px}
 .endscore .es-copy{white-space:pre-wrap;font-size:.8em;opacity:.9;margin-top:8px;max-height:8em;overflow:auto}
 .packtip{margin-top:8px;font-size:.9em;opacity:.85}
+
+/* v0.7.15 boss phase threshold tick on HP bar */
+.hpbar .phase-tick{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:rgba(255,220,140,.95);box-shadow:0 0 4px rgba(255,200,80,.85);pointer-events:none;z-index:3;opacity:.95}
+
+/* v0.7.15 seed screen in Options */
+.sx-seedbox{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end;flex:1;min-width:0}
+.sx-seedcur{display:inline-flex;gap:6px;align-items:center;font-size:13px}
+.sx-seedcur.muted{opacity:.55}
+.sx-seednext{display:inline-flex;gap:4px;align-items:center;font-size:13px}
+.sx-seednext input{width:7.5em;max-width:28vw;padding:4px 6px;border-radius:6px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:inherit;font:inherit}
+.es.esseed{cursor:pointer}
+.es.esseed:focus-visible{outline:2px solid #f0d080;outline-offset:2px}

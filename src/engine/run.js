@@ -54,7 +54,9 @@ export function newRun(cls,o={}){clearWin();nextActSnap=null;
  // v0.6.54 / v0.7.12: Daily run uses today's seed, forces the day's class, draws 3 modifiers; Ascension off. Neither touches a normal run.
  const daily=o.daily!=null?!!o.daily:(o.seed==null&&!urlSeed&&!!settings.dailyMode);
  const asc=o.asc!=null?(o.asc|0):(daily?0:Math.min(settings.ascension|0,ascUnlocked()));
- const seed=(o.seed!=null?o.seed:urlSeed?urlSeed:daily?dailySeed():(Date.now()^Math.floor(Math.random()*4294967296)))>>>0;
+ const nextSeed=(!daily&&o.seed==null&&!urlSeed&&settings.nextSeed!=null&&settings.nextSeed!=='')?(settings.nextSeed>>>0):null;
+ const seed=(o.seed!=null?o.seed:urlSeed?urlSeed:daily?dailySeed():nextSeed!=null?nextSeed:(Date.now()^Math.floor(Math.random()*4294967296)))>>>0;
+ if(nextSeed!=null){/* keep nextSeed sticky like StS until the player clears it */}
  if(daily&&!o.keepCls)cls=dailyClass(seed); // design-v2 §4.7: class comes from the seed
  const K=CLASSES[cls];
  applyHeroHp();const maxHp=K.hp-(asc>=14?4:0);W.run={v:2,seed,rngs:seedStreams(seed),cls,hp:asc>=6?Math.round(maxHp*.9):maxHp,max:maxHp,gold:ECON.startGold-(asc>=3?30:0),deck:K.starter.map(id=>mk(id)),floor:0,act:1,pos:{r:-1,i:-1},vis:{},won:false,kills:0,

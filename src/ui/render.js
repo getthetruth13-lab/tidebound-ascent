@@ -377,6 +377,14 @@ export function settingsHTML(){return `<div class="settings sx">
  ${sxSw('setshapes','Shapes on status icons (▲ good, ▼ bad)',!!settings.statusShapes,'setStatusShapes')}
  ${(()=>{const u=ascUnlocked(),cur=Math.min(settings.ascension|0,u);return u>0?(u<=5?sxSeg('setasc','Ascension (harder runs)',Array.from({length:u+1},(_,i)=>[String(i),i?'A'+i:'Off']),String(cur),'setAscension'):`<div class="sx-row"><span class="sx-t">Ascension (harder runs)</span><span class="sx-seg sx-step" id="setasc" role="group" aria-label="Ascension"><button type="button" data-v="dn" aria-label="Lower Ascension"${cur<=0?' disabled':''} onclick="setAscension('${cur-1}');render();sxRefocus('setasc','dn')">◀</button><button type="button" class="on" data-v="cur" aria-live="polite">${cur?'A'+cur:'Off'}</button><button type="button" data-v="up" aria-label="Higher Ascension"${cur>=u?' disabled':''} onclick="setAscension('${cur+1}');render();sxRefocus('setasc','up')">▶</button></span></div>`)+`<div class="sx-row sx-note"><span class="sx-t">${cur?'A'+cur+': '+ascInfo[cur]+(cur>1?'. Includes every lower level.':'.'):ascInfo[0]+'.'}${u<20?` Win on A${u} to open A${u+1}.`:''}</span></div>`:'<div class="sx-row sx-note"><span class="sx-t">Ascension (harder runs) opens after your first win.</span></div>'})()}
  ${sxSw('setdaily','Daily Current: shared seed, class and modifiers',!!settings.dailyMode,'setDailyMode')}
+ ${(()=>{const cur=W.run&&W.run.seed!=null?String(W.run.seed>>>0):'';const next=settings.nextSeed!=null&&settings.nextSeed!==''?String(settings.nextSeed>>>0):'';
+  return `<div class="sx-row sx-seed" id="seedrow"><span class="sx-t">Run seed</span><span class="sx-seedbox">
+ ${cur?`<span class="sx-seedcur" title="This run's seed">Now <b id="curseed">${cur}</b><button type="button" class="btn sm" id="copycurseed" onclick="copyRunSeed()">Copy</button></span>`:`<span class="sx-seedcur muted">No run yet</span>`}
+ <label class="sx-seednext">Next <input id="nextseed" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="random" value="${next}" aria-label="Seed for the next run" onkeydown="if(event.key==='Enter'){event.preventDefault();applyNextSeed()}"></label>
+ <button type="button" class="btn sm" id="applyseed" onclick="applyNextSeed()">Set</button>
+ <button type="button" class="btn sm" id="clearseed" onclick="clearNextSeed()" ${next?'':'disabled'}>Clear</button>
+ </span></div>
+ <div class="sx-row sx-note"><span class="sx-t">Set a seed before Embark to replay maps and rolls. Daily Current ignores it. ?seed= in the URL also works.</span></div>`})()}
  ${(()=>{const p=dailyPreview(dailySeed());const K=CLASSES[p.cls];return `<div class="sx-row sx-note" id="dailynote"><span class="sx-t">Today: <b>${K?K.e+' '+K.n:p.cls}</b> · seed ${p.seed}<br>${p.mods.map(m=>`${m.e} <b>${m.n}</b> — ${m.d}`).join('<br>')}</span></div>`})()}
  <div class="sx-row"><span class="sx-t">Your past runs</span><button type="button" class="btn sm" id="histbtn" onclick="openOv('history')">Run history</button></div>
  ${sxSw('setrigs','Animated heroes and enemies',!rigsOff(),'setRigs')}
@@ -384,6 +392,13 @@ export function settingsHTML(){return `<div class="settings sx">
  </div>`}
 export function setAscension(v){settings.ascension=Math.max(0,Math.min(+v|0,ascUnlocked()));saveSettings()}
 export function setDailyMode(on){settings.dailyMode=!!on;saveSettings();render()}
+export function applyNextSeed(){const el=document.getElementById('nextseed');const raw=(el?el.value:'').trim();
+ if(!raw){clearNextSeed();return}const n=Number(raw);if(!Number.isFinite(n)||n<0||n>4294967295){toast('Seed must be 0–4294967295','');return}
+ settings.nextSeed=(n>>>0);saveSettings();toast('Next seed set','');render()}
+export function clearNextSeed(){delete settings.nextSeed;saveSettings();render()}
+export function copyRunSeed(){const s=W.run&&W.run.seed!=null?String(W.run.seed>>>0):(settings.nextSeed!=null?String(settings.nextSeed>>>0):'');
+ if(!s){toast('No seed to copy','');return}try{navigator.clipboard.writeText(s);toast('Seed copied','')}catch(_){toast(s,'')}}
+export function copySeedValue(s){s=String(s??'');if(!s)return;try{navigator.clipboard.writeText(s);toast('Seed copied','')}catch(_){toast(s,'')}}
 export function setRigs(on){setRigOff(!on)}
 // Two taps: the first asks, the second deletes the saved run (Lamplight and unlocks are never touched).
 export function eraseRunSave(){if(!loadRunData())return;if(!W.S.confirmErase){W.S={...W.S,confirmErase:true};return render()}clearRun();W.S={...W.S,confirmErase:false};render()}
@@ -538,7 +553,7 @@ export function sameHeroNewRun(){const cls=W.run&&W.run.cls;if(!cls||!CLASSES[cl
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
  const stat=(k,v,g)=>`<span class="es" title="${k}" aria-label="${k}: ${v}">${glyph(g)}<b>${v}</b></span>`;
  return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?((run.act||1)>=3?'The climb is done':`Act ${run.act||1} cleared!`):'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.${(run.act||1)>=3?' '+CROWN_HOLDS:''}`:`${K.n} fell on floor ${overallFloor(run.act||1,Math.max(1,run.floor))} of ${TOTAL_FLOORS}. ${deathLine(run.floor,run.boss,run.act||1)}${st.lastHit?` <span class="lasthit">Last blow: ${st.lastHit.amt} from ${st.lastHit.by}${st.lastHit.turn?' on turn '+st.lastHit.turn:''}.</span>`:''}`}</p>
- ${pathStripHTML(st.path)}<div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}<button class="es esdeck" id="enddeck" type="button" title="Deck: tap to look at your final deck" aria-label="Deck: ${run.deck.length} cards. Tap to view" onclick="openOv('deck')">${glyph('book')}<b>${run.deck.length}</b></button>${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
+ ${pathStripHTML(st.path)}<div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}<button class="es esdeck" id="enddeck" type="button" title="Deck: tap to look at your final deck" aria-label="Deck: ${run.deck.length} cards. Tap to view" onclick="openOv('deck')">${glyph('book')}<b>${run.deck.length}</b></button>${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}<button class="es esseed" type="button" title="Seed ${run.seed} — tap to copy" aria-label="Seed ${run.seed}. Tap to copy" onclick="copySeedValue('${run.seed}')">${glyph('dice')}<b>${run.seed}</b></button></div>
  ${canContinueToAct2()?`<button class="endlink endnext" id="act2go" onclick="continueToAct2()">${glyph('arrowright')}<span>Continue to Act 2</span><small class="prev">Act 2 preview</small></button>`:''}
  ${canContinueToAct3()?`<button class="endlink endnext" id="act3go" onclick="continueToAct3()">${glyph('arrowright')}<span>Continue to Act 3</span><small class="prev">Act 3 preview</small></button>`:''}
  ${(()=>{const sc=computeScore(run);const daily=!!run.daily;return `<div class="endscore" id="endscore"><div class="es-head">${daily?'Daily score':'Score'} <b>${sc.total}</b></div>

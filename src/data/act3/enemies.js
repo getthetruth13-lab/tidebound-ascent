@@ -134,7 +134,7 @@ registerEnemies({
   intent:e=>{const m=e.next||{none:1};if(!m.veil)return m;const cb=W.cb;const marked=!!cb&&((cb.mark&&cb.markTgt===e)||(cb.mark2&&cb.markTgt2===e));return {...m,veiled:!marked,fog:!marked}}},
  // ================= BOSSES =================
  // 4.1 The Maelstrom Engine [RINGS]: each living ring gives it a rule; Overclock / Redline scale with rings alive.
- engine:{n:'The Maelstrom Engine',e:'⚙️',act:3,role:'bruiser',hp:HP.engine,boss:1,anim:AB('spin','drop','blast'),
+ engine:{n:'The Maelstrom Engine',e:'⚙️',act:3,role:'bruiser',hp:HP.engine,phaseAt:240,boss:1,anim:AB('spin','drop','blast'),
   passive:{n:'Runaway Gears',text:'Each ring gives the Engine a rule. Break a ring to lose it. Fewer rings, weaker blasts.',rings:1,
    endTurn:e=>{if(ringOn('ringpull'))pullPlayer(3);if(ringOn('ringcharge')){const m=e.lastAct||{};if(!m.discharge)setPool(e,poolOf(e)+1)}}},
   dmgMod:(e,d)=>ringOn('ringveil')?Math.floor(d*(e.flare?.65:.75)):d,
@@ -147,9 +147,9 @@ registerEnemies({
     {a:12,oc:8,lbl:'Redline',anim:AB('spin','drop','blast',{hold:1.6}),fx:q=>{if(ringOn('ringpull'))pullPlayer(3);if(ringOn('ringcharge'))setPool(q,poolOf(q)+1);q.flare=true;q.flareT=q.t}}])}),
   intent:e=>{const m={...(e.next||{none:1})};if(m.oc)m.a=12+m.oc*rings().length;
    if(m.a&&ringOn('ringcharge')&&poolOf(e)>=3){m.a+=8;m.discharge=1;m.status=STATIC}return m},
-  onDamaged:e=>{if(e.ph===1&&e.hp<=240){e.ph=2;e.ci=0;e.hist=[];e.next=EN.engine.ai(e);if(W.cb.acting===e)e.keepNext=true;log('⚙️ The Engine runs away: Redline');bossBeat('phase','Runaway','The rings spin faster. Redline.',e)}}},
+  onDamaged:e=>{if(e.ph===1&&e.hp<=((EN[e.key]&&EN[e.key].phaseAt)||240)){e.ph=2;e.ci=0;e.hist=[];e.next=EN.engine.ai(e);if(W.cb.acting===e)e.keepNext=true;log('⚙️ The Engine runs away: Redline');bossBeat('phase','Runaway','The rings spin faster. Redline.',e)}}},
  // 4.2 Thalassa the Undrowned [WATER]: hail, orbs, a verdict; in phase 2 your Guard drains you (engine: endTurn Water).
- thalassa:{n:'Thalassa the Undrowned',e:'🌩️',act:3,role:'support',hp:HP.thalassa,boss:1,anim:AB('raise','volley','hail'),
+ thalassa:{n:'Thalassa the Undrowned',e:'🌩️',act:3,role:'support',hp:HP.thalassa,phaseAt:250,boss:1,anim:AB('raise','volley','hail'),
   passive:{n:'Undrowned',text:'Heals 3 at the end of her turn if you played no Attack. From half HP, Water drains 1 HP per 5 Guard you hold at turn end.',water:1,
    endTurn:e=>{const cb=W.cb;
     // Hail Orbs that have waited a full round fall now (6 + Brittle); the new ones age one round.
@@ -158,11 +158,11 @@ registerEnemies({
   ai:AI(e=>{const raise={summon:'hailorb',n:2,max:3,lbl:'Raise Hail',anim:AB('read','cast','hail',{hits:0})};
    if(e.ph===1)return loop(e,[{a:6,h:3,lbl:'Hail Volley',anim:AB('raise','volley','hail',{hits:3})},raise,{b:14,lbl:'Verdict next',anim:AB('open','cast','water',{hits:0})},{a:26,lbl:'Tidal Verdict',anim:AB('raise','drop','water',{hold:1.4})}]);
    return loop(e,[{a:6,h:4,lbl:'Hail Volley',anim:AB('raise','volley','hail',{hits:4})},raise,{b:16,lbl:'Falls in 2',anim:AB('open','cast','water',{hits:0})},{b:6,lbl:'Falls in 1',anim:AB('open','cast','water',{hits:0})},{a:40,lbl:'Undrowning',anim:AB('raise','drop','water',{hold:1.6})}])}),
-  onDamaged:e=>{if(e.ph===1&&e.hp<=250){e.ph=2;['weak','vuln','bleed','brittle','drench','reson'].forEach(k=>delete e.st[k]);addSt(e,'str',1);e.ci=0;e.hist=[];e.queued=null;
+  onDamaged:e=>{if(e.ph===1&&e.hp<=((EN[e.key]&&EN[e.key].phaseAt)||250)){e.ph=2;['weak','vuln','bleed','brittle','drench','reson'].forEach(k=>delete e.st[k]);addSt(e,'str',1);e.ci=0;e.hist=[];e.queued=null;
    for(let i=0;i<2&&countAlive('hailorb')<3;i++){const o=spawn('hailorb',{summoned:true});o.age=1}
    e.next=EN.thalassa.ai(e);if(W.cb.acting===e)e.keepNext=true;log('👑 The sea comes down: Water begins');bossBeat('phase','The sea comes down','Water drains your Guard. Hit hard.',e)}}},
  // 4.3 The Chartless Navigator [SHARD]: one body holds the Deep Shard (half damage, +4 attacks); the pass fails if you hurt the holder or kill the next one.
- navigator:{n:'The Chartless Navigator',e:'🧭',act:3,role:'support',hp:HP.navigator,boss:1,anim:AB('read','drop','blast'),dmgMod:holdHalf,
+ navigator:{n:'The Chartless Navigator',e:'🧭',act:3,role:'support',hp:HP.navigator,phaseAt:210,boss:1,anim:AB('read','drop','blast'),dmgMod:holdHalf,
   passive:{n:'The Deep Shard',text:'The holder takes half damage. Hurt it badly, or kill the next holder, and the pass fails.',shard:1,
    endTurn:e=>{const cb=W.cb;if(cb.shardDropped||e.hp<=0)return;if(e.ph<2&&e.t%2)return;const h=holder();if(!h)return;
     const order=cb.shardOrder.filter(x=>x.hp>0);const i=order.indexOf(h),nxt=order[(i+1)%order.length];const thr=e.ph===2?12:15;
@@ -175,7 +175,7 @@ registerEnemies({
    const ch={b:14,lbl:'Chart a Course',anim:AB('read','cast','blunt',{hits:0})},ll={a:10,v:1,lbl:'Lead Line',anim:AB('haul','snatch','blunt')};
    return loop(e,[e.ph===2?ll:ch,{a:6,h:3,lbl:'Cast the Line',anim:AB('haul','lob','blunt',{hits:3})},{b:8,lbl:'Reckoning next',anim:AB('read','cast','blunt',{hits:0})},{a:34,lbl:'Dead Reckoning',anim:AB('raise','drop','blast',{hold:1.5})}])}),
   onDeath:e=>{},
-  onDamaged:e=>{if(e.ph===1&&e.hp<=210){e.ph=2;e.ci=0;e.hist=[];const cb=W.cb;
+  onDamaged:e=>{if(e.ph===1&&e.hp<=((EN[e.key]&&EN[e.key].phaseAt)||210)){e.ph=2;e.ci=0;e.hist=[];const cb=W.cb;
    // All hands: a fresh pair of couriers rise into any empty slot (once)
    cb.shardOrder.forEach((x,i)=>{if(i>0&&x.hp<=0){const c=spawn('shardcarrier',{summoned:true});cb.shardOrder[i]=c}});
    e.next=EN.navigator.ai(e);if(W.cb.acting===e)e.keepNext=true;log('🧭 All hands: the Shard passes every turn');bossBeat('phase','All hands','The Shard passes every turn. Hurt it at 12.',e)}}}
