@@ -1,4 +1,4 @@
-name: Deploy Pages (long timeout)
+name: Deploy Pages
 on:
   push:
     branches: [main]
@@ -18,11 +18,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Build publish tree (no .git / workflows)
+        run: |
+          mkdir -p /tmp/publish
+          # Copy tracked site files only — never .git (was ~613MB) or hidden dirs
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.gitignore' \
+            ./ /tmp/publish/
+          echo "publish files=$(find /tmp/publish -type f | wc -l) size=$(du -sh /tmp/publish | cut -f1)"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
-          include-hidden-files: true
+          path: /tmp/publish
       - id: deployment
         uses: actions/deploy-pages@v4
         with:
