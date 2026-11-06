@@ -117,7 +117,7 @@ R.scratchedplaque={on:{combatStart(r){gainBlock(14);flash(r)},turnStart(r,ctx){i
 R.ballastbar={on:{combatStart(r){W.cb.startQ.push(()=>{if(W.run.gold<8)return;choose('⚓ Ballast Bar: pay 8 gold?',[
  {l:'Pay 8 gold',cap:'+1 Energy on turn 1, +10 Guard',f:()=>{if(W.run.gold<8)return;W.run.gold-=8;W.cb.pendingE=(W.cb.pendingE||0)+1;gainBlock(10);flash(r)}},{l:'Keep the gold',f:()=>{}}])})}}};
 R.dampbedroll={on:{combatStart(r){addSt(W.cb.p,'weak',1)}},mod:{mendFrac(r,ctx,v){return v+12.01/Math.max(1,W.run.max)}}};
-R.censerash={pickup(r){let n=0;const d=W.run.deck;for(let i=d.length-1;i>=0&&n<2;i--){const c=CARDS[d[i].id];if(c&&(c.t==='C'||c.curse||c.cls==='curse')){d.splice(i,1);n++}}loseMaxHp(8)}};
+R.censerash={pickup(r){let n=0;const d=W.run.deck;for(let i=d.length-1;i>=0&&n<2;i--){const c=CARDS[d[i].id];if(c&&(c.t==='C'||c.curse||c.cls==='curse')&&!c.noRemove){d.splice(i,1);n++}}loseMaxHp(8)}};
 
 // ================= BOSS =================
 R.gagstrap={on:{turnStart(r,ctx){ctx.energy=(ctx.energy||0)+1},afterDraw(r){if(lockHighest())flash(r)}}};

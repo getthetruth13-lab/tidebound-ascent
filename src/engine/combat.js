@@ -269,7 +269,7 @@ export function startTurn(){const cb=W.cb;if(!cb)return;cb.turn++;cb.enemyTurn=f
  if(cb.turn>1&&!mod('retainGuard',{},false))cb.p.block=0;
  Object.assign(cb,{parry:0,parryUsed:false,parries:{},advUsed:0,decUsed:0,breaks:0,markType:null,mark2Type:null,lastType:null,mark:null,markTgt:null,afterMark:0,armMark:false,armFlourish:false,mark2:null,markTgt2:null,after2:0,mark2Scale:1,extraMarks:0,lastNF:null,lastNFTgt:null,last:null,sel:null,insp:null,slack:false,keepMom:false,tideBtnUsed:false,wheelUsed:false});
  cb.stat.wpLeftLast=cb.stat.wpLeftTurn||0;cb.stat.echoesLast=cb.stat.echoesTurn||0;Object.assign(cb.stat,{typesTurn:{},playedTurn:0,attacksTurn:0,tideturnsTurn:0,echoesTurn:0,bigTurn:0,wpLeftTurn:0});cb.bitter={};
- cb.ens.forEach(x=>{x.armSpent=false;x.base=x.hp;x.siph=0;x.intr=false});cb.numbCard=null;cb.refracted=false;cb.stormUsed=false;cb.storm=!!cb.stormNext&&mod('stormTide',{},true) /* Act 3 hook: onStormTide */;cb.stormNext=false;cb.owedRec=false;cb.locked=null;cb.owed=cb.owedNext||null;cb.owedNext=null;cb.owedUsed=false;
+ cb.ens.forEach(x=>{x.armSpent=false;x.base=x.hp;x.siph=0;x.intr=false});cb.numbCard=null;cb.mimic=false;cb.refracted=false;cb.stormUsed=false;cb.storm=!!cb.stormNext&&mod('stormTide',{},true) /* Act 3 hook: onStormTide */;cb.stormNext=false;cb.owedRec=false;cb.locked=null;cb.owed=cb.owedNext||null;cb.owedNext=null;cb.owedUsed=false;
  cb.energy=cb.maxE;if(cb.drainE){cb.energy=Math.max(0,cb.energy-cb.drainE);log(`⚡ Drained: −${cb.drainE} Energy`);cb.drainE=0}
  cb.banner={txt:'Player Turn',t:Date.now()};
  const q=cb.nextTurnQ;cb.nextTurnQ=[];q.forEach(fn=>fn());
@@ -443,7 +443,10 @@ export function phasePlan(){const cb=W.cb;const out={};if(!cb)return out;let vul
  return out}
 function phasePlanFor(e){const cb=W.cb;if(!cb)return {str:0,vuln:false};if(cb.acting)return {str:0,vuln:!!cb.p.st.vuln}; // live values while enemies act
  return phasePlan()[e.uid]||{str:0,vuln:!!cb.p.st.vuln}}
-export function intentOf(e){const t=EN[e.key];const m=t.intent?t.intent(e):e.next;return mod('intentDisplay',{enemy:e},m)||{none:1}}
+export function intentOf(e){const t=EN[e.key];let m=t.intent?t.intent(e):e.next;m=mod('intentDisplay',{enemy:e},m)||{none:1};
+ // v0.7.10: Listen Closely (cb.reveal) shows fogged / veiled numbers until the player's next turn.
+ if(W.cb&&W.cb.reveal!=null&&W.cb.turn<W.cb.reveal&&(m.fog||m.veiled)){m={...m};delete m.fog;delete m.veiled}
+ return m}
 // Enemy Attack on the player: Parry first (reduce the first Attack, reflect half, once per turn), then Guard, then HP.
 export function enemyHitPlayer(e,d,o={}){const cb=W.cb;
  if(d>0&&cb.parries&&cb.parries[e.uid]>0&&!cb.parryHit[e.uid])d=answerParry(e,d);

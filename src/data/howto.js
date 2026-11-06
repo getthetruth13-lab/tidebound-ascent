@@ -7,8 +7,8 @@ import {DATA} from './generated/data-v2.js';
 const C=DATA.v21.sim.core,T=C.tide,E=C.echo,K=C.carto,D=C.duel;
 const RD=K.rank_dmg.slice(1).map(n=>'+'+n).join(' / ');
 export const GENERAL=[
- {id:'climb',tab:'The Climb',title:'The Climb',epi:'Fifteen floors, one boss at the top',blocks:[
-  {h:'The goal',html:'Climb the map one floor at a time. Act 1 has 15 floors and ends with a boss. Your HP carries from fight to fight and does not refill on its own (a win heals a little, camps heal more), so every hit you take matters later. If your HP reaches 0 the run ends. Later acts are open as previews: keep climbing after the Act 1 boss.'},
+ {id:'climb',tab:'The Climb',title:'The Climb',epi:'Three acts, forty-seven floors, one climb',blocks:[
+  {h:'The goal',html:'Climb the map one floor at a time across three acts (47 floors in all). Each act ends with a boss; beating the Act 1 or Act 2 boss continues into the next act. Your HP carries from fight to fight and does not refill on its own (a win heals a little, camps heal more), so every hit you take matters later. If your HP reaches 0 the run ends. Beating the Act 3 boss finishes the climb.'},
   {h:'Choosing a path',html:'The map shows rooms you can reach next. You pick one each floor. Lines show which rooms connect, so look a few floors ahead before you commit. Open the map any time from the top bar.',art:'map'},
   {h:'Room types',html:'<ul class="hw-list"><li><b>⚔️ Fight</b>: a normal battle. Gold, a card choice, sometimes a potion.</li><li><b>💀 Elite</b>: a tougher battle that also drops a relic.</li><li><b>❓ ? Event</b>: a story choice. It can help, cost HP, or open a fight.</li><li><b>🔥 Camp</b>: heal or upgrade a card.</li><li><b>💰 Merchant</b>: spend gold on cards, relics, potions and card removal.</li><li><b>💎 Treasure</b>: a chest with a relic and gold.</li><li><b>🔔 Boss</b>: the last floor of the act.</li></ul>'}]},
  {id:'turn',tab:'Your Turn',title:'Your Turn',epi:'Energy, cards and the end-turn seal',blocks:[
@@ -41,7 +41,7 @@ export const GENERAL=[
   {h:'Camp',html:'Choose <b>one</b>: <b>Mend</b> heals 30% of your Max HP, or <b>Temper</b> upgrades a card. Some relics add a third option (cook, scour, trawl, annotate). Mend when low; Temper when healthy.'},
   {h:'Merchant',html:'Spend gold on cards, relics and potions. A common card costs about 45 to 55, an uncommon about 70 to 80 and a rare about 140 to 160. The merchant will also <b>remove a card</b> from your deck; the price rises each time you do it. Removing starter cards makes your deck sharper.'},
   {h:'? Events',html:'A short story with choices. Each choice shows its cost and reward. Some need HP or gold and are greyed out if you cannot pay. There is no wrong answer you cannot see coming: read the buttons.'},
-  {h:'Treasure and the boss',html:'A chest holds a relic and gold. The boss is a bigger fight at the top of the act; beat it to finish the climb. Lamplight earned on every run unlocks new cards, relics and potions for the next climber (see the Ledger).'}]}
+  {h:'Treasure and the boss',html:'A chest holds a relic and gold. The boss is a bigger fight at the top of each act. Beat the Act 1 or Act 2 boss to keep climbing; beat the Act 3 boss to finish the climb. Lamplight earned on every run unlocks new cards, relics and potions for the next climber (see the Ledger).'}]}
 ];
 // ---- Hero pages ----
 export const HEROES_GUIDE={
@@ -61,7 +61,7 @@ export const HEROES_GUIDE={
    [['hammer','drawtide'],'Hightide Hammer and Draw the Tide want a high Tide: build it first.'],
    [['seesaw','crosscur'],'Seesaw makes a Tideturn. Crosscurrent deals more for each Tideturn this turn.'],
    [['turningpoint','salttears'],'Turning Point deals damage on every Tideturn. Salt Tears makes one while it softens everything.']],
-  mistakes:['Ignoring the arrow. The Tide moves on its own each turn, so a plan that ends at 7 starts the next turn at 8.','Overshooting on purpose. A Crest happens at 10 whatever the extra, so wasted Surge is wasted.','Spending your Crest on one weak enemy. Crest hits <b>all</b> enemies, so it shines with 2 or 3 foes.','Playing Recede cards when you wanted to Crest. Check each card before you drop it.','Forgetting Undertow is also good: 12 Guard and a card is a full defensive turn.'],
+  mistakes:['Ignoring the arrow. The Tide moves on its own each turn, so a plan that ends at 7 starts the next turn at 8.','Overshooting on purpose. A Crest happens at 10 whatever the extra, so wasted Surge is wasted.','Spending your Crest on one weak enemy. Crest hits <b>all</b> enemies, so it shines with 2 or 3 foes.','Playing Recede cards when you wanted to Crest. Check each card before you drop it.',`Forgetting Undertow is also good: ${T.undertow_blk} Guard and a card is a full defensive turn.`],
   win:['Count your push. Add up the Surge on your hand before you play; hitting exactly 10 is the goal.','Use the drift. End a turn at 9 (arrow up) or 1 (arrow down) and the next turn begins with a free break.','Two breaks in one turn make the second x1.5. Save a big Surge for after a Crest.','Against one big enemy, use Crest for the damage and Undertow for the defence.']},
  echo:{id:'echo',tab:'Echo Mage',
   meter:{h:'Marks and Echoes',html:`Each turn your <b>first Attack</b> and <b>first Skill</b> are <b>Marked</b> automatically. At the end of your turn, every Marked card <b>Echoes</b>: it plays again <b>for free</b>. If you played a card after it, the Echo is <b>+${E.bonus_cap}</b> stronger. At most ${E.cap} Echoes a turn.`,art:'echo'},

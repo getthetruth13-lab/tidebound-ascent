@@ -129,7 +129,7 @@ registerEnemies({
   ai:e=>twinAI(e),intent:e=>twinIntent(e),onSpawn:e=>{e.back=true},onDeath:e=>twinDied(e)},
  // 3.3 Eye of the Gale [VEIL]: a fixed loop of four, alternating clear and veiled turns. A Marked eye shows its number.
  eyegale:{n:'Eye of the Gale',e:'👁️',act:3,role:'attacker',hp:HP.eyegale,elite:1,anim:AE('lean','cast','gale'),
-  passive:{n:'Hidden Hand',text:'Hidden Hand: its intent hides the number. It never exceeds 26.',veil:1},
+  passive:{n:'Hidden Hand',text:'Hidden Hand: its intent hides the number (Listen Closely and Squall Lens reveal it).',veil:1},
   ai:AI(e=>loop(e,[{a:12,h:2,lbl:'Sidewind',anim:AE('lean','cast','gale',{hits:2})},{a:22,veil:'atk',lbl:'Stormfall',anim:AE('build','drop','blast',{hold:1.4})},{b:14,s:1,lbl:'Shelter',anim:AE('lean','cast','gale',{hits:0})},{b:18,a:10,veil:'mix',lbl:'Eyewall',anim:AE('open','cast','blast',{hold:1.2})}])),
   intent:e=>{const m=e.next||{none:1};if(!m.veil)return m;const cb=W.cb;const marked=!!cb&&((cb.mark&&cb.markTgt===e)||(cb.mark2&&cb.markTgt2===e));return {...m,veiled:!marked,fog:!marked}}},
  // ================= BOSSES =================
@@ -196,7 +196,7 @@ const TIPS={jelly:'At three Charge it discharges and clogs your deck with Static
  skua:'Gust sends your last drawn card back on top of the draw pile.',petrel:'Gust sends your last drawn card back on top of the draw pile.',automaton:'Numbed: your cheapest card costs one more this turn.',
  cloudshark:'When it dives, only area damage and Bleed can reach it.',cloudserpent:'When it dives, only area damage and Bleed can reach it.',galereader:"Tailwind: its allies' next attack hits four harder.",
  lenswright:'Your first Attack each turn hurts you for 3. Lead with Skills.',slinger:'Pelt hits many times. The last hit makes you Brittle.',anchorite:'Gain Guard from a card and the Anchorite takes half.',
- magus:'Foul Tide weakens your Surge, Recede, or first Guard card.',squallwest:'Only the front twin can be hit. AoE and Bleed reach both.',eyegale:'Hidden Hand: its intent hides the number. It never exceeds 26.',
+ magus:'Foul Tide weakens your Surge, Recede, or first Guard card.',squallwest:'Only the front twin can be hit. AoE and Bleed reach both.',eyegale:'Hidden Hand: its intent hides the number (Listen Closely and Squall Lens reveal it).',
  engine:'Break a ring to lose its rule. Fewer rings, weaker blasts.',thalassa:'Water drains 1 HP per 5 Guard you hold at turn end.',navigator:'Hurt the Shard holder hard or kill the next one.'};
 for(const [k,v] of Object.entries(TIPS))if(EN[k])EN[k].tip=v;
 export const A3_ENEMY_IDS=['jelly','polyp','voltray','skua','petrel','automaton','cloudshark','cloudserpent','galereader','lenswright','slinger','anchorite','ringpull','ringcharge','ringveil','hailorb','shardcarrier','magus','squallwest','squalleast','eyegale','engine','thalassa','navigator'];

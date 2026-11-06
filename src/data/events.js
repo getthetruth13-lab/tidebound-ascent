@@ -52,7 +52,7 @@ registerEvents([
    if(d===3){heal(run().max);return done(lbl+'Warm water washes over you. Healed to full.')}
    if(d===4)return pickThen('remove','☸️ Tidal Wheel: remove a card',ci=>done(lbl+`The current carries off <b>${cname(ci)}</b>.`));
    if(d===5){gainCurse('dread');return done(lbl+'A cold dread settles on you. (Curse: Dread)','bad')}
-   const l=Math.max(1,Math.floor(run().max*.1));hurt(l);return done(lbl+`The wheel bites. Lose ${l} HP.`,'bad')}}),
+   const l=Math.max(1,Math.floor(run().max*.1));loseMaxHp(l);return done(lbl+`The wheel bites. Lose ${l} Max HP.`,'bad')}}),
   O('Spin it backwards','50%: upgrade 2 cards, else Dread and lose 5 HP',{risk:.5,ok:()=>run().hp>5,why:'Needs more than 5 HP',d:'Fight the current. 50%: two random cards are upgraded. 50%: a Dread curse and you lose 5 HP.',f:()=>{
    if(roll(.5)){const c=shuffle(upPool(),'events').slice(0,2);if(c.length){c.forEach(upgradeCard);return done(`The wheel groans and turns your way. <b>${c.map(cname).join('</b> and <b>')}</b> shine.`)}const g=gainGold(60);return done(`The wheel turns your way, but you have nothing to polish. +${g} gold.`)}
    hurt(5);gainCurse('dread');done('The wheel spins on you. Lose 5 HP and gain a Dread curse.','bad')}}),

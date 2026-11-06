@@ -224,16 +224,23 @@ export function pickOffer(pool,stream,src){const run=W.run,hist=(src==='shop'?ru
 const remember=(k,ids)=>{const h=W.run[k]||(W.run[k]=[]);h.push(ids.slice());if(h.length>12)h.shift()};
 export function rollCards(n,src,{stream='cards',forceR=null,type=null,exclude=[]}={}){const run=W.run;const out=[];let g=0;
  while(out.length<n&&g++<400){const rar=forceR||rollRarity(src,stream);let pool=cardPool(rar).filter(c=>!type||c.t===type);
-  // Small Phase 1 pools: if every card of that rarity is already shown/excluded, widen to the other rarities rather than repeat or fail.
+  // Small Phase 1 pools: if every card of that rarity is already shown/excluded, widen — but never drop below a forced/boss rarity (v0.7.10).
   const fresh=l=>l.filter(c=>!out.includes(c.id)&&!exclude.includes(c.id));
-  if(!fresh(pool).length)pool=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.r!=='s'&&inActSet(c)&&(!type||c.t===type));
-  if(!fresh(pool).length)pool=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.r!=='s'&&inActSet(c));
+  const keepR=forceR||(src==='boss'?'r':null);
+  if(!fresh(pool).length){const wide=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.r!=='s'&&inActSet(c)&&(!type||c.t===type)&&(!keepR||c.r===keepR));if(wide.length)pool=wide}
+  if(!fresh(pool).length&&!keepR)pool=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.r!=='s'&&inActSet(c)&&(!type||c.t===type));
+  if(!fresh(pool).length&&!keepR)pool=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.r!=='s'&&inActSet(c));
   if(fresh(pool).length)pool=fresh(pool);
+  if(!pool.length)break;
   const c=pickOffer(pool,stream,src);if(out.includes(c.id)||exclude.includes(c.id))continue;out.push(c.id);
   if(src!=='shop'&&!forceR){if(c.r==='c')run.swell=Math.min(ECON.swellMax,run.swell+1);else if(c.r==='r')run.swell=ECON.swellStart}}
  // Fresh slot (plan 7.4): from Act 2 on, every reward offer carries at least one card of the current act's own pool, so the new cards are seen.
- if(!forceR&&!type&&(run.act||1)>=2&&src!=='shop'&&out.length>=3&&!out.some(id=>CARDS[id].act===run.act)){
-  const fp=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.act===run.act&&inActSet(c)&&!out.includes(c.id)&&!exclude.includes(c.id));if(fp.length)out[out.length-1]=pick(fp,stream).id}
+ // v0.7.10: keep the replaced slot's rarity (boss / forced Rare must stay Rare).
+ if(!type&&(run.act||1)>=2&&src!=='shop'&&src!=='boss'&&out.length>=3&&!out.some(id=>CARDS[id].act===run.act)){
+  const wantR=forceR||(CARDS[out[out.length-1]]&&CARDS[out[out.length-1]].r);
+  let fp=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.act===run.act&&inActSet(c)&&!out.includes(c.id)&&!exclude.includes(c.id)&&(!wantR||c.r===wantR));
+  if(!fp.length&&!forceR)fp=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.act===run.act&&inActSet(c)&&!out.includes(c.id)&&!exclude.includes(c.id));
+  if(fp.length)out[out.length-1]=pick(fp,stream).id}
  return out}
 export function rewardCardCount(){return mod('rewardCards',{},3)}
 export function rollGold(kind){const g=ECON.gold[kind]||ECON.gold.fight;const v=rng(g[0],g[1],'cards');return kind==='boss'&&asc()>=13?Math.round(v*.75):v}

@@ -67,7 +67,8 @@ N('cacophony',{e:'🥁',d:'Deal {4|5} to ALL. Sink every Flotsam and Burden in y
  const junk=c.hand.filter(isJunk);junk.forEach(ci=>sinkHand(ci,'cacophony'));
  const n=Math.min(4,junk.length);for(let i=0;i<n;i++){if(!W.cb||!alive().length)return;f.all(f.v(4,5))}if(junk.length)log('🥁 Cacophony: '+junk.length+' junk Sunk')}});
 N('clearnote',{e:'🎵',d:'Unlock every locked card in your hand (Gagged), remove Numbed from you, and draw {1|2}. Faint.',p:f=>{const c=W.cb;if(c.locked){log('🎵 Clear Note: '+cname(c.locked)+' unlocked');c.locked=null}
- if(c.p.st.numbed){delete c.p.st.numbed;log('🎵 Clear Note: Numbed removed')}f.draw(f.v(1,2))}});
+ // v0.7.10: Numbed is tracked as cb.numbCard (the card that costs +1), not a player status.
+ if(c.numbCard||(c.p.st&&c.p.st.numbed)){c.numbCard=null;if(c.p.st)delete c.p.st.numbed;log('🎵 Clear Note: Numbed removed')}f.draw(f.v(1,2))}});
 N('pedaltone',{e:'🎚️',d:'Resonating on enemies does not fall at the end of their turns.',power:{on:{enemyAct(inst,ctx){const e=ctx.enemy;if(e&&e.st&&e.st.reson)(e.hold=e.hold||{}).reson=1}}}});
 // Bronze Bulwark: Guard a Skill's ring gives is remembered (up to 20) and put back after the start-of-turn Guard clear.
 N('bronzebulwark',{e:'🏛️',d:'Guard gained from a Skill\'s Echo is not removed at the start of your next turn (up to 20 Guard kept).',power:{
@@ -135,8 +136,8 @@ N('greathall',{e:'🏟️',cu:1,d:'You may Echo up to 5 times a turn instead of 
 
 // ENGINE-NEEDS:
 // - faultline: enemy Brittle is applied (addSt) but the engine does not yet lower the Guard an enemy gains by 25% (round down).
-// - clearnote: the 'numbed' player status does not exist yet; this clears st.numbed if an Act 2 enemy ever sets it.
-// - listenclose: sets cb.reveal (= the turn number the reveal lasts through); the intent UI / hidden-intent (Fog Veil) enemies need to read it.
+// - clearnote: clears cb.numbCard (and any legacy st.numbed).
+// - listenclose: sets cb.reveal (= the turn number the reveal lasts through); intentOf strips fog while reveal is active.
 // - thirdtine: the engine has two tines (cb.mark / cb.mark2). Emulated here: the second Attack's ring runs from this Vigil's turnEndInHand
 //   hook after the normal rings (shared cap, +1 per card after it). It is not in the live Echo preview and is not re-targetable by Retune/Seeking Echo.
 // - growingpeal: the engine adds plan.bonus to a card's FIRST repeat only; the +N bonus therefore does not reach later repeats of the same ring.

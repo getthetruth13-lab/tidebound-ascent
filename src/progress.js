@@ -4,7 +4,7 @@ import {LAMP_XP,CLIMB_XP,CLASS_ORDER,LOCK_CARDS,lockCards,SPOIL_CARDS,LOCK_HERO_
 export const PROFILE_KEY='tidebound.profile.v1',PROFILE_V=1;
 export const ENDING_IDS=['light','lens','cut'];
 let mem=null; // fallback when localStorage is unavailable (private mode, Node)
-const blank=()=>({v:PROFILE_V,xp:{},climb:0,claimed:{},climbClaimed:0,runs:{},wins:{},unlocked:{cards:[],relics:[],potions:[]},spoils:{},seen:{enemy:{},event:{},relic:{},card:{},potion:{}},tasks:0,best:{},twistSeen:false,endings:{},lastEnding:'',tutSeen:{},lampMode:LAMP_MODE,heroSeen:null});
+const blank=()=>({v:PROFILE_V,xp:{},climb:0,claimed:{},climbClaimed:0,runs:{},wins:{},unlocked:{cards:[],relics:[],potions:[]},spoils:{},seen:{enemy:{},event:{},relic:{},card:{},potion:{}},tasks:0,best:{},twistSeen:false,endings:{},lastEnding:'',tutSeen:{},lampMode:LAMP_MODE,heroSeen:null,ascMax:0});
 function norm(p){const b=blank();if(!p||typeof p!=='object'||Array.isArray(p))return b;
  const num=x=>Number.isFinite(+x)&&+x>0?Math.floor(+x):0,map=o=>{const r={};if(o&&typeof o==='object')for(const k of Object.keys(o))r[k]=num(o[k]);return r};
  b.xp=map(p.xp);b.climb=num(p.climb);b.claimed=map(p.claimed);b.climbClaimed=num(p.climbClaimed);b.runs=map(p.runs);b.wins=map(p.wins);b.tasks=num(p.tasks);b.best=map(p.best);
@@ -16,6 +16,8 @@ function norm(p){const b=blank();if(!p||typeof p!=='object'||Array.isArray(p))re
  for(const k of Object.keys(b.seen))if(p.seen&&p.seen[k]&&typeof p.seen[k]==='object')for(const id of Object.keys(p.seen[k]))b.seen[k][id]=1;
  // Ladder migration: a profile saved under the other LAMP_MODE keeps every unlock and all Lamplight; only the claimed-level counters restart so the new ladder offers what XP has earned (already-owned items are skipped).
  b.heroSeen=null;if(p.heroSeen&&typeof p.heroSeen==='object'){b.heroSeen={};for(const k of CLASS_ORDER)if(p.heroSeen[k])b.heroSeen[k]=1}
+ // v0.7.10: Ascension ceiling lives on the profile so a 60-run history window cannot wipe it.
+ b.ascMax=Math.max(0,Math.min(20,num(p.ascMax)));
  b.lampMode=p.lampMode==='five'?'five':'ten';if(b.lampMode!==LAMP_MODE){b.claimed={};b.lampMode=LAMP_MODE}
  return b}
 export function loadProfile(){let raw=null;try{raw=JSON.parse(localStorage.getItem(PROFILE_KEY))}catch(_){raw=mem}return norm(raw)}
@@ -109,13 +111,22 @@ export function takeHeroNews(){if(!heroLockingOn())return [];const p=loadProfile
 export const HISTORY_KEY='tidebound.history.v1';
 let histMem=[];
 export function loadHistory(){try{const v=JSON.parse(localStorage.getItem(HISTORY_KEY));return Array.isArray(v)?v:histMem}catch(_){return histMem}}
-export function addHistory(rec){const h=[rec,...loadHistory()].slice(0,60);histMem=h;try{localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}catch(_){}return h}
+export function addHistory(rec){const h=[rec,...loadHistory()].slice(0,60);histMem=h;try{localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}catch(_){}
+ // v0.7.10: remember the highest Ascension opened by this win on the profile (history is only a 60-row display log).
+ if(rec&&rec.won){const from=ascFromRec(rec);if(from>0){const p=loadProfile();if((p.ascMax|0)<from){p.ascMax=Math.min(ASC_MAX,from);saveProfile(p)}}}
+ return h}
 export const ASC_MAX=20;
-// Ascension levels open one per win (history), up to ASC_MAX. Level 0 is the normal game and is always on.
+// Ascension levels open one per win, up to ASC_MAX. Level 0 is the normal game and is always on.
 // v0.7.09: a win is a finished climb (Act 3 boss). Act 1 wins recorded before v0.7.09 (when a run could end there) still count;
 // the old preview-era Act 2 win records are skipped so one carried run is not counted twice.
 // v0.7.09 (Slay the Spire rule): finishing the climb on Ascension N opens N+1. Old Act 1 wins (pre-v0.7.09) still open one level each, up to the old cap of 5.
-export function ascUnlocked(){const h=loadHistory().filter(r=>r.won);const old=Math.min(5,h.filter(r=>(r.act||1)===1).length);
- const climb=h.filter(r=>(r.act||1)>=3).reduce((m,r)=>Math.max(m,(r.asc|0)+1),0);return Math.min(ASC_MAX,Math.max(old,climb))}
+// v0.7.10: the opened ceiling is stored on the profile (ascMax) so truncating history cannot close levels.
+function ascFromRec(r){if(!r||!r.won)return 0;if((r.act||1)>=3)return Math.min(ASC_MAX,(r.asc|0)+1);if((r.act||1)===1)return 1;return 0}
+function ascFromHistory(h){const w=(h||[]).filter(r=>r.won);const old=Math.min(5,w.filter(r=>(r.act||1)===1).length);
+ const climb=w.filter(r=>(r.act||1)>=3).reduce((m,r)=>Math.max(m,(r.asc|0)+1),0);return Math.min(ASC_MAX,Math.max(old,climb))}
+export function ascUnlocked(){const fromHist=ascFromHistory(loadHistory());const p=loadProfile();let max=Math.max(p.ascMax|0,fromHist);
+ // Migrate once: lift profile.ascMax to whatever history still proves, so older saves keep their ceiling.
+ if((p.ascMax|0)<fromHist){p.ascMax=fromHist;saveProfile(p);max=fromHist}
+ return Math.min(ASC_MAX,max)}
 export function statsOf(h){const by={};for(const r of h){const b=by[r.cls]||(by[r.cls]={runs:0,wins:0,best:0,climbs:0,ascWon:-1});b.runs++;if(r.won)b.wins++;if(r.won&&(r.act||1)>=3){b.climbs++;b.ascWon=Math.max(b.ascWon,r.asc|0)}b.best=Math.max(b.best,r.floor||0)}
  const wins=h.filter(r=>r.won&&r.mins!=null);return {by,runs:h.length,wins:h.filter(r=>r.won).length,fastest:wins.length?Math.min(...wins.map(r=>r.mins)):null,best:h.reduce((a,r)=>Math.max(a,r.floor||0),0)}}

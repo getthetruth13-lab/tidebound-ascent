@@ -10,6 +10,11 @@ import {RELICS} from '../../core/registry.js';
 const actRelic=tier=>{const c=relicCandidates(tier).filter(r=>r.act===2);if(c.length){const r=pick(c,'events');run().seenRelics[r.id]=1;return r.id}return randomRelic(undefined,'events',{tier})};
 const giveRelic=(tier,text,tone)=>{const id=actRelic(tier);if(!id){const g=gainGold(50);return done(`${text} Nothing is left to find: +${g} gold.`,'mixed')}gainRelic(id);return done(`${text} You gain ${rel(id)}.`,tone||'good')};
 const potion=()=>{if(!freeSlot()){const g=gainGold(25);return `+${g} gold (your belt is full)`}const p=randomPotion('events');addPotion(p);return `${B(POTIONS[p].e+' '+POTIONS[p].n)}`};
+// v0.7.10: Deserter promises a Common potion — sample Commons only (fallback to any if none left).
+const commonPotion=()=>{if(!freeSlot()){const g=gainGold(25);return `+${g} gold (your belt is full)`}
+ const open=p=>(!p.cls||p.cls===run().cls)&&!p.stub&&(p.act||1)<=(run().act||1)&&!isLocked('potions',p.id);
+ let pool=Object.values(POTIONS).filter(p=>p.rarity==='c'&&open(p));if(!pool.length)pool=Object.values(POTIONS).filter(open);
+ const id=pick(pool,'events').id;addPotion(id);return `${B(POTIONS[id].e+' '+POTIONS[id].n)}`};
 const cls=c=>run().cls===c;
 const upgradeOne=()=>{const c=upPool();if(!c.length)return null;const x=pick(c,'events');upgradeCard(x);return x};
 const hasCurse=()=>run().deck.some(c=>CARDS[c.id].curse);
@@ -65,7 +70,7 @@ registerEvents([
  {id:'a2_deserter',pool:'act',act:2,n:'The Deserter Warden',e:'🏃',t:'A Warden crouches in a drain, helmet off. He ran from the order to hold.',req:()=>!run().relics.some(r=>r.id==='deserterbadge'),get o(){return [
   O('Recruit him','gain Deserter\'s Badge',{d:'Gain Deserter\'s Badge: your fights start with 4 Guard.',f:()=>{if(RELICS.deserterbadge){gainRelic('deserterbadge');return done(`He hands over his badge. You gain ${rel('deserterbadge')}.`)}const g=gainGold(40);done(`He gives you what he has. +${g} gold.`)}}),
   O('Turn him in','+70 gold',{d:'+70 gold.',f:()=>{const g=gainGold(70);done(`They take him away. +${g} gold.`,'mixed')}}),
-  O('Let him go','a Common potion',{d:'A random potion.',f:()=>done(`He presses ${potion()} into your hand and is gone.`)}),LEAVE]}},
+  O('Let him go','a Common potion',{d:'A random Common potion.',f:()=>done(`He presses ${commonPotion()} into your hand and is gone.`)}),LEAVE]}},
  {id:'a2_magazine',pool:'act',act:2,n:'The Powder Magazine',e:'💥',t:'A sealed magazine. They kept the powder dry. They did not remember why.',get o(){return [
   O('Open it','50%: a Rare relic, else lose 16 HP',{risk:.5,ok:()=>run().hp>16,why:'Needs more than 16 HP',d:'50%: a random Rare relic. 50%: a spark: lose 16 HP.',f:()=>{if(roll(.5))return giveRelic('r','The door swings. Dry powder, and something under it.');hurt(16);done('A spark. Lose 16 HP.','bad')}}),
   O('Take a handful','+45 gold, lose 5 HP',{ok:()=>run().hp>5,why:'Needs more than 5 HP',d:'+45 gold, lose 5 HP.',f:()=>{hurt(5);const g=gainGold(45);done(`It sells fast. +${g} gold. Lose 5 HP.`,'mixed')}}),
@@ -74,7 +79,7 @@ registerEvents([
   ...[[40,cls('carto')?2:1],[80,2],[120,3]].map(([p,n])=>O(`Bid ${p} gold`,`${n} hidden lot${n>1?'s':''}`+(p===40&&cls('carto')?' (Cartographer: two)':''),{ok:()=>run().gold>=p,why:`Needs ${p} gold`,d:`Pay ${p} gold for ${n} hidden lot${n>1?'s':''}: each is a Common relic (40%), a potion (40%) or a card (20%).`,f:()=>{run().gold-=p;const got=[];for(let i=0;i<n;i++){const x=rnd('events');if(x<.4){const id=actRelic('c');if(id){gainRelic(id);got.push(rel(id));continue}}if(x<.8){got.push(potion());continue}const id=pick(Object.values(CARDS).filter(c=>c.cls===run().cls&&c.r==='u'&&!c.cut&&!c.stub&&!isLocked('cards',c.id)&&(c.act||1)<=2),'events');if(id){gainCard(id.id);got.push(B(id.n))}}done(`The hammer falls. Pay ${p} gold: ${got.join(', ')||'nothing'}.`,'mixed','Sold')}})),LEAVE]}},
  {id:'a2_surgeon',pool:'act',act:2,n:"Surgeon's Tent",e:'⚕️',t:'A tent of oilcloth over iron cots. The surgeon counted bodies, not names.',get o(){return [
   O('Stitch you up','heal 35% Max HP, lose 40 gold',{ok:()=>run().gold>=40,why:'Needs 40 gold',d:'Pay 40 gold. Heal 35% of your Max HP.',f:()=>{run().gold-=40;const h=Math.round(run().max*.35);heal(h);done(`Clean thread. Heal ${h} HP. Pay 40 gold.`,'mixed')}}),
-  O('Upgrade a card','lose 8 HP',{ok:()=>run().hp>8&&pickable('upgrade').length>0,why:'Needs more than 8 HP',d:'Choose a card to upgrade. Lose 8 HP.',f:()=>pickThen('upgrade','⚕️ Upgrade a card (−8 HP)',ci=>{upgradeCard(ci);hurt(8);done(`${B(cname(ci))} is improved. Lose 8 HP.`,'mixed')})}),
+  O('Upgrade a card','lose 8 HP',{ok:()=>run().hp>8&&pickable('upgrade').length>0,why:'Needs more than 8 HP',d:'Choose a card to upgrade. Lose 8 HP.',f:()=>pickThen('upgrade','⚕️ Upgrade a card (−8 HP)',ci=>{hurt(8);done(`${B(cname(ci))} is improved. Lose 8 HP.`,'mixed')})}),
   O('Cut a card away','lose 8 HP',{ok:()=>run().hp>8&&pickable('remove').length>0,why:'Needs more than 8 HP',d:'Remove a card. Lose 8 HP.',f:()=>pickThen('remove','⚕️ Remove a card (−8 HP)',ci=>{hurt(8);done(`${B(cname(ci))} is cut away. Lose 8 HP.`,'mixed')})}),
   ...(cls('tide')?[O('[Tidecaller] Read the tide-chart pinned inside','+5 Max HP',{d:'Gain 5 Max HP.',f:()=>{gainMaxHp(5);done('The chart is accurate to the hour. +5 Max HP.')}})]:[]),LEAVE]}},
  {id:'a2_mess',pool:'act',act:2,n:'Warden\'s Mess',e:'🍲',t:'A long iron table, kettles still hot. Somebody is still cooking.',get o(){return [
@@ -85,7 +90,7 @@ registerEvents([
   O('Touch it','+6 Guard at the start of the next 3 fights, lose 5 HP',{ok:()=>run().hp>5,why:'Needs more than 5 HP',d:'Lose 5 HP. Your next 3 fights start with 6 Guard.',f:()=>{hurt(5);run().holdStone=3;done('The word settles into your bones. Lose 5 HP.','mixed')}}),
   O('Lean on it','heal 10',{d:'Heal 10 HP.',f:()=>{heal(10);done('It is warm from somebody else. Heal 10 HP.')}}),LEAVE]}},
  {id:'a2_oathanvil',pool:'shrine',act:2,n:'The Oath Anvil',e:'⚒️',t:'An anvil the Wardens swore on.',get o(){return [
-  O('Swear','upgrade a card, a Dread curse',{ok:()=>pickable('upgrade').length>0,why:'Nothing to upgrade',d:'Choose a card to upgrade. Gain a Dread curse.',f:()=>pickThen('upgrade','⚒️ Swear on a card',ci=>{upgradeCard(ci);gainCurse('dread');done(`${B(cname(ci))} rings true. (Curse: Dread)`,'mixed')})}),
+  O('Swear','upgrade a card, a Dread curse',{ok:()=>pickable('upgrade').length>0,why:'Nothing to upgrade',d:'Choose a card to upgrade. Gain a Dread curse.',f:()=>pickThen('upgrade','⚒️ Swear on a card',ci=>{gainCurse('dread');done(`${B(cname(ci))} rings true. (Curse: Dread)`,'mixed')})}),
   O('Break the oath','remove a card, lose 8 HP',{ok:()=>run().hp>8&&pickable('remove').length>0,why:'Needs more than 8 HP',d:'Remove a card. Lose 8 HP.',f:()=>pickThen('remove','⚒️ Remove a card (−8 HP)',ci=>{hurt(8);done(`${B(cname(ci))} is struck from the roll. Lose 8 HP.`,'mixed')})}),LEAVE]}},
  {id:'a2_tideledger',pool:'shrine',act:2,n:'The Tide-Ledger',e:'📖',t:'A tide table that no longer keeps time.',get o(){return [
   O('Read the page','pay 30 gold, choose 1 of 3 relics',{ok:()=>run().gold>=30,why:'Needs 30 gold',d:'Pay 30 gold. See three relics and take one.',f:()=>{run().gold-=30;const ids=[];for(let i=0;i<8&&ids.length<3;i++){const id=randomRelic(undefined,'events');if(id&&!ids.includes(id))ids.push(id)}

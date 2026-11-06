@@ -21,7 +21,7 @@ function sideParts(e,m,p){
 export function intentParts(e,m){const p=[];if(!m)return p;
  if(m.aim)p.push({k:'aim',icon:'aim',n:'',cls:'atk',txt:'takes aim and fires next turn, ignoring half your Guard'});
  if(m.pull)p.push({k:'pull',icon:'pull',n:m.pull,cls:'deb',txt:W_cls()==='tide'?`drags your Tide down by ${m.pull}`:`strips up to ${m.pull} Guard from you`});
- if(m.a&&m.fog)p.push({k:'a',icon:'attack',n:'?',cls:'atk',txt:'attacks for a number you cannot see (never more than 26)'});
+ if(m.a&&m.fog)p.push({k:'a',icon:'attack',n:'?',cls:'atk',txt:'attacks for a number you cannot see'});
  else if(m.a)p.push({k:'a',icon:'attack',n:`${eAtk(e,m.a)}${m.h>1?'×'+m.h:''}`,cls:'atk',txt:`attacks for ${hits(e,m.a,m.h||1)}`+(m.ignoreG?' (only half your Guard blocks)':'')+(m.boom?', then bursts and dies':'')});
  else if(m.boom)p.push({k:'boom',icon:'attack',n:'',cls:'atk',txt:'bursts and dies'});
  if(m.b)p.push({k:'b',icon:'guard',n:m.fog?'?':m.b,cls:'def',txt:m.fog?'gains Guard you cannot see':`gains ${m.b} Guard`});
