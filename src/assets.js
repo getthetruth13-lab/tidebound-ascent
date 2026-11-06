@@ -125,8 +125,10 @@ export const LATER_ACT_SPRITES={diver:2,shellguard:2,kettleman:2,lice:2,bosun:2,
 export function actPackFiles(){const o={};for(const [id,act] of Object.entries(LATER_ACT_SPRITES))if(SPRITES[id])o[SPRITES[id].f]=act;return o}
 export function actPackURLs(act=3){const f=actPackFiles();return Object.keys(f).filter(u=>f[u]<=act)}
 // Ask the worker to fetch the Act 2/3 pack (acts <= act). No-op for Act 1, without a worker, or on file://.
+export const actPackProgress={act:0,done:0,total:0,state:''};
 export function warmActPack(act){if(!(act>=2)||typeof navigator==='undefined'||!navigator.serviceWorker)return;
  navigator.serviceWorker.ready.then(reg=>{const w=navigator.serviceWorker.controller||reg.active;w&&w.postMessage({type:'actpack',act})}).catch(()=>{})}
+if(typeof navigator!=='undefined'&&navigator.serviceWorker)try{navigator.serviceWorker.addEventListener('message',e=>{const m=e.data;if(m&&m.type==='actpack-progress')Object.assign(actPackProgress,{act:m.act|0,done:m.done|0,total:m.total|0,state:m.state||''})})}catch(_){}
 export function assetURLs(){const later=LATER_ACT_SPRITES;const out=Object.entries(SPRITES).filter(([id])=>!later[id]).map(([,m])=>m.f);for(const [gn,g] of Object.entries(ASSETS))for(const k in g){if(gn==='sprites')continue;const a=assetEntry(gn,k);if(!a)continue;out.push(a.src);if(a.srcset)a.srcset.split(',').forEach(s=>out.push(s.trim().split(/\s+/)[0]))}out.push(...Object.values(ENEMY_POSES).flatMap(p=>Object.values(p).map(v=>v.f)));return [...new Set(out)].filter(u=>!/^(data:|blob:)/.test(u)&&!/(^|[\/_-])a[23]([._-]|$)/.test(u))}
 // Renders an image slot with fallback placeholder. ph = placeholder inner HTML (emoji)
 export function slotHTML(group,key,cls,ph){const a=assetEntry(group,key);

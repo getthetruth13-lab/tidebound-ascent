@@ -12,7 +12,7 @@ import {placeDetail} from './place.js';
 // Player-facing terminology follows design-v2 §0.3 (Guard, Might, Soaked, Exposed, Sink).
 import {WL} from './wordless.js';
 import {barHTML,statusRowHTML,playerStates,enemyExtraSt} from './combatant.js';
-import {CARD_ART,assetEntry,assetSrc,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE,fallenFor} from '../assets.js';
+import {CARD_ART,assetEntry,assetSrc,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE,fallenFor,actPackProgress} from '../assets.js';
 import {syncAudio} from '../audio.js';
 import {syncEnv,envFxSettingLabel,a2TravelEnv} from './env.js';
 import {fightFeet,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
@@ -410,9 +410,9 @@ function tcA1(){const e=ENV.envs.tc_a1;const m=e&&e.art&&e.art.mid&&e.art.mid[0]
 // viewport bottom-aligned and centred (height max(vh, vw*1080/2340)), so the panel maps to screen px with the same cover math.
 function tcPanelStyle(to){const e=ENV.envs['tc_a'+to],tp=e&&e.text_panel;if(!tp)return '';const vw=innerWidth,vh=innerHeight,sp=e.space||[2340,1080],h=Math.max(vh,vw*sp[1]/sp[0]),k=h/sp[1],x0=vw/2-sp[0]*k/2,y0=vh-h;
  const [x,y,w,hh]=tp;return ` style="position:fixed;left:${(x0+x*k).toFixed(1)}px;top:${(y0+y*k).toFixed(1)}px;width:${(w*k).toFixed(1)}px;height:${(hh*k).toFixed(1)}px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;margin:0;--tck:${k.toFixed(4)}" data-panel="1"`}
-function travelScrA2(){const ok=Date.now()-(W.S.t||0)>1000,card=!!W.S.card,to=W.S.to,AN=ACT_NAMES[to];
+function travelScrA2(){const ok=Date.now()-(W.S.t||0)>1000,card=!!W.S.card,to=W.S.to,AN=ACT_NAMES[to];const packTip=(()=>{const P=actPackProgress;if(!P||!P.total||P.state==='done')return'';const pct=Math.min(100,Math.round(100*P.done/P.total));return `<div class="packtip muted">Preparing Act ${to} art… ${pct}%</div>`})();
  // v0.6.43 (wired as-is): tr_a1a2 travel scene first, tap, then the tc_a2 title card scene with the act name; both are env backdrops (no Act 1 plate)
- return `<div class="page travel a2trav a${to}trav" onclick="skipTravel()">${card?`<div class="a2tcard"${tcPanelStyle(to)}><div class="act">ACT ${to===3?'III':'II'}</div><h1>${AN.n}</h1><div class="sub">${AN.sub}.</div></div><div class="boss muted tcboss a2tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>`:`<div class="ferry win a2ferry" id="ferryman">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div>`}<div class="skip muted">${ok?(card?'Tap to begin':'Tap to continue'):'…'}</div></div>`}
+ return `<div class="page travel a2trav a${to}trav" onclick="skipTravel()">${card?`<div class="a2tcard"${tcPanelStyle(to)}><div class="act">ACT ${to===3?'III':'II'}</div><h1>${AN.n}</h1><div class="sub">${AN.sub}.</div></div><div class="boss muted tcboss a2tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>`:`<div class="ferry win a2ferry" id="ferryman">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div>`}${packTip}<div class="skip muted">${ok?(card?'Tap to begin':'Tap to continue'):'…'}</div></div>`}
 function travelScr(){if(a2TravelEnv())return travelScrA2();const ok=Date.now()-(W.S.t||0)>1000;const T={...tcA1()},AN=W.S.kind==='act'&&ACT_NAMES[W.S.to];if(AN){T.title='Act '+['','I','II','III'][W.S.to]+': '+AN.n;T.sub=AN.sub+'.'}const [px,py,pw,ph]=T.panel,pc=(a,b)=>(a/b*100).toFixed(2)+'%';
  return `<div class="page travel" onclick="skipTravel()"><div class="tcard tcplate" style="aspect-ratio:${T.w}/${T.h}"><img class="tcimg" src="${T.src}" alt="" draggable="false" onerror="this.parentNode.classList.add('noimg');this.remove()">
  <div class="tcpanel" style="left:${pc(px,T.w)};top:${pc(py,T.h)};width:${pc(pw,T.w)};height:${pc(ph,T.h)}"><h1>${T.title}</h1><div class="sub">${T.sub}</div></div></div>

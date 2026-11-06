@@ -496,6 +496,7 @@ function shopRemoveImpl(){const S=W.S;if(S.screen!=='shop'||S.scrubbed||(S.scrub
  openPick('remove',`Scrub: remove a card (${p} gold)`,()=>{W.run.gold-=p;W.run.removals++;if(p===0&&hasDaily('fairtrade'))markFairRemoveUsed();fire('cardRemoved',{shop:true}); /* Act 3 hook: onCardRemoved */S.scrubUses=(S.scrubUses||0)+1;S.scrubbed=S.scrubUses>=ECON.shop.removal.perVisit;W.S=S;render()},()=>{W.S=S;render()})}
 // ================= flow =================
 function goMapImpl(){W.cb=null;if(W.run&&W.run.hp<=0)return endRun(false);
+ if(W.run&&(W.run.act||1)===1&&W.run.floor>=10)try{warmActPack(2)}catch(_){}
  if(W.run&&W.run.eyeLeft>0){W.run.eyeLeft--;if(campOptions().length){W.S={screen:'rest'};render();return}} // the Stormeye: a second camp action
 W.S={screen:'map'};if(W.run&&W.run.offer==='done'&&W.run.floor===0&&W.run.lamp&&!W.run.lamp.shown){W.run.lamp.shown=true;W.S.ov='tasks'} // Lantern Tasks open once the Ferryman is done
 fire('mapEnter',{});saveRun();render()}

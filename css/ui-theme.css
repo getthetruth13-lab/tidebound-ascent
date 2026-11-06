@@ -594,3 +594,4 @@ body.env-still #envfx{visibility:hidden}
 .endscore .es-head{font-size:1.1em;margin-bottom:4px}
 .endscore .es-break{opacity:.8;font-size:.85em;line-height:1.35;margin-bottom:8px}
 .endscore .es-copy{white-space:pre-wrap;font-size:.8em;opacity:.9;margin-top:8px;max-height:8em;overflow:auto}
+.packtip{margin-top:8px;font-size:.9em;opacity:.85}
