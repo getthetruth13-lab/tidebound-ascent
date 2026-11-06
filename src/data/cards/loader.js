@@ -5,6 +5,7 @@
 import {C,CARDS} from '../../core/registry.js';
 import {DATA} from '../generated/data-v2.js';
 import {ACT1_POOL} from '../generated/act1-pool.js';
+import {ACT1_WIDEN} from '../generated/act1-widen.js';
 import {ACT23_POOL} from '../generated/act2-pool.js';
 export const META={};
 for(const [cls,list] of Object.entries(DATA.cards))for(const c of list)META[c.id]={...c,cls};
@@ -19,6 +20,8 @@ for(const [cls,list] of Object.entries(ACT1_POOL))for(const c of list){const o=M
 // ACT23_IDS = every later-act id; card() sets o.act (1 for Act 1 cards). Behaviour lives in cards/act2/<hero>.js; finalize.js stubs the rest.
 export const ACT23_IDS=new Set();
 for(const [cls,list] of Object.entries(ACT23_POOL))for(const c of list){const o=META[c.id]||{};META[c.id]={...o,...c,flavour:c.flavour||o.flavour,arch:o.arch||[],cls,act1:false};ACT23_IDS.add(c.id)}
+// v0.7.13: widen Act 1 with cut cards that already ship art + behaviour (no new paintings).
+for(const id of ACT1_WIDEN){if(!META[id]||ACT1_IDS.has(id)||ACT23_IDS.has(id))continue;META[id]={...META[id],act1:true};ACT1_IDS.add(id)}
 export const RAR={B:'s',C:'c',U:'u',R:'r',S:'x'};
 export function card(cls,id,b){const m=META[id];if(!m)throw new Error('No data-v2 entry for card '+id);
  const o=Object.assign({n:m.name,t:m.type,r:RAR[m.rarity]||'c',flavour:m.flavour,arch:m.arch||[],text:m.effect,upText:m.upgrade},b);
