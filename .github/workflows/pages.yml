@@ -20,14 +20,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Build publish tree (no .git / workflows)
+      - name: Build publish tree (game only)
         run: |
           mkdir -p /tmp/publish
-          # Copy tracked site files only — never .git (was ~613MB) or hidden dirs
+          # Never ship .git (~613MB), workflows, listen packs, art-reviews, or the APK.
+          # deploy-pages caps timeout at 600000ms (10m) regardless of input.
           rsync -a --delete \
             --exclude='.git/' \
             --exclude='.github/' \
             --exclude='.gitignore' \
+            --exclude='listen/' \
+            --exclude='art-reviews/' \
+            --exclude='TheDrownedSun.apk' \
+            --exclude='*.apk' \
             ./ /tmp/publish/
           echo "publish files=$(find /tmp/publish -type f | wc -l) size=$(du -sh /tmp/publish | cut -f1)"
       - uses: actions/configure-pages@v5
@@ -37,4 +42,4 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
         with:
-          timeout: 1800000
+          timeout: 600000
