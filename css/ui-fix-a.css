@@ -158,3 +158,4 @@ html.has-mappage #env,html.has-mappage #env-front{visibility:hidden}
 .tb-opt .settings.sx .sx-row{min-width:0;flex-wrap:wrap;row-gap:0}
 .tb-opt .settings.sx .sx-t{white-space:normal;min-width:0;flex:1 1 90px}
 .tb-opt .settings.sx .sx-row>:not(.sx-t){margin-left:auto;flex:0 1 auto;min-width:0}
+.sx-step button{min-width:44px;font-family:system-ui,sans-serif!important;font-size:15px!important}.sx-step button.on{min-width:56px;font-family:inherit!important}.sx-step button[disabled]{opacity:.45}

@@ -16,6 +16,7 @@ import {loadProfile,saveProfile,lockedFor,addHistory,ascUnlocked} from '../progr
 import {overallFloor} from '../data/places.js';
 import {SPOIL_CARDS} from '../data/lamplight.js';
 import {eventText} from '../data/lore.js';
+import {openFerryOffer,ferryDue} from '../data/ferryman.js';
 import {render,markCardsSeen,updateCardSelection} from '../ui/render.js';
 // ================= economy tables (design-v2 §1.1, §1.4, §1.5) =================
 export const ECON={startGold:99,potionSlots:3,
@@ -40,15 +41,21 @@ export const ECON={startGold:99,potionSlots:3,
 const TIERS=['c','u','r'];
 // ================= run setup =================
 export function dailySeed(d=new Date()){const k=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();let h=2166136261;for(const c of String(k)+'drowned-sun'){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
-export const ascInfo=['Normal game','Foes have 8% more HP','Elites and bosses have 10% more HP','You start with 30 less gold','Victory heals are halved','Foes have 16% more HP in total'];
+// Ascension 1-20 (v0.7.09, following Slay the Spire and design-v2 §4.3 Tidemarks): each level adds one rule and keeps every lower one.
+// Levels 1-5 are unchanged from v0.6.54. ascInfo[n] is the rule level n adds (shown in Options).
+export const ascInfo=['Normal game','Foes have 8% more HP','Elites and bosses have 10% more HP','You start with 30 less gold','Victory heals are halved','Foes have 16% more HP in total',
+ 'You start each run at 90% HP','Normal foes deal 10% more damage','Elites appear more often','Removing a card at the Merchant costs 25 more','You start with Saltburn, a curse you can never remove',
+ 'One fewer potion slot','Elites deal 12% more damage','Bosses drop 25% less gold','You start with 4 less max HP','Between acts you heal 70% of missing HP, not all of it',
+ 'Merchant prices are 10% higher','Bosses deal 12% more damage','Normal foes start each fight with 1 Might','Elites and bosses start each fight with 1 Might','After the Act 3 boss, a second Act 3 boss waits (you heal 25% of missing HP first)'];
+export const asc=()=>(W.run&&W.run.asc)|0;
 export function newRun(cls,o={}){const K=CLASSES[cls];clearWin();nextActSnap=null;
  const urlSeed=o.seed==null&&typeof location!=='undefined'?+new URLSearchParams(location.search).get('seed'):0; // ?seed=N replays a run's maps and rolls
- // v0.6.54: Daily run (settings.dailyMode, or o.daily) uses today's date as the seed; Ascension (settings.ascension, opened one level per Act 1 win) is off by default. Neither touches a normal run.
+ // v0.6.54: Daily run (settings.dailyMode, or o.daily) uses today's date as the seed; Ascension (settings.ascension, opened one level per win) is off by default. Neither touches a normal run.
  const daily=o.daily!=null?!!o.daily:(o.seed==null&&!urlSeed&&!!settings.dailyMode);
  const asc=o.asc!=null?(o.asc|0):(daily?0:Math.min(settings.ascension|0,ascUnlocked()));
  const seed=(o.seed!=null?o.seed:urlSeed?urlSeed:daily?dailySeed():(Date.now()^Math.floor(Math.random()*4294967296)))>>>0;
- applyHeroHp();W.run={v:2,seed,rngs:seedStreams(seed),cls,hp:K.hp,max:K.hp,gold:ECON.startGold-(asc>=3?30:0),deck:K.starter.map(id=>mk(id)),floor:0,act:1,pos:{r:-1,i:-1},vis:{},won:false,kills:0,
-  relics:[],potions:Array(ECON.potionSlots).fill(null),potionChance:ECON.potion.start,swell:ECON.swellStart,qOdds:{fight:ECON.q.fight[0],shop:ECON.q.shop[0],treasure:ECON.q.treasure[0]},
+ applyHeroHp();const maxHp=K.hp-(asc>=14?4:0);W.run={v:2,seed,rngs:seedStreams(seed),cls,hp:asc>=6?Math.round(maxHp*.9):maxHp,max:maxHp,gold:ECON.startGold-(asc>=3?30:0),deck:K.starter.map(id=>mk(id)),floor:0,act:1,pos:{r:-1,i:-1},vis:{},won:false,kills:0,
+  relics:[],potions:Array(ECON.potionSlots-(asc>=11?1:0)).fill(null),potionChance:ECON.potion.start,swell:ECON.swellStart,qOdds:{fight:ECON.q.fight[0],shop:ECON.q.shop[0],treasure:ECON.q.treasure[0]},
   removals:0,seenRelics:{},seenEvents:{},shrinesThisAct:{},charms:[],encHist:[],fights:0,rareNext:false,
   stats:{floors:0,kills:0,elites:[0,0,0],bosses:0,goldEarned:0,maxHit:0,maxCardsTurn:0,cardsPlayed:0,path:[],potionsUsed:0,relicsAtBoss:null,potionsAtBoss:null,startT:Date.now()}};
  // Lamplight (design/progression-proposal.md): the run keeps a snapshot of what is still locked, so rolls and saved runs stay stable. Daily / full-pool runs and old saves have no lock.
@@ -57,13 +64,15 @@ export function newRun(cls,o={}){const K=CLASSES[cls];clearWin();nextActSnap=nul
  // Later-act bosses are drawn on their own 'acts' stream, so Act 1's map/rolls stay identical (golden test). bosses[act] = that act's boss id.
  W.run.bosses={1:W.run.boss};for(const a of [2,3]){const t=encountersFor(a).boss;if(t&&t.length)W.run.bosses[a]=wpick(t.map(x=>[x.e[0],x.w]),'acts')}
  W.run.map=genMap();
+ if(asc>=10)W.run.deck.push(mk('saltburn')); // A10: the unremovable starting curse (design-v2 Tidemark 10)
  if(K.relic)gainRelic(K.relic,{silent:true});
  W.cb=null;
+ if(!o.skipTravel&&!window.FAST&&ferryDue({daily,noOffer:o.noOffer}))W.run.offer=1; // the Ferryman's Offer waits after the travel scene (data/ferryman.js)
  if(o.skipTravel||window.FAST)W.S={screen:'map'};else W.S={screen:'travel',t:Date.now()};
  saveRun();render();return W.run}
 // ================= map (§1.5) =================
 export function nodeType(f){if(f===1)return'fight';if(f===8)return'treasure';if(f===14)return'rest';if(f===15)return'boss';
- const w=ECON.map.weights;const l=[['fight',w.fight],['unknown',w.unknown]];if(f!==13)l.push(['rest',w.rest]);if(f>=5)l.push(['elite',w.elite]);if(f>=3)l.push(['shop',w.shop]);return wpick(l,'map')}
+ const w=ECON.map.weights;const l=[['fight',w.fight],['unknown',w.unknown]];if(f!==13)l.push(['rest',w.rest]);if(f>=5)l.push(['elite',w.elite*(asc()>=8?1.5:1)]);if(f>=3)l.push(['shop',w.shop]);return wpick(l,'map')}
 // Run variety (CLAUDE_TASK_3): every map gets a random "shape" (pinch rows where the paths squeeze to 2 nodes, and link density), and a
 // finished map must pass variety rules: a real choice on every row, early AND late camps, 2+ elites on different floors, enough ? rooms.
 export function genMap(act=1){if(act>1)return genMapLater(act);let m,best=null;for(let t=0;t<400;t++){m=tryMap();fixPathRules(m);if(!hasShop(m))continue;const r=eliteRange(m);if(!(r[0]<=1&&r[1]>=3))continue;best=best||m;if(varietyOK(m))return m}return best||m}
@@ -73,7 +82,7 @@ const MAP_ACT={
  2:{pin:{0:'fight',4:'rest',8:'treasure',9:'shop',14:'rest'},gate:[4,9],pinch:[1,2,6,7,11,12],noElite:[0,1,2,4,9,14],restRows:[2,6,7,10,11,12],w:{fight:42,unknown:24,rest:10,elite:12,shop:6}},
  // Act 3 (ACT3-DESIGN s3): the Eye at floor 8 (row 7, one node), pinch rows at floors 4 and 11, shops only on floors 11-14, no Gate rows besides the Eye, Updrafts added after the rows.
  3:{pin:{0:'fight',7:'rest',11:'treasure',14:'rest'},gate:[7],pinch:[3,10],pinchN:2,noElite:[0,1,2,7,11,14],restRows:[2,3,4,5,9,10,12],shopRows:[10,12,13],w:{fight:40,unknown:24,rest:9,elite:13,shop:6},up:true}};
-function nodeTypeLater(P,r){if(P.pin[r])return P.pin[r];const f=r+1;const l=[['fight',P.w.fight],['unknown',P.w.unknown]];if(P.restRows.includes(r))l.push(['rest',P.w.rest]);if(!P.noElite.includes(r))l.push(['elite',P.w.elite]);if(P.shopRows?P.shopRows.includes(r):(f>=3&&r!==13))l.push(['shop',P.w.shop]);return wpick(l,'map')}
+function nodeTypeLater(P,r){if(P.pin[r])return P.pin[r];const f=r+1;const l=[['fight',P.w.fight],['unknown',P.w.unknown]];if(P.restRows.includes(r))l.push(['rest',P.w.rest]);if(!P.noElite.includes(r))l.push(['elite',P.w.elite*(asc()>=8?1.5:1)]);if(P.shopRows?P.shopRows.includes(r):(f>=3&&r!==13))l.push(['shop',P.w.shop]);return wpick(l,'map')}
 function tryMapLater(P){const rows=[];const pinch=new Set(shuffle(P.pinch,'map').slice(0,P.pinchN||4)),link=[.3,.45,.6][R(3,'map')];
  for(let r=0;r<15;r++){if(P.gate.includes(r)){rows.push([{c:1.5,t:nodeTypeLater(P,r),to:[]}]);continue}
   const cnt=r===0?3:pinch.has(r)?2:3+R(2,'map');const cols=shuffle([0,1,2,3],'map').slice(0,cnt).sort((a,b)=>a-b);rows.push(cols.map(c=>({c,t:nodeTypeLater(P,r),to:[]})))}
@@ -227,7 +236,7 @@ export function rollCards(n,src,{stream='cards',forceR=null,type=null,exclude=[]
   const fp=Object.values(CARDS).filter(c=>c.cls===run.cls&&c.act===run.act&&inActSet(c)&&!out.includes(c.id)&&!exclude.includes(c.id));if(fp.length)out[out.length-1]=pick(fp,stream).id}
  return out}
 export function rewardCardCount(){return mod('rewardCards',{},3)}
-export function rollGold(kind){const g=ECON.gold[kind]||ECON.gold.fight;return rng(g[0],g[1],'cards')}
+export function rollGold(kind){const g=ECON.gold[kind]||ECON.gold.fight;const v=rng(g[0],g[1],'cards');return kind==='boss'&&asc()>=13?Math.round(v*.75):v}
 export function potionRoll(kind){const run=W.run,P=ECON.potion;const ch=run.potionChance+(kind==='elite'?P.eliteBonus:0);const hit=mod('potionDrop',{kind},rnd('potions')*100<ch); /* Act 3 hook: potionDrop (Vial Belt) */
  run.potionChance=Math.max(P.min,Math.min(P.max,run.potionChance+(hit?-P.step:P.step)));return hit?randomPotion():null}
 // Items (relics, potions, cards) carry an `act` field: nothing rolls before its act (Act 2/3 build, plan 6.5). Items without a field are Act 1.
@@ -288,17 +297,22 @@ function rewDoneImpl(){const S=W.S;if(S.screen!=='reward')return;S.leaveConfirm=
  // Boss relic (P3): after the boss reward rows, offer 1 of 3 boss relics (like Slay the Spire's boss chest), then finish the act.
  // OD-6 (Spencer 10-31): ON after the Act 1 and Act 2 bosses, also on the normal build where the next act comes via 'Continue to Act N' (the relic rides in the win snapshot). Never after Act 3.
  if(S.kind==='boss'&&!S.bossPick&&(hasNextAct()||previewOn(W.run.act||1))){const ids=bossRelicChoices();if(ids.length){S.bossPick=ids;S.bossTook=null;S.t=Date.now();return render()}}
- if(S.kind==='boss'){if(hasNextAct())return startNextAct();return endRun(true)}goMap()}
-// Acts that exist (ACT_COUNT, default 1; Acts 2/3 follow via the Continue previews below).
-// Act 2 ships behind the live flag (?act=2 preview, plan 12.3); ACT_COUNT is raised to 2 / 3 when each act is approved.
-let ACT_COUNT=(typeof location!=='undefined'&&+new URLSearchParams(location.search).get('act'))||1;
+ if(S.kind==='boss'){if(hasNextAct())return startNextAct();if(asc()>=20&&!W.run.twin)return twinGale();return endRun(true)}goMap()}
+// A20 Twin Gales (design-v2 Tidemark 20, Slay the Spire A20 double boss): after the Act 3 boss, heal 25% of missing HP and fight another Act 3 boss.
+function twinGale(){const run=W.run;run.twin=1;const pool=(encountersFor(3).boss||[]).filter(x=>x.e[0]!==run.boss);if(!pool.length)return endRun(true);
+ run.firstBoss=run.boss;run.boss=wpick(pool.map(x=>[x.e[0],x.w]),'acts');const h=Math.floor((run.max-run.hp)*.25);if(h>0)run.hp+=h;
+ toast('A second storm rises: '+EN[run.boss].n,'relic');return startCombat('boss',[run.boss])}
+// Acts that exist. v0.7.09 (Spencer 11-05 "finish the game", following Slay the Spire): one run is the whole climb, Acts 1-3.
+// The Act 1 and Act 2 bosses lead straight on (boss relic pick, then the travel plate and the next act's map); only the Act 3 boss ends a run.
+// (Before v0.7.09 ACT_COUNT was 1 and Acts 2/3 came through 'Continue to Act N' preview buttons on an Act 1/2 win screen.)
+let ACT_COUNT=3;
 export const actCount=()=>ACT_COUNT;
 export function setActCount(n){ACT_COUNT=n} // tests / future acts only
 export const hasNextAct=()=>!!W.run&&(W.run.act||1)<ACT_COUNT;
 export const isLastAct=()=>!hasNextAct();
 // Next act (plan 5/7): full heal (StS lesson 14), a fresh map, that act's boss, the shrine/seen tallies reset, then the travel plate and the map. Autosaves on entry.
 export function startNextAct(){const run=W.run;const from=run.act||1,to=from+1;
- run.act=to;run.boss=(run.bosses&&run.bosses[to])||run.boss;run.hp=run.max;run.floor=0;run.pos={r:-1,i:-1};run.vis={};run.shrinesThisAct={};run.wrenTally=0;run.fights=0;run.encHist=[];run.cut=0;
+ run.act=to;run.boss=(run.bosses&&run.bosses[to])||run.boss;run.hp=asc()>=15?Math.min(run.max,run.hp+Math.ceil((run.max-run.hp)*.7)):run.max;run.floor=0;run.pos={r:-1,i:-1};run.vis={};run.shrinesThisAct={};run.wrenTally=0;run.fights=0;run.encHist=[];run.cut=0;
  run.map=genMap(to);run.stats.bossesByAct=(run.stats.bossesByAct||[]);W.cb=null;
  try{warmActPack(to)}catch(_){} fire('actStart',{act:to});W.S={screen:'travel',kind:'act',from,to,t:Date.now()};saveRun();render()}
 // Boss relics the hero can use (class-locked ones only for their class), not already held; 3 at random from the relics stream.
@@ -416,8 +430,8 @@ export const restHeal=()=>campDo('mend');
 // ================= merchant (§1.4) =================
 // Later acts charge more (D-A2-17): Act 2 +25%, Act 3 +50%; Wren's Cairn adds 10% per bundle taken this act. Act 1 is untouched.
 export const actPriceMult=()=>{const r=W.run;if(!r)return 1;return ([1,1,1.25,1.5][r.act||1]||1)*(1+.1*(r.wrenTally||0))};
-export const price=(v,kind)=>Math.max(0,Math.round(mod('price',{kind},v)*(kind==='shop'?actPriceMult():1)));
-export function scrubPrice(){return Math.max(0,Math.round(mod('scrubPrice',{},ECON.shop.removal.base+ECON.shop.removal.step*W.run.removals)))}
+export const price=(v,kind)=>Math.max(0,Math.round(mod('price',{kind},v)*(kind==='shop'?actPriceMult()*(asc()>=16?1.1:1):1)));
+export function scrubPrice(){return Math.max(0,Math.round(mod('scrubPrice',{},ECON.shop.removal.base+(asc()>=9?25:0)+ECON.shop.removal.step*W.run.removals)))}
 // Colourless extras come from the colourless pool when it has Act-set cards of that rarity, else from the class pool (rollCards).
 function shopExtra(r,used){const run=W.run;const pool=Object.values(CARDS).filter(c=>c.cls==='colorless'&&c.r===r&&inActSet(c)&&!used.includes(c.id));
  return pool.length?pick(pool,'shop').id:rollCards(1,'shop',{stream:'shop',forceR:r,exclude:used})[0]}
@@ -447,12 +461,13 @@ function shopRemoveImpl(){const S=W.S;if(S.screen!=='shop'||S.scrubbed||(S.scrub
 // ================= flow =================
 function goMapImpl(){W.cb=null;if(W.run&&W.run.hp<=0)return endRun(false);
  if(W.run&&W.run.eyeLeft>0){W.run.eyeLeft--;if(campOptions().length){W.S={screen:'rest'};render();return}} // the Stormeye: a second camp action
-W.S={screen:'map'};fire('mapEnter',{});saveRun();render()}
+W.S={screen:'map'};if(W.run&&W.run.offer==='done'&&W.run.floor===0&&W.run.lamp&&!W.run.lamp.shown){W.run.lamp.shown=true;W.S.ov='tasks'} // Lantern Tasks open once the Ferryman is done
+fire('mapEnter',{});saveRun();render()}
 // Act 2 preview (Spencer 10-16): beating Act 1 on the normal build offers 'Continue to Act 2'. Act 2 is built but not fully polished, so the button is labelled a preview.
 // The run is snapshotted before clearRun so the same hero, deck, relics and gold carry over. Act 1 is settled (Lamplight credited) exactly as before.
-export const ACT2_PREVIEW=true;
+export const ACT2_PREVIEW=false; // v0.7.09: off, the full climb is the game (ACT_COUNT=3)
 // Act 3 preview (Spencer 10-16): beating Act 2 offers 'Continue to Act 3' the same way, so Acts 1-3 play as one run. Act 3 win ends the run normally. Set false to hide.
-export const ACT3_PREVIEW=true;
+export const ACT3_PREVIEW=false; // v0.7.09: off
 let nextActSnap=null;
 const previewOn=a=>a===1?ACT2_PREVIEW:a===2?ACT3_PREVIEW:false;
 const canContinueTo=to=>!!(previewOn(to-1)&&nextActSnap&&nextActSnap.to===to&&W.S&&W.S.screen==='end'&&W.run&&W.run.won&&(W.run.act||1)===to-1);
@@ -483,6 +498,8 @@ export {cHeal};
 
 export function goNode(...args){return savedAction('goNode',args,()=>goNodeImpl(...args))}
 
+// The Ferryman's Offer (run start, data/ferryman.js); a saved action so a resumed run replays the same offer.
+export function ferryOffer(...args){return savedAction('ferryOffer',args,()=>{if(!W.run||W.run.offer!==1||W.run.floor!==0)return;openFerryOffer()})}
 export function evOpt(...args){return savedAction('evOpt',args,()=>evOptImpl(...args))}
 
 export function claimRow(...args){return savedAction('claimRow',args,()=>claimRowImpl(...args))}

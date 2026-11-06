@@ -110,8 +110,12 @@ export const HISTORY_KEY='tidebound.history.v1';
 let histMem=[];
 export function loadHistory(){try{const v=JSON.parse(localStorage.getItem(HISTORY_KEY));return Array.isArray(v)?v:histMem}catch(_){return histMem}}
 export function addHistory(rec){const h=[rec,...loadHistory()].slice(0,60);histMem=h;try{localStorage.setItem(HISTORY_KEY,JSON.stringify(h))}catch(_){}return h}
-export const ASC_MAX=5;
-// Ascension levels open one per Act 1 win (history), up to ASC_MAX. Level 0 is the normal game and is always on.
-export function ascUnlocked(){return Math.min(ASC_MAX,loadHistory().filter(r=>r.won&&(r.act||1)===1).length)}
-export function statsOf(h){const by={};for(const r of h){const b=by[r.cls]||(by[r.cls]={runs:0,wins:0,best:0});b.runs++;if(r.won)b.wins++;b.best=Math.max(b.best,r.floor||0)}
+export const ASC_MAX=20;
+// Ascension levels open one per win (history), up to ASC_MAX. Level 0 is the normal game and is always on.
+// v0.7.09: a win is a finished climb (Act 3 boss). Act 1 wins recorded before v0.7.09 (when a run could end there) still count;
+// the old preview-era Act 2 win records are skipped so one carried run is not counted twice.
+// v0.7.09 (Slay the Spire rule): finishing the climb on Ascension N opens N+1. Old Act 1 wins (pre-v0.7.09) still open one level each, up to the old cap of 5.
+export function ascUnlocked(){const h=loadHistory().filter(r=>r.won);const old=Math.min(5,h.filter(r=>(r.act||1)===1).length);
+ const climb=h.filter(r=>(r.act||1)>=3).reduce((m,r)=>Math.max(m,(r.asc|0)+1),0);return Math.min(ASC_MAX,Math.max(old,climb))}
+export function statsOf(h){const by={};for(const r of h){const b=by[r.cls]||(by[r.cls]={runs:0,wins:0,best:0,climbs:0,ascWon:-1});b.runs++;if(r.won)b.wins++;if(r.won&&(r.act||1)>=3){b.climbs++;b.ascWon=Math.max(b.ascWon,r.asc|0)}b.best=Math.max(b.best,r.floor||0)}
  const wins=h.filter(r=>r.won&&r.mins!=null);return {by,runs:h.length,wins:h.filter(r=>r.won).length,fastest:wins.length?Math.min(...wins.map(r=>r.mins)):null,best:h.reduce((a,r)=>Math.max(a,r.floor||0),0)}}

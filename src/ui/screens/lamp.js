@@ -3,6 +3,7 @@
 import {W} from '../../core/state.js';
 import {CARDS,CLASSES,RELICS,POTIONS} from '../../core/registry.js';
 import {ACT1_CARDS} from '../../data/act1.js';
+import {ACT23_POOL} from '../../data/generated/act2-pool.js';
 import {LAMP_XP,CLIMB_XP,LAMP_PLAN,CLIMB_PLAN,FIVE,LAMP5_CARDS,CLASS_ORDER,LOCK_CARDS,LOCK_CLASS_RELICS,LOCK_SHARED_RELICS,LOCK_POTIONS,LATER_ACT_CARDS} from '../../data/lamplight.js';
 import {loadProfile,saveProfile,lampLevel,climbLevel,lampPending,climbPending,totalPending,barOf,offerFor,claim,lockedFor,firstLevel,lockHint,classRelicIds,heroUnlocked,HERO_LOCKS} from '../../progress.js';
 import {glyph} from '../glyphs.js';
@@ -65,9 +66,9 @@ export function ledgerTab(t){W.S={...W.S,tab:t};render()}
 export function ledgerSec(k){W.S={...W.S,sec:k};render()}
 export function ledgerDrawer(){const d=document.getElementById('lpdrawer');if(d)d.classList.toggle('open')}
 function barHTML(xp,table,cls=''){const b=barOf(xp,table);return `<div class="lp-bar ${cls}"><i style="width:${b.pct}%"></i></div>`}
-const TAB_N={all:'All cards',climb:'Stair Climb',pages:'Pages'},SEC_N={all:'All',starter:'Starter',unlocked:'Unlocked',locked:'Locked',later:'Later acts'};
+const TAB_N={all:'All cards',climb:'Stair Climb',relics:'Relics',potions:'Potions',pages:'Pages'},SEC_N={all:'All',starter:'Starter',unlocked:'Unlocked',locked:'Locked',later:'Later acts'};
 // Placeholder for a card from an act that is not in play yet: no name, no art, no rarity.
-const laterTile=(act)=>`<div class="lp-lock lp-later-card"><span class="lp-seal">${emblemHTML('lamp-lock-card','🔒','seal')}</span><b>???</b><i>Act ${act}</i><span class="lp-hint">Not in play yet</span></div>`;
+const laterTile=(act)=>`<div class="lp-lock lp-later-card"><span class="lp-seal">${emblemHTML('lamp-lock-card','🔒','seal')}</span><b>???</b><i>Act ${act}</i><span class="lp-hint">Take it in Act ${act} to see it here</span></div>`;
 // Lazy rendering: the grid gets the first chunk now and appends more as the player scrolls (S24 memory budget; the All tab holds 300 tiles).
 /*10-30 BS5: the first chunk only covers the screen (about two rows on an S24), so the open paints fast at 4x CPU throttle; the rest of the first 60 fills in small idle-time chunks, then scrolling appends as before*/const CHUNK0=60,CHUNK=36,FIRST=16,FILL=6;
 const idle=typeof requestIdleCallback==='function'?f=>requestIdleCallback(f,{timeout:120}):f=>setTimeout(f,16);
@@ -78,8 +79,9 @@ function hydrate(){const g=document.getElementById('ledgergrid'),q=W.ledgerQ;if(
  g.onscroll=()=>{if(g.scrollTop+g.clientHeight>g.scrollHeight-400)more()};q.more=more}
 export function ledgerMore(){const q=W.ledgerQ;if(q&&q.more)q.more()}
 export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=lockedFor(p),sec0=S.sec||'all';
- const tabs=['all',...CLASS_ORDER,'climb','pages'].map(t=>{const pend=t==='pages'||t==='all'?0:t==='climb'?climbPending(p):lampPending(p,t);const hl=CLASSES[t]&&!heroUnlocked(p,t);return `<button class="lp-tab${t===tab?' on':''}${hl?' herolocked':''}" data-tab="${t}"${hl?` data-info="${tesc(HERO_LOCKS[t].hint)}" aria-label="${CLASSES[t].n} (locked)"`:''} onclick="ledgerTab('${t}')">${TAB_N[t]||CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
+ const tabs=['all',...CLASS_ORDER,'climb','relics','potions','pages'].map(t=>{const pend=t==='pages'||t==='all'||t==='relics'||t==='potions'?0:t==='climb'?climbPending(p):lampPending(p,t);const hl=CLASSES[t]&&!heroUnlocked(p,t);return `<button class="lp-tab${t===tab?' on':''}${hl?' herolocked':''}" data-tab="${t}"${hl?` data-info="${tesc(HERO_LOCKS[t].hint)}" aria-label="${CLASSES[t].n} (locked)"`:''} onclick="ledgerTab('${t}')">${TAB_N[t]||CLASSES[t].n}${pend?`<em>${pend}</em>`:''}</button>`}).join('');
  if(tab==='pages')return pagesScr(tabs,p);
+ if(tab==='relics'||tab==='potions')return bookScr(tabs,p,tab);
  const all=tab==='all',climb=tab==='climb',heroes=all?CLASS_ORDER:[tab];
  const xp=climb?p.climb:all?0:(p.xp[tab]||0),table=climb?CLIMB_XP:LAMP_XP,b=barOf(xp,table),pend=all?0:climb?climbPending(p):lampPending(p,tab);
  const offer=pend?offerFor(p,tab,CARDS):null,on=new Set(offer&&!offer.final?offer.items.map(i=>i.id):[]);
@@ -99,10 +101,13 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
    const bl=FIVE&&!all?LAMP5_CARDS[h].filter(x=>x.act>1&&CARDS[x.id]):[];
    for(const x of bl){const d=CARDS[x.id];cardTot++;if(lock.cards[x.id])sec.locked.push(lockTile(d.r,TYPE_N[d.t],(on.has(x.id)?'On offer: choose it now':lockHint(p,h,'card',x.id,CARDS))+` Appears in Act ${x.act} once owned.`,on.has(x.id)?d.n:null));
     else{cardOwned++;sec.unlocked.push(`<div class="lp-cardwrap">${cardHTML({id:x.id,uid:-900-cardTot,up:false},{})}<i class="lp-earned" title="Earned with Lamplight"></i></div>`)}}
-   for(const act of [2,3]){const n=Math.max(0,((LATER_ACT_CARDS[h]||{})[act]||0)-bl.filter(x=>x.act===act).length);cardTot+=n;for(let i=0;i<n;i++)sec.later.push(laterTile(act))}}
+   // v0.7.09: Acts 2-3 are part of every run, so a later-act card you have taken shows for real (like a compendium); the rest stay dark until you take one.
+   for(const act of [2,3]){const pool=(ACT23_POOL[h]||[]).filter(x=>x.act===act&&!bl.some(b=>b.id===x.id));const known=pool.filter(x=>CARDS[x.id]&&!CARDS[x.id].stub&&p.seen&&p.seen.card&&p.seen.card[x.id]);
+    const n=pool.length||Math.max(0,((LATER_ACT_CARDS[h]||{})[act]||0)-bl.filter(x=>x.act===act).length);cardTot+=n;
+    known.forEach((x,i)=>{cardOwned++;sec.later.push(`<div class="lp-cardwrap lp-met">${cardHTML({id:x.id,uid:-1100-act*100-i,up:false},{})}</div>`)});for(let i=known.length;i<n;i++)sec.later.push(laterTile(act))}}
   for(const k of ['starter','unlocked','locked','later'])counts[k]=sec[k].length;
   const show=sec0==='all'?['starter','unlocked','locked','later']:[sec0];
-  for(const k of show){if(!sec[k].length)continue;items.push(hd(k,SEC_N[k],sec[k].length));if(k==='later')items.push(`<p class="lp-later" data-sec-body="later">Cards from Acts 2 and 3. Those acts are playable as previews, but each card here stays dark until you meet it in a run. Acts never lock anything.</p>`);items.push(...sec[k])}}
+  for(const k of show){if(!sec[k].length)continue;items.push(hd(k,SEC_N[k],sec[k].length));if(k==='later')items.push(`<p class="lp-later" data-sec-body="later">Cards from Acts 2 and 3. Each one stays dark until you take it in a run, then it shows here. Acts never lock anything.</p>`);items.push(...sec[k])}}
  else{items=[...LOCK_SHARED_RELICS.map(id=>[ 'relic',id]),...LOCK_POTIONS.map(id=>['potion',id])].map(([k,id])=>(k==='relic'?lock.relics[id]:lock.potions[id])?lockItem(k,id,on.has(id)?'On offer: choose it now':lockHint(p,'climb',k,id,CARDS),on.has(id)):itemTile(k,id))}
  W.ledgerQ={id:(W.ledgerQ?W.ledgerQ.id:0)+1,items,n:0};setTimeout(hydrate,0);
  const lamp=all?'':`<button class="lp-chip" id="lampchip" onclick="ledgerDrawer()" aria-label="Lamp level and unlocks"><span class="lp-chipem">${emblemHTML(climb?'lamp-climb':'lamp-class-'+tab,climb?'🗼':CLASSES[tab].e,'pip')}</span><b>${climb?'Stair':'Lamp'} ${b.lvl}<small>/${table.length}</small></b><i class="lp-mb"><u style="width:${b.pct}%"></u></i></button>`;
@@ -116,6 +121,21 @@ export function ledgerScr(){const S=W.S,tab=S.tab||'tide',p=loadProfile(),lock=l
 const pageHTML=(st,got)=>got
  ?`<article class="lp-page${st.cut?' cut':''}${st.twist?' deep':''}" data-stage="${st.n}">${st.cut?'<i class="lp-stub" aria-hidden="true"></i>':''}<span class="lp-pn">${st.n}</span><h3>${st.title}</h3>${st.lines.map(l=>`<p>${l}</p>`).join('')}</article>`
  :`<article class="lp-page sealed${st.twist?' deep':''}" data-stage="${st.n}"><span class="lp-pn">${st.n}</span><h3>${emblemHTML('lore-page-sealed','🕯️','pip')} ???</h3><p class="lp-hint">${stageUnlockedLine(st)} Stair Climb ${st.n}.</p></article>`;
+// ---------- v0.7.09 compendium (Slay the Spire's Relic and Potion pages): every relic and potion in the game, grouped by tier.
+// Ones you have found in a run (profile seen) show in full; the rest stay dark with their tier, so you can see what is left to find.
+const R_TIERS=[['s','Starter'],['c','Common'],['u','Uncommon'],['r','Rare'],['b','Boss'],['shop','Shop'],['e','Event']],P_TIERS=[['c','Common'],['u','Uncommon'],['r','Rare']];
+const unseenTile=(kind,tag)=>`<div class="lp-lock lp-li lp-unseen k-${kind}"><span class="lp-seal">${emblemHTML('lamp-lock-'+kind,'❔','seal')}</span><b>???</b><i>${tag}</i><span class="lp-hint">Find it in a run to see it here</span></div>`;
+export function bookLists(p){const seen=k=>(p.seen&&p.seen[k])||{};const sr=seen('relic'),sp=seen('potion');
+ const rel=R_TIERS.map(([t,n])=>({t,n,ids:Object.values(RELICS).filter(r=>r.tier===t&&!r.stub&&r.n).sort((a,b)=>a.n.localeCompare(b.n)).map(r=>({id:r.id,seen:!!sr[r.id]||(t==='s'&&p.runs&&p.runs[r.cls])}))})).filter(g=>g.ids.length);
+ const pot=P_TIERS.map(([t,n])=>({t,n,ids:Object.values(POTIONS).filter(x=>x.rarity===t&&!x.stub&&x.n).sort((a,b)=>a.n.localeCompare(b.n)).map(x=>({id:x.id,seen:!!sp[x.id]}))})).filter(g=>g.ids.length);
+ return {relics:rel,potions:pot}}
+function bookScr(tabs,p,tab){const kind=tab==='relics'?'relic':'potion',groups=bookLists(p)[tab];const tot=groups.reduce((a,g)=>a+g.ids.length,0),got=groups.reduce((a,g)=>a+g.ids.filter(x=>x.seen).length,0);
+ const items=[];for(const g of groups){items.push(`<h3 class="lp-sec" data-sec="${g.t}">${g.n}<em>${g.ids.filter(x=>x.seen).length} / ${g.ids.length}</em></h3>`);
+  for(const x of g.ids)items.push(x.seen?itemTile(kind,x.id):unseenTile(kind,kind==='relic'?g.n+' relic':g.n+' potion'))}
+ W.ledgerQ={id:(W.ledgerQ?W.ledgerQ.id:0)+1,items,n:0};setTimeout(hydrate,0);
+ return asy(`<div class="tb-scr tb-ledger lp-compact lp-book">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">${glyph('undo')}<span>Back</span></button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
+  <div class="lp-bar2"><div class="lp-tabs">${tabs}</div><div class="lp-row2"><span class="tb-sp lp-spacer"></span><span class="lp-ucount" id="ledgercount" data-owned="${got}" data-total="${tot}"><b>Found ${got}</b> of ${tot} ${tab}</span></div></div>
+  <div class="lp-grid" id="ledgergrid"></div></div>`)}
 function pagesScr(tabs,p){const stage=loreStage(p),tier=loreTier(p);
  return asy(`<div class="tb-scr tb-ledger">${bgHTML()}<div class="tb-top"><button class="tb-btn sm" id="ledgerback" onclick="titleGo('main')">${glyph('undo')}<span>Back</span></button><h2>Keeper's Ledger</h2><span class="tb-sp"></span></div>
   <div class="lp-bar2"><div class="lp-tabs">${tabs}</div></div><div class="lp-pagehead"><i>${lamplightMeaning(tier)}</i><span>${stage} of ${LEDGER_STAGES.length} pages found</span></div>

@@ -48,6 +48,7 @@ export function tick(st,hold){['weak','vuln','brittle','drench','reson'].forEach
 export function spawn(key,o={}){const t=EN[key];let hp=rng(t.hp[0],t.hp[1],cs);{const asc=(W.run&&W.run.asc)|0;if(asc>0){let m=asc>=5?1.16:1.08;if(asc>=2&&(t.elite||t.boss))m*=1.1;hp=Math.round(hp*m)}} // Ascension: more foe HP, no extra RNG
  const e={key,n:t.n,e:t.e,hp,max:hp,block:t.b0||0,st:Object.assign({},t.st0||{}),t:0,ci:0,ph:1,uid:nextId(),elite:t.elite,boss:t.boss,summoned:!!o.summoned,passive:t.passive||null};
  e.k=W.cb.ens.filter(x=>x.key===key).length;if(t.randomSprite){const nv=spriteCount('enemies',key);if(nv>1)e.sv=R(nv,'sprites')} // own stream: never shifts combat rolls
+ {const A=(W.run&&W.run.asc)|0;if(!e.summoned&&((A>=18&&!t.elite&&!t.boss)||(A>=19&&(t.elite||t.boss))))e.st.str=(e.st.str||0)+1} // Ascension 18/19: start with 1 Might
  W.cb.ens.push(e);e.next=t.ai(e);if(t.onSpawn)t.onSpawn(e);return e}
 export function countAlive(key){return alive().filter(x=>x.key===key).length}
 // ================= combat start =================
@@ -426,6 +427,7 @@ export const EC_BONUS_MAX=12; // rule 30: total Echo bonus per ring
 // land earlier in this enemy phase (the enemy's own Might from the move, ally buffs like Bark Orders / Grow, and Exposed from
 // enemies acting before it), so shown == taken. With o={str,vuln} it is computed from those exact values (used by act()).
 export function eAtk(e,a,o,raw){if(!o)o=phasePlanFor(e);let d=a+(e.st.str||0)+(e.st.mightTmp||0)+(o.str||0);if(e.elite&&d>0){const m=(ECON.eliteDmgByKey||{})[e.key]??ECON.eliteDmg??1;d=Math.max(1,Math.round(d*m))} // R1b elite damage (ECON)
+ {const A=(W.run&&W.run.asc)|0;if(A>=7&&d>0){const m=e.boss?(A>=17?1.12:1):e.elite?(A>=12?1.12:1):1.1;if(m>1)d=Math.round(d*m)}} // Ascension 7/12/17: normal foes +10%, elites +12%, bosses +12% (shown == taken)
  if(e.st.weak)d=Math.floor(d*.75);if(o.vuln)d=Math.floor(d*1.5);d=Math.max(0,d);
  if(d>0&&e.holds)d+=4; // R13: the Shard holder's attacks gain +4
  if(d>0&&!raw&&e.tailwind)d+=e.tailwind; // R10 Tailwind: the SHOWN first hit includes it (act() adds it to hit 1 only)
