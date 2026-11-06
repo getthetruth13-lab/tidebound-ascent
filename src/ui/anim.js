@@ -3,6 +3,8 @@
 //  (b) a timed ENTRY: {t0,total,apply(elapsed)} that syncCombatAnimations() re-applies to the new DOM with the elapsed time,
 //      so an animation resumes instead of restarting or vanishing when something re-renders mid-flight.
 import {shakeLayers} from './stage.js';
+import {syncRigs} from './rig.js';
+import {ENEMY_POSES} from '../assets.js';
 import {W} from '../core/state.js';
 import {settings} from '../save.js';
 import {CARDS} from '../core/registry.js';
@@ -10,10 +12,11 @@ import {observeEvents} from '../core/bus.js';
 import {playSound,duckMusic} from '../audio.js';
 import {deathStyleOf,DEATH_STYLES,BOSS_VARIANT,FINALE,DEATH_DRAIN} from './deathstyles.js';
 import {alive} from '../engine/combat.js';
-import {T,U,EB,HIT_WEIGHT} from '../core/timing.js';
-import {cardHTML} from './render.js';
+import {T,U,EB,HIT_WEIGHT,beatsFor} from '../core/timing.js';
+import {cardHTML,mapGhostTap} from './render.js';
 import {cloneCard,IMPACT_MS} from './fx.js';
 import * as PFX from './painted-fx.js';
+import {glideTo,lanternBusy} from './lantern.js';
 import {fxOn,motionOn,reducedMotion,fxQueue,emit,ring,vignette,shakeFrames,slowmo,freezeIdle,rectOf,setImpact,impactBase,crossfade,xfadeEl,flyIcon,cue,COL,CLASS_COL} from './vfx.js';
 const enabled=()=>motionOn();
 export const motionEnabled=enabled;
@@ -41,6 +44,28 @@ const later=(ms,fn)=>ms>0?fxQueue.push(T(ms),fn):fn();
 const laterU=(ms,fn)=>ms>0?fxQueue.push(U(ms),fn):fn();
 function burstAt(sel,kind,ms=0,...args){later(ms,()=>{const c=centre(sel);if(c)emit(kind,c.x,c.y,...args)})}
 function ringAt(sel,col,size,ms=0,ms2=360){later(ms,()=>{const c=centre(sel);if(c)ring(c.x,c.y,col,size,ms2)})}
+// Attack cutouts keep idle height and foot anchor; wider weapons/gestures may extend beyond the idle box.
+// 10-30 BS (single-pose-84): the pose file used to be fetched only when the strike swapped it in, so the first strike of a fight showed an
+// undecoded (blank) sprite for a frame or more (longer on a slow phone link). Poses are now warmed at the telegraph and only swapped in once decoded;
+// until then the idle stays up. Enemies without an atk pose never reach here (the idle simply lunges).
+const POSE_IMG=new Map();
+function warmPose(f){if(!f||typeof Image==='undefined')return null;let im=POSE_IMG.get(f);if(!im){im=new Image();im.decoding='async';im.src=f;
+ im.ready=(im.decode?im.decode():new Promise((ok,no)=>{im.onload=ok;im.onerror=no})).catch(()=>new Promise(r=>{if(im.complete)return r();im.onload=im.onerror=()=>r()}));POSE_IMG.set(f,im)}return im}
+const poseReady=im=>im&&im.complete&&im.naturalWidth>0;
+export function warmEnemyPoses(key){const p=ENEMY_POSES[key];if(p){warmPose(p.atk?.f);warmPose(p.fall?.f)}}
+function attackPose(sel,pose,total){
+ const touched=new Map(),t0=performance.now(),end=T(total),warm=warmPose(pose.f);
+ const swap=im=>{if(touched.has(im)||!im.isConnected)return;touched.set(im,{src:im.getAttribute('src'),style:im.getAttribute('style')});
+   im.src=pose.f;im.dataset.pose='atk';im.parentElement?.classList.add('posing');   /*v0.6.97: a rigged foe hides its img.spr under the idle rig; .posing shows the strike pose and hides the rig (css/anim.css)*/
+   const box=im.closest('.fig');const h=box.offsetHeight,w=h*pose.w/pose.h;
+   /*10-30 BS1: --bx is the idle's body anchor (sprite ax) in every fight; --ax centres plates and intents at .5 in group fights, which made poses jump sideways there*/const st=im.closest('.en').style,anchor=parseFloat(st.getPropertyValue('--bx'))||parseFloat(st.getPropertyValue('--ax'))||box.offsetWidth/2;
+   Object.assign(im.style,{height:h+'px',width:w+'px',left:(anchor-w*pose.ax)+'px',top:'auto',bottom:'0'})};
+ entry(total,elapsed=>{const im=sel&&$(sel+' img.spr');if(!im)return;
+  if(!touched.has(im)){if(!warm||poseReady(warm))swap(im);
+   else warm.ready.then(()=>{const cur=sel&&$(sel+' img.spr');if(cur===im&&poseReady(warm)&&performance.now()-t0<end*.8)swap(im)})}
+ });
+ setTimeout(()=>{for(const [im,old] of touched){if(im.dataset.pose!=='atk'||im.getAttribute('src')!==pose.f)continue;im.src=old.src;old.style==null?im.removeAttribute('style'):im.setAttribute('style',old.style);delete im.dataset.pose;im.parentElement?.classList.remove('posing')}},T(total));
+}
 // ---------- ghosts (persistent copies of a figure) ----------
 function ghost(selector,kind,opts={}){const source=selector&&$(selector);if(!source)return null;
  const fig=source.querySelector('.fig'),r=(fig||source).getBoundingClientRect();
@@ -61,7 +86,7 @@ let finalEnd=0,finaleTimer=0,finaleEls=[],finaleOn=false,rewardAt=0;
 const keep=el=>{finaleEls.push(el);return el};
 const drop=el=>{el.remove();finaleEls=finaleEls.filter(x=>x!==el)};
 // Remove every finale element and release the held screen. Always safe to call (new fight, tap, hidden tab).
-export function finaleCleanup(){clearTimeout(finaleTimer);finaleTimer=0;finaleEls.forEach(el=>el.remove());finaleEls=[];finaleOn=false;finalEnd=0;rewardAt=0;
+export function finaleCleanup(){finaleTs.forEach(clearTimeout);finaleTs=[];clearTimeout(finaleTimer);finaleTimer=0;finaleEls.forEach(el=>el.remove());finaleEls=[];finaleOn=false;finalEnd=0;rewardAt=0;
  document.body.classList.remove('battle-finale','finale-hide')}
 function skipFinale(){if(!finaleOn)return;xfadeEl()?.getAnimations().forEach(a=>{try{a.finish()}catch(_){}});holdUntil=0;finaleCleanup()}
 document.addEventListener('pointerdown',()=>{if(finaleOn&&performance.now()-finaleStart>T(350))skipFinale()},true);
@@ -149,12 +174,13 @@ function death(e,lead){const sel=enemy(e);const el=sel&&$(sel);if(!el)return;
 }
 // Boss kill: the reward screen shows ~0.6 s after the killing blow while the boss death and finale play on over it (sweep S2-1: it was hidden ~5 s).
 const BOSS_REWARD_AT=600;
-function scheduleFinale(delay,info){setTimeout(()=>document.body.classList.remove('finale-hide'),Math.max(0,(info.hideEnd||finalEnd)-performance.now()));
+let finaleTs=[];const fT=(fn,ms)=>{const t=setTimeout(fn,ms);finaleTs.push(t);return t}; // victory-sweep: finale timers are stored so a cleanup / the next fight can cancel them
+function scheduleFinale(delay,info){finaleTs.forEach(clearTimeout);finaleTs=[];fT(()=>document.body.classList.remove('finale-hide'),Math.max(0,(info.hideEnd||finalEnd)-performance.now()));
  clearTimeout(finaleTimer);finaleOn=true;if(info.hero)keep(info.hero.el);
  info.hero&&(info.hero.el.style.opacity=0);cue.victoryAt=performance.now()+delay;
  finaleTimer=setTimeout(()=>runFinale(info),delay);
- setTimeout(()=>{if(finalEnd&&performance.now()>finalEnd+T(900))finaleCleanup()},delay+T(1800));
- setTimeout(()=>finaleOn&&performance.now()>finalEnd+T(500)&&finaleCleanup(),delay+T(2600))}
+ fT(()=>{if(finalEnd&&performance.now()>finalEnd+T(900))finaleCleanup()},delay+T(1800));
+ fT(()=>finaleOn&&performance.now()>finalEnd+T(500)&&finaleCleanup(),delay+T(2600))}
 // The battle-won moment: a sweep of light, the hero's lantern flares, then the centred banner. All body-level, so rerenders can't disturb it.
 function runFinale({boss,kind,name,hero}){if(!finaleOn||document.hidden)return;finaleTimer=0;
  const part=(cls,html='')=>{const el=keep(document.createElement('div'));el.className=cls;el.setAttribute('aria-hidden','true');el.innerHTML=html;document.body.appendChild(el);return el};
@@ -234,10 +260,13 @@ observeEvents((event,c)=>{if(!W.cb||W.S.screen!=='combat')return;
   if(big||c.f?.flourish||c.f?.echo||c.f?.doubled){comboBeat(c.f?.flourish?'flourish':c.f?.echo?'echo':'critical',dealt/12);
    const number=W.cb.vfx.findLast(v=>v.who===t.uid&&v.txt==='-'+dealt);if(number)number.cls+=' combo-pop';}
   queue({k:'hit',sel:target,amount:dealt,big:!!big,boss:!!(t&&t.boss),kill:!!(t&&t.hp<=0),delay:IMPACT_MS,e:t});
+  if(t&&t.key==='gateplate'&&dealt>0&&fxOn())later(IMPACT_MS,()=>{const f=document.querySelector(target+' .fig');if(f)PFX.plateSpark(rectOf(f))});
   if(!c.hpLoss&&c.amount)queue({k:'blocked',sel:target})}
- if(event==='playerHit'){queue({k:'herohit',amount:c.amount,blocked:c.blocked,enemy:c.enemy})}
- if(event==='enemyTelegraph'){setImpact(0);queue({k:'telegraph',sel:enemy(c.enemy)})}
- if(event==='enemyAct'){setImpact(Math.round(110*EB().strike/370));queue({k:'estrike',sel:enemy(c.enemy)})}
+ if(event==='playerHit'){queue({k:'herohit',amount:c.amount,blocked:c.blocked,enemy:c.enemy,B:W.cb&&W.cb.beats||beatsFor(c.enemy,{a:1})})}
+ if(event==='combatStart'){for(const e of c.enemies||[])warmEnemyPoses(e?.key)}/*10-30: fetch + decode this fight's atk/fall poses up front*/
+ if(event==='enemyTelegraph'){setImpact(0);queue({k:'telegraph',sel:enemy(c.enemy),B:c.beats||beatsFor(c.enemy,{a:1}),e:c.enemy})}
+ if(event==='enemyStrike'){queue({k:'estrike',sel:enemy(c.enemy),B:c.beats,m:c.intent||{},e:c.enemy})}
+ if(event==='enemyAct'){setImpact(Math.round((W.cb&&W.cb.beats||EB()).impact||0))}
  if(event==='playerAttacked')setImpact(0);
  if(event==='enemyKilled'){const e=c.enemy;if(move){death(e,impactBase());queue({k:'shake',amp:(e.boss||e.elite)?7:3,delay:impactBase()})}else if(reducedMotion()&&fxOn())deathFade(e)}
  if(event==='draw')queue({k:'draw',uid:c.card.uid});
@@ -304,6 +333,7 @@ export function syncCombatAnimations(){
   if(!el.style.getPropertyValue('--idle-period'))el.style.setProperty('--idle-phase',`-${(Date.now()+hash*17+i*719)%(3800+hash%1700)}ms`);
   el.style.setProperty('--idle-period',`${3800+hash%1700}ms`);
  });
+ syncRigs();
  syncBars();syncResources();
  flush();
  const now=performance.now();entries=entries.filter(e=>now-e.t0<e.total);
@@ -345,18 +375,36 @@ function flush(){let recs=pending;pending=[];if(!recs.length)return;
    const a=r.boss&&r.big?8:r.big?5:2;later(r.delay,()=>shakeNow(a))}
   else if(r.k==='blocked'){burstAt(r.sel,'guard',IMPACT_MS);ringAt(r.sel,COL.pale,70,IMPACT_MS,300)}
   else if(r.k==='shake'){const a=r.amp;later(r.delay,()=>shakeNow(a))}
-  else if(r.k==='herohit'){const k=heroHits++,delay=Math.round((110+k*95)*EB().strike/370);
-   if(r.amount>0){const hf=EB().hit/355,s=(r.amount>=W.run.max*.15?90:55)*hf,dur=(s+300*hf);
-    entry(delay+dur,el=>play($('#hero .fig'),[{filter:'brightness(2.4) sepia(.6) hue-rotate(-30deg)',scale:'1.06',translate:'0 0',offset:0},{filter:'brightness(1.3)',scale:'1.05',translate:'0 0',offset:at(s,dur),easing:'ease-out'},{filter:'none',scale:'1',translate:'-10px 0',offset:at(s+90*hf,dur),easing:'ease-in-out'},{filter:'none',scale:'1',translate:'0 0',offset:1}],dur,el,delay));
+  else if(r.k==='herohit'){const k=heroHits++,B=r.B,delay=Math.round((B.impact||0)+k*(B.lead>0?B.hitGap:95*B.strike/370));
+   if(r.amount>0){const hf=EB().hit/355,ratio=r.amount/Math.max(1,W.run.max),big=ratio>=.15,s=B.lead>0?B.hitstop:(big?90:55)*hf,dur=(s+300*hf),rec=Math.min(22,8+r.amount*.9)*(B.shake||1);
+    entry(delay+dur,el=>play($('#hero .fig'),[{filter:'brightness(2.4) sepia(.6) hue-rotate(-30deg)',scale:'1.06',translate:'0 0',offset:0},{filter:'brightness(1.3)',scale:'1.05',translate:'0 0',offset:at(s,dur),easing:'ease-out'},{filter:'none',scale:'1',translate:`${-Math.round(rec)}px 0`,offset:at(s+90*hf,dur),easing:'ease-in-out'},{filter:'none',scale:'1',translate:'0 0',offset:1}],dur,el,delay));
     later(delay,()=>{freezeIdle($('#hero .fig'),s);const c=centre('#hero');if(c)emit('hit',c.x,c.y-c.h*.1,-1)});
-    const a=r.amount>=W.run.max*.15?(r.enemy&&r.enemy.boss?8:5):2;later(delay,()=>shakeNow(a));vig='red'}
+    const a=B.lead>0?Math.max(2,Math.min(12,Math.round((2+ratio*28)*(B.shake||1)))):(big?(r.enemy&&r.enemy.boss?8:5):2);later(delay,()=>shakeNow(a));vig='red'}
    if(r.blocked>0){later(delay,()=>{const c=centre('#hero');if(c){emit('guard',c.x+10,c.y);ring(c.x,c.y,COL.pale,80,320)}});if(!vig)vig='blue'}}
-  else if(r.k==='telegraph'){const sel=r.sel,B=EB(),tm=B.tele;
-   entry(tm+B.teleHold,el=>{play(figOf(sel),[{scale:'1 1',translate:'0 0',filter:'none',offset:0},{scale:'1.03 .94',translate:'0 0',filter:'brightness(1.3)',offset:.35,easing:'linear'},{scale:'1.03 .94',translate:'3px 0',filter:'brightness(1.35)',offset:.5},{scale:'1.03 .94',translate:'-3px 0',filter:'brightness(1.35)',offset:.65},{scale:'1.03 .94',translate:'0 0',filter:'brightness(1.3)',offset:1}],tm,el,0,'ease-out');
+  else if(r.k==='telegraph'){const sel=r.sel,B=r.B,tm=B.tele,w=B.w==='boss'?1.5:B.w==='elite'?1.25:1;warmEnemyPoses(r.e?.key);
+   entry(tm+B.teleHold,el=>{
+    if(B.dmg||B.lead<=0)play(figOf(sel),[{scale:'1 1',translate:'0 0',filter:'none',offset:0},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(6*w)}px 0`,filter:'brightness(1.3)',offset:.35,easing:'linear'},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(9*w)}px 0`,filter:'brightness(1.4)',offset:.5},{scale:`${1+.03*w} ${1-.07*w}`,translate:`${Math.round(7*w)}px 0`,filter:'brightness(1.4)',offset:.65},{scale:`${1+.03*w} ${1-.06*w}`,translate:`${Math.round(8*w)}px 0`,filter:'brightness(1.35)',offset:1}],tm,el,0,'ease-out');
+    else play(figOf(sel),[{scale:'1 1',translate:'0 0',filter:'none',offset:0},{scale:'1.04',translate:'0 -3px',filter:'brightness(1.35)',offset:1}],tm,el,0,'ease-out');
     const ic=$(sel+' .intentw');if(ic)play(ic,[{scale:'1.4',filter:'brightness(1.6)'},{scale:'1',filter:'none'}],tm*.96,el,0,'cubic-bezier(.2,1.4,.4,1)')})}
-  else if(r.k==='estrike'){const sel=r.sel,dir=-1,total=EB().strike,f=total/370;   // 370 = the classic stage sum 60+50+60+200
-   const st=n=>n*f;
-   entry(total,el=>play(figOf(sel),[{translate:'0 0',scale:'1 1',offset:0},{translate:`${-dir*7}px 0`,scale:'1.02 .97',offset:at(st(60),total),easing:'cubic-bezier(.2,.9,.3,1)'},{translate:`${dir*30}px 0`,scale:'1.06 .96',offset:at(st(110),total)},{translate:`${dir*30}px 0`,scale:'1.06 .96',offset:at(st(170),total),easing:'ease-out'},{translate:'0 0',scale:'1 1',offset:1}],total,el,0,'linear'))}
+  else if(r.k==='estrike'){ /* posesOn: see POSE_ACTS below */const sel=r.sel,dir=-1,B=r.B||EB(),m=r.m||{};
+   if(B.dmg||m.a||posesOn(m)){
+    const pose=ENEMY_POSES[r.e?.key]?.atk,total=B.lead>0?B.lead+B.hitstop+Math.max(0,B.hits-1)*B.hitGap+B.recover:B.strike;
+    if(pose)attackPose(sel,pose,total);
+    if(r.e?.key==='lenswright')later(B.lead||0,()=>{const im=sel&&$(sel+' img.spr');PFX.lensBeam(im?rectOf(im):centre(sel),centre('#hero'))});
+   }
+   if(!(B.lead>0)){const total=B.strike,f=total/370;   // 370 = the classic stage sum 60+50+60+200
+    const st=n=>n*f;
+    entry(total,el=>play(figOf(sel),[{translate:'0 0',scale:'1 1',offset:0},{translate:`${-dir*7}px 0`,scale:'1.02 .97',offset:at(st(60),total),easing:'cubic-bezier(.2,.9,.3,1)'},{translate:`${dir*30}px 0`,scale:'1.06 .96',offset:at(st(110),total)},{translate:`${dir*30}px 0`,scale:'1.06 .96',offset:at(st(170),total),easing:'ease-out'},{translate:'0 0',scale:'1 1',offset:1}],total,el,0,'linear'))}
+   else{const L=B.lead,H=B.hitstop+Math.max(0,B.hits-1)*B.hitGap,total=L+H+B.recover,w=B.w==='boss'?1.5:B.w==='elite'?1.25:1;
+    if(B.dmg){const d=Math.round(30*w),fr=[{translate:`${-dir*Math.round(8*w)}px 0`,scale:`${1+.03*w} ${1-.06*w}`,filter:'brightness(1.3)',offset:0,easing:'ease-out'},
+      {translate:`${-dir*Math.round(15*w)}px 0`,scale:`${1+.05*w} ${1-.09*w}`,filter:'brightness(1.35)',offset:at(L*.55,total),easing:'cubic-bezier(.7,0,1,.6)'},
+      {translate:`${dir*d}px 0`,scale:`${1+.06*w} ${1-.05*w}`,filter:'brightness(1.5)',offset:at(L,total),easing:'linear'}];
+     for(let i=1;i<B.hits;i++){fr.push({translate:`${dir*Math.round(d*.55)}px 0`,scale:'1.03 .98',filter:'brightness(1.2)',offset:at(L+i*B.hitGap-B.hitGap*.45,total),easing:'cubic-bezier(.7,0,1,.6)'});fr.push({translate:`${dir*d}px 0`,scale:`${1+.06*w} ${1-.05*w}`,filter:'brightness(1.5)',offset:at(L+i*B.hitGap,total),easing:'linear'})}
+     fr.push({translate:`${dir*d}px 0`,scale:`${1+.06*w} ${1-.05*w}`,filter:'brightness(1.4)',offset:at(L+H,total),easing:'ease-out'},{translate:'0 0',scale:'1 1',filter:'none',offset:1});
+     entry(total,el=>play(figOf(sel),fr,total,el,0,'linear'))}
+    else{entry(total,el=>play(figOf(sel),[{translate:'0 0',scale:'1 1',filter:'brightness(1.2)',offset:0,easing:'ease-out'},{translate:'0 -6px',scale:'1.07',filter:'brightness(1.8)',offset:at(L,total)},{translate:'0 -6px',scale:'1.07',filter:'brightness(1.6)',offset:at(L+50,total),easing:'ease-in-out'},{translate:'0 0',scale:'1 1',filter:'none',offset:1}],total,el,0,'linear'));
+     const col=m.heal||m.healAlly?COL.heal:m.b||m.allyB?COL.pale:m.s||m.allyS?COL.ember:m.summon?COL.kelp:m.steal||m.stealPotion?COL.gold:COL.echo;
+     ringAt(sel,col,96,L,380);burstAt(sel,'burst',L,col,8)}}}
   else if(r.k==='status'){statusFx(r)}
   else if(r.k==='draw'){const i=drawI++;const cb=W.cb;later(baseDraw+i*62,()=>{if(W.cb===cb&&!document.hidden)playSound('draw',.96+Math.random()*.08)});
    entry(baseDraw+draws.length*60+360,el=>{const card=$(`.hand .card[data-uid="${r.uid}"]`),pile=$('#drawpile');if(!card||!pile)return;
@@ -366,6 +414,11 @@ function flush(){let recs=pending;pending=[];if(!recs.length)return;
  if(draws.length)firstDrawn=true;
  if(vig)vignette(vig,vig==='red'?.5:.32,vig==='red'?420:320);
 }
+// 10-30 BS1: an enemy with an attack pose also strikes it on a move that deals no damage but acts on you (Pull, Seize, Gust, Numb, Storm Tide, Weak/Vuln/Brittle,
+// status cards, Drain, steals, Ringing, Lure) or carries strike:1 (the Engine rings' Pull and Charge spins). Block, buff, heal, cleanse and summon moves,
+// self-state moves (dive, surface, vent, discharge) and plain waits keep their hop.
+export const POSE_ACTS=['strike','pull','seize','muffle','gust','numb','tide','w','v','brittle','status','drainE','stealPotion','steal','ring','lure'];
+export const posesOn=m=>!!m&&POSE_ACTS.some(k=>m[k]);
 // Status-specific effects (R13), each under 400 ms.
 function statusFx(r){const sel=r.sel;if(!sel)return;const k=r.key;
  const fig=(frames,dur)=>entry(dur,el=>play(figOf(sel),frames,dur,el,0,'ease-out'));
@@ -397,23 +450,27 @@ function flipReveal(delay){const ws=$$('.rewgrid .rcw');ws.forEach((w,i)=>{const
   setTimeout(()=>card.classList.remove('foiling'),U(900))})})}
 // B061 reward tiles: each one flies from the fallen foes to its usual spot, one after another (design ms, see ANIMATION-TIMINGS.md)
 const TILE_FLY={ms:760,gap:640,lift:20};
-function flyInTiles(hold){const tiles=$$('.rewtiles .tile');if(!tiles.length)return;
+// v0.6.93 B8: while the tiles fly in they are live buttons -- one waiting its turn sits invisible over the remains, a flying one passes over
+// the landed ones. A tap on the tiles during the fly-in finishes it (all tiles snap to rest) and takes nothing (capture hook below).
+let tileFlights=[];
+function finishTileFlights(){const live=tileFlights.filter(a=>a.playState!=='finished'&&a.effect?.target?.isConnected);tileFlights=[];live.forEach(a=>{try{a.finish()}catch(_){}});return live.length}
+function flyInTiles(hold){const tiles=$$('.rewtiles .tile');if(!tiles.length)return;tileFlights=[];
  const rem=$$('.victory-wrap .remains').map(rectOf),ox=rem.length?rem.reduce((a,r)=>a+r.x,0)/rem.length:innerWidth*.72,oy=rem.length?rem.reduce((a,r)=>a+r.y,0)/rem.length:innerHeight*.55;
  const ban=$('.reward-banner');ban&&ban.animate&&ban.animate([{opacity:0,translate:'0 10px'},{opacity:1,translate:'0 0'}],{duration:U(520),delay:U(hold),easing:'ease-out',fill:'backwards'});
  const sub=$('#pksub');sub&&sub.animate&&sub.animate([{opacity:0},{opacity:1}],{duration:U(500),delay:U(hold+TILE_FLY.gap),easing:'ease-out',fill:'backwards'});
  tiles.forEach((el,i)=>{if(!el.animate)return;const r=rectOf(el),dx=ox-r.x,dy=oy-r.y,t0=hold+260+i*TILE_FLY.gap;
-  el.animate([{translate:`${dx}px ${dy}px`,scale:'.25',rotate:`${i%2?9:-9}deg`,opacity:0},{translate:`${dx*.35}px ${dy*.35-TILE_FLY.lift*3}px`,scale:'.7',rotate:`${i%2?-4:4}deg`,opacity:1,offset:.45},
-   {translate:`0 -${TILE_FLY.lift}px`,scale:'1.07',rotate:'0deg',opacity:1,offset:.82},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],{duration:U(TILE_FLY.ms),delay:U(t0),easing:'cubic-bezier(.3,.7,.35,1)',fill:'backwards'});
+  tileFlights.push(el.animate([{translate:`${dx}px ${dy}px`,scale:'.25',rotate:`${i%2?9:-9}deg`,opacity:0},{translate:`${dx*.35}px ${dy*.35-TILE_FLY.lift*3}px`,scale:'.7',rotate:`${i%2?-4:4}deg`,opacity:1,offset:.45},
+   {translate:`0 -${TILE_FLY.lift}px`,scale:'1.07',rotate:'0deg',opacity:1,offset:.82},{translate:'0 0',scale:'1',rotate:'0deg',opacity:1}],{duration:U(TILE_FLY.ms),delay:U(t0),easing:'cubic-bezier(.3,.7,.35,1)',fill:'backwards'}));
   laterU(t0+TILE_FLY.ms*.8,()=>{playSound('flip');ring(r.x,r.y,COL.gold,r.w?Math.min(r.w,160):90,380)})})}
 // Proceed: the hero turns toward the path and walks off to the right in a step-and-bob, the tiles and prompt fade; then the map (design ms)
 export const HERO_WALK={turn:260,walk:2300,steps:7,bob:7};
 let walking=false;
-function heroWalkOff(done){const hero=$('.victory-wrap .hero');if(!hero||!hero.animate||walking)return false;walking=true;
+function heroWalkOff(done){const hero=$('.victory-wrap .hero');if(!hero||!hero.animate||walking)return false;walking=true;const S0=W.S;$$('#app .rewtiles,#app .pk-foot,#app #proceed').forEach(el=>{el.style.pointerEvents='none'});
  const r=hero.getBoundingClientRect(),fig=hero.querySelector('.fig'),dist=innerWidth-r.left+40,W0=U(HERO_WALK.turn),W1=U(HERO_WALK.walk),tot=W0+W1;
  $$('.rewtiles .tile,#pksub,.reward-banner,.bossvic,.pk-foot').forEach(el=>el.animate&&el.animate([{opacity:1},{opacity:0}],{duration:U(420),easing:'ease-in',fill:'forwards'}));
  hero.querySelector('.plate')?.animate([{opacity:1},{opacity:0}],{duration:U(300),fill:'forwards'});
  const k=W0/tot;
- hero.animate([{translate:'0 0',scale:'1',offset:0},{translate:'0 0',scale:'.8 1',offset:k*.5},{translate:'0 0',scale:'1',offset:k},{translate:`${dist}px 0`,scale:'1',offset:1}],{duration:tot,easing:'linear',fill:'forwards'}).finished.then(()=>{walking=false;done()},()=>{walking=false;done()});
+ hero.animate([{translate:'0 0',scale:'1',offset:0},{translate:'0 0',scale:'.8 1',offset:k*.5},{translate:'0 0',scale:'1',offset:k},{translate:`${dist}px 0`,scale:'1',offset:1}],{duration:tot,easing:'linear',fill:'forwards'}).finished.then(()=>{walking=false;if(W.S===S0&&W.S.screen==='reward')done()},()=>{walking=false}); // victory-sweep: a cancelled walk (double Proceed, tap on a reward tile, re-render) must NOT call done() again: it re-ran rewDone (boss end -> map)
  // the walk's x-motion eases in on its own layer (the bob is on .fig so the two never fight over one property)
  if(fig&&fig.animate){const b=[{translate:'0 0',rotate:'0deg',offset:0},{translate:'0 0',rotate:'0deg',offset:k}];
   for(let i=0;i<HERO_WALK.steps*2;i++)b.push({translate:`0 ${i%2?0:-HERO_WALK.bob}px`,rotate:`${i%2?0:(i%4?-1.6:1.6)}deg`,offset:k+(1-k)*(i+1)/(HERO_WALK.steps*2),easing:'ease-in-out'});
@@ -432,6 +489,7 @@ function syncScreens(){if(!motionOn())return;const S=W.S,s=S.screen;
 }
 // capture-phase click hooks: flights start before the click's own handler re-renders the screen
 addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.closest)return;
+ if(tileFlights.length&&t.closest('.rewtiles')&&finishTileFlights()){ev.stopImmediatePropagation();ev.preventDefault();return}
  const card=t.closest('#confirmcard')&&W.S.cardSelected!=null&&!W.S.skipConfirm?$('.rewgrid .reward-selected .card'):null;
  if(card){const deck=$('#deckbtn');if(deck){const all=$$('.rewgrid .card').filter(c=>c!==card);const b=rectOf(deck),rects=new Map([card,...all].map(c=>[c,c.getBoundingClientRect()]));const {g,r}=cloneCard(card,rects.get(card));
    all.forEach(c=>{const o=cloneCard(c,rects.get(c));o.g.animate([{opacity:1},{opacity:0,transform:'translateY(18px) scale(.9)'}],{duration:U(260),easing:'ease-in'}).finished.then(()=>o.g.remove(),()=>o.g.remove())});
@@ -454,14 +512,11 @@ addEventListener('click',ev=>{if(!motionOn())return;const t=ev.target;if(!t.clos
  if(chest&&!chest.dataset.shaking){chest.dataset.shaking=1;ev.stopImmediatePropagation();ev.preventDefault();
   chest.animate([{translate:'0 0'},{translate:'-5px 0',rotate:'-3deg',offset:.15},{translate:'5px 0',rotate:'3deg',offset:.3},{translate:'-4px 0',rotate:'-2deg',offset:.45},{translate:'4px 0',rotate:'2deg',offset:.6},{translate:'0 0',rotate:'0deg'}],{duration:U(340)});
   setTimeout(()=>{if(window.openChestLid)window.openChestLid()},U(340))}
- // map travel: a lantern glides from the current node (or the foot of the map) to the chosen node while the old map lingers
- const node=t.closest('.node.av');
- if(node&&W.S.screen==='map'&&!W.S.ov){const cur=$('.node.cur'),from=cur?rectOf(cur):{x:innerWidth/2,y:innerHeight+20},to=rectOf(node);
-  const m=document.createElement('i');m.className='travelmark';m.setAttribute('aria-hidden','true');Object.assign(m.style,{left:from.x+'px',top:from.y+'px'});document.body.appendChild(m);
-  const dx=to.x-from.x,dy=to.y-from.y;let raf=0;const trail=()=>{if(!m.isConnected)return;const q=m.getBoundingClientRect();emit('trail',q.left+q.width/2,q.top+q.height/2,COL.gold);raf=requestAnimationFrame(trail)};raf=requestAnimationFrame(trail);
-  const end=()=>{cancelAnimationFrame(raf);m.remove();ring(to.x,to.y,COL.gold,56,320)};
-  m.animate([{transform:'translate(-50%,-50%) translate(0,0)'},{transform:`translate(-50%,-50%) translate(${dx*.5}px,${dy*.5-8}px)`,offset:.5},{transform:`translate(-50%,-50%) translate(${dx}px,${dy}px)`}],{duration:U(480),easing:'ease-in-out'}).finished.then(end,end);
-  holdFor(U(480))}
+ // map travel: the painted map lantern glides to the chosen node along the path; the room opens on arrival (ui/lantern.js). Input is locked meanwhile.
+ const mnode=t.closest('.node');
+ if(mnode&&W.S.screen==='map'&&!W.S.ov){if(lanternBusy()||mapGhostTap()){ // v0.6.93 B9: the second tap of a double tap that left the last room picks nothing
+ ev.stopImmediatePropagation();ev.preventDefault()}
+  else if(mnode.classList.contains('av')){const r=+mnode.dataset.r,i=+mnode.dataset.i;if(glideTo(mnode,()=>{if(W.S.screen==='map'&&!W.S.ov&&window.goNode)window.goNode(r,i)})){ev.stopImmediatePropagation();ev.preventDefault()}}}
 },true);
 // A collected reward's frame lifts away (its art flies to the HUD separately); the live slot is hidden by CSS so the other tiles stay put
 function rewardGhost(tile){const r=tile.getBoundingClientRect(),g=tile.cloneNode(true);g.removeAttribute('onclick');g.removeAttribute('id');g.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));g.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
@@ -472,8 +527,9 @@ function rewardGhost(tile){const r=tile.getBoundingClientRect(),g=tile.cloneNode
 function countUp(sel,from,to){if(from===to)return;const t0=performance.now(),dur=U(420);const tick=()=>{const el=$(sel);if(!el)return;const k=Math.min(1,(performance.now()-t0)/dur);const v=Math.round(from+(to-from)*k);
  const tn=[...el.childNodes].reverse().find(n=>n.nodeType===3);if(tn)tn.textContent=' '+v;if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
 // ---------- screen change: old screen lingers and fades (called by render()) ----------
-const quiet=new Set(['title']);
-export function screenChange(app,prev,next){if(prev!==next)document.querySelectorAll('.reward-ghost').forEach(g=>g.remove());if(!prev||prev===next||quiet.has(prev)||quiet.has(next))return;
+// Spencer 11-06: title used to be quiet, so Embark (title→map) wiped #app with no crossfade cover and flashed.
+// Title-internal view changes never hit screenChange (same screen). Menu dips stay for start→main etc.
+export function screenChange(app,prev,next){if(prev!==next)document.querySelectorAll('.reward-ghost').forEach(g=>g.remove());if(!prev||prev===next)return;
  if(next==='combat')finaleCleanup();const hero=W.run&&W.run.hp<=0&&prev==='combat';const hold=Math.max(prev==='combat'?deathHold():0,holdReal(),hero?U(700):0);
  if(hold)holdUntil=Math.max(holdUntil,performance.now()+hold);
  crossfade(app,{hold,ms:prev==='combat'?T(340):U(260),gray:hero});

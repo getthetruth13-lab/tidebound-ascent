@@ -6,6 +6,7 @@ import {observeEvents} from '../core/bus.js';
 import {CARDS,CLASSES,EN} from '../core/registry.js';
 import {DATA} from '../data/generated/data-v2.js';
 import {EARN,LAMP_XP,CLIMB_XP} from '../data/lamplight.js';
+import {overallFloor,TOTAL_FLOORS} from '../data/places.js';
 import {loadProfile,saveProfile,lockedFor,barOf,lampPending,climbPending} from '../progress.js';
 const CORE=DATA.v21.sim.core;
 // ================= Lantern Tasks: short optional goals, 3 per run (1 any-class + 2 for your class) =================
@@ -54,12 +55,12 @@ observeEvents(onEvent,{replay:true});
 // ================= settle =================
 // The run's Lamplight so far (same formula settleRun commits). Shared by settleRun and the battle-victory Lamplight bar.
 function tally(run,won,p){const L=run.lamp,cls=run.cls;
- const floors=Math.max(0,Math.min(15,run.floor||0)),tasksDone=L.tasks.filter(t=>t.done),newFirsts=L.firsts.filter(k=>{const [kind,id]=k.split(':');return !(p.seen[kind]&&p.seen[kind][id])});
+ const floors=Math.max(0,Math.min(TOTAL_FLOORS,overallFloor(run.act||1,run.floor||0))), /* v0.7.09: the whole climb counts (47 floors) */tasksDone=L.tasks.filter(t=>t.done),newFirsts=L.firsts.filter(k=>{const [kind,id]=k.split(':');return !(p.seen[kind]&&p.seen[kind][id])});
  const lines=[{k:'floors',label:`Floors reached (${floors})`,pts:floors*EARN.floor},{k:'fights',label:`Fights won (${L.fights})`,pts:L.fights*EARN.fight},
-  {k:'elites',label:`Elites felled (${L.elites})`,pts:L.elites*EARN.elite},{k:'boss',label:`${(EN[run.boss]||{}).n||'The boss'} silenced`,pts:L.boss*EARN.boss},{k:'win',label:'Act 1 cleared',pts:won?EARN.win:0},
+  {k:'elites',label:`Elites felled (${L.elites})`,pts:L.elites*EARN.elite},{k:'boss',label:L.boss>1?`Bosses silenced (${L.boss})`:`${(EN[run.boss]||{}).n||'The boss'} silenced`,pts:L.boss*EARN.boss},{k:'win',label:'The climb is done',pts:won?EARN.win:0},
   {k:'firsts',label:`First sightings (${newFirsts.length})`,pts:newFirsts.length*EARN.first},{k:'tasks',label:`Lantern Tasks (${tasksDone.length}/${L.tasks.length})`,pts:tasksDone.length*EARN.task}].filter(l=>l.pts>0);
  let sub=lines.reduce((a,l)=>a+l.pts,0);const mults=[];
- const tm=run.tidemark||0;if(tm>0){mults.push({label:`Tidemark ${tm}`,x:1+EARN.tidemark*tm})}
+ const tm=run.asc|0;if(tm>0){mults.push({label:`Ascension ${tm}`,x:1+EARN.tidemark*tm})} // +5% Lamplight per Ascension level (design-v2 Tidemark bonus)
  if((p.runs[cls]||0)<EARN.earlyRuns)mults.push({label:'Early climbs +50%',x:EARN.earlyBonus});
  let total=sub;for(const m of mults)total*=m.x;total=Math.round(total);
  return {floors,tasksDone,newFirsts,lines,mults,sub,total}}
@@ -76,7 +77,7 @@ export function settleRun(run,won){if(W.previewing)return null;const L=run.lamp;
  p.xp[cls]=before.lamp+total;p.climb=before.climb+total;p.runs[cls]=(p.runs[cls]||0)+1;if(won)p.wins[cls]=(p.wins[cls]||0)+1;p.tasks+=tasksDone.length;
  for(const k of newFirsts){const [kind,id]=k.split(':');(p.seen[kind]||(p.seen[kind]={}))[id]=1}
  p.best[cls]=Math.max(p.best[cls]||0,total);saveProfile(p);
- L.summary={cls,won:!!won,floor:floors,boss:run.boss,lines,mults,sub,total,before,after:{lamp:p.xp[cls],climb:p.climb},
+ L.summary={cls,won:!!won,floor:floors,act:run.act||1,at:Math.max(1,run.floor||0),boss:run.boss,lines,mults,sub,total,before,after:{lamp:p.xp[cls],climb:p.climb},
   lampBar:{from:barOf(before.lamp,LAMP_XP),to:barOf(p.xp[cls],LAMP_XP)},climbBar:{from:barOf(before.climb,CLIMB_XP),to:barOf(p.climb,CLIMB_XP)},
   lampPending:lampPending(p,cls),climbPending:climbPending(p),tasks:L.tasks.map(t=>({id:t.id,n:TASKS[t.id].n,done:t.done}))};
  return L.summary}

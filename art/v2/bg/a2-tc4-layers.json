@@ -1,0 +1,173 @@
+{
+ "id": "tc_a2",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 171.3,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate tc_a2_v2 (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-lamp-bracket.webp",
+   "px": [
+    228,
+    246
+   ],
+   "channels": 4,
+   "kb": 5.3,
+   "decoded_mb": 0.21,
+   "animated": false,
+   "reason": "wall-lamp bracket REBUILT in iron: builder-drawn flat iron post, arm and diagonal brace (the painted brace read as timber), cold dark iron, thin highlight, attached soft wall shadow",
+   "place": [
+    1028,
+    323
+   ],
+   "parallax": 0.4,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-lamp.webp",
+   "px": [
+    155,
+    203
+   ],
+   "channels": 4,
+   "kb": 4.1,
+   "decoded_mb": 0.12,
+   "animated": false,
+   "reason": "the wall lantern (single amber accent) cut tight; soft wall shadow",
+   "place": [
+    1142,
+    357
+   ],
+   "parallax": 0.4,
+   "role": "mid"
+  },
+  {
+   "file": "layers/rain-far.webp",
+   "px": [
+    1061,
+    611
+   ],
+   "channels": 4,
+   "kb": 61.7,
+   "decoded_mb": 2.47,
+   "animated": true,
+   "reason": "painted rain plate fx_rain_v4 (alpha only), falls with vec (-130, 300), op 0.07",
+   "effect": "rain",
+   "vec": [
+    -130,
+    300
+   ],
+   "op": 0.07,
+   "plate_src": "fx_rain_v4"
+  },
+  {
+   "file": "layers/rain-near.webp",
+   "px": [
+    1415,
+    814
+   ],
+   "channels": 4,
+   "kb": 95.0,
+   "decoded_mb": 4.39,
+   "animated": true,
+   "reason": "painted rain plate fx_rain_v4 (alpha only), falls with vec (-230, 520), op 0.09",
+   "effect": "rain",
+   "vec": [
+    -230,
+    520
+   ],
+   "op": 0.09,
+   "plate_src": "fx_rain_v4"
+  },
+  {
+   "file": "layers/mist-low.webp",
+   "px": [
+    2359,
+    308
+   ],
+   "channels": 4,
+   "kb": 291.6,
+   "decoded_mb": 2.77,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (wind R->L 280 px/6s), screen/alpha=luminance, screen y=620 h=300",
+   "effect": "mist",
+   "vec": [
+    -280,
+    0
+   ],
+   "op": 0.2,
+   "y": 620,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/lamp-glow.webp",
+   "px": [
+    529,
+    539
+   ],
+   "channels": 4,
+   "kb": 49.5,
+   "decoded_mb": 1.09,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    958,
+    210
+   ],
+   "op": 0.34
+  },
+  {
+   "file": "layers/lamp-flame-mask.png",
+   "px": [
+    80,
+    94
+   ],
+   "channels": 1,
+   "kb": 2.1,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1166,
+    427
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 680.6,
+  "mp4_kb": 957.8,
+  "decoded_mb": 18.3,
+  "n_layers": 8,
+  "n_animated": 5
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "text_panel_2340x1080": [
+  1500,
+  110,
+  800,
+  380
+ ],
+ "packaged": {
+  "layers": "art/v2/bg/a2-tc4-layers.json",
+  "loop": "art/v2/bg/a2-tc4-living.mp4",
+  "preview": "art/v2/bg/a2-tc4-living-preview.webp"
+ }
+}

@@ -1,0 +1,212 @@
+{
+ "id": "shop_a3",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 122.8,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate cefd3e7e (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-lantern-lit.webp",
+   "px": [
+    340,
+    499
+   ],
+   "channels": 4,
+   "kb": 16.5,
+   "decoded_mb": 0.65,
+   "animated": false,
+   "reason": "brass storm lantern in a glass cage on its iron chain, the single amber accent (only lit light); chain runs off the top edge so it stays attached",
+   "place": [
+    187,
+    0
+   ],
+   "parallax": 0.4,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-tarp.webp",
+   "px": [
+    558,
+    388
+   ],
+   "channels": 4,
+   "kb": 18.5,
+   "decoded_mb": 0.83,
+   "animated": true,
+   "reason": "ragged fringe of the hail-dented tarp (keyed against the sky): travelling ripple R->L, weight 0 where it joins the tarp body and stakes chain, so it never tears; the real wind mover",
+   "place": [
+    1182,
+    94
+   ],
+   "parallax": 0.1,
+   "role": "mid",
+   "effect": "wave",
+   "amp_view_px": 5.0,
+   "wavelength_view_px": 95,
+   "weight_rows_view": [
+    130,
+    205
+   ],
+   "note": "travelling ripple R->L (wind), weight 0 at the sewn top edge so the tarp stays attached; 2 gust pulses per loop, seamless"
+  },
+  {
+   "file": "layers/mid-tarp-wave-weight.png",
+   "px": [
+    558,
+    388
+   ],
+   "channels": 1,
+   "kb": 3.4,
+   "decoded_mb": 0.21,
+   "animated": true,
+   "reason": "per-pixel ripple weight for the tarp wave (0 = attached, 1 = free fringe)",
+   "effect": "wave-weight",
+   "place": [
+    1182,
+    94
+   ]
+  },
+  {
+   "file": "layers/hail-far.webp",
+   "px": [
+    749,
+    421
+   ],
+   "channels": 4,
+   "kb": 72.2,
+   "decoded_mb": 1.2,
+   "animated": true,
+   "reason": "painted rain plate e8f7c654 (alpha only), falls with vec (-515, 559), op 0.08",
+   "effect": "rain",
+   "vec": [
+    -515,
+    559
+   ],
+   "op": 0.08,
+   "plate_src": "e8f7c654"
+  },
+  {
+   "file": "layers/hail-near.webp",
+   "px": [
+    1170,
+    658
+   ],
+   "channels": 4,
+   "kb": 156.0,
+   "decoded_mb": 2.94,
+   "animated": true,
+   "reason": "painted rain plate e8f7c654 (alpha only), falls with vec (-780, 845), op 0.07",
+   "effect": "rain",
+   "vec": [
+    -780,
+    845
+   ],
+   "op": 0.07,
+   "plate_src": "e8f7c654"
+  },
+  {
+   "file": "layers/cloud-drift.webp",
+   "px": [
+    3393,
+    338
+   ],
+   "channels": 4,
+   "kb": 401.7,
+   "decoded_mb": 4.37,
+   "animated": true,
+   "reason": "painted effect plate 58dd41aa (wind R->L 360 px/6s), screen/alpha=luminance, screen y=300 h=330",
+   "effect": "mist",
+   "vec": [
+    -360,
+    0
+   ],
+   "op": 0.16,
+   "y": 300,
+   "plate_src": "58dd41aa"
+  },
+  {
+   "file": "layers/mist-floor.webp",
+   "px": [
+    2340,
+    248
+   ],
+   "channels": 4,
+   "kb": 230.8,
+   "decoded_mb": 2.21,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (wind R->L 240 px/6s), screen/alpha=luminance, screen y=840 h=240",
+   "effect": "mist",
+   "vec": [
+    -240,
+    0
+   ],
+   "op": 0.05,
+   "y": 840,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/lantern-glow.webp",
+   "px": [
+    1404,
+    852
+   ],
+   "channels": 4,
+   "kb": 161.0,
+   "decoded_mb": 4.56,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    0,
+    0
+   ],
+   "op": 0.34
+  },
+  {
+   "file": "layers/lantern-flame-mask.png",
+   "px": [
+    101,
+    104
+   ],
+   "channels": 1,
+   "kb": 5.0,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    305,
+    235
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 1187.9,
+  "mp4_kb": 758.3,
+  "decoded_mb": 24.2,
+  "n_layers": 10,
+  "n_animated": 8
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "packaged": {
+  "layers": "art/v2/bg/a3-shop1c3-layers.json",
+  "loop": "art/v2/bg/a3-shop1c3-living.mp4",
+  "preview": "art/v2/bg/a3-shop1c3-living-preview.webp"
+ }
+}

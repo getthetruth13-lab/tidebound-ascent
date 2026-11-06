@@ -1,0 +1,221 @@
+{
+ "id": "tr_a1a2",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 102.2,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate tr_a1a2_v2 (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-bearer.webp",
+   "px": [
+    418,
+    684
+   ],
+   "channels": 4,
+   "kb": 26.2,
+   "decoded_mb": 1.09,
+   "animated": false,
+   "reason": "Lantern bearer v4: cloaked figure from plate 64a2a619, tight polygon, opaque boots, dark attached contact shadow and boot contact lines, no pale box; hand lantern dimmed",
+   "place": [
+    130,
+    358
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-iron-gate.webp",
+   "px": [
+    496,
+    658
+   ],
+   "channels": 4,
+   "kb": 21.9,
+   "decoded_mb": 1.24,
+   "animated": false,
+   "reason": "Bell Gate: wrought iron gate in its arch (plate 819b54bc); sill shadow",
+   "place": [
+    622,
+    263
+   ],
+   "parallax": 0.3,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mist-still-left.webp",
+   "px": [
+    2360,
+    363
+   ],
+   "channels": 4,
+   "kb": 353.2,
+   "decoded_mb": 3.27,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (still vertical rise 55 px/6s), screen/alpha=luminance, screen y=700 h=300",
+   "effect": "mist",
+   "vec": [
+    0,
+    -55
+   ],
+   "op": 0.15,
+   "y": 700,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/rain-right.webp",
+   "px": [
+    1416,
+    817
+   ],
+   "channels": 4,
+   "kb": 95.5,
+   "decoded_mb": 4.41,
+   "animated": true,
+   "reason": "painted rain plate fx_rain_v4 (alpha only), falls with vec (-230, 520), op 0.1",
+   "effect": "rain",
+   "vec": [
+    -230,
+    520
+   ],
+   "op": 0.1,
+   "plate_src": "fx_rain_v4"
+  },
+  {
+   "file": "layers/mist-right.webp",
+   "px": [
+    2360,
+    288
+   ],
+   "channels": 4,
+   "kb": 271.8,
+   "decoded_mb": 2.59,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (wind R->L 280 px/6s), screen/alpha=luminance, screen y=700 h=280",
+   "effect": "mist",
+   "vec": [
+    -280,
+    0
+   ],
+   "op": 0.24,
+   "y": 700,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/bell-glow.webp",
+   "px": [
+    1471,
+    612
+   ],
+   "channels": 4,
+   "kb": 104.4,
+   "decoded_mb": 3.43,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    127,
+    0
+   ],
+   "op": 0.12
+  },
+  {
+   "file": "layers/bell-flame-mask.png",
+   "px": [
+    132,
+    119
+   ],
+   "channels": 1,
+   "kb": 4.4,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    498,
+    17
+   ]
+  },
+  {
+   "file": "layers/lantern-glow.webp",
+   "px": [
+    588,
+    743
+   ],
+   "channels": 4,
+   "kb": 117.7,
+   "decoded_mb": 1.67,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    0,
+    312
+   ],
+   "op": 0.24
+  },
+  {
+   "file": "layers/lantern-pool.webp",
+   "px": [
+    596,
+    156
+   ],
+   "channels": 4,
+   "kb": 56.6,
+   "decoded_mb": 0.35,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    0,
+    924
+   ],
+   "op": 0.2
+  },
+  {
+   "file": "layers/lantern-flame-mask.png",
+   "px": [
+    62,
+    59
+   ],
+   "channels": 1,
+   "kb": 1.7,
+   "decoded_mb": 0.0,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    179,
+    675
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 1155.6,
+  "mp4_kb": 564.6,
+  "decoded_mb": 25.3,
+  "n_layers": 11,
+  "n_animated": 8
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "packaged": {
+  "layers": "art/v2/bg/a2-tr4-layers.json",
+  "loop": "art/v2/bg/a2-tr4-living.mp4",
+  "preview": "art/v2/bg/a2-tr4-living-preview.webp"
+ }
+}

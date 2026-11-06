@@ -79,6 +79,8 @@
 .end{padding:0}
 .end.withlamp{position:fixed;inset:48px var(--sf-x) var(--sf-b);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:28px;align-items:center;max-width:none;max-height:none;overflow:auto;padding:0;margin:0;text-align:center}
 .end:not(.withlamp){padding-top:12vh}
+/* v0.6.90: the lamp end screen starts under the relic row (top 88 + relic 55x1.2 + 8 gap = 162 HUD units; 58px at 1080/384), not at a fixed 48px that sat inside it (topbar-shared game-over). */
+@media(orientation:landscape){.end.withlamp{top:calc(162 * var(--hud-unit, calc(100dvh / 1080)))}.end.withlamp .endl{gap:4px}}
 .end .endl{display:flex;flex-direction:column;align-items:center;gap:6px}
 .end .endl .big{font-size:54px;line-height:1;color:#d9b46a}.end .endl .big .gi{width:1em;height:1em;color:#d9b46a;filter:drop-shadow(0 0 12px #d9b46a66)}
 .end .endl .sub{margin:0;font:italic 400 16px/1.3 var(--serif);color:var(--cream-dim);max-width:34em}
@@ -98,10 +100,19 @@
 .end .lp-btns .btn{min-height:44px;font-size:13px;white-space:nowrap}
 /* toasts (Lantern Task etc.) stay off the title: bottom-left of the safe frame on every non-combat page */
 .page .toasts{top:auto;bottom:calc(var(--foot-h) + 4px);left:var(--sf-x);right:auto;align-items:flex-start}
+/* camp: the foot strip is empty, so toasts sit in it side by side, below the camp tiles (v0.6.94: they covered the bottom of Mend / Forge) */
+.page.fit-rest .toasts{bottom:var(--sf-b);flex-direction:row;align-items:flex-end;max-width:calc(100vw - 2*var(--sf-x))}
 /* ---- tap targets: icons keep their size, the hit area grows to >= 44x40 (about 9mm on the S24) ---- */
 .topbar .mini,.topbar .potion,.topbar .relics>*{position:relative}
 .topbar .mini::after,.topbar .potion::after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:max(100%,var(--tap));transform:translateY(-50%)}
 .topbar .mini{min-width:44px;min-height:40px}
+/* PICKETROPE: in the fixed battle / run top bar the four .mini hit areas are an invisible 32 CSS px zone around each icon (nothing drawn
+   differently, nothing moves): 14/26 hud-units above/below, and map / deck / settings split the strip 736-768 / 768-800 / 800-832 px (at 832 wide)
+   with no overlap. The lamp is already wider than 32. */
+:is(.combat,.runhud) .topbar>.mini::after{top:calc(-14*var(--hud-unit));bottom:calc(-26*var(--hud-unit));height:auto;transform:none;left:-6px;right:-6px}
+:is(.combat,.runhud) .topbar>#mapbtn::after{left:-1.71vw;right:0}
+:is(.combat,.runhud) .topbar>#deckbtn::after{left:-.42vw;right:-1.28vw}
+:is(.combat,.runhud) .topbar>#setbtn::after{left:-.21vw;right:-1.5vw}
 /* ---- checkboxes: label right next to the box, same on both columns ---- */
 .chk{display:inline-flex;align-items:center;gap:10px;cursor:pointer;min-height:var(--tap);font:500 15px var(--serif);color:var(--cream)}
 .chk input{width:22px;height:22px;accent-color:#d9b46a;flex:none;margin:0}
@@ -181,3 +192,11 @@
  .page.fit-shop .pk-shop .shelf.relics,.page.fit-shop .pk-shop .shelf.potions{gap:6px}
  .page.fit-shop .pk-shop .shelfrow{gap:12px}
 }
+
+/* B-051 run summary path strip */
+.endpath{display:flex;flex-wrap:wrap;gap:3px 4px;justify-content:center;max-width:30em;margin:4px 0 2px}
+.endpath .ep{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;color:#a99a76;opacity:.85}
+.endpath .ep svg,.endpath .ep img{width:100%;height:100%}
+.endpath .ep-elite{color:#d98b6a}.endpath .ep-boss{color:#e8c872}.endpath .ep-rest{color:#8fc3a0}
+/* v0.7.02: reward fallback exit (only drawn if a reward sub-screen ever renders without Proceed / Skip) */
+.rew-fallback{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));z-index:60}

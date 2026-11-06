@@ -63,3 +63,11 @@
 @keyframes evshake{0%,100%{transform:none}20%{transform:translate(-5px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,0)}}
 @media (max-height:420px){.evtext{top:56px}.evscene{--u:clamp(11px,3.2vh,30px)}}
 @media (prefers-reduced-motion:reduce){.evbg img{animation:none}}
+
+/* v0.6.43 (Act 2 scenes wired as-is, below the 9 review bar): Act 2 events show the painted ev_a2_* room env behind the words */
+body.a2-room .page.fit-event{background:transparent}
+.evscene.a2env .evbg{background:none}
+.evscene.a2env .evbg>*{display:none}
+body.a2-room.scene-choice #env .envstack,body.a2-room.scene-choice #env-front .envstack{filter:none}
+body.a2-room.scene-choice #env .envlv-water,body.a2-room.scene-choice #env .envlv-swell{display:block}
+body.a2-room.scene-choice #env .envlv *{animation-play-state:running!important}

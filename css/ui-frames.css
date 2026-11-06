@@ -56,3 +56,21 @@ img.pot-ic{display:inline-block;width:1.35em;height:1.35em;vertical-align:-.3em;
 /* v0.6.5: long tile titles wrap at spaces and never spill past the frame; JS (fitTileNames) shrinks further if one word is too wide */
 .tile .tname{white-space:normal;overflow-wrap:normal;text-wrap:balance;box-sizing:border-box;max-width:calc(100% - 4px);overflow:hidden;text-overflow:clip}
 .tile .tname.fit{letter-spacing:0;padding-left:3px;padding-right:3px}
+
+/* ---- 6. relic / potion tiles (reward-tiles fix, Spencer 2026-10-13): every screen (victory rewards, boss relics, potion swap / pick,
+   Lamplight) shows the painted pedestal scene filling the art area and the item's own painted icon standing on it, large and centred.
+   The icon is an in-flow block (.ticon, tiles.js) that takes all the height above the name plate, so it can never collapse into a
+   corner; the rarity / POTION tag sits inside the bronze frame, clear of the icon. ---- */
+.tile.sp:is(.k-relic,.k-potion) .tart{background:#07090c}
+.tile.sp:is(.k-relic,.k-potion) .tart::after{display:none}
+.tile.sp:is(.k-relic,.k-potion) .tart>.emb{display:block;background:#07090c}
+.tile.sp:is(.k-relic,.k-potion) .tart>.emb img{object-fit:cover;object-position:50% 34%;filter:brightness(1.08)}
+.tile.sp:is(.k-relic,.k-potion) .tart>.emb .ph{display:none}
+.tile.sp .ticon{position:relative;z-index:3;flex:1 1 0;min-height:calc(var(--th,200px)*.3);width:100%;box-sizing:border-box;padding:calc(var(--fb,14px) + 14px) 0 2px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.tile.sp .ticon::after{content:'';position:absolute;left:50%;bottom:0;width:46%;height:12%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,#000c 0,#0000 70%);z-index:-1}
+.tile.sp .ticon>.slot{position:relative;inset:auto;transform:none;height:100%;width:auto;aspect-ratio:1;max-width:66%;margin:0;border:0;border-radius:0;background:none;box-shadow:none;
+ filter:drop-shadow(0 5px 5px #000d) drop-shadow(0 0 12px color-mix(in srgb,var(--cg,#ffb347) 40%,transparent));--phs:calc(var(--th,200px)*.24)}
+.tile.sp .ticon>.slot>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.tile.sp .ticon>.slot>.ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:none;font-size:var(--phs)}
+.tile.sp .ticon>.slot.has-img>.ph{display:none}
+.tile.sp .ttag{top:calc(var(--fb) - 1px);left:calc(var(--fb) + 1px);max-width:calc(100% - var(--fb)*2 - 2px);font-size:clamp(8.5px,calc(var(--th,200px)*.055),11px);line-height:1.15;background:none;border:0;white-space:nowrap;overflow:hidden;text-overflow:clip}

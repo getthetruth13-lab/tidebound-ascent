@@ -1,0 +1,274 @@
+{
+ "id": "ev_a2_yard",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 70.9,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate 85c49ccd (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-quay-wall.webp",
+   "px": [
+    1374,
+    795
+   ],
+   "channels": 4,
+   "kb": 51.6,
+   "decoded_mb": 4.17,
+   "animated": false,
+   "reason": "distant stone quay arcade for the right half (painted quay plate d9b12aa4, soft-edged polygon cut, no ships), fading into the fog",
+   "place": [
+    966,
+    0
+   ],
+   "parallax": 0.1,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-gate-leaf.webp",
+   "px": [
+    751,
+    926
+   ],
+   "channels": 4,
+   "kb": 39.0,
+   "decoded_mb": 2.65,
+   "animated": false,
+   "reason": "riveted iron-plate double gate in its stone arch (plate 85c49ccd); sill shadow",
+   "place": [
+    267,
+    0
+   ],
+   "parallax": 0.4,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-bollard-near.webp",
+   "px": [
+    291,
+    271
+   ],
+   "channels": 4,
+   "kb": 5.8,
+   "decoded_mb": 0.3,
+   "animated": false,
+   "reason": "iron bollard, near; moved up out of the bottom strip, own crisp oval shadow",
+   "place": [
+    650,
+    644
+   ],
+   "parallax": 0.55,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-bollard-mid.webp",
+   "px": [
+    268,
+    262
+   ],
+   "channels": 4,
+   "kb": 5.2,
+   "decoded_mb": 0.27,
+   "animated": false,
+   "reason": "iron bollard, centre; moved up out of the bottom strip, own oval shadow",
+   "place": [
+    1313,
+    653
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-bollard-far.webp",
+   "px": [
+    200,
+    230
+   ],
+   "channels": 4,
+   "kb": 3.4,
+   "decoded_mb": 0.18,
+   "animated": false,
+   "reason": "far iron bollard; own oval shadow",
+   "place": [
+    1523,
+    663
+   ],
+   "parallax": 0.35,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-bollard-right.webp",
+   "px": [
+    214,
+    230
+   ],
+   "channels": 4,
+   "kb": 3.5,
+   "decoded_mb": 0.19,
+   "animated": false,
+   "reason": "far right iron bollard; own oval shadow",
+   "place": [
+    1948,
+    736
+   ],
+   "parallax": 0.35,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-chain-coil.webp",
+   "px": [
+    440,
+    194
+   ],
+   "channels": 4,
+   "kb": 22.7,
+   "decoded_mb": 0.33,
+   "animated": false,
+   "reason": "coiled iron chain lying at the gate foot, left of the card, wholly above canvas y~870 (GenerateImage candidate chain-B c74be0e7 keyed from pure black, tight to the links, no floor mat); connected contact shadow (link footprints + soft ellipse + AO) on the real cobbles",
+   "place": [
+    145,
+    712
+   ],
+   "parallax": 0.55,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-quay-lantern.webp",
+   "px": [
+    255,
+    538
+   ],
+   "channels": 4,
+   "kb": 12.4,
+   "decoded_mb": 0.52,
+   "animated": false,
+   "reason": "iron quay lantern on a stepped iron base, the amber accent, right of the card (candidate lantern-A 3500a5f2 keyed from pure black, edge-decontaminated: no grey halo); connected base shadow; flame at the old glow point",
+   "place": [
+    1641,
+    369
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/mid-notice-board.webp",
+   "px": [
+    352,
+    375
+   ],
+   "channels": 4,
+   "kb": 12.2,
+   "decoded_mb": 0.5,
+   "animated": false,
+   "reason": "blank riveted iron notice board on one iron post with bolted flange (candidate board-C 08ac36b6, keyed from black, no lettering); face darkened to the scene grade; painted warm rim (screen, plate f2f0f758) on the lantern-facing frame; connected foot shadow on the lit cobbles",
+   "place": [
+    1792,
+    538
+   ],
+   "parallax": 0.45,
+   "role": "mid"
+  },
+  {
+   "file": "layers/rain-near.webp",
+   "px": [
+    1498,
+    948
+   ],
+   "channels": 4,
+   "kb": 134.3,
+   "decoded_mb": 5.42,
+   "animated": true,
+   "reason": "painted rain plate ce9d92c6 (alpha only), falls with vec (-150, 520), op 0.07",
+   "effect": "rain",
+   "vec": [
+    -150,
+    520
+   ],
+   "op": 0.07,
+   "plate_src": "ce9d92c6"
+  },
+  {
+   "file": "layers/mist-low.webp",
+   "px": [
+    2340,
+    308
+   ],
+   "channels": 4,
+   "kb": 290.1,
+   "decoded_mb": 2.75,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (wind R->L 300 px/6s), screen/alpha=luminance, screen y=640 h=300",
+   "effect": "mist",
+   "vec": [
+    -300,
+    0
+   ],
+   "op": 0.2,
+   "y": 640,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/lantern-glow.webp",
+   "px": [
+    1510,
+    1037
+   ],
+   "channels": 4,
+   "kb": 203.8,
+   "decoded_mb": 5.97,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    705,
+    32
+   ],
+   "op": 0.26
+  },
+  {
+   "file": "layers/lantern-flame-mask.png",
+   "px": [
+    70,
+    36
+   ],
+   "channels": 1,
+   "kb": 0.7,
+   "decoded_mb": 0.0,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1727,
+    478
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 855.6,
+  "mp4_kb": 1322.0,
+  "decoded_mb": 30.5,
+  "n_layers": 14,
+  "n_animated": 4
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "packaged": {
+  "layers": "art/v2/bg/a2-evyard6-layers.json",
+  "loop": "art/v2/bg/a2-evyard6-living.mp4",
+  "preview": "art/v2/bg/a2-evyard6-living-preview.webp"
+ }
+}

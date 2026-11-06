@@ -40,6 +40,7 @@ export function introNext(){if(W.S.screen!=='title'||W.S.view!=='intro')return;c
 function introDone(){clearTimeout(timer);const replay=W.S.replay;settings.introSeen=true;saveSettings();
  dip(()=>{W.S=replay?{screen:'title',view:'learn',page:0}:{screen:'title',view:'select',page:0,hero:null};render()})}
 export function introSkip(){introDone()}
-// Every New Game opens the cinematic; Continue and Load use their own paths.
-export function newGame(){introStart(false)}
+// v0.6.99 (D4, same as Slay the Spire): New Game goes straight to character select, no cinematic in between.
+// The cinematic stays on Learn to Play (introStart(true)). Continue and Load use their own paths.
+export function newGame(){dip(()=>{W.S={screen:'title',view:'select',page:0,hero:null};render()})}
 export function setSkipIntro(on){settings.skipIntro=!!on;saveSettings()}

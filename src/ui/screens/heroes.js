@@ -6,7 +6,7 @@ export const HEROES={
  tide:{epithet:'Moon-Sworn Keeper of the Tides',
   blurb:'A patient caster who bends the sea itself: raise it, lower it, and let it break over every foe.',
   lore:['The sea once answered every word the keepers spoke. Then the sun sank, and the water forgot its manners.',
-   'You kept the moon-tables at Saltmere until the lowest tide in a generation bared the Drowned Stair, a mountain-city of landings.',
+   'You kept the moon-tables at Saltmere until the lowest tide in a generation bared the Ebb Stair, a mountain-city of landings.',
    'The moonshell at your belt still hums in time with the waves.',
    'You climb to make the sea answer to you again.'],
   plain:'A tide meter runs from 0 to 10. From your second turn it drifts after you draw. Surge and Recede cards push it. Reach 10 for a Crest that hits every enemy; reach 0 for an Undertow that gives Guard and a card.',

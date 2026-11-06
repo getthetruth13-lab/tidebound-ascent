@@ -14,12 +14,14 @@
 // The full list of events and modifiers the engine fires is in README.md ("Engine hooks").
 import {W} from './state.js';
 import {CARDS,RELICS,POTIONS,CHARMS} from './registry.js';
+import {DAILY_MODS} from '../data/daily.js';
 export const HAND_EVENTS=new Set(['turnEndInHand','whileInHand']);
 export const HAND_MODS=new Set(['cost','canPlay']);
 export function sources(event){const out=[],cb=W.cb,run=W.run;
  if(cb&&cb.fx)for(const l of cb.fx)if(!l.dead)out.push({kind:'turn',def:l,inst:l});
  if(run&&run.relics)for(const r of run.relics){const def=RELICS[typeof r==='string'?r:r.id];if(def)out.push({kind:'relic',def,inst:r})}
  if(run&&run.charms)for(const c of run.charms){const def=CHARMS[c];if(def)out.push({kind:'charm',def,inst:c})}
+ if(run&&run.mods)for(const id of run.mods){const def=DAILY_MODS[id];if(def)out.push({kind:'daily',def,inst:id})}
  if(cb&&cb.powers)for(const p of cb.powers){const def=CARDS[p.id];if(def)out.push({kind:'power',def,inst:p})}
  if(cb&&cb.slots)for(const w of cb.slots){const def=CARDS[w.id];if(def)out.push({kind:'waypoint',def,inst:w})}
  if(cb&&cb.hand&&(HAND_EVENTS.has(event)||HAND_MODS.has(event)))for(const c of cb.hand){const def=CARDS[c.id];if(def)out.push({kind:'hand',def,inst:c})}

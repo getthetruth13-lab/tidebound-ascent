@@ -449,7 +449,7 @@ body.env-on .page{background:transparent}
 .intent.mirror{border-color:var(--echo-mage-primary)}
 /* travel / title card */
 .page.travel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;min-height:100dvh;cursor:pointer;text-align:center;background:radial-gradient(ellipse 70% 60% at 50% 50%,#05070b99,transparent 75%)}
-.tcard{animation:tcard 1.4s ease-out both}
+.tcard:not(.opt){animation:tcard 1.4s ease-out both}
 .tcard .act{font:700 14px var(--font-display);letter-spacing:.4em;color:var(--ui-text-muted)}
 .tcard h1{font-size:clamp(30px,7vw,52px);margin:4px 0}
 .tcard .boss{margin-top:10px;font-size:14px}
@@ -637,7 +637,7 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
 .combat .en.hot .shadow::after{border-color:color-mix(in srgb,var(--status-energy) 75%,transparent)}
 .combat .en.hot .fig{filter:drop-shadow(0 0 1px color-mix(in srgb,var(--status-energy) 50%,transparent)) drop-shadow(0 0 1px color-mix(in srgb,var(--status-energy) 50%,transparent))}
 /* env rim light on enemy sprites (--env-rim colour, --env-rim-s strength set per scene by ui/env.js; 0 = off) */
-.combat .en img.spr{filter:drop-shadow(-1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(0 0 5px color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent))}
+.combat .en img.spr,.combat .remains>img/*10-30 BS1: fallen sprites take the idle's filter path*/{filter:drop-shadow(-1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(1.5px -1px 0 color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent)) drop-shadow(0 0 5px color-mix(in srgb,var(--env-rim,#8fa3c7) calc(var(--env-rim-s,0)*100%),transparent))}
 /* status / relic / potion icons */
 .bd .uic{width:16px;height:16px;display:inline-block;flex:none}
 .combat .stw .bd .uic{width:18px;height:18px}
@@ -771,7 +771,7 @@ body.env-combat #env-front .envstack{-webkit-mask-image:linear-gradient(to botto
  .combat .scene{position:absolute;inset:0;display:block;padding:0}
  .combat .scene::before,.combat .scene .ground{display:none}
  .combat .fig>.slot.spr-slot{aspect-ratio:auto!important}
- .combat .fig>.slot.spr-slot>img.spr{filter:var(--stage-grade) drop-shadow(var(--stage-light) -1px 1px color-mix(in srgb,var(--stage-rim) 38%,transparent)) drop-shadow(0 2px 2px #0008)}
+ .combat .fig>.slot.spr-slot>img.spr,.combat .remains>img{filter:var(--stage-grade) drop-shadow(var(--stage-light) -1px 1px color-mix(in srgb,var(--stage-rim) 38%,transparent)) drop-shadow(0 2px 2px #0008)}
  /* Task 59: contact shadow = soft radial ellipse (~0.7 sprite width, .55) + a 3px dark core; bosses wider, floaters smaller and offset (sizes set in render.js) */
  .combat .shadow{background:radial-gradient(ellipse,#000 0%,#000a 38%,#0003 62%,transparent 74%);opacity:.55}
  .combat .shadow::before{content:'';position:absolute;left:22%;right:22%;top:calc(50% - 1.5px);height:3px;border-radius:50%;background:#000;filter:blur(1px)}
@@ -1133,7 +1133,7 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
 
 /* Task 41: measured 2340×1080 battle baseline, scaled by height and UI size. */
 @media(orientation:landscape){
- .combat,.runhud{--unit:calc(100dvh / 1080);--hud-unit:calc(var(--unit)*1);--topbar-h:calc(78*var(--hud-unit));--hud-icon:calc(40*var(--hud-unit));--hud-text:calc(30*var(--hud-unit));--hud-gap:calc(8*var(--hud-unit));--edge:calc(20*var(--hud-unit));--relic-cell:calc(63*var(--hud-unit))}
+ .combat,.runhud{--unit:calc(100dvh / 1080);--hud-unit:calc(var(--unit)*1);--topbar-h:calc(78*var(--hud-unit));--hud-icon:calc(40*var(--hud-unit));--hud-text:calc(30*var(--hud-unit));--hud-gap:calc(8*var(--hud-unit));--edge:calc(20*var(--hud-unit));--relic-cell:calc(63*var(--hud-unit));--relic-scale:1.2;--relic-size:calc(55*var(--hud-unit)*var(--relic-scale))}
  :is(.combat,.runhud)>.topbar{position:absolute;inset:0 0 auto;width:100%;height:var(--topbar-h);transform:none;padding:0;background:linear-gradient(#15212bd9,#18242bc4,#18242b00);border:0;box-shadow:none;display:block;font-size:var(--hud-text)}
  :is(.combat,.runhud) .topbar>.who,:is(.combat,.runhud) .topbar>.stat,:is(.combat,.runhud) .topbar>.mini,:is(.combat,:where(.runhud>.topbar.sts)) #potions{position:absolute;top:calc(40*var(--hud-unit));transform:translateY(-50%);padding:0;background:none;border:0;box-shadow:none;min-height:0;white-space:nowrap}
  :is(.combat,:where(.runhud>.topbar.sts)) .who{left:2.56%;width:calc(170*var(--hud-unit))}:is(.combat,:where(.runhud>.topbar.sts)) .who>.slot{display:none}:is(.combat,:where(.runhud>.topbar.sts)) .who .nm{font-size:var(--hud-text);line-height:1}:is(.combat,:where(.runhud>.topbar.sts)) .who small{display:block;font:calc(20*var(--hud-unit))/1 var(--font-body)}
@@ -1141,8 +1141,8 @@ body.reduce-motion .bossbeat,body.reduce-motion .bossbeat.bb-phase{animation:bbf
  :is(.combat,.runhud) .topbar .uic{width:var(--hud-icon);height:var(--hud-icon)}
  :is(.combat,:where(.runhud>.topbar.sts)) #potions{left:27.35%;display:flex;gap:calc(48*var(--hud-unit))}:is(.combat,:where(.runhud>.topbar.sts)) .potion,:is(.combat,:where(.runhud>.topbar.sts)) .potion .slot{width:var(--hud-icon);height:var(--hud-icon);min-width:0;padding:0}
  :is(.combat,:where(.runhud>.topbar.sts)) #lampbtn{left:53%;font-size:var(--hud-text)}:is(.combat,:where(.runhud>.topbar.sts)) #mapbtn{left:90.17%}:is(.combat,:where(.runhud>.topbar.sts)) #deckbtn{left:92.73%}:is(.combat,:where(.runhud>.topbar.sts)) #setbtn{left:96.36%}:is(.combat,.runhud) .topbar .mini{font-size:calc(20*var(--hud-unit))}:is(.combat,.runhud) .topbar .mini .uic{width:calc(50*var(--hud-unit));height:calc(50*var(--hud-unit))}
- :is(.combat,:where(.runhud>.topbar.sts)) #relicbar{position:absolute;left:var(--edge);top:calc(88*var(--hud-unit));width:calc(59% - var(--edge));height:calc(55*var(--hud-unit));display:flex;flex-wrap:nowrap;gap:var(--hud-gap);overflow:hidden;align-items:center}
- :is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic{width:calc(55*var(--hud-unit));height:calc(55*var(--hud-unit));flex:0 0 calc(55*var(--hud-unit));padding:0}:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .slot{width:100%;height:100%}:is(.combat,:where(.runhud>.topbar.sts)) .relic-more{font-size:var(--hud-text)}
+ :is(.combat,:where(.runhud>.topbar.sts)) #relicbar{position:absolute;left:var(--edge);top:calc(88*var(--hud-unit));width:calc(59% - var(--edge));height:var(--relic-size);display:flex;flex-wrap:nowrap;gap:var(--hud-gap);overflow:hidden;align-items:center}
+ :is(.combat,:where(.runhud>.topbar.sts)) #relicbar .relic{width:var(--relic-size);height:var(--relic-size);flex:0 0 var(--relic-size);padding:0}:is(.combat,:where(.runhud>.topbar.sts)) #relicbar .slot{width:100%;height:100%}:is(.combat,:where(.runhud>.topbar.sts)) .relic-more{font-size:var(--hud-text)}
  .combat #orb{left:calc(10.043% - 60*var(--hud-unit));bottom:calc(18.519dvh - 60*var(--hud-unit));width:calc(120*var(--hud-unit));height:calc(120*var(--hud-unit));transform:none;font-size:var(--hud-text)}
  .combat .ctl .pile{width:calc(70*var(--hud-unit));height:calc(70*var(--hud-unit));min-height:0;min-width:0;padding:0;font-size:calc(24*var(--hud-unit));display:block}.combat .ctl .pile .uic{display:block;width:100%;height:100%}
  .combat #drawpile{left:calc(2.137% - 35*var(--hud-unit));bottom:calc(8.333dvh - 35*var(--hud-unit));transform:none}.combat #discpile{right:calc(2.35% - 35*var(--hud-unit));bottom:calc(8.333dvh - 35*var(--hud-unit));transform:none}
@@ -1201,7 +1201,7 @@ body.reduce-motion .combat #endbtn:active:not(:disabled){transform:none}
    viewport like in battle, and the page reserves the bar (78) + relic row (88..143) so content never sits under the relics. */
 @media(orientation:landscape){
  .runhud>.topbar.sts{position:fixed;inset:0 0 auto;width:100%;z-index:30;border-radius:0}
- .page.page.runhud:not(.fit-event){padding-top:calc(150*var(--hud-unit));box-sizing:border-box}
+ .page.page.runhud:not(.fit-event){padding-top:calc(95*var(--hud-unit) + var(--relic-size));box-sizing:border-box}
  .page.runhud.fit{height:100dvh}
  .runhud>.topbar.sts #relicbar .relic,.runhud>.topbar.sts #relicbar .slot{background:none;border:0;box-shadow:none;border-radius:0}
  .runhud>.topbar.sts #relicbar .relic::before{display:none}
@@ -1212,7 +1212,7 @@ body.reduce-motion .combat #endbtn:active:not(:disabled){transform:none}
  .page.runhud.fit-shop .pk-shop .shopicon .slot{width:30px;height:30px}
  .page.runhud.fit-shop .pk-shop .shopicon .inm{font-size:11px;white-space:nowrap}
  /* the map is bright parchment, not a dark battle scene: a soft dusk scrim behind the bar + relic row keeps the same bar readable */
- .page.mappage.runhud::before{content:'';position:fixed;inset:0 0 auto;height:calc(150*var(--hud-unit));background:linear-gradient(#0b0e14e6,#0b0e14b0 55%,#0b0e1400);z-index:29;pointer-events:none}
+ .page.mappage.runhud::before{content:'';position:fixed;inset:0 0 auto;height:calc(95*var(--hud-unit) + var(--relic-size));background:linear-gradient(#0b0e14e6,#0b0e14b0 55%,#0b0e1400);z-index:29;pointer-events:none}
 }
 /* clovis-intents: "+1" surcharge badge on the cost gem (Barnacled), a small painted coral-red seal at the gem's lower right. */
 .card .costplus{position:absolute;z-index:2;left:calc(12% + 2.5cqw);top:calc(8.286% + 2cqw);min-width:8.5cqw;height:8.5cqw;padding:0 1cqw;box-sizing:border-box;display:flex;align-items:center;justify-content:center;
@@ -1336,15 +1336,64 @@ body.reduce-motion .combat #endbtn .end-seal{animation:none}
 #env[data-still] .envL,#env-front[data-still] .envL{animation:none!important;transform:none!important}
 #env .envlv i{position:absolute;display:block}
 #env .envlv .envlv-a{will-change:transform}
+body[data-env-rest] #env .envlv,body[data-env-rest] #env .envlv *{animation-play-state:paused!important}
 #env[data-q="off"] .envlv-a,#env.gov-off .envlv-a,#env[data-q="reduced"] .envlv-part,#env.gov-reduced .envlv-part{display:none}
+/* gfxmem: the empty ambient canvas / back div (code-drawn effects were deleted) each held a viewport-size composited layer (17 MB at DPR 3.75) for nothing */
+#envfx,#env .envfx-back:empty{display:none}
 #env .envlv-combat{display:none}body.env-combat #env .envlv-combat{display:block}
 @media (prefers-reduced-motion:reduce){#env .envlv,#env .envlv *{animation:none!important}}
 .reduce-motion #env .envlv,.reduce-motion #env .envlv *{animation:none!important}
+/* v0.6.65 reduce flashes: a flash plate (sheet glow, a3_terraces) is hidden with Reduced motion, Effects Reduced/Off, the load governor or the OS reduced-motion setting */
+.reduce-motion #env .envlv-flash,#env[data-q="reduced"] .envlv-flash,#env[data-q="off"] .envlv-flash,#env.gov-reduced .envlv-flash,#env.gov-off .envlv-flash{display:none!important}
+@media (prefers-reduced-motion:reduce){#env .envlv-flash{display:none!important}}
 /* bugsweep 10-14: behind scene-choice screens (event/reward/pick/tasks: blur 7px + dim) and a card inspect (backdrop blur) the stack is filtered every frame. The two swell groups
    (masked, 836x388, one pair per paint) make that filter cost ~2x (headless event screen 33 ms median vs 16.7 with them hidden; p95 50). The swell is a +-6 px shift of the plate that
    already sits underneath, so hiding it under a 7 px blur changes nothing visible. Everything else on the stack freezes (paused) while blurred. */
-body.scene-choice #env .envlv-water,body:has(#inspect:not(.held-hand)) #env .envlv-water{display:none}
-body.scene-choice #env .envlv *,body:has(#inspect:not(.held-hand)) #env .envlv *{animation-play-state:paused!important}
+body.scene-choice #env .envlv-water,body.has-inspect #env .envlv-water,body.scene-choice #env .envlv-swell,body.has-inspect #env .envlv-swell{display:none}
+body.scene-choice #env .envlv *,body.has-inspect #env .envlv *{animation-play-state:paused!important}
 /* Wrack Terraces is a pale wet stage: contact shadows read stronger so feet never float (Spencer flagged twice; matches v-new2g mock cores) */
 body[data-still-env] .combat .shadow{opacity:.88}
 body[data-still-env] .combat .shadow::before{left:16%;right:16%;top:calc(50% - 2px);height:4px}
+
+/* End Turn sun states (v0.6.17): dim = you can still act; ready = energy 0, burning bright; work = burning through the enemy turn. Glow is one small pseudo layer animated with opacity/transform only; the seal only gets a static filter. */
+.combat #endbtn::before{content:"";position:absolute;inset:-22%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,#fff3b0cc 0,#ffb53ccc 28%,#ff7a1a66 52%,#ff7a1a00 70%)}
+.combat #endbtn[data-sun=dim] .end-seal{filter:brightness(.62) saturate(.6)}
+.combat #endbtn[data-sun=dim]:not(:disabled) .end-seal{animation:none}
+.combat #endbtn[data-sun=ready],.combat #endbtn[data-sun=work]{opacity:1}
+.combat #endbtn[data-sun=ready] .end-seal,.combat #endbtn[data-sun=work] .end-seal{filter:brightness(1.3) saturate(1.25);animation:sunburn 1.6s ease-in-out var(--sp,0ms) infinite}
+.combat #endbtn[data-sun=ready]::before,.combat #endbtn[data-sun=work]::before{animation:sunglow 1.6s ease-in-out var(--sp,0ms) infinite}
+.combat #endbtn[data-sun=work]::before{inset:-30%}
+.combat #endbtn.sun-pop .end-seal{filter:brightness(1.8) saturate(1.4)}
+@keyframes sunburn{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes sunglow{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.12)}}
+body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .combat #endbtn[data-sun=work]::before,body.reduce-motion .combat #endbtn[data-sun=ready] .end-seal,body.reduce-motion .combat #endbtn[data-sun=work] .end-seal{animation:none}
+body.reduce-motion .combat #endbtn[data-sun=ready]::before,body.reduce-motion .combat #endbtn[data-sun=work]::before{opacity:.85}
+@media(prefers-reduced-motion:reduce){.combat #endbtn[data-sun=ready]::before,.combat #endbtn[data-sun=work]::before,.combat #endbtn[data-sun=ready] .end-seal,.combat #endbtn[data-sun=work] .end-seal{animation:none}.combat #endbtn[data-sun=ready]::before,.combat #endbtn[data-sun=work]::before{opacity:.85}}
+.end-confirm-box{text-align:center}.end-confirm-box .actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:6px}.end-confirm-box .actions .btn{min-width:130px;min-height:44px;margin:0}
+/* v0.6.17 Act 1 battle backgrounds: each painted layer is its own stacking context, so living plates in a lower layer (clouds in the sky, rain behind the hall) stay UNDER the solids above them. Wrack Terraces keeps the old stacking. */
+#env[data-sandwich] .envL{isolation:isolate}
+
+/* v0.6.43 Act 2 travel (tr_a1a2 scene, then tc_a2 title card scene), wired as-is */
+.page.a2trav{background:none}
+.a2tcard{padding:14px 28px;border-radius:6px;background:radial-gradient(ellipse at center,#04060acc 40%,#04060a00 100%);text-shadow:0 2px 10px #000,0 0 3px #000;animation:tcard 1.4s ease-out both}
+.a2tcard .act{font:700 14px var(--font-display);letter-spacing:.4em;color:#e0c48a}
+.a2tcard h1{font-size:clamp(26px,6vw,48px);margin:4px 0}
+.a2tcard .sub{font-size:15px;color:#d8cdb4}
+.a2tcard[data-panel]{padding:0 2%;background:none}
+.a2tcard[data-panel] h1{font-size:clamp(20px,calc(var(--tck,1)*96px),48px)}
+.a2tcard[data-panel] .act{font-size:clamp(10px,calc(var(--tck,1)*30px),14px)}
+.a2tcard[data-panel] .sub{font-size:clamp(11px,calc(var(--tck,1)*32px),15px)}
+.a2trav .a2tcboss,.a2trav .a2ferry{text-shadow:0 2px 8px #000;background:#04060a99;border-radius:6px;padding:4px 12px}
+
+/* Wordless End Turn seal (ui/wordless.js, art/v2/ui/end-turn.json): "END" is live text centred on the clean seal. Button size/position untouched. */
+.combat #endbtn[data-wl] .end-label{position:absolute;inset:0;width:auto;height:auto;margin:0;overflow:visible;clip:auto;display:grid;place-items:center;pointer-events:none;font:700 calc(50*var(--hud-unit)) 'Cinzel',var(--font-display),Georgia,serif;letter-spacing:.06em;color:#f0b95a;background:linear-gradient(180deg,#ffe9a8 0%,#f0b24c 55%,#b8671f 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 calc(1.2*var(--hud-unit)) #000) drop-shadow(0 0 calc(1.2*var(--hud-unit)) #000) drop-shadow(0 calc(2*var(--hud-unit)) calc(3*var(--hud-unit)) #000)}
+.combat #endbtn[data-wl][data-sun=dim] .end-label{opacity:.7}
+
+/* v0.6.65 camp_a3: the run's hero standing in the painted scene (ui/env.js sceneHero); soft contact shadow like the scene mock */
+#env .envstack .envhero{position:absolute;pointer-events:none;z-index:3}
+#env .envstack .envhero img{position:absolute;inset:0;width:100%;height:100%}
+#env .envstack .envhero .envhero-sh{position:absolute;left:calc(var(--ax,50%) - 42%);width:84%;bottom:-3%;height:6%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,0))}
+/* v0.6.95: in battle each toast is placed in its own free slot by src/ui/toast-place.js; a narrow slot wraps the text */
+.toasts.placed{top:0;left:0;right:auto;bottom:auto;width:0;height:0}
+.toasts.placed .toast{position:fixed}
+.toasts .toast.wrap{white-space:normal}

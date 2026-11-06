@@ -1,0 +1,98 @@
+{
+ "scene": "spires-v9",
+ "canvas": [
+  2340,
+  1080
+ ],
+ "foot_y": 586,
+ "hero_x": 570,
+ "layers": [
+  {
+   "file": "layers/solids-baked.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "kb": 122.9,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "baked painted plate (cracked slab terrace, balustrade and arches, soft teal crystal spires fading into rain haze); static, Act 1 solids-baked pattern; v9: deepened ~5 L*, crack contrast on the slab, top-centre fog-sky darkened to <=35"
+  },
+  {
+   "file": "layers/mist-veil.webp",
+   "px": [
+    1404,
+    434
+   ],
+   "kb": 243.8,
+   "decoded_mb": 2.44,
+   "animated": true,
+   "reason": "teal mist veil drifting left between the crystal spires (own painted plate 204d1eaf) [half res, game scales x2]"
+  },
+  {
+   "file": "layers/rain-far.png",
+   "px": [
+    1170,
+    658
+   ],
+   "kb": 49.2,
+   "decoded_mb": 0.77,
+   "animated": true,
+   "reason": "far rain streaks, low contrast (own painted plate 07df2336), whole-tile scroll"
+  },
+  {
+   "file": "layers/rain-near.png",
+   "px": [
+    1872,
+    1053
+   ],
+   "kb": 104.1,
+   "decoded_mb": 1.97,
+   "animated": true,
+   "reason": "nearer rain streaks, low contrast, faster (same own plate, larger)"
+  },
+  {
+   "file": "layers/accent-glow-mask.png",
+   "px": [
+    147,
+    228
+   ],
+   "kb": 4.7,
+   "decoded_mb": 0.03,
+   "animated": true,
+   "reason": "the glowing heart of the near-left crystal spire pulses softly (the one accent); place at (831,162)"
+  }
+ ],
+ "authored_layers": 5,
+ "composited_layer_count": 7,
+ "game_layers": [
+  "fighters (game sprites)",
+  "hud (game)"
+ ],
+ "draw_order": [
+  "solids-baked",
+  "mist-veil",
+  "rain-far",
+  "accent glow",
+  "rain-near",
+  "fighters",
+  "hud"
+ ],
+ "animated_effects": [
+  "mist-veil",
+  "rain-far",
+  "rain-near",
+  "glow"
+ ],
+ "animated_effect_count": 4,
+ "total_asset_kb": 524.7,
+ "decoded_memory_mb": 15.3,
+ "mp4_kb": 4183.3,
+ "note": "Solids are one baked painted plate (Act 1 solids-baked pattern) and never move; every mover is a painted plate.",
+ "packaged": {
+  "layers": "art/v2/bg/a3-spire9-layers.json",
+  "preview": "art/v2/bg/a3-spire9-living-preview.webp",
+  "loop": null,
+  "note": "loop rendered in-game from the layers; MP4 not shipped"
+ }
+}

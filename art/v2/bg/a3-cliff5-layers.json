@@ -1,0 +1,222 @@
+{
+ "layers": [
+  {
+   "file": "layers/solids-baked.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 4,
+   "kb": 256.6,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "used_as": 1,
+   "reason": "v5: wall panel = brass frame from plate dabf751c with a carved bronze wave relief (own plate 7bf04849, Real-ESRGAN x4, no letters/symbols, value-matched to the slate); pale floor chips at (1058,815)/(270,816) cloned out from surrounding slate; low-frequency floor tone variation (calm in the fighter band) and a faint warm lantern spill on the floor; v4 base: set in the wall with depth (recessed inner shadow, bevelled frame, bottom lip, soft drop shadow onto the wall); wall, anemometer posts/footings and lamp post/block regraded to the floor camera (hue cast, value and contrast pulled toward the floor right under each group, floor bounce on the lower body, sky haze at the top); mist, lamp glow, chain end and rain plates now Real-ESRGAN x4. Rock-rubble plate 288ce17e (Real-ESRGAN) at wall base/footings/block/chain end with attached shadows, floor chain baked (anchor buried under rubble). ALL solids baked into one layer: cliff slab + fight floor (ground plate 23658ff0, Real-ESRGAN then downsample only, one plate, no tiling/mirroring, regraded to storm slate), wind-wall with the relief panel, anemometer posts + stone footings (cups removed), storm-lantern post + glass cage + iron block, with cast shadows/contact occlusion baked (cut by hand polygons from ref 24993dd7); chain, cups, flame excluded (own movers). alpha hole = sky"
+  },
+  {
+   "file": "layers/sky-base.jpg",
+   "px": [
+    2340,
+    640
+   ],
+   "channels": 3,
+   "kb": 85.3,
+   "decoded_mb": 5.99,
+   "animated": false,
+   "used_as": 1,
+   "reason": "storm sky plate ad2922ec graded (static): bruise-violet; v5 Upturned-Sea underside (own plate 6143701e, Real-ESRGAN, foam softened, strength 0.55, calmer behind the top-right icons) upper right; far glass needles (from 24993dd7) baked in; the Line (plate 4a7cd79d, Real-ESRGAN) baked in at x~750 y40-396: v5 variant B, gentle waver (~2.4 px), warm pale-gold core (R>B) with warm-grey halo, smudge at ~(752,245) removed (row peaks held to the running median), even strength along its length, alpha dissolves over its last 150 px into the horizon haze with a soft foot glow on the sea surface at y~396 (no hard stop); seen through the solids alpha hole"
+  },
+  {
+   "file": "layers/sky-clouds-a.jpg",
+   "px": [
+    2816,
+    470
+   ],
+   "channels": 3,
+   "kb": 80.6,
+   "decoded_mb": 5.29,
+   "animated": true,
+   "used_as": 1,
+   "reason": "cloud mover plate 71d9661f (own v5 plate, violet-grey storm cloud on black, Real-ESRGAN; top band dimmed for HUD calm; screen-composite), depth 1: right-to-left drift 10 px/s, screen gain 0.17, placed at y=0"
+  },
+  {
+   "file": "layers/sky-clouds-b.jpg",
+   "px": [
+    2432,
+    470
+   ],
+   "channels": 3,
+   "kb": 81.3,
+   "decoded_mb": 4.57,
+   "animated": true,
+   "used_as": 1,
+   "reason": "cloud mover plate 71d9661f (own v5 plate, violet-grey storm cloud on black, Real-ESRGAN; top band dimmed for HUD calm; screen-composite), depth 2: right-to-left drift 25 px/s, screen gain 0.2, placed at y=50"
+  },
+  {
+   "file": "layers/sky-clouds-c.jpg",
+   "px": [
+    3328,
+    470
+   ],
+   "channels": 3,
+   "kb": 67.2,
+   "decoded_mb": 6.26,
+   "animated": true,
+   "used_as": 1,
+   "reason": "cloud mover plate 71d9661f (own v5 plate, violet-grey storm cloud on black, Real-ESRGAN; top band dimmed for HUD calm; screen-composite), depth 3: right-to-left drift 50 px/s, screen gain 0.15, placed at y=-30"
+  },
+  {
+   "file": "layers/mist.jpg",
+   "px": [
+    1280,
+    390
+   ],
+   "channels": 3,
+   "kb": 62.5,
+   "decoded_mb": 2.0,
+   "animated": true,
+   "used_as": 2,
+   "reason": "wind mist plate 8a4d8fe9 (screen on black), own plate, used twice: back band (y372-572, scale 1.15, 44 px/s R->L, opacity 0.30) and low band over the cliff (y640-970, scale 1.35, 62 px/s, opacity 0.36, left half), two phase-offset instances each fading in/out so the loop is seamless"
+  },
+  {
+   "file": "layers/rain-near.png",
+   "px": [
+    1664,
+    936
+   ],
+   "channels": 1,
+   "kb": 115.0,
+   "decoded_mb": 1.56,
+   "animated": true,
+   "used_as": 1,
+   "reason": "rain streak plate 3fcaeb72 (own v5 plate, Real-ESRGAN), alpha only, near depth, R->L fall (-230,+520) px/s, opacity 0.04"
+  },
+  {
+   "file": "layers/rain-far.png",
+   "px": [
+    1152,
+    648
+   ],
+   "channels": 1,
+   "kb": 63.4,
+   "decoded_mb": 0.75,
+   "animated": true,
+   "used_as": 1,
+   "reason": "same plate 3fcaeb72 rotated 180 deg (slant kept) at a finer scale, far depth, slower (-130,+300) px/s, opacity 0.03"
+  },
+  {
+   "file": "layers/lamp-glow.webp",
+   "px": [
+    343,
+    249
+   ],
+   "channels": 3,
+   "kb": 2.1,
+   "decoded_mb": 0.34,
+   "animated": true,
+   "used_as": 1,
+   "reason": "storm-lantern cage glow (own plate 4a80f14b; v5: cage-bar shadows smeared sideways where they fall on open sky, kept on surfaces) aligned to the lantern flame at screen (1261,113); slow pulse, screen blend 0.42"
+  },
+  {
+   "file": "layers/lamp-flame-mask.png",
+   "px": [
+    79,
+    98
+   ],
+   "channels": 1,
+   "kb": 2.6,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "used_as": 1,
+   "reason": "mask of the painted warm flame/glass pixels at (1392,196): 10 fps flicker"
+  },
+  {
+   "file": "layers/chain-loose-end.webp",
+   "px": [
+    70,
+    224
+   ],
+   "channels": 4,
+   "kb": 6.2,
+   "decoded_mb": 0.06,
+   "animated": true,
+   "used_as": 1,
+   "reason": "loose chain end (plate a502f429, keyed on black) hung from an iron bolt in the wall face, own attached shadow, at screen (1077,184); free end sways R->L ~+-5 px, ring fixed"
+  },
+  {
+   "file": "layers/cup-a1L.webp",
+   "px": [
+    34,
+    37
+   ],
+   "channels": 4,
+   "kb": 0.9,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "used_as": 1,
+   "reason": "anemometer cup a1L cut from the painted post, at screen (1150,177); orbits the hub (x=cos, squash with |cos|, depth swap): 7-8 turns per 6 s loop"
+  },
+  {
+   "file": "layers/cup-a1R.webp",
+   "px": [
+    30,
+    37
+   ],
+   "channels": 4,
+   "kb": 0.7,
+   "decoded_mb": 0.0,
+   "animated": true,
+   "used_as": 1,
+   "reason": "anemometer cup a1R cut from the painted post, at screen (1207,177); orbits the hub (x=cos, squash with |cos|, depth swap): 7-8 turns per 6 s loop"
+  },
+  {
+   "file": "layers/cup-a2L.webp",
+   "px": [
+    38,
+    41
+   ],
+   "channels": 4,
+   "kb": 1.1,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "used_as": 1,
+   "reason": "anemometer cup a2L cut from the painted post, at screen (1307,171); orbits the hub (x=cos, squash with |cos|, depth swap): 7-8 turns per 6 s loop"
+  },
+  {
+   "file": "layers/cup-a2R.webp",
+   "px": [
+    37,
+    41
+   ],
+   "channels": 4,
+   "kb": 1.0,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "used_as": 1,
+   "reason": "anemometer cup a2R cut from the painted post, at screen (1372,173); orbits the hub (x=cos, squash with |cos|, depth swap): 7-8 turns per 6 s loop"
+  }
+ ],
+ "composited_layer_count": 17,
+ "authored_layers": 15,
+ "game_layers": [
+  "fighters (game sprites)",
+  "hud (game)"
+ ],
+ "full_screen_layers": [
+  "layers/solids-baked.webp"
+ ],
+ "animated_effects": [
+  "clouds x3 depths (10/25/50 px/s)",
+  "mist x2 bands (44/62 px/s)",
+  "rain x2 depths",
+  "lantern glow pulse",
+  "lantern flame flicker",
+  "loose chain end sway",
+  "anemometer cups x2 posts (4 cup sprites)"
+ ],
+ "animated_effect_count": 12,
+ "animated_instances": 14,
+ "total_asset_kb": 826.5,
+ "decoded_memory_mb_measured_from_exported_pixel_dims": 37.0,
+ "note": "decoded MB = w*h*4 for every RGB(A) layer file, w*h*1 for single-channel masks/rain/mist alpha; fighters/HUD excluded (game-owned); no fg-* layers exist (nothing beside the card)"
+}

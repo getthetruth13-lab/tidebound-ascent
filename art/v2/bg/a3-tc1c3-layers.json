@@ -1,0 +1,155 @@
+{
+ "id": "tc_a3",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 124.9,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate tc_a3_p1 (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-storm-lantern.webp",
+   "px": [
+    315,
+    450
+   ],
+   "channels": 4,
+   "kb": 14.4,
+   "decoded_mb": 0.54,
+   "animated": false,
+   "reason": "storm lantern in its glass cage on an iron post bolted to a rock outcrop (new plate, foot + flange contact painted in); the single amber accent; dark contact shadow under the rock + soft shadow on the rocks behind",
+   "place": [
+    1867,
+    630
+   ],
+   "parallax": 0.45,
+   "role": "mid"
+  },
+  {
+   "file": "layers/rain-far.webp",
+   "px": [
+    1053,
+    592
+   ],
+   "channels": 4,
+   "kb": 58.1,
+   "decoded_mb": 2.38,
+   "animated": true,
+   "reason": "painted rain plate fx_rain_v4 (alpha only), falls with vec (-130, 300), op 0.06",
+   "effect": "rain",
+   "vec": [
+    -130,
+    300
+   ],
+   "op": 0.06,
+   "plate_src": "fx_rain_v4"
+  },
+  {
+   "file": "layers/rain-near.webp",
+   "px": [
+    1404,
+    790
+   ],
+   "channels": 4,
+   "kb": 91.0,
+   "decoded_mb": 4.23,
+   "animated": true,
+   "reason": "painted rain plate fx_rain_v4 (alpha only), falls with vec (-230, 520), op 0.08",
+   "effect": "rain",
+   "vec": [
+    -230,
+    520
+   ],
+   "op": 0.08,
+   "plate_src": "fx_rain_v4"
+  },
+  {
+   "file": "layers/mist-spray.webp",
+   "px": [
+    2340,
+    328
+   ],
+   "channels": 4,
+   "kb": 309.6,
+   "decoded_mb": 2.93,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (wind R->L 280 px/6s), screen/alpha=luminance, screen y=600 h=320",
+   "effect": "mist",
+   "vec": [
+    -280,
+    0
+   ],
+   "op": 0.2,
+   "y": 600,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/lantern-glow.webp",
+   "px": [
+    567,
+    574
+   ],
+   "channels": 4,
+   "kb": 56.3,
+   "decoded_mb": 1.24,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    1746,
+    506
+   ],
+   "op": 0.3
+  },
+  {
+   "file": "layers/lantern-flame-mask.png",
+   "px": [
+    57,
+    56
+   ],
+   "channels": 1,
+   "kb": 1.8,
+   "decoded_mb": 0.0,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1995,
+    753
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 656.1,
+  "mp4_kb": 1573.6,
+  "decoded_mb": 18.6,
+  "n_layers": 7,
+  "n_animated": 5
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "text_panel_2340x1080": [
+  120,
+  140,
+  980,
+  360
+ ],
+ "packaged": {
+  "layers": "art/v2/bg/a3-tc1c3-layers.json",
+  "loop": "art/v2/bg/a3-tc1c3-living.mp4",
+  "preview": "art/v2/bg/a3-tc1c3-living-preview.webp"
+ }
+}

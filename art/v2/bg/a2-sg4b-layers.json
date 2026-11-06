@@ -1,0 +1,203 @@
+{
+ "layers": [
+  {
+   "file": "layers/solids-baked.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "pos": [
+    0,
+    0
+   ],
+   "channels": 3,
+   "kb": 280.5,
+   "decoded_mb": 10.11,
+   "animated": false,
+   "reason": "wall/gate slab (plate 6f0f38a0; embossed lettering removed in v4 by txtfix_v4.py; v4b rivetfix_v4b.py replaces the sunken socket rivets in the patched band with dome rivets matching the y>260 rows and breaks the cloned rivet pattern), boss-slot machinery pushed right of x2250 and dimmed, plain slab bolts behind the slot, causeway + tracks, matte black water (plate f6b2188b, ripple ring far right under the END button, faint 240490e8 ripple crop at lower-left), static rust-stain sources for the drips"
+  },
+  {
+   "file": "layers/lip-foreground.webp",
+   "px": [
+    2340,
+    246
+   ],
+   "pos": [
+    0,
+    649
+   ],
+   "channels": 4,
+   "kb": 47.5,
+   "decoded_mb": 2.3,
+   "animated": false,
+   "reason": "causeway front lip (ONE wide painted plate bb3ac364, cracked flagstones + riveted iron strip + stone lip, resized to full width, no tiling) + attached shadow on the water"
+  },
+  {
+   "file": "layers/winch-mid.webp",
+   "px": [
+    809,
+    288
+   ],
+   "pos": [
+    0,
+    327
+   ],
+   "channels": 4,
+   "kb": 25.2,
+   "decoded_mb": 0.93,
+   "animated": false,
+   "reason": "iron winch cut out of plate 0f10edb9 (grabcut-refined) at left x170-480 with its own contact shadow on the stone"
+  },
+  {
+   "file": "layers/mist-causeway.webp",
+   "px": [
+    2249,
+    883
+   ],
+   "pos": [
+    0,
+    330
+   ],
+   "channels": 4,
+   "kb": 633.3,
+   "decoded_mb": 7.94,
+   "animated": true,
+   "reason": "grey mist plate 6ce94604: still rising, vertical only 60 px/6 s, thinned at the boss slot"
+  },
+  {
+   "file": "layers/mist-water.webp",
+   "px": [
+    2342,
+    329
+   ],
+   "pos": [
+    0,
+    640
+   ],
+   "channels": 4,
+   "kb": 256.0,
+   "decoded_mb": 3.08,
+   "animated": true,
+   "reason": "same plate, lower bank mirrored: low mist over the black water, rises 38 px/6 s"
+  },
+  {
+   "file": "layers/seam-glow.webp",
+   "px": [
+    557,
+    351
+   ],
+   "pos": [
+    1028,
+    181
+   ],
+   "channels": 3,
+   "kb": 3.6,
+   "decoded_mb": 0.78,
+   "animated": true,
+   "reason": "amber seam plate 02b99079 (lower part), screen-added, flicker"
+  },
+  {
+   "file": "layers/seam-dust.png",
+   "px": [
+    1248,
+    756
+   ],
+   "pos": [
+    0,
+    0
+   ],
+   "channels": 1,
+   "kb": 278.2,
+   "decoded_mb": 0.94,
+   "animated": true,
+   "reason": "amber dust plate d325dbc2 (single channel), rises 30 px/6 s, masked to the seam area"
+  },
+  {
+   "file": "layers/pool-glow.webp",
+   "px": [
+    473,
+    317
+   ],
+   "pos": [
+    994,
+    311
+   ],
+   "channels": 3,
+   "kb": 5.2,
+   "decoded_mb": 0.6,
+   "animated": true,
+   "reason": "painted amber pool glow (plate 24617343 lower part), screen-added, slow brightness pulse; replaces the code gaussian"
+  },
+  {
+   "file": "layers/drip-strands.webp",
+   "px": [
+    473,
+    317
+   ],
+   "pos": [
+    994,
+    311
+   ],
+   "channels": 3,
+   "kb": 2.3,
+   "decoded_mb": 0.6,
+   "animated": true,
+   "reason": "painted rust-water drips (plate 24617343 upper part), screen-added, fall vertically 70 px/6 s (cyclic)"
+  },
+  {
+   "file": "layers/steam-wisp.webp",
+   "px": [
+    140,
+    220
+   ],
+   "pos": [
+    370,
+    355
+   ],
+   "channels": 3,
+   "kb": 1.0,
+   "decoded_mb": 0.12,
+   "animated": true,
+   "reason": "painted steam wisp (plate fe07c64c upper part) rising 36 px/6 s, vertical only, screen-added at the winch base"
+  },
+  {
+   "file": "layers/ember-pulse.webp",
+   "px": [
+    140,
+    220
+   ],
+   "pos": [
+    370,
+    355
+   ],
+   "channels": 3,
+   "kb": 0.6,
+   "decoded_mb": 0.12,
+   "animated": true,
+   "reason": "painted glowing ember/rivet (plate fe07c64c lower part), slow brightness pulse, screen-added"
+  }
+ ],
+ "composited_layer_count": 14,
+ "authored_layers": 11,
+ "game_layers": [
+  "hero (game sprite)",
+  "boss (game sprite, NOT in this folder)",
+  "hud (game)"
+ ],
+ "animated_effects": [
+  "grey mist rising over causeway",
+  "low mist over black water",
+  "amber seam flicker",
+  "painted amber pool pulse",
+  "painted rust drips falling (vertical)",
+  "amber dust haze rising",
+  "painted steam wisp rising at the winch",
+  "painted glowing rivet pulse at the winch"
+ ],
+ "animated_effect_count": 8,
+ "total_asset_kb": 1533.4,
+ "mp4_kb": 3619.0,
+ "decoded_memory_mb_measured_from_exported_pixel_dims": 27.5,
+ "note": "decoded MB = w*h*4 per RGB(A) layer, w*h*1 for single channel. No code-drawn effects in v2.",
+ "version": "v4b (2026-10-22)"
+}

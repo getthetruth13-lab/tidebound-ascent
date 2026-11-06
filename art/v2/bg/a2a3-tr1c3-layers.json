@@ -1,0 +1,130 @@
+{
+ "id": "tr_a2a3",
+ "size": [
+  2340,
+  1080
+ ],
+ "loop_s": 6.0,
+ "fps": 20,
+ "layers": [
+  {
+   "file": "layers/base-far.webp",
+   "px": [
+    2340,
+    1080
+   ],
+   "channels": 3,
+   "kb": 186.6,
+   "decoded_mb": 7.23,
+   "animated": false,
+   "reason": "ALL back solids baked in one opaque layer: plate tr_a2a3_p1 (Real-ESRGAN x4 then downsample), HUD/card-zone darkening, local clone fixes, objects inpainted out (they live in the mid/fore layers)",
+   "parallax": 0.1
+  },
+  {
+   "file": "layers/mid-storm-lantern.webp",
+   "px": [
+    284,
+    413
+   ],
+   "channels": 4,
+   "kb": 17.2,
+   "decoded_mb": 0.45,
+   "animated": false,
+   "reason": "storm lantern in its glass cage standing on the stair flags (the single amber accent; the Warden pole-lamp swapped for it); dark attached contact shadow + foot contact line",
+   "place": [
+    1474,
+    667
+   ],
+   "parallax": 0.5,
+   "role": "mid"
+  },
+  {
+   "file": "layers/rain-right.webp",
+   "px": [
+    1404,
+    790
+   ],
+   "channels": 4,
+   "kb": 145.3,
+   "decoded_mb": 4.23,
+   "animated": true,
+   "reason": "painted rain plate fx_rain_updraft_a3 (alpha only), falls with vec (-300, 445), op 0.09",
+   "effect": "rain",
+   "vec": [
+    -300,
+    445
+   ],
+   "op": 0.09,
+   "plate_src": "fx_rain_updraft_a3"
+  },
+  {
+   "file": "layers/mist-updraft.webp",
+   "px": [
+    2340,
+    498
+   ],
+   "channels": 4,
+   "kb": 454.8,
+   "decoded_mb": 4.45,
+   "animated": true,
+   "reason": "painted effect plate sl_mist (still vertical rise 70 px/6s), screen/alpha=luminance, screen y=560 h=420",
+   "effect": "mist",
+   "vec": [
+    0,
+    -70
+   ],
+   "op": 0.2,
+   "y": 560,
+   "plate_src": "sl_mist"
+  },
+  {
+   "file": "layers/lantern-glow.webp",
+   "px": [
+    630,
+    488
+   ],
+   "channels": 4,
+   "kb": 55.7,
+   "decoded_mb": 1.17,
+   "animated": true,
+   "reason": "painted lamp-glow plate, screen blend, slow pulse + flicker",
+   "effect": "glow",
+   "place": [
+    1306,
+    592
+   ],
+   "op": 0.26
+  },
+  {
+   "file": "layers/lantern-flame-mask.png",
+   "px": [
+    85,
+    86
+   ],
+   "channels": 1,
+   "kb": 3.8,
+   "decoded_mb": 0.01,
+   "animated": true,
+   "reason": "mask of the painted warm flame pixels; 10 fps flicker gain on them (no new light drawn)",
+   "effect": "flicker",
+   "place": [
+    1572,
+    849
+   ]
+  }
+ ],
+ "totals": {
+  "layer_files_kb": 863.4,
+  "mp4_kb": 914.9,
+  "decoded_mb": 17.5,
+  "n_layers": 6,
+  "n_animated": 4
+ },
+ "fighters_hero": null,
+ "parallax_note": "suggested factors per layer in \"parallax\" (base 0.1, mid 0.3-0.6, fore 0.8); small shifts only (<=8 px) so inpainted gaps behind cut-outs never show",
+ "packaged": {
+  "layers": "art/v2/bg/a2a3-tr1c3-layers.json",
+  "loop": "art/v2/bg/a2a3-tr1c3-living.mp4",
+  "preview": "art/v2/bg/a2a3-tr1c3-living-preview.webp"
+ }
+}

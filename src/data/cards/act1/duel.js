@@ -14,10 +14,10 @@ const live=(inst)=>!inst.dead&&W.cb&&W.cb.turn===inst.turn;
 export const firstHit=e=>{const m=intentOf(e);return m&&m.a?eAtk(e,m.a):0};
 
 // ---------------- Starters ----------------
-R('parry',{e:'🛡️',tg:1,rk:{max:5},d:'Call a Parry of {5|8|+}.',p:f=>f.parry(f.r(5,8))});
-R('lunge',{e:'🤺',rk:{max:5},d:'Deal {9|12|+}. Apply 2 Exposed.',p:f=>{f.dmg(f.r(9,12));f.vuln(2)}});
+R('parry',{e:'🛡️',tg:1,rk:{max:5},d:'Call a Parry of {6|9|+}.',p:f=>f.parry(f.r(6,9))});
+R('lunge',{e:'🤺',rk:{max:5},d:'Deal {12|15|+}. Apply 2 Exposed.',p:f=>{f.dmg(f.r(12,15));f.vuln(2)}});
 N('lightfeet',{e:'👣',rk:{max:5},d:'Gain {1|2} Momentum. Draw 1.{@2| Gain [0|0|+] Guard.}',p:f=>{f.mom(f.v(1,2));f.draw(1);if(f.lvl>=2)f.blk(f.r(0,0))}});
-R('hiltguard',{e:'🛡️',tg:1,rk:{max:5},d:'Call a Parry of {4|6|+1,1,1,0}. Gain {4|6|+1,1,0,1} Guard.',p:f=>{f.parry(f.r(4,6,'1,1,1,0'));f.blk(f.r(4,6,'1,1,0,1'))}});
+R('hiltguard',{e:'🛡️',tg:1,rk:{max:5},d:'Call a Parry of {6|8|+1,1,1,0}. Gain {6|8|+1,1,0,1} Guard.',p:f=>{f.parry(f.r(6,8,'1,1,1,0'));f.blk(f.r(6,8,'1,1,0,1'))}});
 // ---------------- Common ----------------
 R('advance',{e:'➡️',d:'Deal {6|8}. If you have 2 or more Momentum, draw 1.',p:f=>{const ok=W.cb.mom>=2;f.dmg(f.v(6,8));if(ok)f.draw(1)}});
 R('sidestep',{e:'💃',tg:1,d:'Choose: Call a Parry of {9|11}; or gain 2 Momentum.',p:f=>ask(f,'Sidestep',[{l:'Call a Parry of '+f.v(9,11),f:()=>f.parry(f.v(9,11))},{l:'Gain 2 Momentum',f:()=>f.mom(2)}])});

@@ -12,6 +12,8 @@ const level=k=>settings.audioMuted?0:Math.max(0,Math.min(1,Number(settings[k])||
 const indexURL=new URL('../audio/music/index.json',import.meta.url);
 fetch(indexURL).then(r=>{if(!r.ok)throw Error('Music index unavailable');return r.json()}).then(data=>{
  for(const k of ['map','fight','elite','boss','shop','rest','event'])manifest[k]=(data[k]||[]).filter(f=>new RegExp(`^${k}-act1-\\d+\\.mp3$`).test(f));
+ // Acts 2 and 3: own tracks when files named <kind>-act2-N.mp3 / -act3-N.mp3 exist; otherwise the Act 1 playlist keeps playing (no silence).
+ for(const a of [2,3])for(const k of ['map','fight','elite','boss','shop','rest','event'])manifest[`${k}@${a}`]=(data[k]||[]).filter(f=>new RegExp(`^${k}-act${a}-\\d+\\.mp3$`).test(f));
  manifest.intro=(data.intro||[]).filter(f=>/^intro-\d+\.mp3$/.test(f));
  manifest.menu=(data.menu||[]).filter(f=>/^menu-\d+\.mp3$/.test(f));
  startTrack();
@@ -43,8 +45,9 @@ const bossPhases=new WeakMap(),phaseHeard=new WeakSet();
 function syncBossPhases(){for(const e of W.cb?.ens||[]){if(!e.boss)continue;const phase=e.bloomed?2:e.ph||1,previous=bossPhases.get(e);bossPhases.set(e,phase);
  if(previous!==undefined&&phase>previous&&!phaseHeard.has(e)){phaseHeard.add(e);if(!document.hidden)playSound('bossPhase')}
 }}
+const actTrack=kind=>{const a=W.run.act||1;if(a>1&&manifest[`${kind}@${a}`]?.length)return `${kind}@${a}`;return kind};
 export function syncAudio(){syncUIState();syncBossPhases();const s=W.S.screen;
- const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&W.run.act===1&&s!=='title'&&s!=='end'?(s==='combat'&&W.cb?W.cb.kind:s==='shop'||s==='rest'||s==='event'?(manifest[s]?.length?s:'map'):'map'):null;
+ const next=s==='title'&&W.S.view==='intro'?'intro':s==='title'?(W.S.view==='studio'?null:'menu'):W.run&&s!=='title'&&s!=='end'?actTrack(s==='combat'&&W.cb?W.cb.kind:s==='shop'||s==='rest'||s==='event'?(manifest[s]?.length?s:'map'):'map'):null;
  if(next!==context){retire();context=next;startTrack();if(!current)releaseOutgoing()}
  if(s==='end'&&lastScreen!==s)playSound(W.run&&W.run.won?'victory':'defeat');lastScreen=s;
 }
@@ -61,7 +64,9 @@ function applyVolumes(){if(master)master.gain.setTargetAtTime(level('sfxVolume')
 // Recorded Foley only; buffers are fetched once and decoded after a gesture.
 const sfxURL=new URL('../audio/sfx/index.json',import.meta.url);
 let sfxManifest={},sfxReady;
-const sfxBuffers=new Map(),sfxLoads=new Map(),activeSfx=new Set();
+const sfxBuffers=new Map(),sfxLoads=new Map(),activeSfx=new Set(),recentFile={},fileVoices=new Map();
+// Read-only counters for tests (tests/sfx-picks.cjs): how many cues actually started, and the last one.
+export const sfxStats={played:0,last:null};
 sfxReady=fetch(sfxURL).then(r=>{if(!r.ok)throw Error('SFX index unavailable');return r.json()}).then(m=>{sfxManifest=m;return m}).catch(e=>{console.warn('SFX unavailable:',e.message);return {}});
 function loadSfx(file){if(sfxBuffers.has(file))return Promise.resolve(sfxBuffers.get(file));if(sfxLoads.has(file))return sfxLoads.get(file);
  const request=fetch(new URL(file,sfxURL)).then(r=>{if(!r.ok)throw Error('Missing SFX '+file);return r.arrayBuffer()}).then(b=>ctx.decodeAudioData(b)).then(b=>{sfxBuffers.set(file,b);return b}).catch(e=>{console.warn(e.message);return null});
@@ -72,8 +77,12 @@ function warmSfx(){if(!ctx||warming)return;warming=true;sfxReady.then(m=>Promise
 // Spencer silenced 2026-10-11, do not restore. (These cues all used cloth-open.ogg: title/menu/overlay/popup sound.)
 const SILENT_CUES=new Set(['menuOpen','menuClose','enlarge','tooltip','pile']);
 export function playSound(name,pitch=1){if(SILENT_CUES.has(name))return;if(W.replaying||document.hidden||!ctx||ctx.state!=='running'||!level('sfxVolume'))return;
- const now=ctx.currentTime;if(now-(recent[name]??-10)<.075)return;recent[name]=now;
+ const now=ctx.currentTime;if(now-(recent[name]??-10)<.075)return;
  const config=sfxManifest[name];if(!config)return;
+ // OD-8 (11-05) anti-spam: cues that share one recording (attack+play, pickup+drop, death cues) never stack within 60 ms,
+ // and one recording never has more than 3 copies sounding at once (big multi-hit turns stay clear, not a wall of noise).
+ if(now-(recentFile[config.file]??-10)<.06||(fileVoices.get(config.file)||0)>=3)return;
+ recent[name]=now;recentFile[config.file]=now;
  const started=performance.now();loadSfx(config.file).then(buffer=>{
   // Drop stale first-load cues instead of playing them on an unrelated screen.
   if(!buffer||performance.now()-started>250||document.hidden||W.replaying||ctx.state!=='running'||!level('sfxVolume'))return;
@@ -81,7 +90,8 @@ export function playSound(name,pitch=1){if(SILENT_CUES.has(name))return;if(W.rep
   const source=ctx.createBufferSource(),gain=ctx.createGain();source.buffer=buffer;
   source.playbackRate.value=Math.max(.5,Math.min(1.5,(Number(pitch)||1)*config.pitch*(.97+Math.random()*.06)));
   gain.gain.value=config.gain*(.92+Math.random()*.16);source.connect(gain);gain.connect(master);activeSfx.add(source);
-  source.onended=()=>{activeSfx.delete(source);source.disconnect();gain.disconnect()};source.start();
+  fileVoices.set(config.file,(fileVoices.get(config.file)||0)+1);sfxStats.played++;sfxStats.last=name;
+  source.onended=()=>{activeSfx.delete(source);fileVoices.set(config.file,Math.max(0,(fileVoices.get(config.file)||1)-1));source.disconnect();gain.disconnect()};source.start();
  });
 }
 // Observe real state changes, so rerenders and rejected actions stay silent.
@@ -161,13 +171,13 @@ export function initAudio(){
  document.addEventListener('keydown',unlock,{once:true});
  document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const node=e.target.closest?.('.node');if(node&&!node.contains(e.relatedTarget))playSound('mapHover');else {const el=e.target.closest?.('button,.btn,.tile,.hand .card');if(el&&!el.contains(e.relatedTarget)&&!el.matches('[disabled],[aria-disabled="true"]'))playSound('hover')}});
  document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const source of activeSfx)source.stop();retire();for(const voice of voices){if(voice.frame)cancelAnimationFrame(voice.frame);voice.el.pause();voice.el.removeAttribute('src');voice.el.load()}voices.clear();outgoing.clear();clearTimeout(handoffTimer);if(ctx)ctx.suspend().catch(()=>{})}else if(unlocked){if(ctx)ctx.resume().catch(()=>{});startTrack()}});
- observeEvents((event,c)=>{if(event==='parry'&&fxOn())playSound('parry');queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={shuffle:'shuffle',guardGained:'guard',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'reward',gainCard:'reward',relicGained:'reward',potionUsed:'potion'};
+ observeEvents((event,c)=>{if(event==='parry'&&fxOn())playSound('parry');queueMicrotask(syncProgress);if(event==='enterRoom'){playSound('travel');setTimeout(()=>{if(!document.hidden)playSound('room')},100)}const sounds={shuffle:'shuffle',guardGained:'guard',playerDamaged:'hurt',turnEnd:'endTurn',goldGained:'gold',gainCard:'reward',relicGained:'reward',potionUsed:'potion'};
  contextSound(event,c);
  if(event==='enemyKilled'&&!document.hidden){const e=c.enemy,sound=deathSoundOf(e);if(fxOn())setTimeout(()=>{if(!document.hidden)playSound(sound)},T(impactBase()));else playSound(sound)}
  if(event==='bossBeat'&&c.kind==='intro')playSound('bossIntro');
  if(event==='bossBeat'&&c.kind==='phase'){if(c.enemy)phaseHeard.add(c.enemy);if(!document.hidden)playSound('bossPhase')}
  if(!fxOn()&&!document.hidden){const combo={crest:'crest',undertow:'guard',echo:'echo',flourish:'flourish',parry:'parry',waypointPlaced:'rank',waypointTrigger:'rank',advance:(c.wp?.rank||0)>=3?'landmark':'rank'};if(combo[event])playSound(combo[event])}
- if(event==='playerHit'&&c.blocked>0&&!c.amount)playSound('guard');
+ if(event==='playerHit'&&c.blocked>0&&!c.amount)playSound('blocked'); // S12 (OD-8 11-05): blow fully stopped by Guard
  if(event==='damageDealt'&&c.amount>0)playSound(c.amount>=15?'heavy':'light');
  else if(event==='statusApplied'&&((c.n>0&&['weak','vuln','brittle','soaked','bleed','sink'].includes(c.key))||(c.n<0&&['str','dex'].includes(c.key))))playSound(({weak:'soaked',vuln:'exposed',brittle:'brittle',bleed:'bleed',sink:'sink'})[c.key]||'debuff');
  else if(event==='combatEnd'&&!c.escaped){if(c.won&&cue.victoryAt>performance.now()){const wait=cue.victoryAt-performance.now();cue.victoryAt=0;setTimeout(()=>playSound('victory'),wait)}else playSound(c.won?'victory':'defeat')}else if(sounds[event])playSound(sounds[event]);
@@ -188,6 +198,8 @@ function contextSound(event,c){
  if(event==='enterRoom'){const room={shop:'shop',rest:'camp',chest:'chest',treasure:'chest'}[c.type];if(room)playSound(room)}
  if(event==='statusApplied'&&c.n>0){const sound={str:'might',dex:'poise',regen:'heal',drench:'drenched',reson:'resonating',shell:'shell',barbs:'barbs',ward:'rebuff',mending:'mending',mightTmp:'might',rooted:'entangle',parry:'guard'}[c.key];if(sound)playSound(sound)}
  if(event==='combatStart'&&c.kind==='boss')playSound('bossIntro');
+ if(event==='enemyStrike'&&c.beats&&c.beats.lead>0&&c.intent&&c.intent.a)playSound('windup',c.beats.w==='boss'?.7:.85); // wind-up whoosh as the lunge starts
+ if(event==='playerHit'&&c.amount>0){const big=c.amount>=Math.max(10,(W.run?.max||60)*.15);playSound(big?'heavy':'hurt',big?.88:1)} // the blow lands on the hero (S10 hurt thud; big blows keep the heavy slam)
  if(event==='enemyAct'){
   const e=c.enemy,m=c.intent||{};
   if(e.key==='bell'||e.key==='novice'||m.ring)playSound('knell');
@@ -201,4 +213,7 @@ function contextSound(event,c){
  }
 }
 // Material voices apply to each foe's attacks and named special intents.
-const ENEMY_VOICES={slug:'water',gull:'cloth-open',knight:'steel',pod:'bubble',wisp:'gutter',crab:'metal',leech:'bubble',lurker:'rope',tendril:'rope',penitent:'steel',mender:'steel',heap:'heavy',limpet:'light',novice:'bell',captain:'steel',eel:'water',warden:'gutter',bell:'bell',matriarch:'rope',tenant:'heavy'};
+const ENEMY_VOICES={slug:'water',gull:'cloth-open',knight:'steel',pod:'bubble',wisp:'gutter',crab:'metal',leech:'bubble',lurker:'rope',tendril:'rope',penitent:'steel',mender:'steel',heap:'heavy',limpet:'light',novice:'bell',captain:'steel',eel:'water',warden:'gutter',bell:'bell',matriarch:'rope',tenant:'heavy',
+ // Acts 2/3 reuse the Act 1 material recordings (design/AUDIO-ACT23-AUDIT.md); unknown keys still fall back to heavy / debuff, and a missing manifest cue is a silent no-op in playSound.
+ hgunner:'metal',shellguard:'metal',lice:'bubble',bellnun:'bell',kettleman:'bubble',diver:'metal',salthusk:'rope',sluiceeng:'water',pumper:'water',lamplighter:'gutter',bosun:'steel',mortar:'heavy',ghostcannon:'heavy',deckshade:'cloth-open',gateplate:'metal',pylon:'metal',dummy:'rope',hauler:'metal',grell:'steel',cantor:'bell',chorister:'bell',basso:'bell',colossus:'heavy',wreckqueen:'steel',battery:'heavy',
+ jelly:'water',polyp:'bubble',voltray:'water',skua:'cloth-open',petrel:'cloth-open',automaton:'metal',cloudshark:'water',cloudserpent:'rope',galereader:'cloth-open',lenswright:'bell',slinger:'heavy',anchorite:'metal',ringpull:'metal',ringcharge:'gutter',ringveil:'cloth-open',hailorb:'light',shardcarrier:'steel',magus:'gutter',squallwest:'cloth-open',squalleast:'cloth-open',eyegale:'gutter',engine:'metal',thalassa:'water',navigator:'cloth-open'};

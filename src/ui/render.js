@@ -1,4 +1,5 @@
 import {showOutcome,clearOutcome,healDigits} from './outcome.js';
+import {placeToasts} from './toast-place.js';
 // Win heal (ECON.winHeal): painted heal digits + a short green glow on the hero bar after the fight.
 const healPopOn=()=>!!(W.run&&!W.cb&&W.run.healPop&&Date.now()-W.run.healPop.t<2200);
 // In the victory scene (B061: no combat, hero still on the battle screen) the hero bar glows green and the painted +N rises from it.
@@ -9,15 +10,19 @@ import {daisHTML} from './classdais.js';
 import {placeDetail} from './place.js';
 // ui/render.js — all screens as HTML strings. Inline handlers call the globals main.js exposes.
 // Player-facing terminology follows design-v2 §0.3 (Guard, Might, Soaked, Exposed, Sink).
+import {WL} from './wordless.js';
 import {barHTML,statusRowHTML,playerStates,enemyExtraSt} from './combatant.js';
 import {CARD_ART,assetEntry,assetSrc,slotHTML,uiIcon,spriteFor,iconHTML,SPRITE_BASELINE,fallenFor} from '../assets.js';
 import {syncAudio} from '../audio.js';
-import {syncEnv,envFxSettingLabel} from './env.js';
+import {syncEnv,envFxSettingLabel,a2TravelEnv} from './env.js';
 import {fightFeet,figureScale,stageAtmosphereHTML,syncStage} from './stage.js';
-import {deathLine} from '../data/places.js';
+import {deathLine,ACT_NAMES,overallFloor,TOTAL_FLOORS} from '../data/places.js';
 import {CARDS,CLASSES,TYPEN,RELICS,POTIONS,CHARMS,EN,KW,ENV} from '../core/registry.js';
-import {loadRunData,settings,saveSettings,savedAction} from '../save.js';
-import {loadProfile,saveProfile,tutSeen,markTutSeen} from '../progress.js';
+import {loadRunData,settings,saveSettings,savedAction,clearRun} from '../save.js';
+import {rigsOff,setRigOff} from './rig.js';
+import {loadProfile,saveProfile,tutSeen,markTutSeen,loadHistory,statsOf,ascUnlocked} from '../progress.js';
+import {ctxHintHTML} from './hints.js';
+import {openHowTo,learnOverlayHTML} from './screens/learn.js';
 import {TUTORIAL,snap as tutSnap} from '../data/tutorial.js';
 import {W} from '../core/state.js';
 import {T,U,SPEEDS,SPEED_LABEL,setAnimSpeedValue,setEnemyPace,enemyPace} from '../core/timing.js';
@@ -27,7 +32,8 @@ export {toggleHitLog} from './hero-plate.js';
 import {cname,cost,desc,kwFor,kwList,needsTarget,isUp,lvlLabel,rkMax,baseCost,costSurcharge} from '../engine/cards.js';
 import {alive,canPlay,curTgt,eAtk,intentOf,echoPlan,echoPreview,canMark,canTakeMove,fbLabel,markBonus,releaseBank,flourishMin,flourishMult,hasRelic,CORE,canDrink,potionNeedsTarget,expCount} from '../engine/combat.js';
 import {mod} from '../core/bus.js';
-import {ECON,campOptions,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
+import {ferryOffer,ECON,isLastAct,canContinueToAct2,canContinueToAct3,campOptions,toast,newRun,goNode,ascInfo,dailySeed,scrubPrice,reachable,bootsLeft,cardOdds} from '../engine/run.js';
+import {dailyPreview,computeScore,dailyResultText,hasDaily} from '../data/daily.js';
 import {anim,syncCombatAnimations} from './fx.js';
 import {screenChange,motionEnabled} from './anim.js';
 import {deathStyleOf,DEATH_STYLES,DEATH_DRAIN} from './deathstyles.js';
@@ -44,7 +50,7 @@ import {pkScreen,pkBtn} from './pk.js';
 import {glyph,stripEmoji,iconize} from './glyphs.js';
 import {lampSummaryHTML,tasksHTML,lampBtnLabel} from './screens/lamp.js';
 import {lampPreview} from '../engine/lamplight.js';
-import {relicFlavour,ferrymanLine,bellCount,wrenLine,WREN_SIDE,currentTier,ENEMY_FLAVOUR,BOSS_DEFEAT} from '../data/lore.js';
+import {relicFlavour,ferrymanLine,bellCount,wrenLine,WREN_SIDE,currentTier,ENEMY_FLAVOUR,BOSS_DEFEAT,CROWN_HOLDS} from '../data/lore.js';
 export const TH={tide:'tidecaller',echo:'echo-mage',carto:'cartographer',duel:'duelist',status:'',curse:'',colorless:''};
 const RARN={s:'Starter',c:'Common',u:'Uncommon',r:'Rare',x:'Special'};
 const esc=s=>String(s).replace(/"/g,'&quot;');
@@ -78,9 +84,11 @@ export function cardHTML(ci,o={}){const d=CARDS[ci.id];const c=cost(ci);const ba
 // ---------------- top bar: HP, gold, floor, potions, relics ----------------
 // Etched bronze lantern (Lantern Tasks): vector so it stays crisp and glows amber.
 const LANTERN_SVG='<svg class="uic lantern" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6M12 3.5v2" fill="none" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7h8l1.4 2v7.2L16 19H8l-1.4-2.8V9z" fill="#3a2a15" stroke="#c9a05a" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 9.2c1.8 1.7 2.2 3 .9 4.4-.5.5-1.3.5-1.8 0-1.2-1.3-.7-2.7.9-4.4z" fill="#ffc45a"/><path d="M7.5 19.8h9" stroke="#c9a05a" stroke-width="1.6" stroke-linecap="round"/></svg>';
-export function topBar(){const K=CLASSES[W.run.cls];return `<div class="topbar sts theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act I</small></span></span>
- <span class="stat hp" style="color:var(--status-damage)">${iconHTML('hud','heart','❤️')} ${Math.max(0,W.run.hp)}/${W.run.max}</span><span class="stat gold" style="color:var(--rarity-rare)">${iconHTML('hud','gold','💰')} ${W.run.gold}</span><span class="stat floor">${iconHTML('hud','floor','🏔️')} ${W.run.floor}/15</span>${potionSlots()}${relicBar()}<span class="sp"></span>
- ${W.run.lamp?`<button class="mini" id="lampbtn" onclick="openOv('tasks')" title="Lantern Tasks">${LANTERN_SVG} ${lampBtnLabel()}</button>`:''}<button class="mini" id="deckbtn" onclick="openOv('deck')" title="Deck">${iconHTML('hud','deck','🂠')} <span class="deck-count">${W.run.deck.length}</span></button><button class="mini" id="mapbtn" onclick="openOv('map')" title="Map">${iconHTML('hud','map','🗺️')}</button><button class="mini" id="setbtn" onclick="openOv('settings')" title="Settings">${iconHTML('hud','settings','⚙️')}</button></div>${toastsHTML()}`}
+export function barTip(k){const of=overallFloor(W.run.act,W.run.floor);const t={floor:`Floor ${of} of ${TOTAL_FLOORS} across all three acts`,lamp:`Lantern Tasks finished this run: ${lampBtnLabel()}. Tap again to read them`}[k];if(t){toast(t);render()}}
+export function topBar(){const K=CLASSES[W.run.cls];// The one-time top-bar tip waits for a fight: on camp, shop, event and map pages the bottom-left toast sat over tiles, cards or nodes.
+ if(!settings.barTipSeen&&W.run.floor>=1&&W.S&&W.S.screen==='combat'){settings.barTipSeen=true;try{saveSettings()}catch(_){}toast(`Top bar: floor ${overallFloor(W.run.act,W.run.floor)} of ${TOTAL_FLOORS} · lantern tasks ${lampBtnLabel()||'0/3'} (tap either for more)`)}return `<div class="topbar sts theme-${TH[W.run.cls]}${K.n.length>9?' longname':''}"><span class="who">${slotHTML('portraits',W.run.cls,'pt',K.e)}<span class="nm">${K.n}<small>Act ${['','I','II','III'][W.run.act||1]}${W.run.asc?' · A'+W.run.asc:''}</small></span></span>
+ <span class="stat hp" style="color:var(--status-damage)">${iconHTML('hud','heart','❤️')} ${Math.max(0,W.run.hp)}/${W.run.max}</span><span class="stat gold" style="color:var(--rarity-rare)">${iconHTML('hud','gold','💰')} ${W.run.gold}</span><span class="stat floor" onclick="barTip('floor')" title="Floor out of all three acts" aria-label="Floor ${overallFloor(W.run.act,W.run.floor)} of ${TOTAL_FLOORS}">${iconHTML('hud','floor','🏔️')} <span class="fl-n">${overallFloor(W.run.act,W.run.floor)}/${TOTAL_FLOORS}</span></span>${potionSlots()}${relicBar()}<span class="sp"></span>
+ ${W.run.lamp?`<button class="mini" id="lampbtn" onclick="openOv('tasks')" title="Lantern Tasks done this run" aria-label="Lantern Tasks ${lampBtnLabel()}">${LANTERN_SVG} ${lampBtnLabel()}</button>`:''}<button class="mini" id="deckbtn" onclick="openOv('deck')" title="Deck">${iconHTML('hud','deck','🂠')} <span class="deck-count">${W.run.deck.length}</span></button><button class="mini" id="mapbtn" onclick="openOv('map')" title="Map">${iconHTML('hud','map','🗺️')}</button><button class="mini" id="setbtn" onclick="openOv('settings')" title="Settings">${iconHTML('hud','settings','⚙️')}</button></div>${toastsHTML()}`}
 export function potionSlots(){const ps=W.run.potions;return `<span class="potions" id="potions">${ps.map((id,i)=>{const p=id&&POTIONS[id];
  return `<button class="potion${p?'':' empty'}${W.S.potion===i?' on':''}" data-potion="${i}" ${p?`style="--pcol:${p.col}"`:''} title="${p?esc(p.n+': '+p.d):'Empty potion slot.'}" onclick="potionTap(${i})">${p?slotHTML('potions',id,'',p.e):''}</button>`}).join('')}</span>`}
 export function relicBar(){const rs=W.run.relics;const now=Date.now();return `<div class="relics" id="relicbar">${rs.map(r=>{const d=RELICS[r.id];if(!d)return'';const fl=r.flashT&&now-r.flashT<900;
@@ -94,22 +102,24 @@ function fitRelics(){const bar=document.getElementById('relicbar');if(!bar||!bar
  const capacity=Math.max(1,Math.floor(bar.clientWidth/cell));
  const limit=icons.length>capacity?Math.max(0,capacity-1):capacity;
  icons.forEach((el,i)=>el.hidden=i>=limit);const n=Math.max(0,icons.length-limit);more.hidden=!n;more.textContent='+'+n;more.setAttribute('aria-label',`Show all ${icons.length} relics`)}
-export function toastsHTML(){const now=Date.now();const t=(W.toasts||[]).filter(x=>now-x.t<2600);if(!t.length)return'';return `<div class="toasts">${t.map(x=>`<div class="toast t-${x.cls||""}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`}
+export function toastsHTML(){const now=Date.now();const t=(W.toasts||[]).filter(x=>now-x.t<2600);if(!t.length)return'';return `<div class="toasts">${t.map(x=>`<div class="toast t-${x.cls||""}" data-k="${x.t}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`}
 export function potionTap(i){if(drag)return;const id=W.run.potions[i];if(!id){W.S.potion=null;return render()}W.S.potion=W.S.potion===i?null:i;W.S.relicView=null;render()}
 export function relicTap(id){if(drag)return;W.S.relicView=W.S.relicView===id?null:id;W.S.potion=null;render()}
 export function closePop(){W.S.potion=null;W.S.relicView=null;render()}
+// ui-fix-a #13/#14: popups show the 256px painting, not the 64px HUD icon.
+const bigArt=h=>h.replace(/-64\.webp/g,'.webp').replace(/ srcset="[^"]*"/,'');
 function popHTML(){const S=W.S;
  if(S.potion!=null&&W.run.potions[S.potion]){const id=W.run.potions[S.potion],p=POTIONS[id];const can=canDrink(id);const tg=potionNeedsTarget(id);
   const why=!W.cb&&!p.outside?'Use it in combat':p.passive?'Works automatically when you would die':W.cb&&(W.cb.busy||W.cb.mode)?'Wait for your turn':!can?'Can\'t use this here':'';
-  return `<div class="pop potpop" id="potpop" onclick="event.stopPropagation()"><div class="itemhead">${slotHTML('potions',id,'itemart',p.e)}<div><b>${p.n}</b> <span class="muted">${RARN[p.rarity]}${p.cls?' · '+CLASSES[p.cls].n:''}</span><div>${p.d}</div></div></div>
-  ${tg&&can&&W.cb?`<div class="muted">Targets: ${curTgt()?curTgt().n:'—'} (tap an enemy first to change)</div>`:''}<div class="row"><button class="btn pri" id="drinkbtn" ${can?'':'disabled'} onclick="drinkPotion(${S.potion});W.S.potion=null;render()">${can?'Drink':why}</button><button class="btn" id="discardpot" onclick="discardPotion(${S.potion})">Discard</button><button class="btn" onclick="closePop()">✕</button></div></div>`}
+  return `<div class="pop potpop" id="potpop" onclick="event.stopPropagation()"><div class="itemhead">${bigArt(slotHTML('potions',id,'itemart',p.e))}<div><b>${p.n}</b> <span class="muted">${RARN[p.rarity]}${p.cls?' · '+CLASSES[p.cls].n:''}</span><div>${p.d}</div></div></div>
+  ${tg&&can&&W.cb?`<div class="muted">Targets: ${curTgt()?curTgt().n:'—'} (tap an enemy first to change)</div>`:''}<div class="row">${can?`<button class="btn pri" id="drinkbtn" onclick="drinkPotion(${S.potion});W.S.potion=null;render()">Drink</button>`:`<span class="pop-hint" id="drinkwhy">${why}</span>`}<button class="btn" id="discardpot" onclick="discardPotion(${S.potion})">Discard</button></div><button class="pop-x" onclick="closePop()" aria-label="Close">×</button></div>`}
  if(S.relicView==='__all')return `<div class="pop relpop relic-collection" id="relpop"><button class="relic-close" onclick="closePop()" aria-label="Close relics">×</button><h2>Relics</h2>${relicCollectionHTML()}</div>`;
  if(S.relicView){const ch=S.relicView.startsWith('charm:');const d=ch?CHARMS[S.relicView.slice(6)]:RELICS[S.relicView];const r=!ch&&W.run.relics.find(x=>x.id===S.relicView);
-  if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${slotHTML('relics',S.relicView,'itemart',d.e)}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${relicFlavour(d.id||S.relicView,d.flavour)}</div>`:''}</div>`}
+  if(d)return `<div class="pop relpop" id="relpop" onclick="closePop()"><div class="itemhead">${bigArt(slotHTML('relics',S.relicView,'itemart',d.e))}<div><b>${d.n}</b> <span class="muted">${ch?'Charm':(d.tierName||'')+(d.cls?' · '+CLASSES[d.cls].n:'')}</span><div>${d.d}</div></div></div>${r&&(r.id==='starfish'||r.id==='boots')?`<div class="muted">Uses left: ${r.n}</div>`:''}${d.flavour?`<div class="flav">${relicFlavour(d.id||S.relicView,d.flavour)}</div>`:''}</div>`}
  return ''}
-export function openOv(k){if(drag)return;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
+export function openOv(k){if(drag)return;W.S.dkTerms=false;W.S.ov=W.S.ov===k?null:k;W.S.potion=null;W.S.relicView=null;render()}
 export function hpbar(h,m,blk,blkT,who){return barHTML(h,m,blk,blkT!=null&&anim(blkT,T(700)),who)}
-export function badges(block,blkT,st,extra,who){const n=alive().length;const limit=who&&typeof who==='object'&&n>1?Math.max(1,Math.min(2,Math.floor((innerWidth*(.98-1720/2340)/(n-.5)+1)/23))):6;return statusRowHTML(st,extra,who,limit)}
+export function badges(block,blkT,st,extra,who){const n=alive().length;const limit=who&&typeof who==='object'&&n>1?Math.max(1,Math.min(2,Math.floor((laneOf(n,innerWidth).cell+1)/23))):6;return statusRowHTML(st,extra,who,limit)}
 // Floating numbers (R12): size scales with the amount (22-40 px), stacked numbers fan out, Guard uses its icon, and a number waits for the swing to connect (x.d).
 const FLN=/^([+-]?)(\d+)/;
 export function fxHTML(who){const now=Date.now();const list=W.cb.vfx.filter(x=>x.who===who&&now-x.t<T(x.cls==='curse'?1800:950)+(x.d||0));
@@ -169,36 +179,42 @@ export function sceneGeom(){const vw=innerWidth,vh=innerHeight;return {vw,vh,s:M
 // name plate + HP bar (Guard at its left end) under the feet, then the bounded status rail.
 // v0.6.2.1 (Spencer): every battle figure 15% taller; top = feet - H keeps the ground anchor fixed. Head-room and width clamps still apply.
 export const FIG_SCALE=1.15;
+export const BOSS_SCALE=1.3; // Spencer 2026-10-18: every boss (Acts 1-3) is drawn 30% larger than its old on-screen size; minions/adds/elites/hero untouched. One number, change here.
+export const bossMul=boss=>boss?BOSS_SCALE:1;
 function figureHTML({sp,role,ph,g,x,shake,intent,name,hp,badgesH,fx,cls,attrs}){const sc=figureScale(role==='boss')*FIG_SCALE;let H=Math.round(Math.min(sc*(role==='hero'?g.vh*.26:role==='boss'?g.vh*.44:role==='elite'?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(role==='hero'?g.heroTop:g.top+32)));
- if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor(g.enemyMaxWidth*FIG_SCALE*sp.h/sp.w)); // sprites may grow into the cell gap; HP bars/intents keep the cell width (--bw)
+ if(role!=='hero'&&sp&&g.enemyMaxWidth)H=Math.min(H,Math.floor((g.spriteMaxWidth||g.enemyMaxWidth)*FIG_SCALE*sp.h/sp.w)); // sprites may grow into the cell gap; HP bars/intents keep the cell width (--bw)
+ if(role==='boss')H=Math.round(H*BOSS_SCALE); // x1.3 of the size the old caps allowed; feet stay on the ground line (top = feet-H)
  const W=sp?Math.round(H*sp.w/sp.h):Math.round(H*.8);const ax=sp?sp.ax:.5;const hov=sp?Math.round(sp.hover/1440*g.vh):0;
- const top=g.feet-H-hov,L=Math.max(4,Math.min(g.vw-W-4,x-Math.round(W*(g.multi?.5:ax)))),fx0=Math.round(W*(g.multi?.5:ax));const it=Math.max(g.top,top-46)-top;const bw=Math.round(Math.min(g.vh*260/1080,g.multi?g.enemyMaxWidth:Infinity));
+ const top=g.feet-H-hov,L=Math.max(4,Math.min(g.vw-W-4,x-Math.round(W*(g.multi?.5:ax)))),fx0=Math.round(W*(g.multi?.5:ax));const it=Math.max(role==='boss'?g.top-18:g.top,top-46)-top;const bw=Math.round(Math.min(g.vh*260/1080,g.multi?g.enemyMaxWidth:Infinity));
  const shW=Math.round(W*.7*(role==='boss'?1.3:1)*(hov?.55:1));const img=`<div class="slot spr-slot${sp?' has-img':''}" data-asset="sprites.${sp?sp.id:'none'}"><div class="ph" style="font-size:${Math.round(Math.min(W,H)*.7)}px">${ph}</div>${sp?`<img class="spr" src="${sp.f}" alt="" draggable="false" decoding="async" style="height:${H}px${role!=='hero'&&sp.facing==='right'?';scale:-1 1':''}" onerror="assetFail(this)">`:''}</div>`;
- return `<div class="${cls}" ${attrs} style="left:${L}px;top:${top}px;width:${W}px;height:${H+hov}px;--bw:${bw}px;--ax:${fx0}px">
+ return `<div class="${cls}" ${attrs} style="left:${L}px;top:${top}px;width:${W}px;height:${H+hov}px;--bw:${bw}px;--ax:${fx0}px;--bx:${Math.round(W*ax)}px">
  <i class="shadow${hov?' float':''}" style="left:${fx0}px;top:${H+hov}px;width:${shW}px;height:${Math.max(8,Math.round(shW*.17))}px"></i>
  <div class="fig ${shake?'shake':''}" style="width:${W}px;height:${H}px;left:0;top:0;${shake||''}">${img}</div>
  ${intent?`<div class="intentw" style="top:${it}px">${intent}</div>`:''}
  <div class="plate" style="top:${H+hov+2}px">${`<div class="nm">${name}</div>`}${hp}<div class="stw">${badgesH}</div></div>${fx}</div>`}
-function enemyX(i,n,g){if(n===1)return Math.round(g.vw*1720/2340);const a=1720/2340,cell=g.vw*(.98-a)/(n-.5);return Math.round(g.vw*a+cell*i)}
-export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();g={...g,multi:(n||1)>1,enemyMaxWidth:(n||1)>1?g.vw*((.98-1720/2340)/((n||1)-.5)-.012):g.vw*.43};const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
+// Enemy lane (battle-room-v1): x of the first enemy centre (fraction of width), cell width, sprite width cap. 1-2 foes keep the old narrow lane; crowds start further left and sprites may overlap neighbours by up to ~30-45% (plates keep the cell width).
+const LANE_A=[0,1720/2340,1720/2340,.60,.53,.48,.44];
+export function laneOf(n,vw){n=n||1;const a=n===1?1720/2340:LANE_A[Math.min(n,6)],cell=n>1?vw*(.98-a)/(n-.5):vw*.43,ov=n>=3?1.3:1;return {a,cell,plate:n>1?cell-vw*.012:vw*.43,sprite:n>1?cell*ov-vw*.012:vw*.43}}
+function enemyX(i,n,g){if(n===1)return Math.round(g.vw*1720/2340);const L=laneOf(n,g.vw);return Math.round(g.vw*L.a+L.cell*i)}
+export function enemyHTML(e,i,k,n,g){g=g||sceneGeom();{const L=laneOf(n,g.vw);g={...g,multi:(n||1)>1,enemyMaxWidth:L.plate,spriteMaxWidth:L.sprite}};const many=alive().length>1;const sh=motionEnabled()?null:anim(e.shake,400);const act=W.cb.busy&&W.cb.tele===e;
  const role=e.boss?'boss':e.elite?'elite':'normal';const vi=W.cb.ens.slice(0,i).filter(x=>x.key===e.key).length;
  const flav=ENEMY_FLAVOUR[e.key],nm0=flav?`${e.n}<i class="nmfl">${esc(flav)}</i>`:e.n;
- const name=`${nm0}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}`;const pasH=e.passive?`<span class="pas" title="${esc(e.passive.n+': '+e.passive.text)}">${e.passive.n==='Rooted'?iconHTML('status','rooted','🌿'):'🌿'}${e.passive.n}</span>`:'';
+ const name=`${nm0}${e.elite?' <span class="star">★</span>':''}${e.boss&&e.key==='bell'?` <span class="ph">P${e.ph}</span>`:''}`;const pasH=''; /* v0.6.52 (Spencer): no passive/ability name text under the enemy HP bar; status icons + tap info (enemy description, Passive line) stay */
  return figureHTML({sp:spriteFor('enemies',e.key,e.sv!=null?e.sv:vi),role,ph:e.e,g,x:enemyX(k==null?i:k,n||1,g),shake:sh,intent:intentHTML(e),name,hp:hpbar(e.hp,e.max,e.block,e.blkT,'e'+e.uid),
-  badgesH:(e.passive?.n==='Rooted'?'':pasH)+badges(0,0,{...e.st,...enemyExtraSt(e),...(e.passive?.n==='Rooted'?{rooted:1}:{}),...(W.cb&&W.cb.parries&&W.cb.parries[e.uid]?{parry:W.cb.parries[e.uid]}:{})},undefined,e),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
+  badgesH:(e.passive?.n==='Rooted'?'':pasH)+badges(0,0,{...e.st,...enemyExtraSt(e),...(e.passive?.n==='Rooted'?{rooted:1}:{}),...(W.cb&&W.cb.parries&&W.cb.parries[e.uid]?{parry:W.cb.parries[e.uid]}:{})},undefined,e),fx:fxHTML(e.uid),cls:`en ${e.boss?'boss':''} ${e.elite?'elite':''} ${many&&W.cb.tgt===i?'tg':''} ${act?'act':''}${e.sub?' sub':''}${e.back?' back':''}${e.holds?' holder':''}`,attrs:`onclick="tgt(${i})" data-en="${i}" data-key="${e.key}"`})}
 export function heroHTML(g){g=g||sceneGeom();const K=CLASSES[W.run.cls];const cb=W.cb||{p:{st:{}}}; // after the win (reward screen) there is no combat: the hero stands in the same spot with no statuses
  const sh=motionEnabled()||!W.cb?null:anim(cb.pshake,400);
  return figureHTML({sp:spriteFor('figures',W.run.cls),role:'hero',ph:K.e,g,x:Math.round(g.vw*570/2340),shake:sh,intent:'',name:`<span class="hn">${K.n}</span>`,hp:heroBarHeal(hpbar(W.run.hp,W.run.max,cb.p.block,cb.p.blkT,'p')),
   badgesH:W.cb?badges(0,0,{...cb.p.st,...(cb.parry&&!cb.parryUsed?{parry:cb.parry}:{})},playerStates(),'p'):'',fx:W.cb?fxHTML('p'):'',cls:`hero theme-${TH[W.run.cls]}`,attrs:'id="hero"'})}
 // Painted fallen-remains of a foe (B061): lies where it fell, same foot line and slot as the standing figure. e = a live enemy or a snapshot {key,sv,vi,boss,elite,ph,remT}.
 // It fades in as the death animation ends (CSS animation delay, resumed from remT so re-renders never restart it) and never blocks a tap.
-export function remainsHTML(e,k,n,g,vi){g=g||sceneGeom();const multi=(n||1)>1,mw=multi?g.vw*((.98-1720/2340)/((n||1)-.5)-.012):g.vw*.43;
+export function remainsHTML(e,k,n,g,vi){if(e.gap)return '';g=g||sceneGeom();const multi=(n||1)>1,mw=laneOf(n,g.vw).sprite;
  const sp=spriteFor('enemies',e.key,e.sv!=null?e.sv:vi||0),fa=fallenFor(sp,e);if(!fa)return '';
  const sc=figureScale(!!e.boss),H=Math.round(Math.min(sc*(e.boss?g.vh*.44:e.elite?g.vh*.36:sp?.role==='summon'?g.vh*Math.min(.31,(sp.pct||24)/100):g.vh*280/1080),g.feet-(g.top+32)));
- const x=enemyX(k,n||1,g);let w=Math.round(Math.max(H*(sp?sp.w/sp.h:.8),H*.9)*(e.boss?.92:.85));w=Math.min(w,Math.round(mw*.96),Math.round(g.vw*.4));const h=Math.round(w*fa.h/fa.w);
+ const x=enemyX(k,n||1,g);let w=Math.round(Math.max(H*(sp?sp.w/sp.h:.8),H*.9)*(e.boss?.92:.85));w=Math.min(w,Math.round(mw*.96),Math.round(g.vw*.4));if(e.boss)w=Math.round(w*BOSS_SCALE);const h=Math.round(w*fa.h/fa.w);
  if(!e.remT)e.remT=Date.now();const d=remainsDelay(e),age=Date.now()-e.remT;
  const L=Math.max(4,Math.min(g.vw-w-4,x-Math.round(w/2)));
- return `<div class="remains${e.boss?' boss':''}" data-key="${e.key}" data-fallen="${fa.id}" style="left:${L}px;top:${g.feet-h+Math.round(h*.06)}px;width:${w}px;height:${h}px;--rd:${d-age}ms"><i class="shadow" style="left:${Math.round(w*.5)}px;top:${Math.round(h*.94)}px;width:${Math.round(w*.9)}px;height:${Math.max(8,Math.round(w*.1))}px"></i><img src="${fa.src}" alt="" draggable="false" decoding="async" width="${w}" height="${h}"></div>`}
+ return `<div class="remains${e.boss?' boss':''}${e.back?' back':''}${e.sub?' sub':''}" data-key="${e.key}" data-fallen="${fa.id}" style="left:${L}px;top:${g.feet-h+Math.round(h*.06)}px;width:${w}px;height:${h}px;--rd:${d-age}ms"><i class="shadow" style="left:${Math.round(w*.5)}px;top:${Math.round(h*.94)}px;width:${Math.round(w*.9)}px;height:${Math.max(8,Math.round(w*.1))}px"></i><img src="${fa.src}" alt="" draggable="false" decoding="async" width="${w}" height="${h}"></div>`}
 // ms from the kill to the remains appearing: the death animation's own length (shorter when motion is off)
 const remainsDelay=e=>motionEnabled()?T(250+DEATH_DRAIN+((DEATH_STYLES[deathStyleOf(e)]||{ms:900}).ms)*.62+(e.boss?0:100)):0;
 export function tipHTML(){const cb=W.cb;
@@ -239,31 +255,40 @@ function cursePopsHTML(){const now=Date.now(),cb=W.cb;const c=(cb.cursePops||[])
  return `<div class="cursepops">${c.map((x,i)=>`<div class="cursepop" style="--i:${i};animation-delay:-${now-x.t}ms">${cardHTML({id:x.id,uid:-800-i,up:false})}</div>`).join('')}</div>`}
 function calloutsHTML(){const now=Date.now();const c=(W.cb.callouts||[]).filter(x=>now-x.t<T(1300));return cursePopsHTML()+(c.length?`<div class="callouts">${c.slice(-2).map(x=>`<div class="co c-${x.cls}" style="animation-delay:-${now-x.t}ms">${x.txt}</div>`).join('')}</div>`:'')}
 const titleHTML=t=>{const k=String(t).indexOf(': ');return k>0&&k<40?`<h2>${t.slice(0,k)}</h2><div class="muted csub">${t.slice(k+2)}</div>`:`<h2>${t}</h2>`};
+// End Turn sun: dim while you can still act, burning once energy is 0, burning through the whole enemy turn (cb.enemyTurn, set by endTurn, cleared in finish/win/lose), dim again on your next turn.
+export const sunState=cb=>cb.enemyTurn?'work':(cb.energy<=0?'ready':'dim');
 export function combatScr(){const cb=W.cb;if((settings.enemyPace||'measured')!==enemyPace())setEnemyPace(settings.enemyPace);
- const incoming=cb.ens.filter(e=>e.hp>0&&!e.fled).reduce((a,e)=>{const m=intentOf(e);return a+(m.a?eAtk(e,m.a)*(m.h||1):0)},0);let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
+ const incoming=cb.ens.filter(e=>e.hp>0&&!e.fled).reduce((a,e)=>{const m=intentOf(e);return a+(m.a&&!m.fog?eAtk(e,m.a)*(m.h||1):0)},0);let h=`<div class="combat theme-${TH[W.run.cls]}${cb.kind==='boss'?' bossfight':''}${alive().length>3?' dense-foes':''}">`+topBar();
  h+=daisHTML();
- const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>!e.fled&&(e.hp>0||!e.summoned)); // the fallen stay in their slot as remains
- h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>e.hp>0?enemyHTML(e,i,k,live.length,g):remainsHTML(e,k,live.length,g,cb.ens.slice(0,i).filter(x=>x.key===e.key).length)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${coachHTML()}${hintHTML()}`;
+ const g=sceneGeom();const pick=cb.mode&&['choice','slot','chart','retain'].includes(cb.mode.k);const live=cb.ens.map((e,i)=>[e,i]).filter(([e])=>!e.fled); // the fallen stay in their slot as remains. victory-sweep: a dead summoned foe keeps its slot as an empty gap (drawn as nothing), so its death never re-spaces the others (they used to slide, and the survivors jumped again at victory)
+ h+=`<div class="scene${pick?' pick-dim':''}" onclick="sceneTap(event)"><div class="ground"></div>${stageAtmosphereHTML(false)}${heroHTML(g)}<div class="foes${cb.busy&&cb.tele?' has-act':''}">${live.map(([e,i],k)=>e.hp>0?enemyHTML(e,i,k,live.length,g):e.summoned?'':remainsHTML(e,k,live.length,g,cb.ens.slice(0,i).filter(x=>x.key===e.key).length)).join('')}</div>${stageAtmosphereHTML(true)}${tipHTML()}${calloutsHTML()}${bossBeatHTML()}${(()=>{const c=coachHTML(),hh=hintHTML();if(hh&&!cb.hhRe){cb.hhRe=1;setTimeout(()=>{if(W.cb===cb&&!drag)render()},HINT_MS+120)}return c+hh+ctxHintHTML(cb,W.run.cls,!!c||!!hh)})()}`;
  h+=`<div class="log">${cb.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.25}">${l}</div>`).join('')}</div>`;
  if(cb.banner&&!['Enemy Turn','Player Turn'].includes(cb.banner.txt)){const a=anim(cb.banner.t,T(560));if(a)h+=`<div class="banner ${cb.banner.en?'en':''}" style="${a}">${cb.banner.txt}</div>`}
  const fl=W.run.cls==='duel'&&cb.armFlourish,mkA=W.run.cls==='echo'&&cb.armMark;
  h+=`</div><div class="bottom"><div class="hand${fl?' flourishing':''}${mkA?' marking':''}" id="hand">${cb.hand.map((ci,i)=>{const d=CARDS[ci.id];return cardHTML(ci,{sel:cb.sel===i,can:canPlay(ci),i,flourish:fl&&d.t==='A',mark:mkA&&canTakeMove(ci)})}).join('')}</div>
  <div class="ctl"><div>${heroPlateHTML({incoming})}<button class="pile" id="drawpile" onclick="openOv('draw')" title="Draw pile.">${iconHTML('hud','draw','📚')} <span class="pile-count">${cb.draw.length}</span></button></div>
- <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurnTap()" ${cb.busy||cb.mode?'disabled':''} aria-label="End turn"><img class="end-seal" src="${assetSrc('ui','end-turn-c2')}" alt="" draggable="false"><span class="end-label">END</span></button></div></div></div>`;
+ <div><div class="row2"><button class="pile" id="exhpile" onclick="openOv('exh')" title="Sunk: removed for this combat.">${iconHTML('hud','sunk','⚓')} <span class="pile-count">${cb.exh.length}</span></button><button class="pile" id="discpile" onclick="openOv('disc')" title="Discard pile. Reshuffled when the draw pile runs out.">${iconHTML('hud','discard','🗑️')} <span class="pile-count">${cb.disc.length}</span></button></div><button class="endbtn" id="endbtn" onclick="endTurnTap()" ${cb.busy||cb.mode?'disabled':''} data-sun="${sunState(cb)}"${WL.endTurn?' data-wl="1"':''} style="--sp:-${Date.now()%1600}ms" aria-label="End turn"><img class="end-seal" src="${assetSrc('ui',WL.endTurn?'end-turn-clean':'end-turn-c2')}" alt="" draggable="false"><span class="end-label">END</span></button></div></div></div>`;
  const m=cb.mode;
  if(m&&m.k==='choice')h+=`<div class="ov battle"><div class="box tilebox" id="choicebox">${titleHTML(m.title)}${tilesRow(m.opts.map((o,i)=>optionHTML(o,`modeAct('choice',${i})`,{i})),'chtiles')}</div></div>`;
+ if(m&&m.k==='retain')h+=`<div class="ov battle"><div class="box tilebox" id="retainbox" role="dialog" aria-modal="true" aria-label="${esc(m.title)}">${titleHTML(m.title)}<div class="tiles chtiles retaintiles" style="--n:${m.uids.length}">${m.uids.map((u,i)=>{const ci=cb.hand.find(c=>c.uid===u);return ci?`<button class="tcard opt retainpick" data-retain="${i}" aria-label="Retain ${esc(cname(ci))}" onclick="modeAct('retain',${i})">${cardHTML(ci,{})}</button>`:''}).join('')}</div><div class="actions"><button class="btn" id="retainskip" onclick="modeAct('skip')">Let them all go</button></div></div></div>`;
  if(m&&m.k==='slot')h+=`<div class="ov battle"><div class="box tilebox" id="slotbox">${titleHTML(m.title)}<div class="tiles chtiles slottiles" style="--n:${cb.slots.length}">${cb.slots.map((w,i)=>`<div class="tcard opt slotpick">${cardHTML(w,{click:`modeAct('slot',${i})`})}<span class="tcap">${w.rank?'Rank '+w.rank:'Rank 0'}${w.temp?' · starting':''}</span></div>`).join('')}</div></div></div>`;
- if(m&&m.k==='chart'){const n=m.n;const cards=Array.from({length:n},(_,i)=>{const ci=cb.draw[i];return `<div class="cslot${i===0?' first':''}" data-i="${i}"><span class="cnum">${i===0?'<b>1</b> drawn first':'<b>'+(i+1)+'</b>'}</span>${cardHTML({...ci,uid:ci.uid},{})}<span class="cmv"><button class="cmvb" aria-label="Earlier" onclick="modeAct('up',${i})" ${i===0?'disabled':''}>◀</button><button class="cmvb" aria-label="Later" onclick="modeAct('dn',${i})" ${i===n-1?'disabled':''}>▶</button></span></div>`}).join('');
+ if(m&&m.k==='chart'&&Math.min(m.n,cb.draw.length)<1){/* nothing left to chart (draw pile shorter than m.n): never render a broken prompt, just finish it */setTimeout(()=>{if(W.cb&&W.cb.mode&&W.cb.mode.k==='chart')window.modeAct('done')},0)}
+ else if(m&&m.k==='chart'){const n=m.n=Math.min(m.n,cb.draw.length);const cards=Array.from({length:n},(_,i)=>{const ci=cb.draw[i];return `<div class="cslot${i===0?' first':''}" data-i="${i}"><span class="cnum">${i===0?'<b>1</b> drawn first':'<b>'+(i+1)+'</b>'}</span>${cardHTML({...ci,uid:ci.uid},{})}<span class="cmv"><button class="cmvb" aria-label="Earlier" onclick="modeAct('up',${i})" ${i===0?'disabled':''}>◀</button><button class="cmvb" aria-label="Later" onclick="modeAct('dn',${i})" ${i===n-1?'disabled':''}>▶</button></span></div>`}).join('');
   h+=`<div class="ov battle"><div class="box chartbox" id="chartbox"><h2>🗺️ Chart: set the order of your next draws</h2><div class="muted csub">Drag cards left or right. The leftmost card is drawn first. Drop one in the Bottom slot to send it under the pile.</div>
   <div class="chartrow" style="--n:${n}"><div class="cards" id="chartcards">${cards}</div><div class="cright"><div class="cbottom${m.moved?' used':''}" id="chartbottom"><span class="cbi">⤓</span><b>Bottom</b><i>${m.moved?'Card sent down':'Drop 1 card here'}</i></div><button class="btn pri" id="chartdone" onclick="modeAct('done')">Done</button></div></div></div></div>`}
+ if(cb.endConfirm&&!cb.busy&&!cb.mode)h+=endConfirmDialog();
  return h+'</div>'}
+function endConfirmDialog(){return `<div class="ov end-confirm-ov" id="endconfirm" role="dialog" aria-modal="true" aria-labelledby="endconfirmq"><div class="box card-skip-box end-confirm-box"><h2 id="endconfirmq">You still have energy. End your turn anyway?</h2><div class="actions"><button class="btn" id="endcancel" onclick="endTurnConfirm(false)">Cancel</button><button class="btn pri" id="endyes" onclick="endTurnConfirm(true)">End Turn</button></div></div></div>`}
+export function endTurnConfirm(yes){const cb=W.cb;if(!cb||!cb.endConfirm)return;cb.endConfirm=false;if(yes)endTurnTap(true);else render()}
 // C2 sun seal: press scales the button; ending the turn plays the painted burst (transform/opacity only, never past 1.6x) on a layer that survives the re-render.
-export function endTurnTap(){const btn=document.getElementById('endbtn');
+export function endTurnTap(force){const btn=document.getElementById('endbtn');const cb0=W.cb;
+ // Spencer 10-15: pressing End with energy left AND a playable card asks first. Never at 0 energy, with nothing playable, mid-enemy-turn or in a pick mode.
+ if(cb0&&!cb0.busy&&!cb0.mode&&!force&&!cb0.endConfirm&&cb0.energy>0&&cb0.hand.some(ci=>canPlay(ci))){cb0.endConfirm=true;cb0.sel=null;render();return}
  const reduce=document.body.classList.contains('reduce-motion')||matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(btn&&!btn.disabled&&!reduce){const r=btn.getBoundingClientRect(),fx=document.createElement('img');
   fx.className='end-burst-fx';fx.alt='';fx.draggable=false;fx.src=assetSrc('ui','end-turn-c2-burst');
   fx.style.left=(r.left+r.width/2)+'px';fx.style.top=(r.top+r.height/2)+'px';fx.style.width=r.width+'px';fx.style.height=r.height+'px';
-  document.body.appendChild(fx);const done=()=>fx.remove();fx.addEventListener('animationend',done,{once:true});setTimeout(done,900)}
+  btn.classList.remove('sun-pop');void btn.offsetWidth;btn.classList.add('sun-pop');setTimeout(()=>btn.classList.remove('sun-pop'),620);document.body.appendChild(fx);const done=()=>fx.remove();fx.addEventListener('animationend',done,{once:true});setTimeout(done,900)}
  window.endTurn?.()}
 function tgtImpl(i){const cb=W.cb;if(!cb||cb.busy||drag)return;if(cb.mode)return;const e=cb.ens[i];if(!e||e.hp<=0)return;cb.tgt=i;
  cb.insp=cb.insp===i?null:i;cb.sel=null;render()}
@@ -332,21 +357,39 @@ function placeStatusRows(){
 
 // ---------------- title / travel ----------------
 const sxSw=(id,label,on,fn,dis)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-sw" id="${id}" type="checkbox" ${on?'checked':''} ${dis?'disabled':''} onchange="${fn}(this.checked)"></label>`;
-const sxSeg=(id,label,vals,cur,fn)=>`<div class="sx-row"><span class="sx-t">${label}</span><span class="sx-seg" id="${id}" role="radiogroup" aria-label="${label}">${vals.map(([v,t])=>`<button type="button" role="radio" aria-checked="${v===cur}" class="${v===cur?'on':''}" data-v="${v}" onclick="${fn}('${v}');render()">${t}</button>`).join('')}</span></div>`;
+const sxSeg=(id,label,vals,cur,fn)=>`<div class="sx-row"><span class="sx-t">${label}</span><span class="sx-seg" id="${id}" role="radiogroup" aria-label="${label}" onkeydown="sxKey(event)">${vals.map(([v,t])=>`<button type="button" role="radio" aria-checked="${v===cur}" class="${v===cur?'on':''}" data-v="${v}" onclick="${fn}('${v}');render();sxRefocus('${id}','${v}')">${t}</button>`).join('')}</span></div>`;
 const sxRange=(id,label,key,val)=>`<label class="sx-row"><span class="sx-t">${label}</span><input class="sx-rng" id="${id}" aria-label="${label} volume" type="range" min="0" max="1" step="0.01" value="${val}" style="--p:${Math.round(val*100)}%" oninput="this.style.setProperty('--p',this.value*100+'%');setAudioSetting('${key}',this.value)"></label>`;
+// Segmented settings: render() rebuilds the rows, so give keyboard focus back to the chosen step; arrow keys move between steps (radiogroup).
+export function sxRefocus(id,v){const b=document.querySelector(`#${id} [data-v="${v}"]`);if(b)b.focus()}
+export function sxKey(ev){const k=ev.key,d=k==='ArrowRight'||k==='ArrowDown'?1:k==='ArrowLeft'||k==='ArrowUp'?-1:0;if(!d)return;const bs=[...ev.currentTarget.querySelectorAll('button')],i=bs.indexOf(ev.target.closest('button'));if(i<0)return;ev.preventDefault();bs[(i+d+bs.length)%bs.length].click()}
 export function settingsHTML(){return `<div class="settings sx">
- ${sxSeg('setanimspeed','Animation speed',Object.keys(SPEEDS).map(v=>[v,SPEED_LABEL[v]]),settings.animSpeed||'normal','setAnimSpeed')}
+ <div class="sx-row sx-howto"><span class="sx-t">Rules, heroes and tips</span><button type="button" class="btn sm" id="howtobtn" onclick="openHowTo()">How to Play</button></div>
+ ${sxSeg('setanimspeed','Animation speed',[...Object.keys(SPEEDS).map(v=>[v,SPEED_LABEL[v]]),['instant','Instant']],settings.fastAnim?'instant':settings.animSpeed||'normal','setAnimSpeed')}
  ${sxSeg('setenemypace','Enemy turns',[['measured','Measured'],['classic','Fast']],settings.enemyPace||'measured','setEnemyPaceMode')}
  ${sxSeg('setenvfx','Effects',['full','reduced','off'].map(v=>[v,envFxSettingLabel(v)]),settings.envFx,'setEnvFx')}
  ${sxRange('setmusic','Music','musicVolume',settings.musicVolume)}${sxRange('setsfx','SFX','sfxVolume',settings.sfxVolume)}
- ${sxSw('setfast','Fast animations',settings.fastAnim,'setFast')}${sxSw('setmute','Mute audio',settings.audioMuted,'setMute')}
- ${sxSw('sethints','First-fight hints',settings.coach!==false,'setCoach')}${sxSw('setcardskip','Confirm skipping card rewards',settings.confirmCardSkip!==false,'setConfirmCardSkip')}
+ ${sxSw('setmute','Mute audio',settings.audioMuted,'setMute')}
+ ${sxSw('sethints','First-fight hints',settings.coach!==false,'setCoach')}${sxSw('setctxhints','Hero and rules hints',settings.hints!==false,'setCtxHints')}${sxSw('setcardskip','Confirm skipping card rewards',settings.confirmCardSkip!==false,'setConfirmCardSkip')}
  ${sxSw('setshake','Screen shake',settings.screenShake!==false,'setScreenShake')}${sxSw('sethaptic','Hand vibration',settings.handHaptic!==false,'setHandHaptic')}
  ${sxSw('settaptwice','Tap twice to confirm',!!settings.tapConfirm,'setTapConfirm')}
  ${sxSw('setcharselpar','Hero select motion',settings.charselParallax!==false&&!settings.reduceMotion,'setCharselParallax',settings.reduceMotion)}${sxSw('setreduce','Reduced motion',settings.reduceMotion,'setReduceMotion')}
+ ${sxSeg('settextsize','Text size',[['normal','Normal'],['large','Large'],['xlarge','Larger']],settings.textSize||'normal','setTextSize')}
+ ${sxSw('setshapes','Shapes on status icons (▲ good, ▼ bad)',!!settings.statusShapes,'setStatusShapes')}
+ ${(()=>{const u=ascUnlocked(),cur=Math.min(settings.ascension|0,u);return u>0?(u<=5?sxSeg('setasc','Ascension (harder runs)',Array.from({length:u+1},(_,i)=>[String(i),i?'A'+i:'Off']),String(cur),'setAscension'):`<div class="sx-row"><span class="sx-t">Ascension (harder runs)</span><span class="sx-seg sx-step" id="setasc" role="group" aria-label="Ascension"><button type="button" data-v="dn" aria-label="Lower Ascension"${cur<=0?' disabled':''} onclick="setAscension('${cur-1}');render();sxRefocus('setasc','dn')">◀</button><button type="button" class="on" data-v="cur" aria-live="polite">${cur?'A'+cur:'Off'}</button><button type="button" data-v="up" aria-label="Higher Ascension"${cur>=u?' disabled':''} onclick="setAscension('${cur+1}');render();sxRefocus('setasc','up')">▶</button></span></div>`)+`<div class="sx-row sx-note"><span class="sx-t">${cur?'A'+cur+': '+ascInfo[cur]+(cur>1?'. Includes every lower level.':'.'):ascInfo[0]+'.'}${u<20?` Win on A${u} to open A${u+1}.`:''}</span></div>`:'<div class="sx-row sx-note"><span class="sx-t">Ascension (harder runs) opens after your first win.</span></div>'})()}
+ ${sxSw('setdaily','Daily Current: shared seed, class and modifiers',!!settings.dailyMode,'setDailyMode')}
+ ${(()=>{const p=dailyPreview(dailySeed());const K=CLASSES[p.cls];return `<div class="sx-row sx-note" id="dailynote"><span class="sx-t">Today: <b>${K?K.e+' '+K.n:p.cls}</b> · seed ${p.seed}<br>${p.mods.map(m=>`${m.e} <b>${m.n}</b> — ${m.d}`).join('<br>')}</span></div>`})()}
+ <div class="sx-row"><span class="sx-t">Your past runs</span><button type="button" class="btn sm" id="histbtn" onclick="openOv('history')">Run history</button></div>
+ ${sxSw('setrigs','Animated heroes and enemies',!rigsOff(),'setRigs')}
+ <div class="sx-row"><span class="sx-t">Saved run</span><button type="button" class="btn sm${W.S.confirmErase?' danger':''}" id="eraserun" onclick="eraseRunSave()">${W.S.confirmErase?'Sure? Tap again':loadRunData()?'Erase saved run':'No saved run'}</button></div>
  </div>`}
+export function setAscension(v){settings.ascension=Math.max(0,Math.min(+v|0,ascUnlocked()));saveSettings()}
+export function setDailyMode(on){settings.dailyMode=!!on;saveSettings();render()}
+export function setRigs(on){setRigOff(!on)}
+// Two taps: the first asks, the second deletes the saved run (Lamplight and unlocks are never touched).
+export function eraseRunSave(){if(!loadRunData())return;if(!W.S.confirmErase){W.S={...W.S,confirmErase:true};return render()}clearRun();W.S={...W.S,confirmErase:false};render()}
 export function setMute(on){setAudioSetting('audioMuted',!!on)}
 export function setConfirmCardSkip(on){settings.confirmCardSkip=!!on;saveSettings()}
+export function setCtxHints(on){settings.hints=!!on;saveSettings();render()}
 export function setCoach(on){settings.coach=!!on;saveSettings();render()}
 export function setScreenShake(on){settings.screenShake=!!on;saveSettings()}
 export function setCharselParallax(on){settings.charselParallax=!!on;saveSettings()}
@@ -354,20 +397,29 @@ export function setHandHaptic(on){settings.handHaptic=!!on;saveSettings()}
 export function setTapConfirm(on){settings.tapConfirm=!!on;saveSettings()}
 export function setFast(on){settings.fastAnim=!!on;window.FAST=on?1:0;saveSettings()}
 export function setEnemyPaceMode(v){settings.enemyPace=v==='classic'?'classic':'measured';setEnemyPace(settings.enemyPace);saveSettings()}
-export function setAnimSpeed(v){settings.animSpeed=SPEEDS[v]?v:'normal';setAnimSpeedValue(settings.animSpeed);saveSettings()}
+// ui-fix-a: the old separate "Fast animations" switch (skip animations) is the Instant step of Animation speed; other steps turn it off.
+export function setAnimSpeed(v){if(v==='instant'){setFast(true);settings.animSpeed='fast'}else{setFast(false);settings.animSpeed=SPEEDS[v]?v:'normal'}setAnimSpeedValue(settings.animSpeed);saveSettings()}
 export function setEnvFx(v){settings.envFx=v;saveSettings();render()}
 // Act I title card (design-v2 §W.5, art/v2/bg/_src/tc-a1-spec.json): the painted plate (frame + emblem, 60% of the screen width, centred) fades in
 // at 0.8 s over the tr_start travel scene; title + subtitle are HTML text inside the plate's dark panel (text_panel rect). Text fallback if the file fails.
-const TC_A1_DEFAULT={src:'art/v2/bg/tc-a1-plate@2x.webp',w:1870,h:761,panel:[1099-864,671-342,1401,260],title:'Act I: The Wrack Terraces',sub:'The foot of the Drowned Stair.'};
+const TC_A1_DEFAULT={src:'art/v2/bg/tc-a1-plate@2x.webp',w:1870,h:761,panel:[1099-864,671-342,1401,260],title:'Act I: The Wrack Terraces',sub:'The foot of the Ebb Stair.'};
 // Plate rect + text panel from the Artist's manifests (tc-a1-rects.json -> ENV.envs.tc_a1.art.mid, tc-a1-spec.json -> .spec), panel made plate-relative.
 function tcA1(){const e=ENV.envs.tc_a1;const m=e&&e.art&&e.art.mid&&e.art.mid[0];const sp=e&&e.spec;if(!m||!sp||!sp.text_panel)return TC_A1_DEFAULT;const [x,y,w,h]=m.r,[px,py,pw,ph]=sp.text_panel.rect;
  return {src:m.f,w,h,panel:[px-x,py-y,pw,ph],title:sp.title||TC_A1_DEFAULT.title,sub:sp.subtitle||TC_A1_DEFAULT.sub}}
-function travelScr(){const ok=Date.now()-(W.S.t||0)>1000;const T=tcA1(),[px,py,pw,ph]=T.panel,pc=(a,b)=>(a/b*100).toFixed(2)+'%';
+// v0.6.66 tc_a3 (c3): the painted card leaves an empty text panel (layer 120,140 980x360 of 2340x1080); the act title sits inside it. The still stack covers the
+// viewport bottom-aligned and centred (height max(vh, vw*1080/2340)), so the panel maps to screen px with the same cover math.
+function tcPanelStyle(to){const e=ENV.envs['tc_a'+to],tp=e&&e.text_panel;if(!tp)return '';const vw=innerWidth,vh=innerHeight,sp=e.space||[2340,1080],h=Math.max(vh,vw*sp[1]/sp[0]),k=h/sp[1],x0=vw/2-sp[0]*k/2,y0=vh-h;
+ const [x,y,w,hh]=tp;return ` style="position:fixed;left:${(x0+x*k).toFixed(1)}px;top:${(y0+y*k).toFixed(1)}px;width:${(w*k).toFixed(1)}px;height:${(hh*k).toFixed(1)}px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;margin:0;--tck:${k.toFixed(4)}" data-panel="1"`}
+function travelScrA2(){const ok=Date.now()-(W.S.t||0)>1000,card=!!W.S.card,to=W.S.to,AN=ACT_NAMES[to];
+ // v0.6.43 (wired as-is): tr_a1a2 travel scene first, tap, then the tc_a2 title card scene with the act name; both are env backdrops (no Act 1 plate)
+ return `<div class="page travel a2trav a${to}trav" onclick="skipTravel()">${card?`<div class="a2tcard"${tcPanelStyle(to)}><div class="act">ACT ${to===3?'III':'II'}</div><h1>${AN.n}</h1><div class="sub">${AN.sub}.</div></div><div class="boss muted tcboss a2tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>`:`<div class="ferry win a2ferry" id="ferryman">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div>`}<div class="skip muted">${ok?(card?'Tap to begin':'Tap to continue'):'…'}</div></div>`}
+function travelScr(){if(a2TravelEnv())return travelScrA2();const ok=Date.now()-(W.S.t||0)>1000;const T={...tcA1()},AN=W.S.kind==='act'&&ACT_NAMES[W.S.to];if(AN){T.title='Act '+['','I','II','III'][W.S.to]+': '+AN.n;T.sub=AN.sub+'.'}const [px,py,pw,ph]=T.panel,pc=(a,b)=>(a/b*100).toFixed(2)+'%';
  return `<div class="page travel" onclick="skipTravel()"><div class="tcard tcplate" style="aspect-ratio:${T.w}/${T.h}"><img class="tcimg" src="${T.src}" alt="" draggable="false" onerror="this.parentNode.classList.add('noimg');this.remove()">
  <div class="tcpanel" style="left:${pc(px,T.w)};top:${pc(py,T.h)};width:${pc(pw,T.w)};height:${pc(ph,T.h)}"><h1>${T.title}</h1><div class="sub">${T.sub}</div></div></div>
  <div class="boss muted tcboss">At the summit waits <b>${EN[W.run.boss].e} ${EN[W.run.boss].n}</b></div>
  <div class="ferry win" id="ferryman" data-info="${tesc('The Ferryman: He carries every Lampbearer to the Stair\'s foot, and never looks up.')}">${emblemHTML('lore-ferryman','⚓','fyp')}<q>${ferrymanLine(W.run.cls,currentTier())}</q></div><div class="skip muted">${ok?'Tap to begin':'…'}</div></div>`}
-export function skipTravel(){if(W.S.screen!=='travel')return;if(Date.now()-(W.S.t||0)<1000&&!window.FAST)return;W.S={screen:'map'};
+export function skipTravel(){if(W.S.screen!=='travel')return;if(Date.now()-(W.S.t||0)<1000&&!window.FAST)return;if(a2TravelEnv()&&!W.S.card&&!window.FAST){W.S.card=true;W.S.t=Date.now();render();return}if(W.run&&W.run.offer===1&&W.run.floor===0&&(W.run.act||1)===1&&W.S.kind!=='act')return ferryOffer(); // the Ferryman's Offer before floor 1
+ W.S={screen:'map'};
  if(W.run&&W.run.lamp&&!W.run.lamp.shown&&W.run.floor===0){W.run.lamp.shown=true;W.S.ov='tasks'} // Lantern Tasks are shown once, when the climb begins
  render()}
 // ---------------- rewards / chests ----------------
@@ -375,7 +427,8 @@ function rowHTML(r,i,click){const done=!!r.done,c=done?'':`${click}(${i})`;
  if(r.k==='gold')return tileHTML({id:'reward-gold',emoji:'💰',name:`${r.n} gold`,sum:r.note||'Into your purse.',cls:'k-gold',click:c,done,disabled:done,tid:'row'+i,info:`${r.n} gold: spend it at the merchant.`});
  if(r.k==='relic')return relicTile(r.id,{click:c,done,disabled:done,sum:RELICS[r.id].d});
  if(r.k==='potion')return potionTile(r.id,{click:c,done,disabled:done});
- if(r.k==='artifact'){const artifactShort=t=>{t=String(t||'').replace(/<[^>]+>/g,'').trim();return t.length>80?t.slice(0,t.lastIndexOf(' ',77)).replace(/[.,;:]+$/,'')+'…':t};const d=CARDS[r.id];return tileHTML({id:'reward-artifact',emoji:d.e,art:cardArtHTML(r.id,d,false),name:d.n,sum:r.done?'taken':artifactShort(d.text),cls:'k-artifact',click:c,done,disabled:done,tid:'row'+i,info:d.n+' (Artifact, '+TYPEN[d.t]+'): '+d.text+' Artifacts are shared rare cards; you can carry 3.'})}
+ if(r.k==='artifact'){const artifactShort=t=>String(t||'').replace(/<[^>]+>/g,'').trim(); // full text; fitTileSums shrinks it to fit (no ellipsis)
+const d=CARDS[r.id];return tileHTML({id:'reward-artifact',emoji:d.e,art:cardArtHTML(r.id,d,false),name:d.n,sum:r.done?'taken':artifactShort(d.text),cls:'k-artifact',click:c,done,disabled:done,tid:'row'+i,info:d.n+' (Artifact, '+TYPEN[d.t]+'): '+d.text+' Artifacts are shared rare cards; you can carry 3.'})}
  return tileHTML({id:'reward-cards',emoji:'🂠',name:r.took?`Took ${CARDS[r.took].n}`:r.skipped?'Skipped':'Choose a card',sum:r.took||r.skipped?'':`Add 1 of ${r.cards.length} to your deck.`,cls:'k-cards',click:c,done,disabled:done,tid:'row'+i,info:'Card reward: pick one card for your deck, or skip.'})}
 // The battle scene stays behind the reward tiles (B061): the hero, the fallen foes' remains, a soft dim. No separate victory screen.
 function victorySceneHTML(S){const g=sceneGeom(),f=S.scene.foes;
@@ -389,21 +442,27 @@ function vicLampHTML(){const v=lampPreview();if(!v)return '';const up=v.to.lvl>v
  const from=up?0:v.from.pct,to=v.to.pct,need=v.to.max?'':`${v.to.span-v.to.into} to Lamp ${v.to.lvl+1}`;
  return `<div class="vic-lamp${up?' up':''}" id="viclamp" style="--from:${from.toFixed(1)};--to:${to.toFixed(1)}"><div class="vl-top"><b class="vl-gain">Lamplight +${v.gain}</b><span class="vl-lvl">${up?`Lamp ${v.to.lvl} at run end`:need}</span></div>
   <div class="vl-bar"><i class="vl-fill"></i><i class="vl-new"></i><img class="vl-frame" src="art/v2/ui/lamp/vic-lamp-frame.png" alt="" draggable="false">${up?'<img class="vl-glow" src="art/v2/ui/lamp/vic-lamp-ready-glow.png" alt="" draggable="false">':''}<img class="vl-lantern" src="art/v2/ui/lamp/vic-lamp-lantern.png" alt="" draggable="false"></div></div>`}
-function rewardScr(){const S=W.S,title=stripEmoji(S.title||'');
+const ownedBadge=id=>{const n=(W.run&&W.run.deck||[]).filter(c=>c.id===id).length;return n?`<span class="owned" aria-label="You own ${n}">Owned ${n}</span>`:''};
+// v0.7.02: every reward sub-screen keeps a way out (Slay the Spire always lets you skip rewards). If a state ever renders without one, a Proceed fallback is added.
+const REW_EXIT=/id="(proceed|skiprelic|confirmcard|skipcard|skipswap)"/;
+function rewardScr(){const h=rewardBody();if(REW_EXIT.test(h))return h;const S=W.S;
+ const fn=S.swap!=null?'potionSwap(-1)':S.bossPick&&!S.bossTook?'bossRelicPick(-1)':S.cardsOpen!=null?'rewSkipCards()':'rewDone()';
+ return h+`<div class="rew-fallback">${pkBtn('Proceed',fn,{pri:1,id:'proceed',icon:'arrowright'})}</div>`}
+function rewardBody(){const S=W.S,title=stripEmoji(S.title||'');
  const boss=S.kind==='boss'&&S.boss&&EN[S.boss]&&S.cardsOpen==null&&S.swap==null?`<div class="bossvic" style="${anim(S.t,2600)||''}"><i class="bv-rays"></i><b>${EN[S.boss].n}</b><q>${BOSS_DEFEAT[S.boss]||''}</q></div>`:'';
  if(S.cardsOpen!=null){const row=S.rows[S.cardsOpen];
   return topBar()+pkScreen({cls:'pk-cards',title:`<span class="reward-banner">${title||'Choose a card'}</span>`,sub:cardSelSub(S.cardSelected!=null?CARDS[row.cards[S.cardSelected]].n:null),
-   body:`<div class="grid rewgrid">${row.cards.map((id,j)=>`<div class="rcw${S.cardSelected===j?' reward-selected':''}" aria-selected="${S.cardSelected===j}">${cardHTML({id,uid:-1-j,up:false},{click:`rewCard(${j})`,isNew:isNewCard(id)})}${cardBackHTML()}</div>`).join('')}</div>`,
+   body:`<div class="grid rewgrid">${row.cards.map((id,j)=>`<div class="rcw${S.cardSelected===j?' reward-selected':''}" aria-selected="${S.cardSelected===j}">${cardHTML({id,uid:-1-j,up:false},{click:`rewCard(${j})`,isNew:isNewCard(id)})}${ownedBadge(id)}${cardBackHTML()}</div>`).join('')}</div>`,
    left:pkBtn('Back','rewCloseCards()',{icon:'undo'})+pkBtn('Skip card','rewSkipCards()',{id:'skipcard'}),right:pkBtn('Continue','rewConfirmCards()',{pri:1,id:'confirmcard'}),
    after:S.skipConfirm?`<div class="ov" role="dialog" aria-modal="true" aria-labelledby="skipquestion"><div class="box card-skip-box"><h2 id="skipquestion">No card has been selected. Do you wish to continue?</h2><label class="chk"><input type="checkbox" id="skipdont"><span>Don't show this again</span></label><div class="actions"><button class="btn pri" id="skipyes" onclick="rewSkipAnswer(true,document.getElementById('skipdont').checked)">Yes</button><button class="btn" id="skipno" onclick="rewSkipAnswer(false)">No</button></div></div></div>`:''})}
  if(S.swap!=null){const row=S.rows[S.swap],p=POTIONS[row.id];
   return topBar()+pkScreen({cls:'pk-swap',title:'Potion belt full',sub:`Swap <b>${p.n}</b> for a potion you hold, or leave it behind.`,
-   body:tilesRow([...W.run.potions.map((id,s)=>potionTile(id,{click:`potionSwap(${s})`,tag:'Replace',cls:'swap'})),tileHTML({id:'opt-remove',emoji:'🗑️',name:`Discard ${p.n}`,sum:'Leave it behind.',click:'potionSwap(-1)',cls:'k-discard',tid:'discardnew'})],'swaptiles')})}
+   body:tilesRow([...W.run.potions.map((id,s)=>potionTile(id,{click:`potionSwap(${s})`,tag:'Replace',cls:'swap'})),tileHTML({id:'opt-remove',emoji:'🗑️',name:`Discard ${p.n}`,sum:'Leave it behind.',click:'potionSwap(-1)',cls:'k-discard',tid:'discardnew'})],'swaptiles'),right:pkBtn('Leave it','potionSwap(-1)',{id:'skipswap',icon:'arrowright'})})}
  if(S.bossPick){const took=S.bossTook;
   return (S.scene?victorySceneHTML(S):'')+topBar()+pkScreen({cls:'pk-rewards pk-bossrelic'+(S.scene?' vic':''),title:`<span class="reward-banner">Boss relic</span>`,sub:took?'':'Choose one. The others sink with the boss.',
    body:tilesRow(S.bossPick.map((id,j)=>relicTile(id,{click:took?'':`bossRelicPick(${j})`,done:took===id,disabled:!!took&&took!==id,sum:RELICS[id].d})),'rewtiles bossrelics'),
-   right:took?pkBtn(W.run.act===1?'Finish the act':'Proceed','rewDone()',{pri:1,id:'proceed',icon:'arrowright'}):pkBtn('Skip','bossRelicPick(-1)',{id:'skiprelic'})})}
- const none=S.rows.length>0&&!S.rows.some(r=>r.done),last=S.kind==='boss'&&W.run.act===1;
+   right:took?pkBtn(isLastAct()?'Finish the act':'Proceed','rewDone()',{pri:1,id:'proceed',icon:'arrowright'}):pkBtn('Skip','bossRelicPick(-1)',{id:'skiprelic'})})}
+ const none=S.rows.length>0&&!S.rows.some(r=>r.done),last=S.kind==='boss'&&isLastAct();
  return (S.scene?victorySceneHTML(S):'')+topBar()+boss+pkScreen({cls:'pk-rewards'+(boss?' hasboss':'')+(S.scene?' vic':''),title:`<span class="reward-banner">${title}</span>`,sub:(S.kind==='boss'?'':'Take what you want. Anything left behind is lost.')+vicLampHTML(),body:tilesRow(S.rows.map((r,i)=>rowHTML(r,i,'claimRow')),'rewtiles'),
   right:pkBtn(last?'Finish the act':none?'Skip':'Proceed',none?'rewLeave()':'rewDone()',{pri:1,id:'proceed',icon:'arrowright'}),after:S.leaveConfirm?leaveDialog():''})}
 export {leaveDialog};
@@ -415,17 +474,18 @@ function chestScr(){const S=W.S,t=stripEmoji(S.name);
 const SHOP_INTRO=3400; // ms the scene beat + staggered pop-in last (tap skips)
 const shopFresh=S=>!window.FAST&&motionEnabled()&&Date.now()-(S.t||0)<U(SHOP_INTRO);
 const shopDef=(S,key)=>{const [sh,i]=key.split(':'),it=S[sh]&&S[sh][+i];return it?{sh,it,def:sh==='relics'?RELICS[it.id]:sh==='potions'?POTIONS[it.id]:CARDS[it.id]}:null};
-function shopTipHTML(S){const d=S.shopSelected&&shopDef(S,S.shopSelected);if(!d)return '';
- const {it,def,sh}=d;const desc2=sh==='relics'||sh==='potions'?def.d:cname({id:it.id,up:false});return `<b>${esc(sh==='relics'||sh==='potions'?def.n:cname({id:it.id,up:false}))}</b>${sh==='relics'||sh==='potions'?' '+esc(desc2):''} <span class="tipgold${W.run.gold<it.price?' poor':''}">${glyph('coin')} ${it.price}</span>`}
+function shopTipHTML(S){const d=S.shopSelected&&shopDef(S,S.shopSelected);if(!d)return `<span class="tipneed ok">You have ${W.run.gold} gold</span>`;
+ const {it,def,sh}=d;const desc2=sh==='relics'||sh==='potions'?def.d:cname({id:it.id,up:false});return `<b>${esc(sh==='relics'||sh==='potions'?def.n:cname({id:it.id,up:false}))}</b>${sh==='relics'||sh==='potions'?' '+esc(desc2):''} <span class="tipgold${W.run.gold<it.price?' poor':''}">${glyph('coin')} ${it.price}</span>${it.sold?'':W.run.gold<it.price?` <span class="tipneed">Need ${it.price-W.run.gold} more</span>`:''}`}
 function shopScr(){const S=W.S;const g=W.run.gold;const sp=scrubPrice();const coin=glyph('coin');let n=0;
  const pop=()=>`style="--i:${n++}"`;
  const price=it=>`<span class="price${g<it.price?' poor':''}">${it.sold?'SOLD':(it.sale?'<s>'+Math.round(it.base)+'</s> ':'')+coin+' '+it.price}</span>`;
- const card=(it,sh,i)=>`<div data-shop-card="${sh}:${i}" class="shopitem sh1-it${it.sold?' sold':''}${it.sale?' sale':''}${S.shopSelected===sh+':'+i?' reward-selected':''}${anim(it.noT,400)?' no':''}" ${pop()}>${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`selectShopCard('${sh}',${i})`,can:g>=it.price})}${price(it)}${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
+ const card=(it,sh,i)=>`<div data-shop-card="${sh}:${i}" class="shopitem sh1-it${it.sold?' sold':''}${it.sale?' sale':''}${S.shopSelected===sh+':'+i?' reward-selected':''}${anim(it.noT,400)?' no':''}" ${pop()}>${it.sold?'<div class="soldcard">SOLD</div>':cardHTML({id:it.id,uid:-100-i-(sh==='colorless'?10:0),up:false},{click:`selectShopCard('${sh}',${i})`,can:g>=it.price})}${it.sold?'':ownedBadge(it.id)}${price(it)}${it.sale&&!it.sold?'<span class="saletag">SALE</span>':''}</div>`;
  const icon=(it,sh,i,def)=>`<button class="sh1-icon sh1-it${it.sold?' sold':''}${it.right?' right':''}${S.shopSelected===sh+':'+i?' reward-selected':''}${anim(it.noT,400)?' no':''}" ${it.sold?'disabled':`onclick="selectShopCard('${sh}',${i})"`} title="${esc(def.n+': '+def.d)}" data-shelf="${sh}" data-i="${i}" ${pop()}>${slotHTML(sh,it.id,'',def.e)}<span class="inm">${def.n}</span>${price(it)}</button>`;
  const sel=S.shopSelected&&shopDef(S,S.shopSelected);
  const used=(S.scrubUses||0)>=ECON.shop.removal.perVisit;
- return `<div class="sh1-bg" aria-hidden="true"></div>`+topBar()+`<div class="sh1${shopFresh(S)?' fresh':''}" id="shop1" style="--sp:${U(1)}" onclick="if(this.classList.contains('fresh')){this.classList.remove('fresh');W.S.t=0}">
-  <h2 class="etitle sh1-title" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE+" "+wrenLine(bellCount(W.run.seed),currentTier()))}">Wren's Driftwood Bazaar</h2>
+ const act=W.run.act||1,a2Shop=(act===2||act===3)&&!!(ENV.envs['shop_a'+act]&&ENV.envs['shop_a'+act].art); // Act 2/3: the painted shop_a2 / shop_a3 (v0.6.66) environment shows through (no Act 1 .sh1-bg plate)
+ return (a2Shop?'':`<div class="sh1-bg" aria-hidden="true"></div>`)+topBar()+`<div class="sh1${shopFresh(S)?' fresh':''}" id="shop1" style="--sp:${U(1)}" onclick="if(this.classList.contains('fresh')){this.classList.remove('fresh');W.S.t=0}">
+  <h2 class="etitle sh1-title" data-info="${tesc("Quartermaster Wren: "+WREN_SIDE+" "+wrenLine(bellCount(W.run.seed),currentTier()))}">${a2Shop?(act===3?"Wren's Sky Stall":"Wren's Harbour Chandlery"):"Wren's Driftwood Bazaar"}</h2>
   <div class="sh1-stage"><div class="sh1-in"><div class="sh1-cards" id="cardshelf">${S.cards.map((it,i)=>card(it,'cards',i)).join('')}</div>
    <div class="sh1-low"><div class="sh1-extra">${S.colorless.map((it,i)=>card(it,'colorless',i)).join('')}</div>
     <div class="sh1-rp"><div class="sh1-relics">${S.relics.map((it,i)=>icon(it,'relics',i,RELICS[it.id])).join('')}</div><div class="sh1-potions">${S.potions.map((it,i)=>icon(it,'potions',i,POTIONS[it.id])).join('')}</div></div>
@@ -449,11 +509,42 @@ export function updateCardSelection(){const S=W.S;
  if(ci&&S.mode==='upgrade'){for(const q of ['.cost','.text']){const old=box.querySelector(q),next=box.querySelector('.upgrade-after '+q);if(old?.textContent!==next?.textContent&&next){if(q==='.cost')next.classList.add('upgrade-change');else highlightUpgradeText(old,next)}}decorateKeywords(box);fitCards(box)}}}
 }
 function potPickScr(){const S=W.S;const free=W.run.potions.filter(p=>!p).length;return topBar()+pkScreen({cls:'pk-potpick',title:stripEmoji(S.title),sub:`Pick up to ${Math.min(3,free)} (free slots: ${free}).`,body:tilesRow(S.ids.map((id,j)=>potionTile(id,{click:`potPickToggle(${j})`,on:S.chosen.includes(j)})),'pottiles'),right:pkBtn('Done','potPickDone()',{pri:1,id:'potpickdone'})})}
+const PATH_GLYPH={fight:['sword','Fight'],elite:['skull','Elite'],rest:['tent','Camp'],shop:['coin','Shop'],unknown:['question','Event'],treasure:['chest','Treasure'],boss:['crown','Boss']};
+// B-051 run summary: one painted glyph per floor climbed, in order.
+function pathStripHTML(path){if(!path||!path.length)return '';return `<div class="endpath" role="img" aria-label="Path: ${path.map(t=>(PATH_GLYPH[t]||['','Room'])[1]).join(', ')}">${path.map((t,i)=>{const g=PATH_GLYPH[t]||['sigil','Room'];return `<span class="ep ep-${t}" title="Floor ${i+1}: ${g[1]}">${glyph(g[0])}</span>`}).join('')}</div>`}
+// Route preview: press and hold an open map node to light every room you could reach from it; a hold never picks the node.
+let rtTimer=0,rtHeld=0;
+export function routeHL(r,i,on){clearTimeout(rtTimer);const map=document.querySelector('.mapwrap');if(!map)return;
+ if(!on){if(map.querySelector('.node.rt'))rtHeld=Date.now();map.classList.remove('routehl');map.querySelectorAll('.node.rt,.node.rt0').forEach(n=>n.classList.remove('rt','rt0'));return}
+ rtTimer=setTimeout(()=>{const rows=W.run&&W.run.map;if(!rows)return;const seen=new Set([r+':'+i]),q=[[r,i]];while(q.length){const [a,b]=q.shift();const n=rows[a]&&rows[a][b];if(!n)continue;for(const j of n.to||[]){const k=(a+1)+':'+j;if(!seen.has(k)){seen.add(k);q.push([a+1,j])}}}
+  map.classList.add('routehl');seen.forEach(k=>{const [a,b]=k.split(':');const el=map.querySelector(`.node[data-r="${a}"][data-i="${b}"]`);if(el)el.classList.add(k===r+':'+i?'rt0':'rt')})},300)}
+// v0.6.93 B9: a quick double tap on the button that leaves a room (camp Mend, Leave shop, reward Proceed ...) landed its second tap on
+// the map that had just replaced it, and walked into whatever node sat under the finger, so the player skipped the path choice.
+// A node tap (here and in the anim.js lantern-glide hook) is ignored when the press before it came on another screen less than 450 ms earlier and within 40 px of it (a double tap, not a choice).
+// Only the second press of a real double tap counts: it lands within 40 px of the first. A deliberate tap elsewhere on the map soon after leaving is kept.
+const downs=[];addEventListener('pointerdown',e=>{downs.push({t:Date.now(),x:e.clientX,y:e.clientY,scr:W.S&&W.S.screen});if(downs.length>2)downs.shift()},true);
+export const mapGhostTap=()=>downs.length===2&&downs[1].scr==='map'&&downs[0].scr!=='map'&&downs[1].t-downs[0].t<450&&Math.hypot(downs[1].x-downs[0].x,downs[1].y-downs[0].y)<40;
+export function goNodeTap(r,i){if(rtHeld&&Date.now()-rtHeld<700){rtHeld=0;return}if(mapGhostTap())return;goNode(r,i)}
+// Terms tab (deck view): every keyword used by a card in the deck, in plain words (first line of the glossary entry).
+function historyHTML(){const h=loadHistory(),st=statsOf(h);const nm=k=>(CLASSES[k]&&CLASSES[k].n)||k;
+ const rows=Object.entries(st.by).map(([k,b])=>`<p class="dk-term"><b>${nm(k)}</b> ${b.wins} win${b.wins===1?'':'s'} in ${b.runs} run${b.runs===1?'':'s'} · best floor ${b.best}/${TOTAL_FLOORS}${b.climbs?` · ${b.climbs} full climb${b.climbs===1?'':'s'}, highest A${b.ascWon}`:''}</p>`).join('');
+ const last=h.slice(0,12).map(r=>`<p class="dk-term"><b>${nm(r.cls)}</b> ${r.won?((r.act||1)>=3?'finished the climb':`cleared Act ${r.act||1}`):`fell on floor ${r.floor}${r.by?' to '+r.by:''}`} · ${r.mins} min${r.asc?' · A'+r.asc:''}${r.daily?' · Daily':''}</p>`).join('');
+ return `<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><div class="dk-head"><h2>Run history</h2><button class="btn dk-close">Close</button></div><div class="dk-termlist">${h.length?`<p class="dk-term"><b>All runs</b> ${st.wins} win${st.wins===1?'':'s'} in ${st.runs} · best floor ${st.best}/${TOTAL_FLOORS}${st.fastest!=null?' · fastest win '+st.fastest+' min':''}</p>${rows}<p class="dk-term"><b>Latest</b></p>${last}`:'<span class="muted">No finished runs yet. Your wins and losses will show up here.</span>'}</div></div></div>`}
+export function termsToggle(){W.S.dkTerms=!W.S.dkTerms;render()}
+function termsHTML(list){const txt=list.map(c=>(CARDS[c.id]?desc(c):'')).join(' ').replace(/<[^>]+>/g,' ');
+ const names=Object.keys(KW).filter(k=>new RegExp('\\b'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(txt)).sort();
+ return names.length?names.map(k=>`<p class="dk-term"><b>${k}</b> ${shortText(k)||KW[k]}</p>`).join(''):'<span class="muted">No special terms yet.</span>'}
+export function sameHeroNewRun(){const cls=W.run&&W.run.cls;if(!cls||!CLASSES[cls])return;newRun(cls)}
 function endScr(){const run=W.run,K=CLASSES[run.cls],st=run.stats;const mins=Math.round(((st.endT||Date.now())-st.startT)/60000);const sum=run.lamp&&run.lamp.summary;
  const stat=(k,v,g)=>`<span class="es" title="${k}" aria-label="${k}: ${v}">${glyph(g)}<b>${v}</b></span>`;
- return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?'Act 1 cleared!':'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.`:`${K.n} fell on floor ${run.floor} of 15. ${deathLine(run.floor,run.boss)}`}</p>
- <div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}${stat('Deck',run.deck.length,'book')}${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
- <button class="endlink" id="restart" onclick="W.S={screen:'title'};render()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
+ return `<div class="end${sum?' withlamp':''}"><div class="endl"><div class="big">${glyph(run.won?'crown':'skull')}</div><h1 class="etitle">${run.won?((run.act||1)>=3?'The climb is done':`Act ${run.act||1} cleared!`):'Defeated'}</h1><p class="sub">${run.won?`${K.n} silenced ${EN[run.boss].n}.${(run.act||1)>=3?' '+CROWN_HOLDS:''}`:`${K.n} fell on floor ${overallFloor(run.act||1,Math.max(1,run.floor))} of ${TOTAL_FLOORS}. ${deathLine(run.floor,run.boss,run.act||1)}${st.lastHit?` <span class="lasthit">Last blow: ${st.lastHit.amt} from ${st.lastHit.by}${st.lastHit.turn?' on turn '+st.lastHit.turn:''}.</span>`:''}`}</p>
+ ${pathStripHTML(st.path)}<div class="endstats">${stat('Enemies',run.kills,'sword')}${stat('Elites',st.elites.reduce((a,b)=>a+b,0),'skull')}${stat('Relics',run.relics.length,'gem')}<button class="es esdeck" id="enddeck" type="button" title="Deck: tap to look at your final deck" aria-label="Deck: ${run.deck.length} cards. Tap to view" onclick="openOv('deck')">${glyph('book')}<b>${run.deck.length}</b></button>${stat('Gold',run.gold,'coin')}${stat('Biggest hit',st.maxHit,'bolt')}${stat('Time',mins+' min','moon')}${stat('Seed',run.seed,'dice')}</div>
+ ${canContinueToAct2()?`<button class="endlink endnext" id="act2go" onclick="continueToAct2()">${glyph('arrowright')}<span>Continue to Act 2</span><small class="prev">Act 2 preview</small></button>`:''}
+ ${canContinueToAct3()?`<button class="endlink endnext" id="act3go" onclick="continueToAct3()">${glyph('arrowright')}<span>Continue to Act 3</span><small class="prev">Act 3 preview</small></button>`:''}
+ ${(()=>{const sc=computeScore(run);const daily=!!run.daily;return `<div class="endscore" id="endscore"><div class="es-head">${daily?'Daily score':'Score'} <b>${sc.total}</b></div>
+ <div class="es-break">Floors ${sc.floors}×5 · Kills ${sc.kills}×2 · Elites ${sc.elitePts} · Bosses ${sc.bossPts}${sc.bonus.length?' · '+sc.bonus.map(b=>b[0]+' +'+b[1]).join(' · '):''}${sc.asc?` · ×${sc.mult.toFixed(2)} A${sc.asc}`:''}</div>
+ ${daily?`<button class="btn sm" id="copydaily" type="button" onclick="copyDailyResult()">Copy result</button><pre class="es-copy" id="dailycopy" hidden></pre>`:''}</div>`})()}
+ ${run.won?'':`<button class="endlink endnext" id="samehero" onclick="sameHeroNewRun()">${glyph('undo')}<span>Same hero, new run</span></button>`}<button class="endlink" id="restart" onclick="leaveWinScreen()">${glyph('undo')}<span>Play again</span></button></div>${lampSummaryHTML(sum)}</div>`}
 // Keep a pristine HTML tree separate from the decorated, animated live DOM. Comparing
 // sources preserves fitted text, sprite animations and stage styles on unchanged nodes.
 let renderTree=null,renderedCombat=null;
@@ -474,7 +565,9 @@ function patchNode(old,next){const live=liveNodes.get(old);
   if(name==='style'){const props=new Set([...old.style,...next.style]);for(const prop of props){if(old.style.getPropertyValue(prop)===next.style.getPropertyValue(prop)&&old.style.getPropertyPriority(prop)===next.style.getPropertyPriority(prop))continue;
     if(next.style.getPropertyValue(prop))live.style.setProperty(prop,next.style.getPropertyValue(prop),next.style.getPropertyPriority(prop));else live.style.removeProperty(prop);if(prop==='top'&&live.classList.contains('plate'))delete live.dataset.top}}
   else if(name==='class'){for(const c of old.classList)if(!next.classList.contains(c))live.classList.remove(c);for(const c of next.classList)if(!old.classList.contains(c))live.classList.add(c)}
-  else if(after===null)live.removeAttribute(name);else live.setAttribute(name,after);
+  else if(after===null)live.removeAttribute(name);
+  else if(name==='src'&&live.tagName==='VIDEO'&&live.getAttribute('src')===after){/* keep playing — re-set src reloads and flashes */}
+  else live.setAttribute(name,after);
  }
  patchChildren(old,next,live);return live;
 }
@@ -516,10 +609,12 @@ export function render(){if(W.previewing||W.replaying)return;tutSync();if(drag||
  if(W.run&&s!=='title'&&s!=='end')h+=popHTML();
  if(W.S.ov==='map'&&W.run){h+=`<div class="ov" id="ovl" onclick="if(event.target===this){W.S.ov=null;render()}"><div class="box mapbox">${mapHTML(false)}<button class="btn full" onclick="W.S.ov=null;render()">Close map</button></div></div>`}
  else if(W.S.ov==='tasks'&&W.run){h+=tasksHTML()}
+ else if(W.S.ov==='learn'){h+=learnOverlayHTML()}
+ else if(W.S.ov==='history'){h+=historyHTML()}
  else if(W.S.ov==='settings'){h+=`<div class="ov" id="ovl" onclick="if(event.target===this){W.S.ov=null;render()}"><div class="box plain"><h2>Settings</h2>${settingsHTML()}<button class="btn full" onclick="W.S.ov=null;render()">Close</button></div></div>`}
  else if(W.S.ov&&W.run){const cb=W.cb;const list=W.S.ov==='deck'?W.run.deck:cb?(W.S.ov==='draw'?(W.run.cls==='carto'?cb.draw:cb.draw.slice().sort((a,b)=>a.id<b.id?-1:1)):W.S.ov==='disc'?cb.disc:cb.exh):[];
   const t={deck:'Your deck',draw:W.run.cls==='carto'?'Draw pile (in order: face up)':'Draw pile (order hidden)',disc:'Discard pile',exh:'Sunk this combat'}[W.S.ov];
-  h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><h2>${t} (${list.length})</h2><div class="grid small">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div><button class="btn full">Close</button></div></div>`}
+  h+=`<div class="ov" id="ovl" onclick="W.S.ov=null;render()"><div class="box plain deckbox"><div class="dk-head"><h2>${W.S.dkTerms?'Terms in your deck':`${t} (${list.length})`}</h2>${W.S.ov==='deck'?`<button class="btn dk-terms" onclick="event.stopPropagation();termsToggle()">${W.S.dkTerms?'Cards':'Terms'}</button>`:''}<button class="btn dk-close">Close</button></div>${W.S.dkTerms&&W.S.ov==='deck'?`<div class="dk-termlist">${termsHTML(list)}</div>`:`<div class="grid small dk-grid">${list.map(c=>cardHTML(c)).join('')||'<span class="muted">Empty</span>'}</div>`}</div></div>`}
  if(inspecting)h+=inspectHTML();
  const prev=a.dataset.screen;const changed=prev!==s;
  if(changed){a.dataset.screen=s;runScreenCleanups();screenChange(a,prev,s)}
@@ -530,8 +625,13 @@ export function render(){if(W.previewing||W.replaying)return;tutSync();if(drag||
  for(const el of a.querySelectorAll('.en.hot,.foes.armed,.chartbox.dragging,.cbottom.hot'))el.classList.remove('hot','armed','dragging');
  fitRelics();decorateCardRefs(a);decorateKeywords(a);fitCards(a);if(inspecting)placeHeldInspect();if(s==='pick')updateCardSelection();
  if(s==='combat'){layoutHand();placeDetail();syncTapArm()}
+ placeToasts(a);
+ if(s==='combat'&&W.cb.mode&&W.cb.mode.k==='retain'&&!a.contains(document.activeElement?.closest?.('#retainbox'))){const f=a.querySelector('#retainbox .retainpick');if(f)f.focus({preventScroll:true})} // keyboard: Tab/Enter works at once
  syncEnv();syncStage();syncAudio();syncCombatAnimations();
- if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}}
+ if(s==='map'&&!W.S.ov){const n=a.querySelector('.node.av');if(n)n.scrollIntoView({block:'center'})}
+ // ui-fix-a #3: the map overlay opens on the current floor, not on the lighthouse at the top.
+ if(W.S.ov==='map'&&mapOvShown!==W.run){mapOvShown=W.run;const box=a.querySelector('.mapbox'),n=box&&(box.querySelector('.node.cur')||box.querySelector('.node.av')||box.querySelector('.node[data-r="0"]'));if(n){const br=box.getBoundingClientRect(),nr=n.getBoundingClientRect();box.scrollTop+=nr.top-br.top-box.clientHeight/2}}else if(W.S.ov!=='map'&&mapOvShown){mapOvShown=null;const bx=a.querySelector('.ov .box');if(bx)bx.scrollTop=0}}
+let mapOvShown=null;
 // Fit text within the printed frame areas; never grow a panel into the illustration.
 const fittedCards=new WeakMap(),fitCache=new Map();let fitEpoch=0;
 function fitSignature(c){return [fitEpoch,innerWidth,innerHeight,devicePixelRatio,c.dataset.id,c.dataset.up,
@@ -646,3 +746,6 @@ export function inspectHTML(){const ci=inspecting,d=CARDS[ci.id];if(!d)return'';
  return `<div class="ov inspect" id="inspect" onclick="closeInspect()"><div class="insp">${cardHTML(ci,{full:true})}<div class="inspect-keywords">${inspectKeywordsHTML(ci)}</div><div class="ikw"><b>${cname(ci)}</b> <span class="muted">${TYPEN[d.t]} · ${RARN[d.r]||''}</span><div>${desc(ci)}</div><div class="kws">${kwFor(ci)}</div>${d.flavour?`<div class="flav">${d.flavour}</div>`:''}<div class="muted">Tap anywhere to close</div></div></div></div>`}
 
 export function tgt(...args){return savedAction('tgt',args,()=>tgtImpl(...args))}
+
+export function copyDailyResult(){const run=W.run;if(!run)return;const sc=computeScore(run);const txt=dailyResultText(run,sc);const pre=document.getElementById('dailycopy');if(pre){pre.hidden=false;pre.textContent=txt}
+ try{navigator.clipboard.writeText(txt);toast('Result copied','')}catch(_){toast('Select and copy the text below','')}}

@@ -13,6 +13,7 @@ import * as runMod from './engine/run.js';
 import * as render from './ui/render.js';
 import * as input from './ui/input.js';
 import './ui/chartdrag.js';
+import './ui/docflags.js'; // v0.6.89: html/body page-state classes in place of document-level :has()
 import './ui/foil.js';
 import {loadTiles,tileUrls} from './ui/tiles.js';
 import {installGlyphs} from './ui/glyphs.js';
@@ -23,7 +24,9 @@ import * as env from './ui/env.js';
 import * as title from './ui/screens/title.js';
 import * as select from './ui/screens/select.js';
 import * as learn from './ui/screens/learn.js';
+import * as hints from './ui/hints.js';
 import * as intro from './ui/screens/intro.js';
+import * as loading from './ui/screens/loading.js';
 import * as lamp from './ui/screens/lamp.js';
 import * as lampEngine from './engine/lamplight.js';
 import * as progress from './progress.js';
@@ -32,7 +35,7 @@ import * as lampData from './data/lamplight.js';
 installGlyphs();
 
 // Inline onclick="..." handlers in rendered HTML (and the test scripts) call these by name.
-for(const m of [assets,cards,combat,runMod,render,fx,save,bus,env,title,select,learn,intro,lamp])for(const [k,v] of Object.entries(m))if(typeof v==='function')window[k]=v;
+for(const m of [assets,cards,combat,runMod,render,fx,save,bus,env,title,select,learn,hints,intro,loading,lamp])for(const [k,v] of Object.entries(m))if(typeof v==='function')window[k]=v;
 window.setAudioSetting=setAudioSetting;
 window.W=W;
 window.G={get S(){return W.S},get run(){return W.run},get cb(){return W.cb},CARDS:registry.CARDS,EN:registry.EN,CLASSES:registry.CLASSES,
@@ -51,16 +54,23 @@ W.S={screen:'title',view:title.bootView()};
 assets.applyTextures();title.applyMotion();env.initEnv();
 initAudio();
 render.render();
-assets.loadCardArt().then(n=>{if(n)render.render()});
-loadTiles().then(n=>{if(n)render.render()});
+// Late art/tile loads must not rebuild the title start screen: remounting <video> flashes black and
+// restarts the baked TAP TO BEGIN. Other screens still refresh when new art arrives.
+const refreshIfNeeded=()=>{const S=W.S;if(S&&S.screen==='title'&&(S.view==='start'||S.view==='studio'))return;render.render()};
+assets.loadCardArt().then(n=>{if(n)refreshIfNeeded()});
+loadTiles().then(n=>{if(n)refreshIfNeeded()});
 
 // Landscape lock where the platform allows it (installed PWA / fullscreen / Capacitor); harmless elsewhere.
 addEventListener('pointerdown',()=>{try{const o=screen.orientation;if(o&&o.lock&&(matchMedia('(display-mode: standalone)').matches||document.fullscreenElement))o.lock('landscape').catch(()=>{})}catch(_){}},{once:true});
 
 // Offline support: register the service worker and ask it to cache everything this page loaded + all art in the asset map.
-if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
+loading.loadingInit();
+// Registered after the page's own load (slow links: the game's code and start screen get the bandwidth first, the install does not fight them for it).
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))(document.readyState==='complete'?Promise.resolve():new Promise(r=>addEventListener('load',r,{once:true}))).then(()=>{
  navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(reg=>{
   const urls=performance.getEntriesByType('resource').map(e=>e.name).filter(u=>u.startsWith(location.origin)).concat([...assets.assetURLs(),...env.envURLs(1),...tileUrls()].map(u=>new URL(u,location.href).href));
   (reg.active||navigator.serviceWorker.controller)&&reg.active.postMessage({type:'precache',urls});
- }).catch(e=>console.warn('SW registration failed',e));
-}
+  // Act 2/3 art is not installed up front: fetch it only when a later act is requested (?act=N) or a saved run is already in one.
+  assets.warmActPack(Math.max(+new URLSearchParams(location.search).get('act')||1,(W.run&&W.run.act)||1));
+ }).catch(e=>{console.warn('SW registration failed',e);loading.loadingFail()});
+});

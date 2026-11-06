@@ -13,7 +13,7 @@ export const GLOSSARY={
 "Sink": "Removed for the rest of this combat.",
 "Fleeting": "Sinks if still in hand at the end of your turn.",
 "Moor": "Stays in your hand at the end of your turn.",
-"Opening": "Starts in your first hand.",
+"Opening": "This card starts in your opening hand.",
 "Unplayable": "Can't be played.",
 "Tide": "Meter from 0 to 10, starts at 5. 10 Crests, 0 Undertows; both reset to 5.",
 "Drift": "From turn 2, the Tide moves 1 more in its arrow's direction.",
@@ -37,8 +37,8 @@ export const GLOSSARY={
 "Bleed X": "Loses X HP when your Attack hits it, ignoring Guard. Then drops 1. Max 20.",
 "Duel Focus": "Your Attacks deal +1 damage to the enemy with the most HP.",
 "Vigil": "A card type that stays in play for the rest of the fight.",
-"Flotsam": "Junk added during a fight. It clogs your hand.",
-"Burden": "A curse that stays in your deck.",
-"Full Flame": "Spends all your Energy. X is the amount spent.",
-"Artifact": "A rare card. A badge, not a card type.",
+"Flotsam": "The five status cards: unwanted cards added during a fight.",
+"Burden": "The ten curse cards: unwanted cards that remain in your deck between fights.",
+"Full Flame": "Spend all remaining Energy; X is the amount spent.",
+"Artifact": "A rare shared card; a label, not a card type."
 };

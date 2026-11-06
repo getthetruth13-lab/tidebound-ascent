@@ -139,6 +139,7 @@
 .end .endlink{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:200px;min-height:48px;padding:0 18px;border:0;border-bottom:1px solid #d9b46a88;border-radius:0;background:none;box-shadow:none;color:#f0dcaa;font:700 17px var(--font-display);letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 3px #000,0 0 10px #d9b46a55;cursor:pointer}
 .end .endlink .gi{width:1.1em;height:1.1em}
 .end .endlink:hover,.end .endlink:focus-visible{color:#fff1c2;border-bottom-color:#ffd98a;outline:none}.end .endlink:active{transform:scale(.97)}
+.end .endnext{flex-direction:column;gap:2px;min-height:56px;border-bottom-color:#ffd98a;color:#fff1c2}.end .endnext .prev{font:600 11px var(--font-display);letter-spacing:.18em;color:#d9b46a;text-shadow:0 1px 2px #000}
 .end .lp-btns{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:6px}
 .end .lp-btns .btn{flex:1 1 0;min-width:0;min-height:44px;padding:4px 6px;white-space:normal;line-height:1.1;font-size:13px;letter-spacing:.06em;border:0;border-bottom:1px solid #d9b46a88;border-radius:0;background:none;box-shadow:none;color:#f0dcaa;text-shadow:0 1px 3px #000,0 0 10px #d9b46a55}
 .end .lp-btns .btn:hover,.end .lp-btns .btn:focus-visible{color:#fff1c2;border-bottom-color:#ffd98a;background:#d9b46a14}
@@ -196,4 +197,16 @@
 @keyframes box-in{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
 .ov{animation:ov-in calc(.18s*var(--us,1)) ease-out both}
 .ov>.box,.potpop,.relpop,.msgp{animation:box-in calc(.2s*var(--us,1)) cubic-bezier(.2,.8,.3,1) both}
+/* v0.7.04: a centred popup (.pop: left:50% + translateX(-50%)) keeps its centring through the fade-in. box-in ends at transform:none
+   (fill both), which wiped the translateX, so the relic popup started at the screen centre and ran off the right edge on phones. */
+.pop.relpop{animation-name:box-in-c}
+@keyframes box-in-c{from{opacity:0;transform:translateX(-50%) translateY(6px) scale(.96)}to{opacity:1;transform:translateX(-50%)}}
 .reduce-motion .ov,.reduce-motion .ov>.box,.reduce-motion .potpop,.reduce-motion .relpop,.reduce-motion .msgp{animation-duration:.01s}
+
+/* ===== FINISH_NONART F7 (Spencer 10-16): Options rows are the full 44px tap size; the list scrolls inside the window with a visible gold scrollbar (D-F-07) ===== */
+.tb-frame.tb-opt .settings.sx .sx-row,.ov .box .settings.sx .sx-row,.settings.sx .sx-row{min-height:44px}
+.settings.sx .sx-seg button,.settings.sx .sx-row .btn.sm{min-height:44px}
+.settings.sx{overflow-y:auto;scrollbar-width:auto;scrollbar-color:#b8923f #06080c;padding-right:6px;-webkit-overflow-scrolling:touch}
+.settings.sx::-webkit-scrollbar{width:8px}
+.settings.sx::-webkit-scrollbar-track{background:#06080c;border-radius:4px}
+.settings.sx::-webkit-scrollbar-thumb{background:#b8923f;border-radius:4px;border:1px solid #3a2a10}

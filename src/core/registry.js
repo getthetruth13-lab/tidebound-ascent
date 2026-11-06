@@ -6,7 +6,8 @@ export const EN={};           // id -> enemy def {id,n,e,hp:[min,max],ai:e=>inte
 export const CLASSES={};      // id -> class def {n,e,hp,col,theme,starter:[cardIds],rule,relic}
 export const KW={};           // keyword -> glossary text (design-v2 §2.1)
 export const EVENTS=[];       // event defs {id,n,e,pool:'act1'|'shrine',t,req?,o:[{l,ok?,f}]}
-export const ENCOUNTERS={};   // table name -> list of {e:[enemy ids], w:weight}
+export const ENCOUNTERS={};   // table name -> list of {e:[enemy ids], w:weight}  (ACT 1's table; Acts 2 and 3 live in ENCOUNTERS_BY_ACT)
+export const ENCOUNTERS_BY_ACT={1:ENCOUNTERS,2:{},3:{}};
 export const RELICS={};       // id -> relic def (meta from data-v2.json + behaviour {on,mod,pickup})
 export const POTIONS={};      // id -> potion def (meta from data-v2.json + {use(f,target), on?})
 export const CHARMS={};       // id -> run-long charm (Saltwife's Loom)
@@ -21,7 +22,8 @@ export function registerEnemies(o){for(const k in o){o[k].id=k;EN[k]=o[k]}}
 export function registerClasses(o){Object.assign(CLASSES,o)}
 export function registerKeywords(o){Object.assign(KW,o)}
 export function registerEvents(list){for(const e of list){e.id=e.id||e.n.toLowerCase().replace(/[^a-z0-9]+/g,'-');EVENTS.push(e)}}
-export function registerEncounters(o){for(const k in o)ENCOUNTERS[k]=(ENCOUNTERS[k]||[]).concat(o[k].map(x=>Array.isArray(x)?{e:x,w:1}:x))}
+export function registerEncounters(o,act=1){const T=ENCOUNTERS_BY_ACT[act]||(ENCOUNTERS_BY_ACT[act]={});for(const k in o)T[k]=(T[k]||[]).concat(o[k].map(x=>Array.isArray(x)?{e:x,w:1}:x))}
+export const encountersFor=act=>ENCOUNTERS_BY_ACT[act]||ENCOUNTERS
 export function registerRelic(id,o){o.id=id;RELICS[id]=o;return o}
 export function registerPotion(id,o){o.id=id;POTIONS[id]=o;return o}
 export function registerCharm(id,o){o.id=id;CHARMS[id]=o}

@@ -5,6 +5,7 @@
 //  • shakeFrames  decaying screen shake keyframes; slowmo; snapshot crossfade; flyIcon (reward -> HUD)
 // Everything is transform / opacity (canvas for particles). Quality follows the Effects option (env.quality()).
 import {settings} from '../save.js';
+import {rigFreeze} from './rig.js';
 import {quality,envWillChange} from './env.js';
 import {T,U} from '../core/timing.js';
 const mq=typeof matchMedia==='function'?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false};
@@ -83,7 +84,7 @@ export function shakeFrames(amp){const n=7,f=[];for(let i=0;i<=n;i++){const k=1-
 export function slowmo(ms=400,rate=.5){if(!motionOn()||!document.getAnimations)return;ms=T(ms);const list=document.getAnimations();
  list.forEach(a=>{try{a.updatePlaybackRate(rate)}catch(_){}});setTimeout(()=>list.forEach(a=>{try{a.updatePlaybackRate(1)}catch(_){}}),ms)}
 // ---------- hit-stop for idle loops: pause the CSS animations under `el` for `ms` ----------
-export function freezeIdle(el,ms){if(!el||!el.getAnimations)return;ms=T(ms);const as=el.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);
+export function freezeIdle(el,ms){if(!el||!el.getAnimations)return;ms=T(ms);rigFreeze(el,ms);const as=el.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);
  as.forEach(a=>a.pause());setTimeout(()=>as.forEach(a=>{try{a.play()}catch(_){}}),ms)}
 // ---------- impact timing: damage numbers and reactions land when the swing connects ----------
 let base=0,counts={};
@@ -104,11 +105,21 @@ export function flyIcon(fromEl,toEl,{html,ms=520,col=COL.gold,done}={}){
  const dx=b.x-a.x,dy=b.y-a.y;let tr=0;const t0=performance.now();
  const tick=()=>{if(!el.isConnected)return;const r=el.getBoundingClientRect();emit('trail',r.left+r.width/2,r.top+r.height/2,col);tr=requestAnimationFrame(tick)};tr=requestAnimationFrame(tick);
  el.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:`translate(calc(-50% + ${dx*.4}px),calc(-50% + ${dy*.4-34}px)) scale(1.15)`,opacity:1,offset:.45},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(.5)`,opacity:.9}],{duration:U(ms),easing:'cubic-bezier(.4,0,.4,1)'}).finished.then(()=>{cancelAnimationFrame(tr);el.remove();emit('coin',b.x,b.y);ring(b.x,b.y,col,44,300);done&&done()},()=>{cancelAnimationFrame(tr);el.remove();done&&done()})}
+// perf (combat-start): freeze a computed style into inline text. The property list is computed once and skips what can never change the picture: animation/transition longhands (as
+// before), logical longhands (the physical ones are baked too) and experimental properties that are always at their initial value. ~12% fewer reads, no per-property string tests.
+const SKIP_PROP=/^(animation|transition|border-(block|inline)-|border-(start|end)-(start|end)-radius|inset-(block|inline)|margin-(block|inline)|padding-(block|inline)|scroll-(margin|padding)-(block|inline)|(min-|max-)?(block|inline)-size$|overflow-(block|inline)$|overscroll-behavior-(block|inline)|contain-intrinsic-(block|inline)|(column|row)-rule-inset|corner-|interest-delay|timeline-trigger)/;
+let propNames=null;
+function frozenText(cs){if(!propNames){propNames=[];for(let j=0;j<cs.length;j++){const n=cs[j];if(n.charCodeAt(1)!==45&&!SKIP_PROP.test(n))propNames.push(n)}} // standard properties: the same list for every element
+ let t='';for(let j=0;j<propNames.length;j++){const n=propNames[j];t+=n+':'+cs.getPropertyValue(n)+' !important;'}
+ for(let j=0;j<cs.length;j++){const n=cs[j];if(n.charCodeAt(0)===45&&n.charCodeAt(1)===45)t+=n+':'+cs.getPropertyValue(n)+' !important;'} // custom properties differ per element: read them per element
+ return t}
 // ---------- screen crossfade: the old #app contents fade out over the new screen ----------
-let xf=null;
+let xf=null,xfAnim=null;
 export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!app||!app.firstChild)return;
  const scrollOffset=scrollY,height=app.scrollHeight;
- if(xf){xf.remove();xf=null}
+ // v0.7.01 leak fix: a replaced fade is cancelled, not just removed. Its animation sat paused (waiting for the next screen to paint) and was never played,
+ // so its finished promise never settled and the whole cloned screen (hundreds of nodes) stayed held by the pending fin() callback: ~700 nodes per lap.
+ if(xf){const a=xfAnim;xf.remove();xf=null;xfAnim=null;try{a&&a.cancel()}catch(_){}}
  const o=app.cloneNode(true);o.removeAttribute('id');o.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));o.classList.add('xfade');o.setAttribute('aria-hidden','true');
  o.style.cssText=`position:fixed;left:0;right:0;top:${-scrollOffset}px;height:${height}px;z-index:9000;pointer-events:none;overflow:hidden;visibility:visible`;
  o.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
@@ -116,17 +127,20 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
  // and cloned CSS animations restart from 0% (sprites/meters jump). Decode images sync, copy canvas pixels, freeze each animation at its current time.
  o.querySelectorAll('img').forEach(i=>{i.decoding='sync';i.loading='eager'});
  const src=[...app.querySelectorAll('*')],dst=[...o.querySelectorAll('*')],scr=[];
+ // perf (combat-start): one document.getAnimations() call, grouped by target, instead of an element.getAnimations() per node (each one forced a style flush: ~100+ ms on a phone)
+ const animsOf=new Map();for(const x of (document.getAnimations?document.getAnimations():[])){const t=x.effect&&x.effect.target;if(!t||x.effect.pseudoElement)continue;let l=animsOf.get(t);if(!l)animsOf.set(t,l=[]);l.push(x)}
  // v0.6.2: ids are stripped from the clone, so #app/#relicbar/... rules stop matching and the top bar re-laid out (potions/relics jumped up,
  // bar looked gone) on the first faded frame. Freeze the top bar subtree with its live computed styles so it stays pixel-identical.
  // morning: same for the combat controls styled by id (orb, hero plate, piles, End): without this they flew to the top-left / lost their size for the first second of the victory scene.
  const frozen=new Set(app.querySelectorAll('.topbar,.topbar *,'+['dais','hplate','orb','hpability','hplogbtn','flourishbtn','drawpile','exhpile','discpile','endbtn'].map(i=>`#${i},#${i} *`).join(',')));
  if(src.length===dst.length)for(let i=0;i<src.length;i++){const a=src[i],b=dst[i];
-  if(frozen.has(a)){const cs=getComputedStyle(a);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}b.style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important'}
+  if(frozen.has(a)){b.style.cssText=frozenText(getComputedStyle(a))+'transition:none!important;animation:none!important;pointer-events:none!important'}
   if(a.scrollTop||a.scrollLeft)scr.push([b,a.scrollTop,a.scrollLeft]);
-  if(getComputedStyle(a).position==='sticky'){const r=a.getBoundingClientRect();const cs=getComputedStyle(a),ph=document.createElement('div');ph.setAttribute('aria-hidden','true');ph.style.cssText=`height:${r.height}px;margin:${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft};flex:none;visibility:hidden`;b.before(ph); // v0.6.2: a spacer keeps the bar's room so the screen under it does not jump up
+  if((a.id==='playbtn'||a.classList.contains('topbar'))&&getComputedStyle(a).position==='sticky'){ // gfxmem: only the two sticky elements the css has (a computed-style read per node of the whole screen was ~100 ms on the map)
+   const r=a.getBoundingClientRect();const cs=getComputedStyle(a),ph=document.createElement('div');ph.setAttribute('aria-hidden','true');ph.style.cssText=`height:${r.height}px;margin:${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft};flex:none;visibility:hidden`;b.before(ph); // v0.6.2: a spacer keeps the bar's room so the screen under it does not jump up
    Object.assign(b.style,{position:'fixed',top:r.top+'px',left:r.left+'px',width:r.width+'px',height:r.height+'px',margin:'0',zIndex:'5'})} // sticky top bar: the clone does not scroll, so pin it where it was on screen
   if(a.tagName==='CANVAS'&&a.width&&a.height){try{b.width=a.width;b.height=a.height;b.getContext('2d').drawImage(a,0,0)}catch(_){}}
-  const all=a.getAnimations?a.getAnimations():[],an=all.filter(x=>x.animationName);if(an.length){b.style.animationDelay=an.map(x=>-(x.currentTime||0)+'ms').join(',');b.style.animationPlayState='paused'}
+  const all=animsOf.get(a)||[],an=all.filter(x=>x.animationName);if(an.length){b.style.animationDelay=an.map(x=>-(x.currentTime||0)+'ms').join(',');b.style.animationPlayState='paused'}
   // flicker fix: script (WAAPI) animations and CSS transitions do not travel with cloneNode. The victory walk-off fades the tiles/banner and walks the hero
   // off with fill:forwards, so the clone popped the old screen (hero, tiles, VICTORY) back for a frame. Bake their current values onto the clone.
   const live=all.filter(x=>!x.animationName);if(live.length){const cs=getComputedStyle(a);for(const x of live){const ks=x.effect&&x.effect.getKeyframes?x.effect.getKeyframes():[];
@@ -146,15 +160,22 @@ export function crossfade(app,{hold=0,ms=260,gray=false}={}){if(!motionOn()||!ap
  const ev=document.getElementById('env');if(ev&&(gray||envWillChange())){const ec=frozenCopy(ev);ec.style.setProperty('position','absolute','important');ec.style.setProperty('top',scrollOffset+'px','important');
   ec.style.setProperty('height',innerHeight+'px','important');ec.style.setProperty('z-index','-1','important');o.appendChild(ec)} // last child (index-stable for snapshot/live element matching); z -1 paints it under everything
  document.body.appendChild(o);xf=o;for(const [b,t,l] of scr){b.scrollTop=t;b.scrollLeft=l} // inner scrollers (map) keep their scroll position
- const fin=()=>{o.remove();if(xf===o)xf=null};
+ const fin=()=>{o.remove();if(xf===o){xf=null;xfAnim=null}};
  const k=hold/(hold+ms)||0,f=gray?'grayscale(1) brightness(.55)':'none';
- const anim=o.animate([{opacity:1,filter:'none',offset:0},{opacity:1,filter:f,offset:k},{opacity:0,filter:f,offset:1}],{duration:hold+ms,easing:'ease-out'});anim.finished.then(fin,fin);
+ const anim=xfAnim=o.animate([{opacity:1,filter:'none',offset:0},{opacity:1,filter:f,offset:k},{opacity:0,filter:f,offset:1}],{duration:hold+ms,easing:'ease-out'});anim.finished.then(fin,fin);
  // flicker fix: never let the old screen start fading before the new one is painted with its images decoded (cards/portraits/map nodes and the new
  // backdrop decode async; on a phone that took longer than the hold, so blank boxes and the bare backdrop popped in mid-fade). The hold still runs;
  // the fade waits at full opacity for readiness (cap 700ms), then starts on a fresh frame so a long decode frame never skips it ahead.
- anim.pause();const t0=performance.now();whenPainted(app).then(()=>requestAnimationFrame(()=>{if(xf!==o||anim.playState==='finished')return;anim.currentTime=Math.min(performance.now()-t0,hold);anim.play()}))}
+ anim.pause();const t0=performance.now();whenPainted(app).then(()=>requestAnimationFrame(()=>{if(xf!==o){try{anim.cancel()}catch(_){}return}if(anim.playState==='finished')return;anim.currentTime=Math.min(performance.now()-t0,hold);anim.play()}))}
+// gfxmem: the painted living layers (.envlv: ~40 animated elements) are copied with 8 baked properties instead of all ~350 computed ones (that loop was most of the
+// ~150 ms main-thread block when a fight starts). The pose is baked as a plain 2D transform / translate, with no animation and no will-change, so the copy adds no composited layers.
+const LIV=['transform','translate','opacity','display','visibility','mix-blend-mode','filter'];
 function frozenCopy(src){const c=src.cloneNode(true);c.removeAttribute('id');c.setAttribute('aria-hidden','true');const s=[src,...src.querySelectorAll('*')],d=[c,...c.querySelectorAll('*')];
- if(s.length===d.length)for(let i=0;i<s.length;i++){d[i].removeAttribute('id');const cs=getComputedStyle(s[i]);let t='';for(let j=0;j<cs.length;j++){const n=cs[j];if(n.startsWith('animation')||n.startsWith('transition'))continue;t+=n+':'+cs.getPropertyValue(n)+' !important;'}
+ if(s.length===d.length)for(let i=0;i<s.length;i++){d[i].removeAttribute('id');
+  if(s[i].closest('.envlv')){const cs=getComputedStyle(s[i]);let t=s[i].style.cssText.replace(/animation[^;]*;?/g,'')+';position:absolute;';for(const n of LIV)t+=n+':'+cs.getPropertyValue(n)+' !important;';
+   d[i].style.cssText=t+'animation:none!important;transition:none!important;will-change:auto!important;pointer-events:none!important';
+   if(s[i].tagName==='CANVAS'&&s[i].width){try{d[i].width=s[i].width;d[i].height=s[i].height;d[i].getContext('2d').drawImage(s[i],0,0)}catch(_){}}continue} // v0.6.89: canvas tile plates keep their pixels
+  const t=frozenText(getComputedStyle(s[i]));
   d[i].style.cssText=t+'transition:none!important;animation:none!important;pointer-events:none!important';if(s[i].tagName==='CANVAS'&&s[i].width){try{d[i].width=s[i].width;d[i].height=s[i].height;d[i].getContext('2d').drawImage(s[i],0,0)}catch(_){}}}
  return c}
 // The incoming screen is ready when its <img>s are decoded and the new backdrop layers have finished their own decode-then-fade swap (env.js swapLayer).
