@@ -527,8 +527,9 @@ function rewardGhost(tile){const r=tile.getBoundingClientRect(),g=tile.cloneNode
 function countUp(sel,from,to){if(from===to)return;const t0=performance.now(),dur=U(420);const tick=()=>{const el=$(sel);if(!el)return;const k=Math.min(1,(performance.now()-t0)/dur);const v=Math.round(from+(to-from)*k);
  const tn=[...el.childNodes].reverse().find(n=>n.nodeType===3);if(tn)tn.textContent=' '+v;if(k<1)requestAnimationFrame(tick)};requestAnimationFrame(tick)}
 // ---------- screen change: old screen lingers and fades (called by render()) ----------
-const quiet=new Set(['title']);
-export function screenChange(app,prev,next){if(prev!==next)document.querySelectorAll('.reward-ghost').forEach(g=>g.remove());if(!prev||prev===next||quiet.has(prev)||quiet.has(next))return;
+// Spencer 11-06: title used to be quiet, so Embark (title→map) wiped #app with no crossfade cover and flashed.
+// Title-internal view changes never hit screenChange (same screen). Menu dips stay for start→main etc.
+export function screenChange(app,prev,next){if(prev!==next)document.querySelectorAll('.reward-ghost').forEach(g=>g.remove());if(!prev||prev===next)return;
  if(next==='combat')finaleCleanup();const hero=W.run&&W.run.hp<=0&&prev==='combat';const hold=Math.max(prev==='combat'?deathHold():0,holdReal(),hero?U(700):0);
  if(hold)holdUntil=Math.max(holdUntil,performance.now()+hold);
  crossfade(app,{hold,ms:prev==='combat'?T(340):U(260),gray:hero});

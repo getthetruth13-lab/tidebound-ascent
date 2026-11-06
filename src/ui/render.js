@@ -560,7 +560,9 @@ function patchNode(old,next){const live=liveNodes.get(old);
   if(name==='style'){const props=new Set([...old.style,...next.style]);for(const prop of props){if(old.style.getPropertyValue(prop)===next.style.getPropertyValue(prop)&&old.style.getPropertyPriority(prop)===next.style.getPropertyPriority(prop))continue;
     if(next.style.getPropertyValue(prop))live.style.setProperty(prop,next.style.getPropertyValue(prop),next.style.getPropertyPriority(prop));else live.style.removeProperty(prop);if(prop==='top'&&live.classList.contains('plate'))delete live.dataset.top}}
   else if(name==='class'){for(const c of old.classList)if(!next.classList.contains(c))live.classList.remove(c);for(const c of next.classList)if(!old.classList.contains(c))live.classList.add(c)}
-  else if(after===null)live.removeAttribute(name);else live.setAttribute(name,after);
+  else if(after===null)live.removeAttribute(name);
+  else if(name==='src'&&live.tagName==='VIDEO'&&live.getAttribute('src')===after){/* keep playing — re-set src reloads and flashes */}
+  else live.setAttribute(name,after);
  }
  patchChildren(old,next,live);return live;
 }

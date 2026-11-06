@@ -36,7 +36,7 @@ N('discordant',{e:'💥',d:'Deal {10|13}. Add a Ringing to your discard pile (wh
 
 // ================= Uncommon =================
 R('overtone',{e:'🎼',d:'This turn each of your Marks Echoes one extra time. Faint.',p:f=>{callout('OVERTONE','echo');thisTurn({id:'overtone',mod:{echoPlan(inst,ctx,p){return {...p,repeats:p.repeats+1}}}})}});
-// Fermata: at the first ring of a Mark whose previous card (this turn) can ring, that card rings too (once; counts toward the cap of 4).
+// Fermata: at the first ring of a Mark whose previous card (this turn) can ring, that card rings too (once; counts toward the cap of 3).
 R('fermata',{e:'𝄐',d:'This turn your Echo also repeats the card you played just before your Marked card. Faint.',p:f=>{const c=W.cb;const start=turnStartSeq(f);
  thisTurn({id:'fermata',on:{echo(inst,ctx){if(inst.done||ctx.k!==0||!W.cb)return;const m=ctx.card;
   const prev=playedThisTurn(start).find(ci=>ci._seq===m._seq-1);

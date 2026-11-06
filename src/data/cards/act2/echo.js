@@ -109,7 +109,7 @@ N('belltower',{e:'🛎️',d:'Start of your turn: each Moored card in hand gains
 N('aftertone',{e:'🔔',cu:0,d:'Whenever a card with a Sustain bonus Echoes, gain Guard equal to half that bonus (max 8 per ring).',power:{on:{echo(inst,ctx){const s=ctx.card.sus||0;const g=Math.min(8,Math.floor(s/2));if(g>0)gainBlock(g)}}}});
 // Third Tine: the engine has two tines only, so the second Attack of the turn is remembered here and rung once by this Vigil
 // right after the normal rings (same cap, +1 per card played after it, up to the Echo bonus). See ENGINE-NEEDS.
-N('thirdtine',{e:'🔱',d:'Your second Attack each turn is Marked too (shares the cap of 4; Notes still never take a tine).',power:{on:{
+N('thirdtine',{e:'🔱',d:'Your second Attack each turn is Marked too (shares the cap of 3; Notes still never take a tine).',power:{on:{
  cardPlayed(inst,ctx){const c=W.cb;if(inst.t!==c.turn){inst.t=c.turn;inst.n=0;inst.ci=null}const ci=ctx.card,d=CARDS[ci.id];
   if(inst.ci&&ci!==inst.ci)inst.after=(inst.after||0)+1;
   if(d.t!=='A'||d.faint||isNote(ci))return;inst.n++;if(inst.n===2){inst.ci=ci;inst.tgt=ci._tgt||c.lastTgt;inst.after=0}},
@@ -132,7 +132,7 @@ N('fullorch',{e:'🎻',cu:1,d:'After your 4th card each turn, your next Attack E
  on:{cardPlayed(inst,ctx){const c=W.cb;if(ctx.nThisTurn!==4)return;const n=Math.min(2,c.powers.filter(p=>p!==inst&&p.id!==inst.id).length);if(n>0){inst.ex={turn:c.turn,n};callout('FULL ORCHESTRA +'+n,'echo')}}},
  mod:{echoPlan(inst,ctx,p){const c=W.cb;const x=inst.ex;if(!c||!x||x.turn!==c.turn||x.n<=0||typeOf(p.card)!=='A')return p;if(!ctx.preview)inst.ex=null;return {...p,repeats:p.repeats+x.n}}}}});
 N('opusgrand',{e:'📜',d:'Deal 12. <b>Resound:</b> deal 8 for each Resonating on the target instead (max 6 counted). Sink.',p:f=>{if(!f.echo)return f.dmg(12);const t=f.tg;const k=t?Math.min(6,t.st.reson||0):0;if(k>0)f.dmg(8*k);else log('📜 Magnum Opus: no Resonating on the target')}});
-N('greathall',{e:'🏟️',cu:1,d:'You may Echo up to 5 times a turn instead of 4.',power:{}});
+N('greathall',{e:'🏟️',cu:1,d:'You may Echo up to 4 times a turn instead of 3.',power:{}});
 
 // ENGINE-NEEDS:
 // - faultline: enemy Brittle is applied (addSt) but the engine does not yet lower the Guard an enemy gains by 25% (round down).
@@ -142,7 +142,7 @@ N('greathall',{e:'🏟️',cu:1,d:'You may Echo up to 5 times a turn instead of 
 //   hook after the normal rings (shared cap, +1 per card after it). It is not in the live Echo preview and is not re-targetable by Retune/Seeking Echo.
 // - growingpeal: the engine adds plan.bonus to a card's FIRST repeat only; the +N bonus therefore does not reach later repeats of the same ring.
 // - belltower: growth is stored in ci.sus (the Sustain bonus), so Ring Out / Aftertone also count it. A separate per-card growth stat (added in F.num) would split them.
-// - greathall: EC.cap (CORE.echo.cap) is turned into a getter in this file (reads 5 while Great Hall is in play). A proper mod('echoCap') in doEcho/echoPlan would be cleaner.
+// - greathall: EC.cap (CORE.echo.cap) is turned into a getter in this file (reads 4 while Great Hall is in play). A proper mod('echoCap') in doEcho/echoPlan would be cleaner.
 // - Bell/Learning Bell/Antiphon/Sympathetic Notes count Notes PLAYED through a permanent bus observer in this file; an engine stat (cb.stat.notesPlayed) would replace it.
 // - tunehall: turnStart fires before the draw, so the upgrade is picked by reservoir sampling over drawn cards; an 'afterDraw' event would be simpler.
 // - bronzebulwark / shatternote: the ring that is resolving is tracked from the non-preview echoPlan call (cb._ringCard); a ctx.f in the 'guard' modifier would remove that.

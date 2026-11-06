@@ -7,7 +7,7 @@
 import {registerRelic,RELICS,CARDS} from '../core/registry.js';
 import {W,pick} from '../core/state.js';
 import {DATA} from './generated/data-v2.js';
-import {addCard,addSt,alive,choose,dmgEnemy,drawCards,flash,gainBlock,gainEnergy,bonusEnergy,gainMom,heal,log,callout,curTgt} from '../engine/combat.js';
+import {addCard,addSt,alive,choose,dmgEnemy,drawCards,flash,gainBlock,gainEnergy,bonusEnergy,gainMom,heal,loseHp,log,callout,curTgt} from '../engine/combat.js';
 import {gainGold,gainCurse,openPick,pickPotions,gainMaxHp,addPotionSlot,revealRows,loseRelic,gainRelic,randomRelic} from '../engine/run.js';
 import {render} from '../ui/render.js';
 import {ACT23_ITEMS} from './generated/act2-items.js';
@@ -68,7 +68,7 @@ const B={
  // ---- Task 6 rare build-arounds ----
  stormglass:{on:{tideTurn(r){alive().forEach(e=>addSt(e,'drench',1));flash(r)}}},
  tithebowl:{on:{combatStart(r){r.tt=0},recede(r,ctx){if(ctx.cause!=='spend'||r.tt===W.cb.turn)return;r.tt=W.cb.turn;gainEnergy(1);flash(r);log('🥣 Tithe Bowl: +1 Energy')}}},
- duetbell:{mod:{markSlots(r,ctx,v){return v+1},markSecondScale(r,ctx,v){return .5}}},
+ duetbell:{on:{echo(r){gainBlock(4);flash(r)}}},
  soundinglead:{on:{cardPlayed(r,ctx){if(ctx.type!=='A'||W.cb.stat.attacksTurn!==1||ctx.f.echo)return;const t=ctx.f.tg;if(t&&t.hp>0){addSt(t,'reson',2);flash(r)}}}},
  farglass:{on:{mapEnter(r){revealRows(2);flash(r)}}},
  plinth:{mod:{wpTriggers(r,ctx,v){return ctx.wp&&(ctx.wp.rank||0)>=3?v+1:v}}},
@@ -110,7 +110,7 @@ const B={
  celestial:{pickup(){loseRelic('sextant')}}, // engine: startCombat offers 3 starting Waypoints (upgraded, Rank 1) and sets 4 Waypoint slots
  gauntlet:{pickup(){loseRelic('glove')},on:{turnStart(r){r.t={}},parry(r){if(r.t&&r.t.used)return;r.t={used:1};flash(r);const q=()=>{gainMom(1);log('🥊 Gauntlet: +1 Momentum')};q.meta={mom:1};W.cb.nextTurnQ.push(q)}},mod:{keepMomentum(){return true}}},
  springlocket:{mod:{drift(r,ctx,v){return v*2},crest(r,ctx,c){return {...c,dmg:c.dmg+6}},undertow(r,ctx,u){return {...u,guard:u.guard+6}}}},
- twinclapper:{mod:{markPer(){return 0}}}, // two Marks per turn are already the base rule (Twin Tines), so only the drawback applies
+ twinclapper:{mod:{echoCap(r,ctx,v){return v+1}},on:{combatStart(r){loseHp(8);flash(r);log('🔔 Twin Clapper: −8 HP')}}},
  trailboots:{mod:{advances(r,ctx,v){return Math.max(v,2)}}}, // engine: startCombat places no starting Waypoint when held
  gamblersedge:{on:{flourish(r,ctx){if(ctx.mom>=6){ctx.f.allTargets=true;flash(r)}}},mod:{momMax(r,ctx,v){return Math.max(v,8)},momLoss(){return 99}}},
 };

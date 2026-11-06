@@ -456,7 +456,7 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 /* ---- v3 title video + main menu: full-bleed stage (cover), but never cropping more than 16.5% of height, since the baked title (frame y 9.7%) to TAP TO BEGIN bottom (92.8%) needs 83.1%. At 19.5:9 that leaves ~0.9% dark edges each side, feathered by the mask. Menu plate shares the stage so the swap is seamless. ---- */
 .tb-vid,.tb-imgmenu{background:#03060a;overflow:hidden}
 .tv-stage{position:absolute;left:50%;aspect-ratio:16/9;width:min(max(100vw,calc(100dvh*16/9)),calc(100dvh/.835*16/9));top:calc((100dvh - min(max(100vw,calc(100dvh*16/9)),calc(100dvh/.835*16/9))*9/16)*.56);transform:translateX(-50%);-webkit-mask-image:linear-gradient(90deg,transparent,#000 1.2%,#000 98.8%,transparent);mask-image:linear-gradient(90deg,transparent,#000 1.2%,#000 98.8%,transparent)}
-.tv-video,.tv-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-select:none}
+.tv-video,.tv-img,#titlevid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-select:none;background:#03060a}
 .tb-start.tb-vid.leaving{opacity:0}
 /* Mockup layout in viewport units: title+emblem y 6-48%, words column y 52-93%. */
 .tm-emb{position:absolute;left:50%;top:6dvh;height:42dvh;object-fit:contain;transform:none;margin-left:calc(-42dvh*740/515/2);width:calc(42dvh*740/515);pointer-events:none;user-select:none;filter:drop-shadow(0 0 1.5dvh rgba(60,170,200,.18));will-change:transform}
@@ -474,7 +474,7 @@ body .pop{position:fixed;top:52px;left:50%;transform:translateX(-50%);width:min(
 @keyframes tmIn{from{opacity:0;transform:translateY(1dvh)}to{opacity:1;transform:none}}
 @keyframes tmInOff{from{opacity:0}to{opacity:.38}}
 .reduce-motion .tm-fade .tm-w{animation-duration:.01s;animation-delay:0s}
-#tbdip{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:99999}
+#tbdip{position:fixed;inset:0;background:#03060a;opacity:0;pointer-events:none;z-index:99999}
 /* Title video (v0.6.5, Spencer's 1744x1168 cut): cover the screen, no side bars. Baked title top is at frame y~19%, baked TAP TO BEGIN bottom at ~86%.
    Stage width = max(cover width, but capped so at least 69% of frame height stays visible) -> cover at 19.5:9 shows y~19-88%, so the title clears the top and TAP TO BEGIN keeps ~4% screen space above the bottom. Blurred poster fills any gap on ultra-wide screens. */
 .tb-start.tb-vid::before{content:"";position:absolute;inset:-40px;background:var(--tp,url(../art/v2/title/title-poster.jpg)) center/cover;filter:blur(24px) brightness(.45)}
@@ -585,6 +585,6 @@ body.env-still #envfx{visibility:hidden}
 .tb-start .tv-words span{position:absolute;left:0;right:0;display:block;white-space:nowrap;color:#d8b07a;text-transform:uppercase;text-shadow:0 1px 2px #000,0 0 6px #000,0 0 14px #000c}
 .tb-start .tv-tag{top:75%;transform:translateY(-50%);font-size:max(2.15cqw,11px);letter-spacing:.34em;font-weight:600;color:#c9976a}
 .tb-start .tv-tap{top:84.3%;transform:translateY(-50%);font-size:max(3.1cqw,13px);letter-spacing:.3em;font-weight:700;color:#e8c98f;animation:tvTap 2.4s ease-in-out infinite}
-@keyframes tvTap{0%,100%{opacity:.62}50%{opacity:1}}
+@keyframes tvTap{0%,100%{opacity:.88}50%{opacity:1}} /* Spencer 11-06: pulse OK, never vanish */
 .reduce-motion .tb-start .tv-tap{animation:none}
 @media(prefers-reduced-motion:reduce){.tb-start .tv-tap{animation:none}}

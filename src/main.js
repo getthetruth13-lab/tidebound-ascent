@@ -54,8 +54,11 @@ W.S={screen:'title',view:title.bootView()};
 assets.applyTextures();title.applyMotion();env.initEnv();
 initAudio();
 render.render();
-assets.loadCardArt().then(n=>{if(n)render.render()});
-loadTiles().then(n=>{if(n)render.render()});
+// Late art/tile loads must not rebuild the title start screen: remounting <video> flashes black and
+// restarts the baked TAP TO BEGIN. Other screens still refresh when new art arrives.
+const refreshIfNeeded=()=>{const S=W.S;if(S&&S.screen==='title'&&(S.view==='start'||S.view==='studio'))return;render.render()};
+assets.loadCardArt().then(n=>{if(n)refreshIfNeeded()});
+loadTiles().then(n=>{if(n)refreshIfNeeded()});
 
 // Landscape lock where the platform allows it (installed PWA / fullscreen / Capacitor); harmless elsewhere.
 addEventListener('pointerdown',()=>{try{const o=screen.orientation;if(o&&o.lock&&(matchMedia('(display-mode: standalone)').matches||document.fullscreenElement))o.lock('landscape').catch(()=>{})}catch(_){}},{once:true});

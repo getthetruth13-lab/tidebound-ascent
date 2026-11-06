@@ -308,7 +308,7 @@ function armMarkImpl(){const cb=W.cb;if(!cb||cb.busy||(!cb.armMark&&!canMark()))
 export const flourishMin=()=>mod('flourishMin',{},DU.flourish_min);
 export const flourishMult=m=>Math.min(3.5,1+DU.flourish_per_mom*m);
 export const markBonus=(after)=>{const cb=W.cb;return Math.min(mod('markCap',{},EC.bonus_cap),mod('markPer',{},EC.bonus_per_card_after)*(after==null?cb.afterMark:after))};
-// Marks allowed per turn: 1, +1 from Second Verse / Chorus Draught (this turn) or Twin Clapper (always, but its Echo is half strength). Never more than 2.
+// Marks allowed per turn: Twin Tines = 2 (Attack + Skill). Second Verse / Chorus Draught can help move tines; Twin Clapper is now Echo-cap+1 (boss tradeoff).
 export const markLimit=()=>2; // Twin Tines
 // A card in hand that could take a moved tine now: its type's tine is already on a played card, and you can afford to play it.
 // (An untaken tine goes to the next card of that type anyway, so arming only matters to MOVE a mark.) Moving is free.
